@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.helper;
 
+import com.github.dockerjava.zerodep.shaded.org.apache.commons.codec.binary.Base32;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Deposit;
@@ -64,16 +65,13 @@ public class DepositHelper {
                 """, Map.of(
                 "id", transactionId,
                 "blockchain", network.blockchain().get().name(),
-                "reference", switch (network) {
-                    case STELLAR -> faker.random().hex();
-                    default -> "0x" + faker.random().hex();
-                },
+                "reference", randomTransactionReference(network),
                 "index", 0,
                 "timestamp", CurrentDateProvider.now(),
-                "senderAddress", "0x" + faker.random().hex(),
-                "recipientAddress", "0x" + faker.random().hex(),
+                "senderAddress", randomAddress(network),
+                "recipientAddress", randomAddress(network),
                 "amount", amount,
-                "contractAddress", "0x" + faker.random().hex()
+                "contractAddress", randomAddress(network)
         ));
         databaseHelper.executeQuery("""
                 INSERT INTO accounting.deposits (id, transaction_id, sponsor_id, currency_id, status, billing_information)
@@ -90,5 +88,19 @@ public class DepositHelper {
         final var deposit = depositStoragePort.find(Deposit.Id.of(depositId)).orElseThrow();
         accountBookStorage.save(AccountingTransactionProjection.of(deposit));
         return Deposit.Id.of(depositId);
+    }
+
+    private String randomTransactionReference(Network network) {
+        return switch (network) {
+            case STELLAR -> faker.random().hex();
+            default -> "0x" + faker.random().hex();
+        };
+    }
+
+    private String randomAddress(Network network) {
+        return switch (network) {
+            case STELLAR -> new Base32().encodeAsString(faker.random().hex().getBytes()).replaceAll("=", "");
+            default -> "0x" + faker.random().hex();
+        };
     }
 }
