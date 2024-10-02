@@ -30,6 +30,37 @@ DROP MATERIALIZED VIEW IF EXISTS bi.m_contribution_data;
 DROP MATERIALIZED VIEW IF EXISTS bi.m_reward_data;
 DROP MATERIALIZED VIEW IF EXISTS bi.m_project_grants_data;
 
+DROP VIEW active_programs_projects;
+DROP MATERIALIZED VIEW m_programs_projects;
+
+CREATE VIEW v_programs_projects AS
+WITH allocations AS (SELECT abt.currency_id,
+                            abt.program_id,
+                            abt.project_id,
+                            COALESCE(sum(abt.amount) FILTER (WHERE abt.type = 'TRANSFER' AND reward_id IS NULL), 0)
+                                - COALESCE(sum(abt.amount) FILTER (WHERE abt.type = 'REFUND' AND reward_id IS NULL), 0)
+                                - COALESCE(sum(abt.amount) FILTER (WHERE abt.type = 'TRANSFER' AND reward_id IS NOT NULL), 0)
+                                + COALESCE(sum(abt.amount) FILTER (WHERE abt.type = 'REFUND' AND reward_id IS NOT NULL), 0) AS remaining_amount
+                     FROM accounting.account_book_transactions abt
+                     WHERE abt.project_id IS NOT NULL
+                       AND abt.payment_id IS NULL
+                     GROUP BY abt.currency_id, abt.program_id, abt.project_id)
+SELECT program_id, project_id, bool_or(remaining_amount > 0) as has_remaining_grants
+FROM allocations
+GROUP BY program_id, project_id;
+
+CREATE MATERIALIZED VIEW m_active_programs_projects AS
+SELECT program_id, project_id
+FROM v_programs_projects
+WHERE has_remaining_grants IS TRUE;
+
+
+CREATE UNIQUE INDEX m_active_programs_projects_pk
+    ON m_active_programs_projects (program_id, project_id);
+
+CREATE UNIQUE INDEX m_active_programs_projects_pk_inv
+    ON m_active_programs_projects (project_id, program_id);
+
 CREATE MATERIALIZED VIEW bi.m_contribution_data AS
 WITH project_contributions AS (select distinct on (c.id) c.*,
                                                          pgr.project_id as project_id,
@@ -250,7 +281,7 @@ from rewards r
          join projects p on p.id = r.project_id
          join currencies on currencies.id = r.currency_id
          left join projects_ecosystems pe on pe.project_id = r.project_id
-         left join m_programs_projects pp on pp.project_id = r.project_id
+         left join v_programs_projects pp on pp.project_id = r.project_id
          left join projects_project_categories ppc on ppc.project_id = r.project_id
          left join reward_items ri on r.id = ri.reward_id
          left join indexer_exp.contributions c on c.contributor_id = ri.recipient_id and
@@ -417,7 +448,7 @@ FROM projects p
          LEFT JOIN languages l ON l.id = pl.language_id
          LEFT JOIN projects_project_categories ppc ON ppc.project_id = p.id
          LEFT JOIN project_categories pc ON pc.id = ppc.project_category_id
-         LEFT JOIN m_programs_projects pp ON pp.project_id = p.id
+         LEFT JOIN v_programs_projects pp ON pp.project_id = p.id
          LEFT JOIN programs prog ON prog.id = pp.program_id
          LEFT JOIN project_leads pleads ON pleads.project_id = p.id
          LEFT JOIN iam.users u ON u.id = pleads.user_id
