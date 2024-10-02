@@ -38,7 +38,7 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     SponsorRepository sponsorRepository;
     @Autowired
-    AccountBookTransactionRepository accountBookTransactionRepository;
+    AllTransactionRepository allTransactionRepository;
     @Autowired
     SponsorAccountRepository sponsorAccountRepository;
     @Autowired
@@ -51,7 +51,7 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
     @BeforeEach
     void setup() {
         accountBookEventRepository.deleteAll();
-        accountBookTransactionRepository.deleteAll();
+        allTransactionRepository.deleteAll();
         sponsorAccountRepository.deleteAll();
         accountBookRepository.deleteAll();
         accountBookProvider.evictAll();

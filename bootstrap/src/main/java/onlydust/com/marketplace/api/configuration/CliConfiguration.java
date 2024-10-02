@@ -6,7 +6,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
-import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookTransactionRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.AllTransactionRepository;
 import onlydust.com.marketplace.cli.AccountBookDisplay;
 import onlydust.com.marketplace.cli.AccountBookRefresh;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +27,7 @@ public class CliConfiguration {
                                                  final AccountBookStorage accountBookStorage,
                                                  final AccountBookEventStorage accountBookEventStorage,
                                                  final AccountBookProjector accountBookProjector,
-                                                 final AccountBookTransactionRepository accountBookTransactionRepository) {
-        return new AccountBookRefresh(currencyStorage, accountBookStorage, accountBookEventStorage, accountBookProjector, accountBookTransactionRepository);
+                                                 final AllTransactionRepository allTransactionRepository) {
+        return new AccountBookRefresh(currencyStorage, accountBookStorage, accountBookEventStorage, accountBookProjector, allTransactionRepository);
     }
 }

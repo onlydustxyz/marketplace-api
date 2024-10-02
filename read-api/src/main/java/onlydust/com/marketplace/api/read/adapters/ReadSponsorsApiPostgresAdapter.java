@@ -100,7 +100,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
 
-        final var page = findAccountBookTransactions(sponsorId, fromDate, toDate, types, search, index, size);
+        final var page = findAccountingTransactions(sponsorId, fromDate, toDate, types, search, index, size);
 
         final var response = new SponsorTransactionPageResponse()
                 .transactions(page.getContent().stream().map(AllTransactionReadEntity::toSponsorTransactionPageItemResponse).toList())
@@ -124,7 +124,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
 
-        final var page = findAccountBookTransactions(sponsorId, fromDate, toDate, types, search, index, size);
+        final var page = findAccountingTransactions(sponsorId, fromDate, toDate, types, search, index, size);
         final var format = CSVFormat.DEFAULT.builder().build();
         final var sw = new StringWriter();
 
@@ -141,13 +141,13 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
         return status(hasMore(index, page.getTotalPages()) ? PARTIAL_CONTENT : OK).body(csv);
     }
 
-    private Page<AllTransactionReadEntity> findAccountBookTransactions(UUID sponsorId,
-                                                                       String fromDate,
-                                                                       String toDate,
-                                                                       List<FinancialTransactionType> types,
-                                                                       String search,
-                                                                       int index,
-                                                                       int size) {
+    private Page<AllTransactionReadEntity> findAccountingTransactions(UUID sponsorId,
+                                                                      String fromDate,
+                                                                      String toDate,
+                                                                      List<FinancialTransactionType> types,
+                                                                      String search,
+                                                                      int index,
+                                                                      int size) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(sponsorId)))

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Deposit;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookTransactionProjection;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountingTransactionProjection;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -33,7 +33,7 @@ public class AllTransactionEntity {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "transaction_type")
     @NonNull
-    AccountBookTransactionProjection.Type type;
+    AccountingTransactionProjection.Type type;
 
     UUID sponsorId;
 
@@ -50,9 +50,9 @@ public class AllTransactionEntity {
 
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    Deposit.Status status;
+    Deposit.Status depositStatus;
 
-    public static AllTransactionEntity fromDomain(AccountBookTransactionProjection projection) {
+    public static AllTransactionEntity fromDomain(AccountingTransactionProjection projection) {
         return new AllTransactionEntity(
                 projection.id(),
                 projection.timestamp(),

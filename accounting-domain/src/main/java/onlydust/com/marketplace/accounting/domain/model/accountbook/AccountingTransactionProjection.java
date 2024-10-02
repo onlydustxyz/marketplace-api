@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @Data
 @Accessors(fluent = true, chain = true)
-public class AccountBookTransactionProjection {
+public class AccountingTransactionProjection {
     private @NonNull UUID id;
     private @NonNull ZonedDateTime timestamp;
     private @NonNull Currency.Id currencyId;
@@ -33,11 +33,11 @@ public class AccountBookTransactionProjection {
 
     public enum Type {DEPOSIT, MINT, BURN, TRANSFER, REFUND}
 
-    public static AccountBookTransactionProjection of(final @NonNull ZonedDateTime timestamp,
-                                                      final @NonNull Currency.Id currencyId,
-                                                      final @NonNull SponsorId sponsorId,
-                                                      final @NonNull AccountBook.Transaction transaction) {
-        return new AccountBookTransactionProjection(UUID.randomUUID(),
+    public static AccountingTransactionProjection of(final @NonNull ZonedDateTime timestamp,
+                                                     final @NonNull Currency.Id currencyId,
+                                                     final @NonNull SponsorId sponsorId,
+                                                     final @NonNull AccountBook.Transaction transaction) {
+        return new AccountingTransactionProjection(UUID.randomUUID(),
                 timestamp,
                 currencyId,
                 switch (transaction.type()) {
@@ -51,8 +51,8 @@ public class AccountBookTransactionProjection {
         ).with(transaction.path());
     }
 
-    public static AccountBookTransactionProjection of(final @NonNull Deposit deposit) {
-        return new AccountBookTransactionProjection(deposit.id().value(),
+    public static AccountingTransactionProjection of(final @NonNull Deposit deposit) {
+        return new AccountingTransactionProjection(deposit.id().value(),
                 deposit.transaction().timestamp(),
                 deposit.currency().id(),
                 Type.DEPOSIT,
@@ -61,11 +61,11 @@ public class AccountBookTransactionProjection {
         ).depositStatus(deposit.status());
     }
 
-    public static AccountBookTransactionProjection merge(final AccountBookTransactionProjection left, final @NonNull AccountBookTransactionProjection right) {
+    public static AccountingTransactionProjection merge(final AccountingTransactionProjection left, final @NonNull AccountingTransactionProjection right) {
         return left == null ? right : left.amount(left.amount().add(right.amount()));
     }
 
-    private AccountBookTransactionProjection with(final @NonNull List<AccountBook.AccountId> path) {
+    private AccountingTransactionProjection with(final @NonNull List<AccountBook.AccountId> path) {
         path.forEach(this::with);
         return this;
     }

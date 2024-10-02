@@ -26,21 +26,21 @@ public class AccountBookProjector implements AccountBookObserver, DepositObserve
         final var sponsorAccount = sponsorAccountStorage.get(sponsorAccountId)
                 .orElseThrow(() -> new IllegalStateException("Sponsor account %s not found".formatted(sponsorAccountId)));
 
-        accountBookStorage.save(AccountBookTransactionProjection.of(at, sponsorAccount.currency().id(), sponsorAccount.sponsorId(), transaction));
+        accountBookStorage.save(AccountingTransactionProjection.of(at, sponsorAccount.currency().id(), sponsorAccount.sponsorId(), transaction));
     }
 
     @Override
     public void onDepositSubmittedByUser(UserId userId, Deposit deposit) {
-        accountBookStorage.save(AccountBookTransactionProjection.of(deposit));
+        accountBookStorage.save(AccountingTransactionProjection.of(deposit));
     }
 
     @Override
     public void onDepositRejected(Deposit deposit) {
-        accountBookStorage.save(AccountBookTransactionProjection.of(deposit));
+        accountBookStorage.save(AccountingTransactionProjection.of(deposit));
     }
 
     @Override
     public void onDepositApproved(Deposit deposit) {
-        accountBookStorage.save(AccountBookTransactionProjection.of(deposit));
+        accountBookStorage.save(AccountingTransactionProjection.of(deposit));
     }
 }

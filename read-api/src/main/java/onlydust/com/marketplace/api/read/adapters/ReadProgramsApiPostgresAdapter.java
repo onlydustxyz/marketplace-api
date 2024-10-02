@@ -116,7 +116,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
 
-        final var page = findAccountBookTransactions(programId, fromDate, toDate, types, search, index, size);
+        final var page = findAccountingTransactions(programId, fromDate, toDate, types, search, index, size);
 
         final var response = new ProgramTransactionPageResponse()
                 .transactions(page.getContent().stream().map(AllTransactionReadEntity::toProgramTransactionPageItemResponse).toList())
@@ -142,7 +142,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
 
-        final var page = findAccountBookTransactions(programId, fromDate, toDate, types, search, index, size);
+        final var page = findAccountingTransactions(programId, fromDate, toDate, types, search, index, size);
         final var format = CSVFormat.DEFAULT.builder().build();
         final var sw = new StringWriter();
 
@@ -160,8 +160,8 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                 .body(csv);
     }
 
-    private Page<AllTransactionReadEntity> findAccountBookTransactions(UUID programId, String fromDate, String toDate,
-                                                                       List<FinancialTransactionType> types, String search, int index, int size) {
+    private Page<AllTransactionReadEntity> findAccountingTransactions(UUID programId, String fromDate, String toDate,
+                                                                      List<FinancialTransactionType> types, String search, int index, int size) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))

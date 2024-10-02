@@ -500,7 +500,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
 
-        final var page = findAccountBookTransactions(projectIdOrSlug, fromDate, toDate, types, search, index, size);
+        final var page = findAccountingTransactions(projectIdOrSlug, fromDate, toDate, types, search, index, size);
 
         final var response = new ProjectTransactionPageResponse()
                 .transactions(page.getContent().stream().map(AllTransactionReadEntity::toProjectTransactionPageItemResponse).toList())
@@ -527,7 +527,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
 
-        final var page = findAccountBookTransactions(projectIdOrSlug, fromDate, toDate, types, search, index, size);
+        final var page = findAccountingTransactions(projectIdOrSlug, fromDate, toDate, types, search, index, size);
         final var format = CSVFormat.DEFAULT.builder().build();
         final var sw = new StringWriter();
 
@@ -552,8 +552,8 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         return filteredTypes.isEmpty() ? acceptedTypes : filteredTypes;
     }
 
-    private Page<AllTransactionReadEntity> findAccountBookTransactions(String projectIdOrSlugStr, String fromDate, String toDate,
-                                                                       List<FinancialTransactionType> types, String search, int index, int size) {
+    private Page<AllTransactionReadEntity> findAccountingTransactions(String projectIdOrSlugStr, String fromDate, String toDate,
+                                                                      List<FinancialTransactionType> types, String search, int index, int size) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var projectIdOrSlug = OrSlug.of(projectIdOrSlugStr, ProjectId::of);
         types = sanitizeTypes(types);
