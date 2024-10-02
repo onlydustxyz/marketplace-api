@@ -21,6 +21,8 @@ import org.springframework.http.MediaType;
 import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.assertArg;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 
 @TagAccounting
@@ -574,7 +576,10 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
             final var depositEntity = depositRepository.findById(deposit.id().value()).orElseThrow();
             assertThat(depositEntity.billingInformation().companyName()).isEqualTo("TechCorp Solutions");
             assertThat(depositEntity.status()).isEqualTo(Deposit.Status.PENDING);
-            verify(slackApiAdapter).onDepositSubmittedByUser(UserId.of(caller.user().getId()), deposit);
+            verify(slackApiAdapter).onDepositSubmittedByUser(eq(UserId.of(caller.user().getId())), assertArg((Deposit d) -> {
+                assertThat(d.id().value()).isEqualTo(depositEntity.id());
+                assertThat(d.status()).isEqualTo(Deposit.Status.PENDING);
+            }));
 
             // When another preview is made, the latest billing information should be returned
             final var depositId = new MutableObject<String>();
