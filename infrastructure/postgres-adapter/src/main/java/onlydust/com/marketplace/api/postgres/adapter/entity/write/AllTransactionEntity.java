@@ -13,13 +13,13 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "account_book_transactions", schema = "accounting")
+@Table(name = "all_transactions", schema = "accounting")
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 @Getter
 @Setter
 @Accessors(fluent = true)
-public class AccountBookTransactionEntity {
+public class AllTransactionEntity {
     @Id
     UUID id;
 
@@ -52,8 +52,8 @@ public class AccountBookTransactionEntity {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     Deposit.Status status;
 
-    public static AccountBookTransactionEntity fromDomain(AccountBookTransactionProjection projection) {
-        return new AccountBookTransactionEntity(
+    public static AllTransactionEntity fromDomain(AccountBookTransactionProjection projection) {
+        return new AllTransactionEntity(
                 projection.id(),
                 projection.timestamp(),
                 projection.currencyId().value(),

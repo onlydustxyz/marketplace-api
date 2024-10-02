@@ -77,7 +77,7 @@ public interface BackofficeRewardViewRepository extends JpaRepository<BoRewardQu
             
                                  left join (select abt.reward_id, jsonb_agg(distinct jsonb_build_object('id', s.id, 'name', s.name, 'logoUrl', s.logo_url)) s_list
                                             from sponsors s
-                                               join accounting.account_book_transactions abt on abt.sponsor_id = s.id
+                                               join accounting.all_transactions abt on abt.sponsor_id = s.id
                                             where abt.payment_id is null
                                             group by abt.reward_id) s2 on s2.reward_id = r.id
                                  left join iam.users u on u.github_user_id = r.recipient_id
