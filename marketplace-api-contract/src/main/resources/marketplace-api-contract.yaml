@@ -11487,4 +11487,4 @@ components:
         labels:
           type: array
           items:
-            $ref: '#/components/schemas/ProjectContributorLabelResponse'
+            $ref: '#/components/schemas/ProjectContributorLabelId'

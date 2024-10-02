@@ -436,7 +436,9 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresProjectContributorLabelAdapter postgresProjectContributorLabelAdapter(final ProjectContributorLabelRepository projectContributorLabelRepository) {
-        return new PostgresProjectContributorLabelAdapter(projectContributorLabelRepository);
+    public PostgresProjectContributorLabelAdapter postgresProjectContributorLabelAdapter(final ProjectContributorLabelRepository projectContributorLabelRepository,
+                                                                                         final ContributorProjectContributorLabelRepository contributorProjectContributorLabelRepository) {
+        return new PostgresProjectContributorLabelAdapter(projectContributorLabelRepository,
+                contributorProjectContributorLabelRepository);
     }
 }

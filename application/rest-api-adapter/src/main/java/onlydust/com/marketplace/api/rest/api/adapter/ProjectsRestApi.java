@@ -15,10 +15,8 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.ContributionType;
 import onlydust.com.marketplace.project.domain.model.CreateAndCloseIssueCommand;
-import onlydust.com.marketplace.project.domain.port.input.ContributionFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.ProjectRewardFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
+import onlydust.com.marketplace.project.domain.model.ProjectContributorLabel;
+import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
@@ -32,6 +30,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapProjectBudgetsViewToResponse;
@@ -54,6 +53,7 @@ public class ProjectsRestApi implements ProjectsApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final RewardFacadePort rewardFacadePort;
     private final ContributionFacadePort contributionsFacadePort;
+    private final ProjectContributorLabelFacadePort projectContributorLabelFacadePort;
 
     @Override
     public ResponseEntity<CreateProjectResponse> createProject(CreateProjectRequest createProjectRequest) {
@@ -411,7 +411,12 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<Void> updateContributorsLabels(UUID projectId, ContributorsLabelsRequest contributorsLabelsRequest) {
-        // TODO: Implement this method
-        return ProjectsApi.super.updateContributorsLabels(projectId, contributorsLabelsRequest);
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var labelsPerContributor = contributorsLabelsRequest.getContributorsLabels().stream()
+                .collect(Collectors.toMap(ContributorLabelsRequest::getGithubUserId,
+                        cl -> cl.getLabels().stream().map(ProjectContributorLabel.Id::of).toList()));
+
+        projectContributorLabelFacadePort.updateLabelsOfContributors(authenticatedUser.id(), ProjectId.of(projectId), labelsPerContributor);
+        return noContent().build();
     }
 }
