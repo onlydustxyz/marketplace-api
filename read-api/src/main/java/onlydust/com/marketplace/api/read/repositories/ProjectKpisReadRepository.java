@@ -67,9 +67,9 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                    coalesce(previous_period.active_contributor_count, 0)    as previous_period_active_contributor_count,
                    coalesce(previous_period.onboarded_contributor_count, 0) as previous_period_onboarded_contributor_count
             
-            FROM bi.select_projects(:fromDate, :toDate, :programOrEcosystemIds, :projectIds, :projectSlugs, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search, :showFilteredKpis) d
+            FROM bi.select_projects(:fromDate, :toDate, :programOrEcosystemIds, :programIds, :projectIds, :projectSlugs, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search, :showFilteredKpis) d
                      LEFT JOIN (
-                            select * from bi.select_projects(:fromDatePreviousPeriod, :toDatePreviousPeriod, :programOrEcosystemIds, :projectIds, :projectSlugs, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search, :showFilteredKpis) 
+                            select * from bi.select_projects(:fromDatePreviousPeriod, :toDatePreviousPeriod, :programOrEcosystemIds, :programIds, :projectIds, :projectSlugs, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search, :showFilteredKpis) 
                          ) previous_period ON previous_period.project_id = d.project_id
             
             WHERE (coalesce(:availableBudgetUsdAmountMin) is null or d.available_budget_usd >= :availableBudgetUsdAmountMin)
@@ -114,7 +114,7 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
             """,
             countQuery = """
                     SELECT count(d.project_id)
-                    FROM bi.select_projects(:fromDate, :toDate, :programOrEcosystemIds, :projectIds, :projectSlugs, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search, :showFilteredKpis) d
+                    FROM bi.select_projects(:fromDate, :toDate, :programOrEcosystemIds, :programIds, :projectIds, :projectSlugs, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search, :showFilteredKpis) d
                     WHERE (coalesce(:availableBudgetUsdAmountMin) is null or d.available_budget_usd >= :availableBudgetUsdAmountMin)
                       and (coalesce(:availableBudgetUsdAmountEq) is null or d.available_budget_usd = :availableBudgetUsdAmountEq)
                       and (coalesce(:availableBudgetUsdAmountMax) is null or d.available_budget_usd <= :availableBudgetUsdAmountMax)
@@ -163,6 +163,7 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                                         @NonNull UUID[] programOrEcosystemIds,
                                         @NonNull Boolean showFilteredKpis,
                                         String search,
+                                        UUID[] programIds,
                                         UUID[] projectIds,
                                         String[] projectSlugs,
                                         UUID[] projectLeadIds,

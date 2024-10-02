@@ -614,6 +614,7 @@ $$, 'contributor_id');
 CREATE FUNCTION bi.select_projects(fromDate timestamptz,
                                    toDate timestamptz,
                                    programOrEcosystemIds uuid[],
+                                   programIds uuid[],
                                    projectIds uuid[],
                                    projectSlugs text[],
                                    projectLeadIds uuid[],
@@ -705,6 +706,7 @@ FROM bi.p_project_global_data p
 
 WHERE (p.program_ids && programOrEcosystemIds or p.ecosystem_ids && programOrEcosystemIds)
   and (ecosystemIds is null or p.ecosystem_ids && ecosystemIds)
+  and (programIds is null or p.program_ids && programIds)
   and (projectIds is null or p.project_id = any (projectIds))
   and (projectSlugs is null or p.project_slug = any (projectSlugs))
   and (projectLeadIds is null or p.project_lead_ids && projectLeadIds)

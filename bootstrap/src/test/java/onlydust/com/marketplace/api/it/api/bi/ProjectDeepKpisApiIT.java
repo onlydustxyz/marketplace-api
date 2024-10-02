@@ -592,6 +592,11 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                             .hasSize(1)
                             .extracting(BiProjectsPageItemResponse::getProject).extracting(ProjectLinkResponse::getId).contains(onlyDustId.value()), true
             );
+            test_projects_stats("programIds", ethGrantingProgram.toString(),
+                    response -> assertThat(response.getProjects())
+                            .extracting(BiProjectsPageItemResponse::getPrograms)
+                            .allMatch(programs -> programs.stream().map(ProgramLinkResponse::getId).toList().contains(ethGrantingProgram.value())), true
+            );
             test_projects_stats("projectSlugs", onlyDustSlug,
                     response -> assertThat(response.getProjects())
                             .hasSize(1)
