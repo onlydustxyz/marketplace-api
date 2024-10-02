@@ -141,6 +141,13 @@ DROP MATERIALIZED VIEW IF EXISTS bi.m_project_grants_data;
 DROP VIEW active_programs_projects;
 
 DROP MATERIALIZED VIEW m_programs_projects;
+DROP VIEW accounting.all_transactions;
+
+ALTER TABLE accounting.account_book_transactions
+    ADD COLUMN deposit_status accounting.deposit_status;
+
+ALTER TABLE accounting.account_book_transactions
+    RENAME TO all_transactions;
 
 CREATE VIEW v_programs_projects AS
 WITH allocations AS (SELECT abt.currency_id,
@@ -150,7 +157,7 @@ WITH allocations AS (SELECT abt.currency_id,
                                 - COALESCE(sum(abt.amount) FILTER (WHERE abt.type = 'REFUND' AND reward_id IS NULL), 0)
                                 - COALESCE(sum(abt.amount) FILTER (WHERE abt.type = 'TRANSFER' AND reward_id IS NOT NULL), 0)
                                 + COALESCE(sum(abt.amount) FILTER (WHERE abt.type = 'REFUND' AND reward_id IS NOT NULL), 0) AS remaining_amount
-                     FROM accounting.account_book_transactions abt
+                     FROM accounting.all_transactions abt
                      WHERE abt.project_id IS NOT NULL
                        AND abt.payment_id IS NULL
                      GROUP BY abt.currency_id, abt.program_id, abt.project_id)
@@ -348,7 +355,7 @@ SELECT abt.id                                                                   
            ELSE abt.amount * -1 END                                                     as amount,
        array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null ) as ecosystem_ids,
        coalesce(prog.name, '')                                                          as search
-FROM accounting.account_book_transactions abt
+FROM accounting.all_transactions abt
          JOIN LATERAL (select accounting.usd_quote_at(abt.currency_id, abt.timestamp) as usd_conversion_rate) hq
               ON true
          JOIN programs prog ON prog.id = abt.program_id
