@@ -523,18 +523,10 @@ $$, 'project_id');
 
 
 call create_pseudo_projection('bi', 'contributor_global_data', $$
-WITH user_contries as (select bpu.user_id as user_id,
+WITH user_countries as (select bpu.user_id as user_id,
                               kyc.country as country
                        from accounting.billing_profiles_users bpu
-                                join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id),
-     user_languages as (select u.github_user_id                   as contributor_id,
-                               unnest(upi.preferred_language_ids) as language_id
-                        from user_profile_info upi
-                                 join iam.users u on upi.id = u.id
-                        union
-                        select cd.contributor_id       as contributor_id,
-                               unnest(cd.language_ids) as language_id
-                        from bi.p_contribution_data cd)
+                                join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id)
 SELECT u.github_user_id                                                                                    as contributor_id,
        u.login                                                                                             as contributor_login,
        uc.country                                                                                          as contributor_country,
@@ -590,15 +582,14 @@ SELECT u.github_user_id                                                         
               coalesce(string_agg(distinct currencies.code, ' '), ''), ' ',
               coalesce(string_agg(distinct prog.name, ' '), ''))                                           as search
 FROM iam.all_users u
-         LEFT JOIN user_contries uc on uc.user_id = u.user_id
-         LEFT JOIN bi.p_contribution_data cd on cd.contributor_id = u.github_user_id
+         LEFT JOIN user_countries uc on uc.user_id = u.user_id
+         LEFT JOIN bi.v_contribution_data cd on cd.contributor_id = u.github_user_id
          LEFT JOIN projects p on p.id = cd.project_id
          LEFT JOIN projects_ecosystems pe ON pe.project_id = p.id
          LEFT JOIN ecosystems e ON e.id = pe.ecosystem_id
          LEFT JOIN v_programs_projects pp ON pp.project_id = p.id
          LEFT JOIN programs prog ON prog.id = pp.program_id
-         LEFT JOIN user_languages ul ON ul.contributor_id = u.github_user_id
-         LEFT JOIN languages l ON l.id = ul.language_id
+         LEFT JOIN languages l ON l.id = any(cd.language_ids)
          LEFT JOIN projects_project_categories ppc ON ppc.project_id = p.id
          LEFT JOIN project_categories pc ON pc.id = ppc.project_category_id
          LEFT JOIN rewards r on r.recipient_id = u.github_user_id
