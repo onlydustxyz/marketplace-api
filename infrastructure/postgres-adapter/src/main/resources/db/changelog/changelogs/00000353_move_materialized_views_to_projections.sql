@@ -374,7 +374,7 @@ create index bi_project_grants_data_year_timestamp_idx_inv on bi.p_project_grant
 
 
 
-CREATE MATERIALIZED VIEW bi.m_project_global_data AS
+call create_pseudo_projection('bi', 'project_global_data', $$
 SELECT p.id                                                                                                       as project_id,
        p.slug                                                                                                     as project_slug,
        p.created_at                                                                                               as created_at,
@@ -508,11 +508,8 @@ FROM projects p
                                                          join currencies c on c.id = rd.currency_id
                                                 group by rd.project_id, c.id) rd on gd.project_id = rd.project_id and gd.currency_id = rd.currency_id
                             group by gd.project_id ) budgets on budgets.project_id = p.id
-GROUP BY p.id;
-
-
-CREATE UNIQUE INDEX bi_project_global_data_pk ON bi.m_project_global_data (project_id);
-
+GROUP BY p.id
+$$, 'project_id');
 
 
 CREATE MATERIALIZED VIEW bi.m_contributor_global_data AS
@@ -666,7 +663,7 @@ SELECT p.project_id                        as project_id,
        sum(rd.average_reward_usd_amount)   as average_reward_usd_amount,
        sum(cd.active_contributor_count)    as active_contributor_count,
        sum(cd.onboarded_contributor_count) as onboarded_contributor_count
-FROM bi.m_project_global_data p
+FROM bi.p_project_global_data p
 
          LEFT JOIN (select cd.project_id,
                            count(cd.contribution_id)                                                               as contribution_count,

@@ -14,7 +14,7 @@ public interface WorldMapKpiReadRepository extends JpaRepository<WorldMapKpiRead
             select
                 cd.contributor_country            as country_code,
                 count(distinct cd.contributor_id) as value
-            from bi.m_project_global_data p
+            from bi.p_project_global_data p
                 join bi.p_contribution_data cd on cd.project_id = p.project_id and
                                                 (cast(:fromDate as text) is null or cd.timestamp >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) and
                                                 (cast(:toDate as text) is null or date_trunc('day', cd.timestamp) < to_date(cast(:toDate as text), 'YYYY-MM-DD'))

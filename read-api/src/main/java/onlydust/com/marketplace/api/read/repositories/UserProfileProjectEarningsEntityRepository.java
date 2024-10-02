@@ -13,7 +13,7 @@ public interface UserProfileProjectEarningsEntityRepository extends Repository<U
             select r.project_id       as project_id,
                    sum(r.usd_amount)  as total_earned_usd
             from bi.m_reward_data r
-                join bi.m_project_global_data p on r.project_id = p.project_id
+                join bi.p_project_global_data p on r.project_id = p.project_id
             where r.contributor_id = :githubUserId and
                   (:ecosystemId is null or :ecosystemId = any (p.ecosystem_ids)) and
                   (cast(:fromDate as text) is null or r.timestamp >= :fromDate) and
