@@ -526,7 +526,6 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                             @RequestParam(required = false) String search) {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
-        types = sanitizeTypes(types);
 
         final var page = findAccountBookTransactions(projectIdOrSlug, fromDate, toDate, types, search, index, size);
         final var format = CSVFormat.DEFAULT.builder().build();
@@ -557,6 +556,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                                        List<FinancialTransactionType> types, String search, int index, int size) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var projectIdOrSlug = OrSlug.of(projectIdOrSlugStr, ProjectId::of);
+        types = sanitizeTypes(types);
 
         if (!permissionService.isUserProjectLead(projectIdOrSlug, authenticatedUser.id()))
             throw unauthorized("User %s is not authorized to access project %s".formatted(authenticatedUser.id(), projectIdOrSlug));
@@ -567,7 +567,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable(fromDate),
                 onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable(toDate),
                 search,
-                types == null ? null : types.stream().map(FinancialTransactionType::name).toList(),
+                types.stream().map(FinancialTransactionType::name).toList(),
                 PageRequest.of(index, size, Sort.by("timestamp").descending())
         );
     }
