@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRep
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardableItemMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiContributionDataRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiRewardDataRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
@@ -60,6 +61,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final ProjectInfosViewRepository projectInfosViewRepository;
     private final ProjectCategorySuggestionRepository projectCategorySuggestionRepository;
     private final BiRewardDataRepository biRewardDataRepository;
+    private final BiContributionDataRepository biContributionDataRepository;
 
     @Override
     public Optional<ProjectId> getProjectIdBySlug(String slug) {
@@ -466,5 +468,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     public void refreshStats() {
         projectRepository.refreshStats();
         biRewardDataRepository.refresh();
+        biContributionDataRepository.refresh();
     }
 }

@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiContributionDataRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiRewardDataRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.project.domain.port.input.TechnologyStoragePort;
@@ -63,7 +64,8 @@ public class PostgresConfiguration {
                                                  final ProjectTagRepository projectTagRepository,
                                                  final ProjectInfosViewRepository projectInfosViewRepository,
                                                  final ProjectCategorySuggestionRepository projectCategorySuggestionRepository,
-                                                 final BiRewardDataRepository biRewardDataRepository) {
+                                                 final BiRewardDataRepository biRewardDataRepository,
+                                                 final BiContributionDataRepository biContributionDataRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -80,7 +82,8 @@ public class PostgresConfiguration {
                 projectTagRepository,
                 projectInfosViewRepository,
                 projectCategorySuggestionRepository,
-                biRewardDataRepository
+                biRewardDataRepository,
+                biContributionDataRepository
         );
     }
 
@@ -106,7 +109,8 @@ public class PostgresConfiguration {
                                                            final ProjectTagRepository projectTagRepository,
                                                            final ProjectInfosViewRepository projectInfosViewRepository,
                                                            final ProjectCategorySuggestionRepository projectCategorySuggestionRepository,
-                                                           final BiRewardDataRepository biRewardDataRepository) {
+                                                           final BiRewardDataRepository biRewardDataRepository,
+                                                           final BiContributionDataRepository biContributionDataRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -123,7 +127,8 @@ public class PostgresConfiguration {
                 projectTagRepository,
                 projectInfosViewRepository,
                 projectCategorySuggestionRepository,
-                biRewardDataRepository
+                biRewardDataRepository,
+                biContributionDataRepository
         );
     }
 
@@ -450,6 +455,11 @@ public class PostgresConfiguration {
     @Bean
     public BiRewardDataRepository biRewardDataRepository(final EntityManager entityManager) {
         return new BiRewardDataRepository(entityManager);
+    }
+
+    @Bean
+    public BiContributionDataRepository biContributionDataRepository(final EntityManager entityManager) {
+        return new BiContributionDataRepository(entityManager);
     }
 
     @Bean
