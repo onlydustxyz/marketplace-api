@@ -28,5 +28,7 @@ public interface AccountingObserverPort {
 
     void onFundsRefundedByProgram(final ProgramId from, final SponsorId to, final PositiveAmount amount, final Currency.Id currencyId);
 
+    void onFundsGrantedToProject(final ProgramId from, final ProjectId to, final PositiveAmount amount, final Currency.Id currencyId);
+
     void onFundsRefundedByProject(final ProjectId from, final ProgramId to, final PositiveAmount amount, final Currency.Id currencyId);
 }

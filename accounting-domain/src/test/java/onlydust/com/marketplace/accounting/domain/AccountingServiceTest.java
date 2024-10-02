@@ -896,6 +896,7 @@ public class AccountingServiceTest {
                     new AccountBook.Transaction(REFUND, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(programId), AccountId.of(projectId1)), amount)
             );
             verify(accountingObserver).onFundsAllocatedToProgram(sponsorId, programId, amount, currency.id());
+            verify(accountingObserver).onFundsGrantedToProject(programId, projectId1, amount, currency.id());
             verify(accountingObserver).onFundsRefundedByProject(projectId1, programId, amount, currency.id());
         }
 

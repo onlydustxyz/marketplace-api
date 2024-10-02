@@ -80,22 +80,29 @@ BEGIN
 END
 $$;
 
-CREATE OR REPLACE PROCEDURE refresh_pseudo_projection(schema text, name text, pk_name text, pk_value anyelement)
+CREATE OR REPLACE PROCEDURE refresh_pseudo_projection(schema text, name text, params jsonb)
     LANGUAGE plpgsql
 AS
 $$
 DECLARE
     view_name             text;
     projection_table_name text;
+    condition             text;
+    key                   text;
+    value                 text;
 BEGIN
     view_name := 'v_' || name;
     projection_table_name := 'p_' || name;
 
-    EXECUTE format('delete from %I.%I where %I = $1', schema, projection_table_name, pk_name)
-        using pk_value;
+    condition := '';
+    FOR key, value IN SELECT * FROM jsonb_each_text(params)
+        LOOP
+            condition := condition || format(' and %I = %L', key, value);
+        END LOOP;
 
-    EXECUTE format('insert into %I.%I select * from %I.%I where %I = $1', schema, projection_table_name, schema, view_name, pk_name)
-        using pk_value;
+    EXECUTE format('delete from %I.%I where true %s', schema, projection_table_name, condition);
+
+    EXECUTE format('insert into %I.%I select * from %I.%I where true %s', schema, projection_table_name, schema, view_name, condition);
 END
 $$;
 

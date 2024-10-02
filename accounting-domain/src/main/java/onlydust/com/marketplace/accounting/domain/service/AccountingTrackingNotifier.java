@@ -84,7 +84,12 @@ public class AccountingTrackingNotifier implements AccountingObserverPort {
     }
 
     @Override
+    public void onFundsGrantedToProject(ProgramId from, ProjectId to, PositiveAmount amount, Currency.Id currencyId) {
+
+    }
+
+    @Override
     public void onFundsRefundedByProject(ProjectId from, ProgramId to, PositiveAmount amount, Currency.Id currencyId) {
-        
+
     }
 }

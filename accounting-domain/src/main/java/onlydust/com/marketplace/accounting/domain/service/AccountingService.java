@@ -103,6 +103,7 @@ public class AccountingService implements AccountingFacadePort {
     public void grant(ProgramId from, ProjectId to, PositiveAmount amount, Currency.Id currencyId) {
         final var accountBookState = transfer(from, to, amount, currencyId);
         onAllowanceUpdated(to, currencyId, accountBookState);
+        accountingObserver.onFundsGrantedToProject(from, to, amount, currencyId);
     }
 
     @Override

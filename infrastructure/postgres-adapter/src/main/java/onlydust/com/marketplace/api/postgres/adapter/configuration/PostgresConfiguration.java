@@ -489,7 +489,11 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    PostgresBiProjectorAdapter postgresBiProjectorAdapter(final BiRewardDataRepository biRewardDataRepository) {
-        return new PostgresBiProjectorAdapter(biRewardDataRepository);
+    PostgresBiProjectorAdapter postgresBiProjectorAdapter(final BiRewardDataRepository biRewardDataRepository,
+                                                          final BiProjectGrantsDataRepository biProjectGrantsDataRepository,
+                                                          final BiProjectGlobalDataRepository biProjectGlobalDataRepository) {
+        return new PostgresBiProjectorAdapter(biRewardDataRepository,
+                biProjectGrantsDataRepository,
+                biProjectGlobalDataRepository);
     }
 }

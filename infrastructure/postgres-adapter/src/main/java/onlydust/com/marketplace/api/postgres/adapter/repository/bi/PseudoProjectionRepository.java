@@ -1,8 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository.bi;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.SneakyThrows;
+
+import java.util.Map;
 
 @AllArgsConstructor
 public abstract class PseudoProjectionRepository {
@@ -19,12 +23,12 @@ public abstract class PseudoProjectionRepository {
                 .executeUpdate();
     }
 
-    protected <T> int refresh(T id) {
-        return entityManager.createNativeQuery("call refresh_pseudo_projection(:schema, :name, :pkName, :id)")
+    @SneakyThrows
+    protected int refresh(Map<String, Object> params) {
+        return entityManager.createNativeQuery("call refresh_pseudo_projection(:schema, :name, cast(:params as jsonb))")
                 .setParameter("schema", schema)
                 .setParameter("name", name)
-                .setParameter("pkName", primaryKey)
-                .setParameter("id", id)
+                .setParameter("params", new ObjectMapper().writeValueAsString(params))
                 .executeUpdate();
     }
 }

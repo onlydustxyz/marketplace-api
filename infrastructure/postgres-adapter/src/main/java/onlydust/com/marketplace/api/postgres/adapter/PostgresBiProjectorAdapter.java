@@ -7,12 +7,16 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
+import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiProjectGlobalDataRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiProjectGrantsDataRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiRewardDataRepository;
 import onlydust.com.marketplace.kernel.model.*;
 
 @AllArgsConstructor
 public class PostgresBiProjectorAdapter implements AccountingObserverPort {
     private final BiRewardDataRepository biRewardDataRepository;
+    private final BiProjectGrantsDataRepository biProjectGrantsDataRepository;
+    private final BiProjectGlobalDataRepository biProjectGlobalDataRepository;
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
@@ -65,7 +69,14 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort {
     }
 
     @Override
-    public void onFundsRefundedByProject(ProjectId from, ProgramId to, PositiveAmount amount, Currency.Id currencyId) {
+    public void onFundsGrantedToProject(ProgramId from, ProjectId to, PositiveAmount amount, Currency.Id currencyId) {
+        biProjectGrantsDataRepository.refresh(from, to);
+        biProjectGlobalDataRepository.refresh(to);
+    }
 
+    @Override
+    public void onFundsRefundedByProject(ProjectId from, ProgramId to, PositiveAmount amount, Currency.Id currencyId) {
+        biProjectGrantsDataRepository.refresh(to, from);
+        biProjectGlobalDataRepository.refresh(from);
     }
 }

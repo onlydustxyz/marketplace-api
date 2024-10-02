@@ -192,6 +192,11 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
     }
 
     @Override
+    public void onFundsGrantedToProject(ProgramId from, ProjectId to, PositiveAmount amount, Currency.Id currencyId) {
+        
+    }
+
+    @Override
     public void onFundsRefundedByProject(ProjectId projectId, ProgramId programId, PositiveAmount amount, Currency.Id currencyId) {
         projectServicePort.onFundsRefundedByProject(programId, projectId, amount, currencyId);
     }
