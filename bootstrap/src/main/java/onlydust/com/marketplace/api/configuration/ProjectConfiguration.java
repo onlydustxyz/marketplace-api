@@ -286,8 +286,9 @@ public class ProjectConfiguration {
     @Bean
     public ProjectObserverPort projectObservers(final OutboxProjectService outboxProjectService,
                                                 final SlackApiAdapter slackApiAdapter,
-                                                final ContributionService contributionService) {
-        return new ProjectObserverComposite(outboxProjectService, contributionService, slackApiAdapter);
+                                                final ContributionService contributionService,
+                                                final PostgresBiProjectorAdapter postgresBiProjectorAdapter) {
+        return new ProjectObserverComposite(outboxProjectService, contributionService, slackApiAdapter, postgresBiProjectorAdapter);
     }
 
     @Bean

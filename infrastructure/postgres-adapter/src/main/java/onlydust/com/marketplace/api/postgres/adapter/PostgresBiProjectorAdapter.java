@@ -14,9 +14,12 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiProjectGran
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiRewardDataRepository;
 import onlydust.com.marketplace.kernel.model.*;
 import onlydust.com.marketplace.project.domain.port.input.ContributionObserverPort;
+import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
+
+import java.util.Set;
 
 @AllArgsConstructor
-public class PostgresBiProjectorAdapter implements AccountingObserverPort, ContributionObserverPort {
+public class PostgresBiProjectorAdapter implements AccountingObserverPort, ContributionObserverPort, ProjectObserverPort {
     private final BiRewardDataRepository biRewardDataRepository;
     private final BiContributionDataRepository biContributionDataRepository;
     private final BiProjectGrantsDataRepository biProjectGrantsDataRepository;
@@ -90,5 +93,29 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     @Transactional
     public void onContributionsChanged(Long repoId) {
         biContributionDataRepository.refreshByRepo(repoId);
+    }
+
+    @Override
+    @Transactional
+    public void onLinkedReposChanged(ProjectId projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds) {
+        linkedRepoIds.forEach(biContributionDataRepository::refreshByRepo);
+        unlinkedRepoIds.forEach(biContributionDataRepository::refreshByRepo);
+        biProjectGlobalDataRepository.refresh(projectId);
+    }
+
+    @Override
+    public void onRewardSettingsChanged(ProjectId projectId) {
+
+    }
+
+    @Override
+    @Transactional
+    public void onProjectCreated(ProjectId projectId, UserId projectLeadId) {
+        biProjectGlobalDataRepository.refresh(projectId);
+    }
+
+    @Override
+    public void onProjectCategorySuggested(String categoryName, UserId userId) {
+
     }
 }
