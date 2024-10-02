@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
+import onlydust.com.marketplace.kernel.model.OrSlug;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -27,6 +28,8 @@ public interface ProjectStoragePort {
                        List<UUID> categoryIds, List<String> categorySuggestions);
 
     List<UserId> getProjectLeadIds(ProjectId projectId);
+
+    List<UserId> getProjectLeadIds(OrSlug<ProjectId> projectIdOrSlug);
 
     Set<Long> getProjectInvitedLeadIds(ProjectId projectId);
 

@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.service;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.OrSlug;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -422,7 +423,7 @@ public class ProjectServiceTest {
         final Long issueNumber = 1234L;
 
         // When
-        when(projectStoragePort.getProjectLeadIds(projectId))
+        when(projectStoragePort.getProjectLeadIds(OrSlug.of(projectId)))
                 .thenReturn(List.of(projectLeadId));
         when(projectStoragePort.getRewardableIssue(githubRepoOwner, githubRepoName, issueNumber))
                 .thenReturn(RewardableItemView.builder().number(issueNumber).build());
@@ -494,7 +495,7 @@ public class ProjectServiceTest {
         final Long pullRequestNumber = 1234L;
 
         // When
-        when(projectStoragePort.getProjectLeadIds(projectId))
+        when(projectStoragePort.getProjectLeadIds(OrSlug.of(projectId)))
                 .thenReturn(List.of(projectLeadId));
         when(projectStoragePort.getRewardablePullRequest(githubRepoOwner, githubRepoName, pullRequestNumber))
                 .thenReturn(RewardableItemView.builder().number(pullRequestNumber).build());

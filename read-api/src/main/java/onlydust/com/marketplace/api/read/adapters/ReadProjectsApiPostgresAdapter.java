@@ -23,6 +23,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.Authenticate
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.OrSlug;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
@@ -490,7 +491,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<ProjectTransactionPageResponse> getProjectTransactions(UUID projectId,
+    public ResponseEntity<ProjectTransactionPageResponse> getProjectTransactions(String projectIdOrSlug,
                                                                                  Integer pageIndex,
                                                                                  Integer pageSize,
                                                                                  String fromDate,
@@ -500,7 +501,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
 
-        final var page = findAccountBookTransactions(projectId, fromDate, toDate, types, search, index, size);
+        final var page = findAccountBookTransactions(projectIdOrSlug, fromDate, toDate, types, search, index, size);
 
         final var response = new ProjectTransactionPageResponse()
                 .transactions(page.getContent().stream().map(AllTransactionReadEntity::toProjectTransactionPageItemResponse).toList())
@@ -513,11 +514,11 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     }
 
     @GetMapping(
-            value = "/api/v1/projects/{projectId}/transactions",
+            value = "/api/v1/projects/{projectIdOrSlug}/transactions",
             produces = "text/csv"
     )
     @Transactional(readOnly = true)
-    public ResponseEntity<String> exportProjectTransactions(@PathVariable UUID projectId,
+    public ResponseEntity<String> exportProjectTransactions(@PathVariable String projectIdOrSlug,
                                                             @RequestParam(required = false) Integer pageIndex,
                                                             @RequestParam(required = false) Integer pageSize,
                                                             @RequestParam(required = false) String fromDate,
@@ -527,7 +528,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
 
-        final var page = findAccountBookTransactions(projectId, fromDate, toDate, types, search, index, size);
+        final var page = findAccountBookTransactions(projectIdOrSlug, fromDate, toDate, types, search, index, size);
         final var format = CSVFormat.DEFAULT.builder().build();
         final var sw = new StringWriter();
 
@@ -545,16 +546,17 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 .body(csv);
     }
 
-    private Page<AllTransactionReadEntity> findAccountBookTransactions(UUID projectId, String fromDate, String toDate,
+    private Page<AllTransactionReadEntity> findAccountBookTransactions(String projectIdOrSlugStr, String fromDate, String toDate,
                                                                        List<FinancialTransactionType> types, String search, int index, int size) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var projectIdOrSlug = OrSlug.of(projectIdOrSlugStr, ProjectId::of);
 
-        if (!permissionService.isUserProjectLead(ProjectId.of(projectId), authenticatedUser.id()))
-            throw unauthorized("User %s is not authorized to access project %s".formatted(authenticatedUser.id(), projectId));
-
+        if (!permissionService.isUserProjectLead(projectIdOrSlug, authenticatedUser.id()))
+            throw unauthorized("User %s is not authorized to access project %s".formatted(authenticatedUser.id(), projectIdOrSlug));
 
         return allTransactionReadRepository.findAllForProject(
-                projectId,
+                projectIdOrSlug.uuid().orElse(null),
+                projectIdOrSlug.slug().orElse(null),
                 onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable(fromDate),
                 onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable(toDate),
                 search,
