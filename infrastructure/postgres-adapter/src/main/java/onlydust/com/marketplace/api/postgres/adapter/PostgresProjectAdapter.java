@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRep
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardableItemMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.bi.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import onlydust.com.marketplace.kernel.model.OrSlug;
@@ -58,6 +59,11 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final ProjectTagRepository projectTagRepository;
     private final ProjectInfosViewRepository projectInfosViewRepository;
     private final ProjectCategorySuggestionRepository projectCategorySuggestionRepository;
+    private final BiRewardDataRepository biRewardDataRepository;
+    private final BiContributionDataRepository biContributionDataRepository;
+    private final BiProjectGrantsDataRepository biProjectGrantsDataRepository;
+    private final BiProjectGlobalDataRepository biProjectGlobalDataRepository;
+    private final BiContributorGlobalDataRepository biContributorGlobalDataRepository;
 
     @Override
     public Optional<ProjectId> getProjectIdBySlug(String slug) {
@@ -463,5 +469,10 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Transactional
     public void refreshStats() {
         projectRepository.refreshStats();
+        biRewardDataRepository.refresh();
+        biContributionDataRepository.refresh();
+        biProjectGrantsDataRepository.refresh();
+        biProjectGlobalDataRepository.refresh();
+        biContributorGlobalDataRepository.refresh();
     }
 }

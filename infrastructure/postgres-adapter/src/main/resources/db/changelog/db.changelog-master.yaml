@@ -563,3 +563,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000352_create_project_contributor_labels_table.sql
   - include:
       file: db/changelog/changelogs/00000353_create_contributors_project_contributor_labels_table.sql
+  - include:
+      file: db/changelog/changelogs/00000353_move_materialized_views_to_projections.sql

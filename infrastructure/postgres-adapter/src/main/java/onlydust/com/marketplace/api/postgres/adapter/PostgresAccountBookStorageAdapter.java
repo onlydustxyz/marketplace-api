@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookTransactionProjection;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountingTransactionProjection;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountBookEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountBookTransactionEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.AllTransactionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookTransactionRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.AllTransactionRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -17,12 +17,17 @@ import java.util.Optional;
 @AllArgsConstructor
 public class PostgresAccountBookStorageAdapter implements AccountBookStorage {
     private final @NonNull AccountBookRepository accountBookRepository;
-    private final @NonNull AccountBookTransactionRepository accountBookTransactionRepository;
+    private final @NonNull AllTransactionRepository allTransactionRepository;
 
     @Override
     @Transactional
-    public void save(AccountBookTransactionProjection projection) {
-        accountBookTransactionRepository.findByTimestampAndTypeAndCurrencyIdAndSponsorIdAndProgramIdAndProjectIdAndRewardIdAndPaymentId(
+    public void save(AccountingTransactionProjection projection) {
+        if (projection.depositStatus() != null) {
+            allTransactionRepository.save(AllTransactionEntity.fromDomain(projection));
+            return;
+        }
+
+        allTransactionRepository.findByTimestampAndTypeAndCurrencyIdAndSponsorIdAndProgramIdAndProjectIdAndRewardIdAndPaymentId(
                 projection.timestamp(),
                 projection.type(),
                 projection.currencyId().value(),
@@ -33,7 +38,7 @@ public class PostgresAccountBookStorageAdapter implements AccountBookStorage {
                 projection.paymentId() == null ? null : projection.paymentId().value()
         ).ifPresentOrElse(
                 entity -> entity.amount(entity.amount().add(projection.amount().getValue())),
-                () -> accountBookTransactionRepository.save(AccountBookTransactionEntity.fromDomain(projection))
+                () -> allTransactionRepository.save(AllTransactionEntity.fromDomain(projection))
         );
     }
 

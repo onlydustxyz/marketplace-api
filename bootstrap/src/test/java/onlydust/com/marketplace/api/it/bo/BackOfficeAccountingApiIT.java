@@ -74,7 +74,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     @Autowired
     private AccountBookEventRepository accountBookEventRepository;
     @Autowired
-    private AccountBookTransactionRepository accountBookTransactionRepository;
+    private AllTransactionRepository allTransactionRepository;
     @Autowired
     private CachedAccountBookProvider accountBookProvider;
     @Autowired
@@ -105,7 +105,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     @BeforeEach
     void setup() {
         accountBookEventRepository.deleteAll();
-        accountBookTransactionRepository.deleteAll();
+        allTransactionRepository.deleteAll();
         accountBookRepository.deleteAll();
         sponsorAccountRepository.deleteAll();
         accountBookProvider.evictAll();

@@ -11144,6 +11144,10 @@ components:
           default: false
         search:
           type: string
+        programIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProgramId'
         projectIds:
           type: array
           items:

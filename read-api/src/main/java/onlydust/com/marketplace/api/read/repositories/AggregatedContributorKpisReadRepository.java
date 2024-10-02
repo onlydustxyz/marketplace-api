@@ -28,9 +28,9 @@ public class AggregatedContributorKpisReadRepository {
                              filter (where previous.timestamp < d.#timeGrouping#_timestamp - cast(:timeGroupingInterval as interval)) as reactivated_contributor_count,
             
                              coalesce(sum(d.is_pr), 0)                                                                    as merged_pr_count
-                      from bi.m_contribution_data d
+                      from bi.p_contribution_data d
                                left join lateral ( select max(previous.#timeGrouping#_timestamp) as timestamp
-                                                   from bi.m_contribution_data previous
+                                                   from bi.p_contribution_data previous
                                                    where previous.contributor_id = d.contributor_id
                                                      and previous.#timeGrouping#_timestamp < d.#timeGrouping#_timestamp
                                                      and (coalesce(:programOrEcosystemIds) is null
@@ -48,7 +48,7 @@ public class AggregatedContributorKpisReadRepository {
                  aggregated_project_rewards_stats AS
                      (SELECT d.#timeGrouping#_timestamp     as timestamp,
                              coalesce(sum(d.usd_amount), 0) as total_rewarded_usd_amount
-                      from bi.m_reward_data d
+                      from bi.p_reward_data d
                       where d.#timeGrouping#_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
                         and d.#timeGrouping#_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
                         and (coalesce(:programOrEcosystemIds) is null
@@ -59,7 +59,7 @@ public class AggregatedContributorKpisReadRepository {
                  aggregated_project_grants_stats AS
                      (SELECT d.#timeGrouping#_timestamp     as timestamp,
                              coalesce(sum(d.usd_amount), 0) as total_granted_usd_amount
-                      from bi.m_project_grants_data d
+                      from bi.p_project_grants_data d
                       where d.#timeGrouping#_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
                         and d.#timeGrouping#_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
                         and (coalesce(:programOrEcosystemIds) is null

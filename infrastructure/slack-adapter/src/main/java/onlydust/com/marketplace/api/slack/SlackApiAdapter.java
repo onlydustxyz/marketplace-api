@@ -122,11 +122,9 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     }
 
     @Override
-    public void onDepositSubmittedByUser(UserId userId, Deposit.Id depositId) {
+    public void onDepositSubmittedByUser(UserId userId, Deposit deposit) {
         final var user = userStoragePort.getRegisteredUserById(userId)
                 .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(userId.value())));
-        final Deposit deposit = depositStoragePort.find(depositId)
-                .orElseThrow(() -> OnlyDustException.notFound("Deposit not found %s".formatted(depositId.value())));
         final Sponsor sponsor = sponsorStoragePort.get(deposit.sponsorId())
                 .orElseThrow(() -> OnlyDustException.notFound("Sponsor not found %s".formatted(deposit.sponsorId().value())));
 
@@ -138,12 +136,12 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     }
 
     @Override
-    public void onDepositRejected(Deposit.Id depositId) {
+    public void onDepositRejected(Deposit deposit) {
 
     }
 
     @Override
-    public void onDepositApproved(Deposit.Id depositId) {
+    public void onDepositApproved(Deposit deposit) {
 
     }
 }

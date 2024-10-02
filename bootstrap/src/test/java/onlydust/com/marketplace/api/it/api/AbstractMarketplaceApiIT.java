@@ -265,8 +265,6 @@ public class AbstractMarketplaceApiIT {
     @Autowired
     protected ProgramHelper programHelper;
     @Autowired
-    protected UserHelper userHelper;
-    @Autowired
     protected EcosystemHelper ecosystemHelper;
     @Autowired
     protected SponsorHelper sponsorHelper;

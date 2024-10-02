@@ -103,6 +103,7 @@ public class AccountingService implements AccountingFacadePort {
     public void grant(ProgramId from, ProjectId to, PositiveAmount amount, Currency.Id currencyId) {
         final var accountBookState = transfer(from, to, amount, currencyId);
         onAllowanceUpdated(to, currencyId, accountBookState);
+        accountingObserver.onFundsGrantedToProject(from, to, amount, currencyId);
     }
 
     @Override
@@ -533,12 +534,12 @@ public class AccountingService implements AccountingFacadePort {
             throw forbidden("User %s is not allowed to update deposit %s".formatted(userId, depositId));
         }
 
-        depositStoragePort.save(deposit.toBuilder()
+        final var updatedDeposit = deposit.toBuilder()
                 .status(Deposit.Status.PENDING)
                 .billingInformation(billingInformation)
-                .build());
-
-        depositObserverPort.onDepositSubmittedByUser(userId, depositId);
+                .build();
+        depositStoragePort.save(updatedDeposit);
+        depositObserverPort.onDepositSubmittedByUser(userId, updatedDeposit);
     }
 
     @Override
@@ -549,10 +550,11 @@ public class AccountingService implements AccountingFacadePort {
         if (deposit.status() != Deposit.Status.PENDING)
             throw badRequest("Deposit %s is not pending".formatted(depositId));
 
-        depositStoragePort.save(deposit.toBuilder()
+        final var updatedDeposit = deposit.toBuilder()
                 .status(Deposit.Status.REJECTED)
-                .build());
-        depositObserverPort.onDepositRejected(depositId);
+                .build();
+        depositStoragePort.save(updatedDeposit);
+        depositObserverPort.onDepositRejected(updatedDeposit);
     }
 
     @Override
@@ -567,9 +569,10 @@ public class AccountingService implements AccountingFacadePort {
         final var sponsor = accountingSponsorStoragePort.getView(deposit.sponsorId())
                 .orElseThrow(() -> notFound("Sponsor %s not found".formatted(deposit.sponsorId())));
 
-        depositStoragePort.save(deposit.toBuilder()
+        final var updatedDeposit = deposit.toBuilder()
                 .status(Deposit.Status.COMPLETED)
-                .build());
+                .build();
+        depositStoragePort.save(updatedDeposit);
 
         final var accountBook = getAccountBook(deposit.currency());
         final var transaction = SponsorAccount.Transaction.deposit(sponsor, deposit.transaction());
@@ -583,6 +586,6 @@ public class AccountingService implements AccountingFacadePort {
                         statement -> fund(statement.account().id(), transaction),
                         () -> createSponsorAccountWithInitialBalance(deposit.sponsorId(), deposit.currency().id(), null, transaction)
                 );
-        depositObserverPort.onDepositApproved(depositId);
+        depositObserverPort.onDepositApproved(updatedDeposit);
     }
 }

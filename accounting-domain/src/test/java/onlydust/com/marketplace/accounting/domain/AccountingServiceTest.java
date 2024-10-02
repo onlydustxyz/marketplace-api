@@ -896,6 +896,7 @@ public class AccountingServiceTest {
                     new AccountBook.Transaction(REFUND, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(programId), AccountId.of(projectId1)), amount)
             );
             verify(accountingObserver).onFundsAllocatedToProgram(sponsorId, programId, amount, currency.id());
+            verify(accountingObserver).onFundsGrantedToProject(programId, projectId1, amount, currency.id());
             verify(accountingObserver).onFundsRefundedByProject(projectId1, programId, amount, currency.id());
         }
 
@@ -2155,11 +2156,12 @@ public class AccountingServiceTest {
             accountingService.submitDeposit(userId, deposit.id(), billingInformation);
 
             // Then
-            verify(depositStoragePort).save(deposit.toBuilder()
+            final var updatedDeposit = deposit.toBuilder()
                     .status(Deposit.Status.PENDING)
                     .billingInformation(billingInformation)
-                    .build());
-            verify(depositObserverPort).onDepositSubmittedByUser(userId, deposit.id());
+                    .build();
+            verify(depositStoragePort).save(updatedDeposit);
+            verify(depositObserverPort).onDepositSubmittedByUser(userId, updatedDeposit);
         }
 
         record Transaction(String reference, ZonedDateTime timestamp, Blockchain blockchain, Status status) implements Blockchain.Transaction {

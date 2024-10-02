@@ -12,7 +12,7 @@ public interface ProgramLeadRepository extends JpaRepository<ProgramLeadEntity, 
     @Query(value = """
             select pl.*
             from program_leads pl
-            join accounting.account_book_transactions abt on pl.program_id = abt.program_id
+            join accounting.all_transactions abt on pl.program_id = abt.program_id
             where pl.user_id = :userId
               and abt.project_id = :projectId
             """, nativeQuery = true)
@@ -21,7 +21,7 @@ public interface ProgramLeadRepository extends JpaRepository<ProgramLeadEntity, 
     @Query(value = """
             select pl.*
             from program_leads pl
-            join accounting.account_book_transactions abt on pl.program_id = abt.program_id
+            join accounting.all_transactions abt on pl.program_id = abt.program_id
             join projects p on abt.project_id = p.id
             where pl.user_id = :userId
               and p.slug = :projectSlug

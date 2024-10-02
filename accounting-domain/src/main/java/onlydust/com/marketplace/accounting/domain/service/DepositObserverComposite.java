@@ -15,17 +15,17 @@ public class DepositObserverComposite implements DepositObserverPort {
     }
 
     @Override
-    public void onDepositSubmittedByUser(UserId userId, Deposit.Id depositId) {
-        depositObservers.forEach(observer -> observer.onDepositSubmittedByUser(userId, depositId));
+    public void onDepositSubmittedByUser(UserId userId, Deposit deposit) {
+        depositObservers.forEach(observer -> observer.onDepositSubmittedByUser(userId, deposit));
     }
 
     @Override
-    public void onDepositRejected(Deposit.Id depositId) {
-        depositObservers.forEach(observer -> observer.onDepositRejected(depositId));
+    public void onDepositRejected(Deposit deposit) {
+        depositObservers.forEach(observer -> observer.onDepositRejected(deposit));
     }
 
     @Override
-    public void onDepositApproved(Deposit.Id depositId) {
-        depositObservers.forEach(observer -> observer.onDepositApproved(depositId));
+    public void onDepositApproved(Deposit deposit) {
+        depositObservers.forEach(observer -> observer.onDepositApproved(deposit));
     }
 }

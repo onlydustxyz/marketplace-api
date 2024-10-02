@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.bi.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.project.domain.port.input.TechnologyStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectCategoryStoragePort;
@@ -61,7 +62,12 @@ public class PostgresConfiguration {
                                                  final HiddenContributorRepository hiddenContributorRepository,
                                                  final ProjectTagRepository projectTagRepository,
                                                  final ProjectInfosViewRepository projectInfosViewRepository,
-                                                 final ProjectCategorySuggestionRepository projectCategorySuggestionRepository) {
+                                                 final ProjectCategorySuggestionRepository projectCategorySuggestionRepository,
+                                                 final BiRewardDataRepository biRewardDataRepository,
+                                                 final BiContributionDataRepository biContributionDataRepository,
+                                                 final BiProjectGrantsDataRepository biProjectGrantsDataRepository,
+                                                 final BiProjectGlobalDataRepository biProjectGlobalDataRepository,
+                                                 final BiContributorGlobalDataRepository biContributorGlobalDataRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -77,7 +83,12 @@ public class PostgresConfiguration {
                 hiddenContributorRepository,
                 projectTagRepository,
                 projectInfosViewRepository,
-                projectCategorySuggestionRepository
+                projectCategorySuggestionRepository,
+                biRewardDataRepository,
+                biContributionDataRepository,
+                biProjectGrantsDataRepository,
+                biProjectGlobalDataRepository,
+                biContributorGlobalDataRepository
         );
     }
 
@@ -102,7 +113,12 @@ public class PostgresConfiguration {
                                                            final HiddenContributorRepository hiddenContributorRepository,
                                                            final ProjectTagRepository projectTagRepository,
                                                            final ProjectInfosViewRepository projectInfosViewRepository,
-                                                           final ProjectCategorySuggestionRepository projectCategorySuggestionRepository) {
+                                                           final ProjectCategorySuggestionRepository projectCategorySuggestionRepository,
+                                                           final BiRewardDataRepository biRewardDataRepository,
+                                                           final BiContributionDataRepository biContributionDataRepository,
+                                                           final BiProjectGrantsDataRepository biProjectGrantsDataRepository,
+                                                           final BiProjectGlobalDataRepository biProjectGlobalDataRepository,
+                                                           final BiContributorGlobalDataRepository biContributorGlobalDataRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -118,7 +134,12 @@ public class PostgresConfiguration {
                 hiddenContributorRepository,
                 projectTagRepository,
                 projectInfosViewRepository,
-                projectCategorySuggestionRepository
+                projectCategorySuggestionRepository,
+                biRewardDataRepository,
+                biContributionDataRepository,
+                biProjectGrantsDataRepository,
+                biProjectGlobalDataRepository,
+                biContributorGlobalDataRepository
         );
     }
 
@@ -425,8 +446,8 @@ public class PostgresConfiguration {
     @Bean
     PostgresAccountBookStorageAdapter postgresAccountBookStorageAdapter(
             final AccountBookRepository accountBookRepository,
-            final AccountBookTransactionRepository accountBookTransactionRepository) {
-        return new PostgresAccountBookStorageAdapter(accountBookRepository, accountBookTransactionRepository);
+            final AllTransactionRepository allTransactionRepository) {
+        return new PostgresAccountBookStorageAdapter(accountBookRepository, allTransactionRepository);
     }
 
     @Bean
@@ -440,5 +461,43 @@ public class PostgresConfiguration {
                                                                                          final ContributorProjectContributorLabelRepository contributorProjectContributorLabelRepository) {
         return new PostgresProjectContributorLabelAdapter(projectContributorLabelRepository,
                 contributorProjectContributorLabelRepository);
+    }
+
+    @Bean
+    public BiRewardDataRepository biRewardDataRepository(final EntityManager entityManager) {
+        return new BiRewardDataRepository(entityManager);
+    }
+
+    @Bean
+    public BiContributionDataRepository biContributionDataRepository(final EntityManager entityManager) {
+        return new BiContributionDataRepository(entityManager);
+    }
+
+    @Bean
+    public BiProjectGrantsDataRepository biProjectGrantsDataRepository(final EntityManager entityManager) {
+        return new BiProjectGrantsDataRepository(entityManager);
+    }
+
+    @Bean
+    public BiProjectGlobalDataRepository biProjectGlobalDataRepository(final EntityManager entityManager) {
+        return new BiProjectGlobalDataRepository(entityManager);
+    }
+
+    @Bean
+    public BiContributorGlobalDataRepository biContributorGlobalDataRepository(final EntityManager entityManager) {
+        return new BiContributorGlobalDataRepository(entityManager);
+    }
+
+    @Bean
+    PostgresBiProjectorAdapter postgresBiProjectorAdapter(final BiRewardDataRepository biRewardDataRepository,
+                                                          final BiContributionDataRepository biContributionDataRepository,
+                                                          final BiProjectGrantsDataRepository biProjectGrantsDataRepository,
+                                                          final BiProjectGlobalDataRepository biProjectGlobalDataRepository,
+                                                          final BiContributorGlobalDataRepository biContributorGlobalDataRepository) {
+        return new PostgresBiProjectorAdapter(biRewardDataRepository,
+                biContributionDataRepository,
+                biProjectGrantsDataRepository,
+                biProjectGlobalDataRepository,
+                biContributorGlobalDataRepository);
     }
 }

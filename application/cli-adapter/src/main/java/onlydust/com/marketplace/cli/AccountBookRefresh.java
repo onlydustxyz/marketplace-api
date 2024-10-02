@@ -9,7 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAc
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
-import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookTransactionRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.AllTransactionRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +25,7 @@ public class AccountBookRefresh implements CommandLineRunner {
     private final AccountBookStorage accountBookStorage;
     private final AccountBookEventStorage accountBookEventStorage;
     private final AccountBookProjector accountBookProjector;
-    private final AccountBookTransactionRepository accountBookTransactionRepository;
+    private final AllTransactionRepository allTransactionRepository;
     private final StopWatch stopWatch = new StopWatch();
 
     @Override
@@ -34,7 +34,7 @@ public class AccountBookRefresh implements CommandLineRunner {
         if (args.length == 0 || !args[0].equals("account_book_refresh")) return;
 
         stopWatch.start();
-        accountBookTransactionRepository.deleteAll();
+        allTransactionRepository.deleteAll();
         currencyStorage.all().forEach(this::run);
         stopWatch.stop();
         LOGGER.info("Account book refresh completed in {} ms", stopWatch.getTotalTimeMillis());
