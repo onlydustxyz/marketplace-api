@@ -183,6 +183,7 @@ with project_contributions AS (select distinct on (c.id) c.*,
                                    join accounting.billing_profiles_users bpu on bpu.user_id = u.id
                                    join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id)
 select c.id                                                                                             as contribution_id,
+       c.repo_id                                                                                        as repo_id,
        c.project_id                                                                                     as project_id,
        c.project_slug                                                                                   as project_slug,
        c.contributor_id                                                                                 as contributor_id,
@@ -218,6 +219,7 @@ from project_contributions c
          left join projects_project_categories ppc on ppc.project_id = c.project_id
          left join registered_users ru on ru.github_user_id = c.contributor_id
 group by c.id,
+         c.repo_id,
          c.project_id,
          c.project_slug,
          c.contributor_id,
@@ -229,7 +231,8 @@ group by c.id,
          ru.country
 $$, 'contribution_id');
 
-create unique index bi_contribution_data_pk on bi.p_contribution_data (contribution_id);
+create index bi_contribution_data_repo_id_idx on bi.p_contribution_data (repo_id);
+
 create index bi_contribution_data_project_id_timestamp_idx on bi.p_contribution_data (project_id, timestamp);
 create index bi_contribution_data_project_id_day_timestamp_idx on bi.p_contribution_data (project_id, day_timestamp);
 create index bi_contribution_data_project_id_week_timestamp_idx on bi.p_contribution_data (project_id, week_timestamp);

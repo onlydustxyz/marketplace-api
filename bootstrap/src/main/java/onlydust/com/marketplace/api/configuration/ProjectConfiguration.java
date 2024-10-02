@@ -25,6 +25,7 @@ import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.*;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
 import onlydust.com.marketplace.project.domain.observer.ApplicationObserverComposite;
+import onlydust.com.marketplace.project.domain.observer.ContributionObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.HackathonObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.ProjectObserverComposite;
 import onlydust.com.marketplace.project.domain.port.input.*;
@@ -211,8 +212,14 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public OutboxConsumer contributionRefresher(final ContributionObserverPort contributionObserverPort) {
-        return new RetriedOutboxConsumer(new ContributionRefresher(contributionObserverPort));
+    ContributionObserverPort contributionObservers(final ContributionService contributionService,
+                                                   final PostgresBiProjectorAdapter postgresBiProjectorAdapter) {
+        return new ContributionObserverComposite(contributionService, postgresBiProjectorAdapter);
+    }
+
+    @Bean
+    public OutboxConsumer contributionRefresher(final ContributionObserverPort contributionObservers) {
+        return new RetriedOutboxConsumer(new ContributionRefresher(contributionObservers));
     }
 
     @Bean
