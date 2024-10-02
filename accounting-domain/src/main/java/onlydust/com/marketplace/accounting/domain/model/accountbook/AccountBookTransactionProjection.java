@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.kernel.model.ProgramId;
@@ -13,26 +14,51 @@ import onlydust.com.marketplace.kernel.model.SponsorId;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Accessors(fluent = true, chain = true)
 public class AccountBookTransactionProjection {
+    private @NonNull UUID id;
     private @NonNull ZonedDateTime timestamp;
     private @NonNull Currency.Id currencyId;
-    private @NonNull AccountBook.Transaction.Type type;
+    private @NonNull Type type;
     private @NonNull SponsorId sponsorId;
     private ProgramId programId;
     private ProjectId projectId;
     private RewardId rewardId;
     private Payment.Id paymentId;
     private @NonNull PositiveAmount amount;
+    private Deposit.Status depositStatus;
+
+    public enum Type {DEPOSIT, MINT, BURN, TRANSFER, REFUND}
 
     public static AccountBookTransactionProjection of(final @NonNull ZonedDateTime timestamp,
                                                       final @NonNull Currency.Id currencyId,
                                                       final @NonNull SponsorId sponsorId,
                                                       final @NonNull AccountBook.Transaction transaction) {
-        return new AccountBookTransactionProjection(timestamp, currencyId, transaction.type(), sponsorId, transaction.amount())
-                .with(transaction.path());
+        return new AccountBookTransactionProjection(UUID.randomUUID(),
+                timestamp,
+                currencyId,
+                switch (transaction.type()) {
+                    case MINT -> Type.MINT;
+                    case BURN -> Type.BURN;
+                    case TRANSFER -> Type.TRANSFER;
+                    case REFUND -> Type.REFUND;
+                },
+                sponsorId,
+                transaction.amount()
+        ).with(transaction.path());
+    }
+
+    public static AccountBookTransactionProjection of(final @NonNull Deposit deposit) {
+        return new AccountBookTransactionProjection(deposit.id().value(),
+                deposit.transaction().timestamp(),
+                deposit.currency().id(),
+                Type.DEPOSIT,
+                deposit.sponsorId(),
+                PositiveAmount.of(deposit.transaction().amount())
+        ).depositStatus(deposit.status());
     }
 
     public static AccountBookTransactionProjection merge(final AccountBookTransactionProjection left, final @NonNull AccountBookTransactionProjection right) {

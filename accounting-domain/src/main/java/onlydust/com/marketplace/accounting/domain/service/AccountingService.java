@@ -539,7 +539,7 @@ public class AccountingService implements AccountingFacadePort {
                 .billingInformation(billingInformation)
                 .build());
 
-        depositObserverPort.onDepositSubmittedByUser(userId, depositId);
+        depositObserverPort.onDepositSubmittedByUser(userId, deposit);
     }
 
     @Override
@@ -550,10 +550,11 @@ public class AccountingService implements AccountingFacadePort {
         if (deposit.status() != Deposit.Status.PENDING)
             throw badRequest("Deposit %s is not pending".formatted(depositId));
 
-        depositStoragePort.save(deposit.toBuilder()
+        final var updatedDeposit = deposit.toBuilder()
                 .status(Deposit.Status.REJECTED)
-                .build());
-        depositObserverPort.onDepositRejected(depositId);
+                .build();
+        depositStoragePort.save(updatedDeposit);
+        depositObserverPort.onDepositRejected(updatedDeposit);
     }
 
     @Override
@@ -568,9 +569,10 @@ public class AccountingService implements AccountingFacadePort {
         final var sponsor = accountingSponsorStoragePort.getView(deposit.sponsorId())
                 .orElseThrow(() -> notFound("Sponsor %s not found".formatted(deposit.sponsorId())));
 
-        depositStoragePort.save(deposit.toBuilder()
+        final var updatedDeposit = deposit.toBuilder()
                 .status(Deposit.Status.COMPLETED)
-                .build());
+                .build();
+        depositStoragePort.save(updatedDeposit);
 
         final var accountBook = getAccountBook(deposit.currency());
         final var transaction = SponsorAccount.Transaction.deposit(sponsor, deposit.transaction());
@@ -584,6 +586,6 @@ public class AccountingService implements AccountingFacadePort {
                         statement -> fund(statement.account().id(), transaction),
                         () -> createSponsorAccountWithInitialBalance(deposit.sponsorId(), deposit.currency().id(), null, transaction)
                 );
-        depositObserverPort.onDepositApproved(depositId);
+        depositObserverPort.onDepositApproved(updatedDeposit);
     }
 }

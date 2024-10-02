@@ -22,6 +22,11 @@ public class PostgresAccountBookStorageAdapter implements AccountBookStorage {
     @Override
     @Transactional
     public void save(AccountBookTransactionProjection projection) {
+        if (projection.depositStatus() != null) {
+            accountBookTransactionRepository.save(AccountBookTransactionEntity.fromDomain(projection));
+            return;
+        }
+        
         accountBookTransactionRepository.findByTimestampAndTypeAndCurrencyIdAndSponsorIdAndProgramIdAndProjectIdAndRewardIdAndPaymentId(
                 projection.timestamp(),
                 projection.type(),

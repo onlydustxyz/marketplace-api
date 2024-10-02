@@ -207,24 +207,18 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
     }
 
     @Override
-    public void onDepositSubmittedByUser(UserId userId, Deposit.Id depositId) {
+    public void onDepositSubmittedByUser(UserId userId, Deposit deposit) {
 
     }
 
     @Override
-    public void onDepositRejected(Deposit.Id depositId) {
-        final var deposit = depositStoragePort.find(depositId)
-                .orElseThrow(() -> OnlyDustException.notFound("Deposit not found %s".formatted(depositId)));
-
+    public void onDepositRejected(Deposit deposit) {
         projectServicePort.onDepositRejected(deposit.id(), deposit.sponsorId(), deposit.transaction().amount(), deposit.currency().id(),
                 deposit.transaction().timestamp());
     }
 
     @Override
-    public void onDepositApproved(Deposit.Id depositId) {
-        final var deposit = depositStoragePort.find(depositId)
-                .orElseThrow(() -> OnlyDustException.notFound("Deposit not found %s".formatted(depositId)));
-
+    public void onDepositApproved(Deposit deposit) {
         projectServicePort.onDepositApproved(deposit.id(), deposit.sponsorId(), deposit.transaction().amount(), deposit.currency().id(),
                 deposit.transaction().timestamp());
     }

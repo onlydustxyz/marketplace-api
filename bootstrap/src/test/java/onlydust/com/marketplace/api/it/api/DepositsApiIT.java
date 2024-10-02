@@ -574,7 +574,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
             final var depositEntity = depositRepository.findById(deposit.id().value()).orElseThrow();
             assertThat(depositEntity.billingInformation().companyName()).isEqualTo("TechCorp Solutions");
             assertThat(depositEntity.status()).isEqualTo(Deposit.Status.PENDING);
-            verify(slackApiAdapter).onDepositSubmittedByUser(UserId.of(caller.user().getId()), deposit.id());
+            verify(slackApiAdapter).onDepositSubmittedByUser(UserId.of(caller.user().getId()), deposit);
 
             // When another preview is made, the latest billing information should be returned
             final var depositId = new MutableObject<String>();

@@ -2160,7 +2160,7 @@ public class AccountingServiceTest {
                     .status(Deposit.Status.PENDING)
                     .billingInformation(billingInformation)
                     .build());
-            verify(depositObserverPort).onDepositSubmittedByUser(userId, deposit.id());
+            verify(depositObserverPort).onDepositSubmittedByUser(userId, deposit);
         }
 
         record Transaction(String reference, ZonedDateTime timestamp, Blockchain blockchain, Status status) implements Blockchain.Transaction {

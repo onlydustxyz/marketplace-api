@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
+import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookTransactionProjection;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -33,7 +33,7 @@ public class AccountBookTransactionEntity {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "transaction_type")
     @NonNull
-    AccountBook.Transaction.Type type;
+    AccountBookTransactionProjection.Type type;
 
     UUID sponsorId;
 
@@ -48,9 +48,13 @@ public class AccountBookTransactionEntity {
     @NonNull
     BigDecimal amount;
 
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    Deposit.Status status;
+
     public static AccountBookTransactionEntity fromDomain(AccountBookTransactionProjection projection) {
         return new AccountBookTransactionEntity(
-                UUID.randomUUID(),
+                projection.id(),
                 projection.timestamp(),
                 projection.currencyId().value(),
                 projection.type(),
@@ -59,7 +63,8 @@ public class AccountBookTransactionEntity {
                 projection.projectId() == null ? null : projection.projectId().value(),
                 projection.rewardId() == null ? null : projection.rewardId().value(),
                 projection.paymentId() == null ? null : projection.paymentId().value(),
-                projection.amount().getValue()
+                projection.amount().getValue(),
+                projection.depositStatus()
         );
     }
 }
