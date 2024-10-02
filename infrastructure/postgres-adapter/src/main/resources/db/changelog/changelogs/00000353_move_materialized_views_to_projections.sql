@@ -512,16 +512,11 @@ GROUP BY p.id
 $$, 'project_id');
 
 
-CREATE MATERIALIZED VIEW bi.m_contributor_global_data AS
+call create_pseudo_projection('bi', 'contributor_global_data', $$
 WITH user_contries as (select bpu.user_id as user_id,
                               kyc.country as country
                        from accounting.billing_profiles_users bpu
                                 join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id),
-     project_programs AS (select distinct abt.program_id,
-                                          abt.project_id
-                          from accounting.account_book_transactions abt
-                          where abt.project_id is not null
-                            and abt.reward_id is null),
      user_languages as (select u.github_user_id                   as contributor_id,
                                unnest(upi.preferred_language_ids) as language_id
                         from user_profile_info upi
@@ -590,7 +585,7 @@ FROM iam.all_users u
          LEFT JOIN projects p on p.id = cd.project_id
          LEFT JOIN projects_ecosystems pe ON pe.project_id = p.id
          LEFT JOIN ecosystems e ON e.id = pe.ecosystem_id
-         LEFT JOIN project_programs pp ON pp.project_id = p.id
+         LEFT JOIN v_programs_projects pp ON pp.project_id = p.id
          LEFT JOIN programs prog ON prog.id = pp.program_id
          LEFT JOIN user_languages ul ON ul.contributor_id = u.github_user_id
          LEFT JOIN languages l ON l.id = ul.language_id
@@ -598,11 +593,12 @@ FROM iam.all_users u
          LEFT JOIN project_categories pc ON pc.id = ppc.project_category_id
          LEFT JOIN rewards r on r.recipient_id = u.github_user_id
          LEFT JOIN currencies on r.currency_id = currencies.id
-GROUP BY u.github_user_id, u.login, u.avatar_url, u.user_id, uc.country;
-
-
-CREATE UNIQUE INDEX bi_contributor_global_data_pk ON bi.m_contributor_global_data (contributor_id);
-
+GROUP BY u.github_user_id,
+         u.login,
+         u.avatar_url,
+         u.user_id,
+         uc.country
+$$, 'contributor_id');
 
 
 CREATE FUNCTION bi.select_projects(fromDate timestamptz,
@@ -762,7 +758,7 @@ SELECT c.contributor_id                  as contributor_id,
        sum(cd.pr_count)                  as pr_count,
        sum(cd.code_review_count)         as code_review_count,
        sum(cd.contribution_count)        as contribution_count
-FROM bi.m_contributor_global_data c
+FROM bi.p_contributor_global_data c
 
          LEFT JOIN (select cd.contributor_id,
                            count(cd.contribution_id)           as contribution_count,

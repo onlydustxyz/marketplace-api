@@ -15,4 +15,3 @@ REFRESH MATERIALIZED VIEW m_active_programs_projects;
 REFRESH MATERIALIZED VIEW top_project_recommendations;
 REFRESH MATERIALIZED VIEW bi.project_contribution_stats;
 REFRESH MATERIALIZED VIEW bi.project_reward_stats;
-REFRESH MATERIALIZED VIEW bi.m_contributor_global_data;
