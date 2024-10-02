@@ -1,3 +1,104 @@
+CREATE OR REPLACE PROCEDURE create_pseudo_projection(schema text, name text, query text, pk_name text)
+    LANGUAGE plpgsql
+AS
+$$
+DECLARE
+    view_name              text;
+    materialized_view_name text;
+    projection_table_name  text;
+BEGIN
+    view_name := 'v_' || name;
+    materialized_view_name := 'm_' || name;
+    projection_table_name := 'p_' || name;
+
+    EXECUTE format('CREATE VIEW %I.%I AS SELECT v.*, md5(v::text) as hash from (%s) v', schema, view_name, query);
+
+    EXECUTE format('CREATE MATERIALIZED VIEW %I.%I AS SELECT * FROM %I.%I', schema, materialized_view_name, schema, view_name);
+    EXECUTE format('CREATE UNIQUE INDEX %I_%I_pk ON %I.%I (%I)', schema, 'm_' || name, schema, materialized_view_name, pk_name);
+    EXECUTE format('CREATE UNIQUE INDEX %I_%I_%I_hash_idx ON %I.%I (%I, hash)', schema, 'm_' || name, pk_name, schema, materialized_view_name, pk_name);
+
+    EXECUTE format('CREATE TABLE %I.%I AS TABLE %I.%I', schema, projection_table_name, schema, materialized_view_name);
+    EXECUTE format('ALTER TABLE %I.%I ADD PRIMARY KEY (%I)', schema, projection_table_name, pk_name);
+    EXECUTE format('CREATE UNIQUE INDEX %I_%I_%I_hash_idx ON %I.%I (%I, hash)', schema, 'p_' || name, pk_name, schema, projection_table_name, pk_name);
+
+    EXECUTE format('ALTER TABLE %I.%I ADD COLUMN tech_created_at timestamptz NOT NULL DEFAULT now()', schema, projection_table_name);
+    EXECUTE format('ALTER TABLE %I.%I ADD COLUMN tech_updated_at timestamptz NOT NULL DEFAULT now()', schema, projection_table_name);
+    EXECUTE format('CREATE TRIGGER %s_%s_set_tech_updated_at ' ||
+                   'BEFORE UPDATE ON %I.%I ' ||
+                   'FOR EACH ROW EXECUTE FUNCTION set_tech_updated_at()', schema, name, schema, projection_table_name);
+END
+$$;
+
+CREATE OR REPLACE PROCEDURE drop_pseudo_projection(schema text, name text)
+    LANGUAGE plpgsql
+AS
+$$
+DECLARE
+    view_name              text;
+    materialized_view_name text;
+    projection_table_name  text;
+BEGIN
+    view_name := 'v_' || name;
+    materialized_view_name := 'm_' || name;
+    projection_table_name := 'p_' || name;
+
+    EXECUTE format('DROP TABLE %I.%I', schema, projection_table_name);
+    EXECUTE format('DROP MATERIALIZED VIEW %I.%I', schema, materialized_view_name);
+    EXECUTE format('DROP VIEW %I.%I', schema, view_name);
+END
+$$;
+
+CREATE OR REPLACE PROCEDURE refresh_pseudo_projection(schema text, name text, pk_name text)
+    LANGUAGE plpgsql
+AS
+$$
+DECLARE
+    materialized_view_name text;
+    projection_table_name  text;
+BEGIN
+    materialized_view_name := 'm_' || name;
+    projection_table_name := 'p_' || name;
+
+    EXECUTE format('refresh materialized view %I.%I', schema, materialized_view_name);
+
+    EXECUTE format('delete from %I.%I where not exists(select 1 from %I.%I m where m.%I = %I.%I and m.hash = %I.hash)',
+                   schema,
+                   projection_table_name,
+                   schema,
+                   materialized_view_name,
+                   pk_name,
+                   projection_table_name,
+                   pk_name,
+                   projection_table_name);
+
+    EXECUTE format('insert into %I.%I select * from %I.%I on conflict (%I) do nothing',
+                   schema,
+                   projection_table_name,
+                   schema,
+                   materialized_view_name,
+                   pk_name);
+END
+$$;
+
+CREATE OR REPLACE PROCEDURE refresh_pseudo_projection(schema text, name text, pk_name text, pk_value anyelement)
+    LANGUAGE plpgsql
+AS
+$$
+DECLARE
+    view_name             text;
+    projection_table_name text;
+BEGIN
+    view_name := 'v_' || name;
+    projection_table_name := 'p_' || name;
+
+    EXECUTE format('delete from %I.%I where %I = $1', schema, projection_table_name, pk_name)
+        using pk_value;
+
+    EXECUTE format('insert into %I.%I select * from %I.%I where %I = $1', schema, projection_table_name, schema, view_name, pk_name)
+        using pk_value;
+END
+$$;
+
 DROP FUNCTION bi.select_projects(fromDate timestamptz,
                                  toDate timestamptz,
                                  programOrEcosystemIds uuid[],
@@ -23,14 +124,14 @@ DROP FUNCTION bi.select_contributors(fromDate timestamptz,
                                      contributionStatuses indexer_exp.contribution_status[],
                                      searchQuery text,
                                      filteredKpis boolean);
-
 DROP MATERIALIZED VIEW IF EXISTS bi.m_project_global_data;
 DROP MATERIALIZED VIEW IF EXISTS bi.m_contributor_global_data;
 DROP MATERIALIZED VIEW IF EXISTS bi.m_contribution_data;
 DROP MATERIALIZED VIEW IF EXISTS bi.m_reward_data;
-DROP MATERIALIZED VIEW IF EXISTS bi.m_project_grants_data;
 
+DROP MATERIALIZED VIEW IF EXISTS bi.m_project_grants_data;
 DROP VIEW active_programs_projects;
+
 DROP MATERIALIZED VIEW m_programs_projects;
 
 CREATE VIEW v_programs_projects AS
@@ -49,11 +150,11 @@ SELECT program_id, project_id, bool_or(remaining_amount > 0) as has_remaining_gr
 FROM allocations
 GROUP BY program_id, project_id;
 
+
 CREATE MATERIALIZED VIEW m_active_programs_projects AS
 SELECT program_id, project_id
 FROM v_programs_projects
 WHERE has_remaining_grants IS TRUE;
-
 
 CREATE UNIQUE INDEX m_active_programs_projects_pk
     ON m_active_programs_projects (program_id, project_id);
@@ -130,7 +231,6 @@ FROM (with registered_users as (select u.id             as id,
 ;
 
 create unique index bi_contribution_data_pk on bi.m_contribution_data (contribution_id);
-
 create index bi_contribution_data_project_id_timestamp_idx on bi.m_contribution_data (project_id, timestamp);
 create index bi_contribution_data_project_id_day_timestamp_idx on bi.m_contribution_data (project_id, day_timestamp);
 create index bi_contribution_data_project_id_week_timestamp_idx on bi.m_contribution_data (project_id, week_timestamp);
@@ -142,8 +242,8 @@ create index bi_contribution_data_project_id_day_timestamp_idx_inv on bi.m_contr
 create index bi_contribution_data_project_id_week_timestamp_idx_inv on bi.m_contribution_data (week_timestamp, project_id);
 create index bi_contribution_data_project_id_month_timestamp_idx_inv on bi.m_contribution_data (month_timestamp, project_id);
 create index bi_contribution_data_project_id_quarter_timestamp_idx_inv on bi.m_contribution_data (quarter_timestamp, project_id);
-create index bi_contribution_data_project_id_year_timestamp_idx_inv on bi.m_contribution_data (year_timestamp, project_id);
 
+create index bi_contribution_data_project_id_year_timestamp_idx_inv on bi.m_contribution_data (year_timestamp, project_id);
 create index bi_contribution_data_contributor_id_timestamp_idx on bi.m_contribution_data (contributor_id, timestamp);
 create index bi_contribution_data_contributor_id_day_timestamp_idx on bi.m_contribution_data (contributor_id, day_timestamp);
 create index bi_contribution_data_contributor_id_week_timestamp_idx on bi.m_contribution_data (contributor_id, week_timestamp);
@@ -155,106 +255,8 @@ create index bi_contribution_data_contributor_id_day_timestamp_idx_inv on bi.m_c
 create index bi_contribution_data_contributor_id_week_timestamp_idx_inv on bi.m_contribution_data (week_timestamp, contributor_id);
 create index bi_contribution_data_contributor_id_month_timestamp_idx_inv on bi.m_contribution_data (month_timestamp, contributor_id);
 create index bi_contribution_data_contributor_id_quarter_timestamp_idx_inv on bi.m_contribution_data (quarter_timestamp, contributor_id);
+
 create index bi_contribution_data_contributor_id_year_timestamp_idx_inv on bi.m_contribution_data (year_timestamp, contributor_id);
-
-CREATE OR REPLACE PROCEDURE create_pseudo_projection(schema text, name text, query text, pk_name text)
-    LANGUAGE plpgsql
-AS
-$$
-DECLARE
-    view_name              text;
-    materialized_view_name text;
-    projection_table_name  text;
-BEGIN
-    view_name := 'v_' || name;
-    materialized_view_name := 'm_' || name;
-    projection_table_name := 'p_' || name;
-
-    EXECUTE format('CREATE VIEW %I.%I AS SELECT v.*, md5(v::text) as hash from (%s) v', schema, view_name, query);
-
-    EXECUTE format('CREATE MATERIALIZED VIEW %I.%I AS SELECT * FROM %I.%I', schema, materialized_view_name, schema, view_name);
-    EXECUTE format('CREATE UNIQUE INDEX %I_%I_pk ON %I.%I (%I)', schema, 'm_' || name, schema, materialized_view_name, pk_name);
-    EXECUTE format('CREATE UNIQUE INDEX %I_%I_%I_hash_idx ON %I.%I (%I, hash)', schema, 'm_' || name, pk_name, schema, materialized_view_name, pk_name);
-
-    EXECUTE format('CREATE TABLE %I.%I AS TABLE %I.%I', schema, projection_table_name, schema, materialized_view_name);
-    EXECUTE format('ALTER TABLE %I.%I ADD PRIMARY KEY (%I)', schema, projection_table_name, pk_name);
-    EXECUTE format('CREATE UNIQUE INDEX %I_%I_%I_hash_idx ON %I.%I (%I, hash)', schema, 'p_' || name, pk_name, schema, projection_table_name, pk_name);
-
-    EXECUTE format('ALTER TABLE %I.%I ADD COLUMN tech_created_at timestamptz NOT NULL DEFAULT now()', schema, projection_table_name);
-    EXECUTE format('ALTER TABLE %I.%I ADD COLUMN tech_updated_at timestamptz NOT NULL DEFAULT now()', schema, projection_table_name);
-    EXECUTE format('CREATE TRIGGER %s_%s_set_tech_updated_at ' ||
-                   'BEFORE UPDATE ON %I.%I ' ||
-                   'FOR EACH ROW EXECUTE FUNCTION set_tech_updated_at()', schema, name, schema, projection_table_name);
-END
-$$;
-
-CREATE OR REPLACE PROCEDURE drop_pseudo_projection(schema text, name text)
-    LANGUAGE plpgsql
-AS
-$$
-DECLARE
-    view_name              text;
-    materialized_view_name text;
-    projection_table_name  text;
-BEGIN
-    view_name := 'v_' || name;
-    materialized_view_name := 'm_' || name;
-    projection_table_name := 'p_' || name;
-
-    EXECUTE format('DROP TABLE %I.%I', schema, projection_table_name);
-    EXECUTE format('DROP MATERIALIZED VIEW %I.%I', schema, materialized_view_name);
-    EXECUTE format('DROP VIEW %I.%I', schema, view_name);
-END
-$$;
-
-CREATE OR REPLACE PROCEDURE refresh_pseudo_projection(schema text, name text, pk_name text)
-    LANGUAGE plpgsql
-AS
-$$
-DECLARE
-    materialized_view_name text;
-    projection_table_name  text;
-BEGIN
-    materialized_view_name := 'm_' || name;
-    projection_table_name := 'p_' || name;
-
-    EXECUTE format('delete from %I.%I where not exists(select 1 from %I.%I m where m.%I = %I.%I and m.hash = %I.hash)',
-                   schema,
-                   projection_table_name,
-                   schema,
-                   materialized_view_name,
-                   pk_name,
-                   projection_table_name,
-                   pk_name,
-                   projection_table_name);
-
-    EXECUTE format('insert into %I.%I select * from %I.%I on conflict (%I) do nothing',
-                   schema,
-                   projection_table_name,
-                   schema,
-                   materialized_view_name,
-                   pk_name);
-END
-$$;
-
-CREATE OR REPLACE PROCEDURE refresh_pseudo_projection(schema text, name text, pk_name text, pk_value anyelement)
-    LANGUAGE plpgsql
-AS
-$$
-DECLARE
-    view_name             text;
-    projection_table_name text;
-BEGIN
-    view_name := 'v_' || name;
-    projection_table_name := 'p_' || name;
-
-    EXECUTE format('delete from %I.%I where %I = $1', schema, projection_table_name, pk_name)
-        using pk_value;
-
-    EXECUTE format('insert into %I.%I select * from %I.%I where %I = $1', schema, projection_table_name, schema, view_name, pk_name)
-        using pk_value;
-END
-$$;
 
 call create_pseudo_projection('bi', 'reward_data', $$
 select r.id                                                                                             as reward_id,
