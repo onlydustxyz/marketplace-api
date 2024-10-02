@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.read.adapters;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.api.contract.ReadProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectMoreInfoViewEntity;
@@ -46,16 +47,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toSet;
+import static onlydust.com.marketplace.api.contract.model.FinancialTransactionType.*;
 import static onlydust.com.marketplace.api.contract.model.GithubIssueStatus.OPEN;
 import static onlydust.com.marketplace.api.read.entities.project.ProjectPageItemQueryEntity.*;
 import static onlydust.com.marketplace.api.read.properties.Cache.*;
@@ -527,6 +526,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                             @RequestParam(required = false) String search) {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
+        types = sanitizeTypes(types);
 
         final var page = findAccountBookTransactions(projectIdOrSlug, fromDate, toDate, types, search, index, size);
         final var format = CSVFormat.DEFAULT.builder().build();
@@ -544,6 +544,13 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
         return status(hasMore(index, page.getTotalPages()) ? PARTIAL_CONTENT : OK)
                 .body(csv);
+    }
+
+    private static @NonNull List<FinancialTransactionType> sanitizeTypes(List<FinancialTransactionType> types) {
+        final var acceptedTypes = List.of(GRANTED, UNGRANTED, REWARDED);
+        final var filteredTypes = Optional.ofNullable(types).orElse(List.of())
+                .stream().filter(acceptedTypes::contains).toList();
+        return filteredTypes.isEmpty() ? acceptedTypes : filteredTypes;
     }
 
     private Page<AllTransactionReadEntity> findAccountBookTransactions(String projectIdOrSlugStr, String fromDate, String toDate,

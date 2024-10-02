@@ -329,6 +329,28 @@ public class ProjectTransactionsApiIT extends AbstractMarketplaceApiIT {
             }
 
             @Test
+            void should_get_project_transactions_by_slug() {
+                // When
+                client.get()
+                        .uri(getApiURI(PROJECT_TRANSACTIONS.formatted(projectSlug), Map.of(
+                                "pageIndex", "0",
+                                "pageSize", "5"
+                        )))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .is2xxSuccessful()
+                        .expectBody()
+                        .consumeWith(System.out::println)
+                        .jsonPath("$.transactions[0].thirdParty.contributor.id").isEqualTo(contributor2.userId().toString())
+                        .jsonPath("$.transactions[1].thirdParty.contributor.id").isEqualTo(contributor1.userId().toString())
+                        .jsonPath("$.transactions[2].thirdParty.program.id").isEqualTo(program.id().toString())
+                        .jsonPath("$.transactions[3].thirdParty.program.id").isEqualTo(program.id().toString())
+                        .jsonPath("$.transactions[4].thirdParty.program.id").isEqualTo(program.id().toString());
+            }
+
+            @Test
             void should_get_program_transactions_in_csv() {
                 // When
                 final var csv = client.get()
