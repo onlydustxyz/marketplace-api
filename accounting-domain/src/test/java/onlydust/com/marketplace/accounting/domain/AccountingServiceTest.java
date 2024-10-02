@@ -2156,11 +2156,12 @@ public class AccountingServiceTest {
             accountingService.submitDeposit(userId, deposit.id(), billingInformation);
 
             // Then
-            verify(depositStoragePort).save(deposit.toBuilder()
+            final var updatedDeposit = deposit.toBuilder()
                     .status(Deposit.Status.PENDING)
                     .billingInformation(billingInformation)
-                    .build());
-            verify(depositObserverPort).onDepositSubmittedByUser(userId, deposit);
+                    .build();
+            verify(depositStoragePort).save(updatedDeposit);
+            verify(depositObserverPort).onDepositSubmittedByUser(userId, updatedDeposit);
         }
 
         record Transaction(String reference, ZonedDateTime timestamp, Blockchain blockchain, Status status) implements Blockchain.Transaction {
