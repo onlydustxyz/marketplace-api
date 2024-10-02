@@ -68,6 +68,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     private final PermissionService permissionsService;
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final BiFinancialMonthlyStatsReadRepository biFinancialMonthlyStatsReadRepository;
+    private final ProjectReadRepository projectReadRepository;
 
     @Override
     public ResponseEntity<BiContributorsPageResponse> getBIContributors(BiContributorsQueryParams q) {
@@ -355,21 +356,23 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                                                                               UUID sponsorId,
                                                                               UUID programId,
                                                                               UUID projectId,
+                                                                              String projectSlug,
                                                                               List<FinancialTransactionType> types,
                                                                               Boolean showEmpty,
                                                                               FinancialTransactionStatsSort sort,
                                                                               SortDirection sortDirection) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (sponsorId == null && programId == null && projectId == null)
-            throw badRequest("At least one of sponsorId, programId or projectId must be provided");
+        if (sponsorId == null && programId == null && projectId == null && projectSlug == null)
+            throw badRequest("At least one of sponsorId, programId or projectId or projectSlug must be provided");
 
         final var idGrouping = sponsorId != null ? SPONSOR_ID : programId != null ? PROGRAM_ID : PROJECT_ID;
 
         final var id = switch (idGrouping) {
             case SPONSOR_ID -> sponsorId;
             case PROGRAM_ID -> programId;
-            case PROJECT_ID -> projectId;
+            case PROJECT_ID -> Optional.ofNullable(projectId).orElseGet(() -> projectReadRepository.findBySlug(projectSlug)
+                    .orElseThrow(() -> notFound("Project with slug %s not found".formatted(projectSlug))).id());
         };
 
         switch (idGrouping) {
@@ -383,7 +386,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
 
             }
             case PROJECT_ID -> {
-                if (!permissionService.hasUserAccessToProject(ProjectId.of(id), Optional.ofNullable(authenticatedUser.id())))
+                if (!permissionService.isUserProjectLead(ProjectId.of(id), authenticatedUser.id()))
                     throw unauthorized("User %s is not authorized to access project %s".formatted(authenticatedUser.id(), id));
             }
         }
