@@ -7,7 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookTransactionProjection;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountBookEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountBookTransactionEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.AllTransactionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookTransactionRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,10 +23,10 @@ public class PostgresAccountBookStorageAdapter implements AccountBookStorage {
     @Transactional
     public void save(AccountBookTransactionProjection projection) {
         if (projection.depositStatus() != null) {
-            accountBookTransactionRepository.save(AccountBookTransactionEntity.fromDomain(projection));
+            accountBookTransactionRepository.save(AllTransactionEntity.fromDomain(projection));
             return;
         }
-        
+
         accountBookTransactionRepository.findByTimestampAndTypeAndCurrencyIdAndSponsorIdAndProgramIdAndProjectIdAndRewardIdAndPaymentId(
                 projection.timestamp(),
                 projection.type(),
@@ -38,7 +38,7 @@ public class PostgresAccountBookStorageAdapter implements AccountBookStorage {
                 projection.paymentId() == null ? null : projection.paymentId().value()
         ).ifPresentOrElse(
                 entity -> entity.amount(entity.amount().add(projection.amount().getValue())),
-                () -> accountBookTransactionRepository.save(AccountBookTransactionEntity.fromDomain(projection))
+                () -> accountBookTransactionRepository.save(AllTransactionEntity.fromDomain(projection))
         );
     }
 
