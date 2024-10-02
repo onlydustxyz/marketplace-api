@@ -126,152 +126,173 @@ create index bi_contribution_data_contributor_id_month_timestamp_idx_inv on bi.m
 create index bi_contribution_data_contributor_id_quarter_timestamp_idx_inv on bi.m_contribution_data (quarter_timestamp, contributor_id);
 create index bi_contribution_data_contributor_id_year_timestamp_idx_inv on bi.m_contribution_data (year_timestamp, contributor_id);
 
+CREATE OR REPLACE PROCEDURE create_pseudo_projection(schema text, name text, query text, pk_name text)
+    LANGUAGE plpgsql
+AS
+$$
+DECLARE
+    view_name              text;
+    materialized_view_name text;
+    projection_table_name  text;
+BEGIN
+    view_name := 'v_' || name;
+    materialized_view_name := 'm_' || name;
+    projection_table_name := 'p_' || name;
 
-CREATE VIEW bi.v_reward_data AS
-WITH project_programs AS (select distinct abt.program_id,
-                                          abt.project_id
-                          from accounting.account_book_transactions abt
-                          where abt.project_id is not null
-                            and abt.reward_id is null)
-SELECT r.*,
-       coalesce(currency_search.value, '') as search,
-       md5(r::text)                        as hash
-FROM (select r.id                                                                                                             as reward_id,
-             r.requested_at                                                                                                   as timestamp,
-             date_trunc('day', r.requested_at)                                                                                as day_timestamp,
-             date_trunc('week', r.requested_at)                                                                               as week_timestamp,
-             date_trunc('month', r.requested_at)                                                                              as month_timestamp,
-             date_trunc('quarter', r.requested_at)                                                                            as quarter_timestamp,
-             date_trunc('year', r.requested_at)                                                                               as year_timestamp,
-             r.recipient_id                                                                                                   as contributor_id,
-             r.requestor_id                                                                                                   as requestor_id,
-             r.project_id                                                                                                     as project_id,
-             p.slug                                                                                                           as project_slug,
-             rsd.amount_usd_equivalent                                                                                        as usd_amount,
-             r.amount                                                                                                         as amount,
-             r.currency_id                                                                                                    as currency_id,
-             coalesce(array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null ), '{}')                 as ecosystem_ids,
-             coalesce(array_agg(distinct pp.program_id) filter ( where pp.program_id is not null ), '{}')                     as program_ids,
-             coalesce(array_agg(distinct lfe.language_id) filter ( where lfe.language_id is not null ), '{}')                 as language_ids,
-             coalesce(array_agg(distinct ppc.project_category_id) filter ( where ppc.project_category_id is not null ), '{}') as project_category_ids
-      from rewards r
-               join accounting.reward_status_data rsd ON rsd.reward_id = r.id
-               join projects p on p.id = r.project_id
-               left join projects_ecosystems pe on pe.project_id = r.project_id
-               left join project_programs pp on pp.project_id = r.project_id
-               left join projects_project_categories ppc on ppc.project_id = r.project_id
-               left join reward_items ri on r.id = ri.reward_id
-               left join indexer_exp.contributions c on c.contributor_id = ri.recipient_id and
-                                                        c.repo_id = ri.repo_id and
-                                                        c.github_number = ri.number and
-                                                        c.type::text::contribution_type = ri.type
-               left join language_file_extensions lfe on lfe.extension = any (c.main_file_extensions)
-      group by r.id,
-               r.requested_at,
-               r.recipient_id,
-               r.project_id,
-               rsd.amount_usd_equivalent,
-               r.amount,
-               r.currency_id,
-               p.slug) r
-         left join lateral (select cur.name || ' ' || cur.code as value
-                            from currencies cur
-                            where cur.id = r.currency_id) as currency_search on true;
+    EXECUTE format('CREATE VIEW %I.%I AS SELECT v.*, md5(v::text) as hash from (%s) v', schema, view_name, query);
 
-create materialized view bi.m_reward_data as
-select *
-from bi.v_reward_data;
+    EXECUTE format('CREATE MATERIALIZED VIEW %I.%I AS SELECT * FROM %I.%I', schema, materialized_view_name, schema, view_name);
+    EXECUTE format('CREATE UNIQUE INDEX %I_%I_pk ON %I.%I (%I)', schema, 'm_' || name, schema, materialized_view_name, pk_name);
+    EXECUTE format('CREATE UNIQUE INDEX %I_%I_%I_hash_idx ON %I.%I (%I, hash)', schema, 'm_' || name, pk_name, schema, materialized_view_name, pk_name);
 
-create unique index bi_reward_data_pk on bi.m_reward_data (reward_id, hash);
+    EXECUTE format('CREATE TABLE %I.%I AS TABLE %I.%I', schema, projection_table_name, schema, materialized_view_name);
+    EXECUTE format('ALTER TABLE %I.%I ADD PRIMARY KEY (%I)', schema, projection_table_name, pk_name);
+    EXECUTE format('CREATE UNIQUE INDEX %I_%I_%I_hash_idx ON %I.%I (%I, hash)', schema, 'p_' || name, pk_name, schema, projection_table_name, pk_name);
 
-create index if not exists bi_m_reward_data_project_id_day_timestamp_idx on bi.m_reward_data (project_id, timestamp, currency_id);
-create index if not exists bi_m_reward_data_project_id_day_timestamp_idx on bi.m_reward_data (project_id, day_timestamp, currency_id);
-create index if not exists bi_m_reward_data_project_id_week_timestamp_idx on bi.m_reward_data (project_id, week_timestamp, currency_id);
-create index if not exists bi_m_reward_data_project_id_month_timestamp_idx on bi.m_reward_data (project_id, month_timestamp, currency_id);
-create index if not exists bi_m_reward_data_project_id_quarter_timestamp_idx on bi.m_reward_data (project_id, quarter_timestamp, currency_id);
-create index if not exists bi_m_reward_data_project_id_year_timestamp_idx on bi.m_reward_data (project_id, year_timestamp, currency_id);
-create index if not exists bi_m_reward_data_project_id_day_timestamp_idx_inv on bi.m_reward_data (timestamp, project_id, currency_id);
-create index if not exists bi_m_reward_data_project_id_day_timestamp_idx_inv on bi.m_reward_data (day_timestamp, project_id, currency_id);
-create index if not exists bi_m_reward_data_project_id_week_timestamp_idx_inv on bi.m_reward_data (week_timestamp, project_id, currency_id);
-create index if not exists bi_m_reward_data_project_id_month_timestamp_idx_inv on bi.m_reward_data (month_timestamp, project_id, currency_id);
-create index if not exists bi_m_reward_data_project_id_quarter_timestamp_idx_inv on bi.m_reward_data (quarter_timestamp, project_id, currency_id);
-create index if not exists bi_m_reward_data_project_id_year_timestamp_idx_inv on bi.m_reward_data (year_timestamp, project_id, currency_id);
+    EXECUTE format('ALTER TABLE %I.%I ADD COLUMN tech_created_at timestamptz NOT NULL DEFAULT now()', schema, projection_table_name);
+    EXECUTE format('ALTER TABLE %I.%I ADD COLUMN tech_updated_at timestamptz NOT NULL DEFAULT now()', schema, projection_table_name);
+    EXECUTE format('CREATE TRIGGER %s_%s_set_tech_updated_at ' ||
+                   'BEFORE UPDATE ON %I.%I ' ||
+                   'FOR EACH ROW EXECUTE FUNCTION set_tech_updated_at()', schema, name, schema, projection_table_name);
+END
+$$;
 
-create index if not exists bi_m_reward_data_contributor_id_day_timestamp_idx on bi.m_reward_data (contributor_id, timestamp, currency_id);
-create index if not exists bi_m_reward_data_contributor_id_day_timestamp_idx on bi.m_reward_data (contributor_id, day_timestamp, currency_id);
-create index if not exists bi_m_reward_data_contributor_id_week_timestamp_idx on bi.m_reward_data (contributor_id, week_timestamp, currency_id);
-create index if not exists bi_m_reward_data_contributor_id_month_timestamp_idx on bi.m_reward_data (contributor_id, month_timestamp, currency_id);
-create index if not exists bi_m_reward_data_contributor_id_quarter_timestamp_idx on bi.m_reward_data (contributor_id, quarter_timestamp, currency_id);
-create index if not exists bi_m_reward_data_contributor_id_year_timestamp_idx on bi.m_reward_data (contributor_id, year_timestamp, currency_id);
-create index if not exists bi_m_reward_data_contributor_id_day_timestamp_idx_inv on bi.m_reward_data (timestamp, contributor_id, currency_id);
-create index if not exists bi_m_reward_data_contributor_id_day_timestamp_idx_inv on bi.m_reward_data (day_timestamp, contributor_id, currency_id);
-create index if not exists bi_m_reward_data_contributor_id_week_timestamp_idx_inv on bi.m_reward_data (week_timestamp, contributor_id, currency_id);
-create index if not exists bi_m_reward_data_contributor_id_month_timestamp_idx_inv on bi.m_reward_data (month_timestamp, contributor_id, currency_id);
-create index if not exists bi_m_reward_data_contributor_id_quarter_timestamp_idx_inv on bi.m_reward_data (quarter_timestamp, contributor_id, currency_id);
-create index if not exists bi_m_reward_data_contributor_id_year_timestamp_idx_inv on bi.m_reward_data (year_timestamp, contributor_id, currency_id);
+CREATE OR REPLACE PROCEDURE drop_pseudo_projection(schema text, name text)
+    LANGUAGE plpgsql
+AS
+$$
+DECLARE
+    view_name              text;
+    materialized_view_name text;
+    projection_table_name  text;
+BEGIN
+    view_name := 'v_' || name;
+    materialized_view_name := 'm_' || name;
+    projection_table_name := 'p_' || name;
 
-create table bi.p_reward_data
-(
-    reward_id            uuid primary key,
-    timestamp            timestamptz not null,
-    day_timestamp        timestamptz not null,
-    week_timestamp       timestamptz not null,
-    month_timestamp      timestamptz not null,
-    quarter_timestamp    timestamptz not null,
-    year_timestamp       timestamptz not null,
-    contributor_id       bigint      not null,
-    requestor_id         uuid        not null,
-    project_id           uuid        not null,
-    project_slug         text        not null,
-    usd_amount           numeric,
-    amount               numeric     not null,
-    currency_id          uuid        not null,
-    ecosystem_ids        uuid[]      not null,
-    program_ids          uuid[]      not null,
-    language_ids         uuid[]      not null,
-    project_category_ids uuid[]      not null,
-    search               text        not null,
-    hash                 text        not null,
-    tech_created_at      timestamptz not null default now(),
-    tech_updated_at      timestamptz not null default now(),
-    unique (reward_id, hash)
-);
+    EXECUTE format('DROP TABLE %I.%I', schema, projection_table_name);
+    EXECUTE format('DROP MATERIALIZED VIEW %I.%I', schema, materialized_view_name);
+    EXECUTE format('DROP VIEW %I.%I', schema, view_name);
+END
+$$;
 
-create trigger bi_p_reward_data_set_tech_updated_at
-    before update
-    on bi.p_reward_data
-    for each row
-execute function set_tech_updated_at();
+CREATE OR REPLACE PROCEDURE refresh_pseudo_projection(schema text, name text, pk_name text)
+    LANGUAGE plpgsql
+AS
+$$
+DECLARE
+    materialized_view_name text;
+    projection_table_name  text;
+BEGIN
+    materialized_view_name := 'm_' || name;
+    projection_table_name := 'p_' || name;
 
-create index if not exists bi_p_reward_data_project_id_day_timestamp_idx on bi.p_reward_data (project_id, timestamp, currency_id);
-create index if not exists bi_p_reward_data_project_id_day_timestamp_idx on bi.p_reward_data (project_id, day_timestamp, currency_id);
-create index if not exists bi_p_reward_data_project_id_week_timestamp_idx on bi.p_reward_data (project_id, week_timestamp, currency_id);
-create index if not exists bi_p_reward_data_project_id_month_timestamp_idx on bi.p_reward_data (project_id, month_timestamp, currency_id);
-create index if not exists bi_p_reward_data_project_id_quarter_timestamp_idx on bi.p_reward_data (project_id, quarter_timestamp, currency_id);
-create index if not exists bi_p_reward_data_project_id_year_timestamp_idx on bi.p_reward_data (project_id, year_timestamp, currency_id);
-create index if not exists bi_p_reward_data_project_id_day_timestamp_idx_inv on bi.p_reward_data (timestamp, project_id, currency_id);
-create index if not exists bi_p_reward_data_project_id_day_timestamp_idx_inv on bi.p_reward_data (day_timestamp, project_id, currency_id);
-create index if not exists bi_p_reward_data_project_id_week_timestamp_idx_inv on bi.p_reward_data (week_timestamp, project_id, currency_id);
-create index if not exists bi_p_reward_data_project_id_month_timestamp_idx_inv on bi.p_reward_data (month_timestamp, project_id, currency_id);
-create index if not exists bi_p_reward_data_project_id_quarter_timestamp_idx_inv on bi.p_reward_data (quarter_timestamp, project_id, currency_id);
-create index if not exists bi_p_reward_data_project_id_year_timestamp_idx_inv on bi.p_reward_data (year_timestamp, project_id, currency_id);
+    EXECUTE format('delete from %I.%I where not exists(select 1 from %I.%I m where m.%I = %I.%I and m.hash = %I.hash)',
+                   schema,
+                   projection_table_name,
+                   schema,
+                   materialized_view_name,
+                   pk_name,
+                   projection_table_name,
+                   pk_name,
+                   projection_table_name);
 
-create index if not exists bi_p_reward_data_contributor_id_day_timestamp_idx on bi.p_reward_data (contributor_id, timestamp, currency_id);
-create index if not exists bi_p_reward_data_contributor_id_day_timestamp_idx on bi.p_reward_data (contributor_id, day_timestamp, currency_id);
-create index if not exists bi_p_reward_data_contributor_id_week_timestamp_idx on bi.p_reward_data (contributor_id, week_timestamp, currency_id);
-create index if not exists bi_p_reward_data_contributor_id_month_timestamp_idx on bi.p_reward_data (contributor_id, month_timestamp, currency_id);
-create index if not exists bi_p_reward_data_contributor_id_quarter_timestamp_idx on bi.p_reward_data (contributor_id, quarter_timestamp, currency_id);
-create index if not exists bi_p_reward_data_contributor_id_year_timestamp_idx on bi.p_reward_data (contributor_id, year_timestamp, currency_id);
-create index if not exists bi_p_reward_data_contributor_id_day_timestamp_idx_inv on bi.p_reward_data (timestamp, contributor_id, currency_id);
-create index if not exists bi_p_reward_data_contributor_id_day_timestamp_idx_inv on bi.p_reward_data (day_timestamp, contributor_id, currency_id);
-create index if not exists bi_p_reward_data_contributor_id_week_timestamp_idx_inv on bi.p_reward_data (week_timestamp, contributor_id, currency_id);
-create index if not exists bi_p_reward_data_contributor_id_month_timestamp_idx_inv on bi.p_reward_data (month_timestamp, contributor_id, currency_id);
-create index if not exists bi_p_reward_data_contributor_id_quarter_timestamp_idx_inv on bi.p_reward_data (quarter_timestamp, contributor_id, currency_id);
-create index if not exists bi_p_reward_data_contributor_id_year_timestamp_idx_inv on bi.p_reward_data (year_timestamp, contributor_id, currency_id);
+    EXECUTE format('insert into %I.%I select * from %I.%I on conflict (%I) do nothing',
+                   schema,
+                   projection_table_name,
+                   schema,
+                   materialized_view_name,
+                   pk_name);
+END
+$$;
 
-insert into bi.p_reward_data
-select *
-from bi.m_reward_data;
+CREATE OR REPLACE PROCEDURE refresh_pseudo_projection(schema text, name text, pk_name text, pk_value anyelement)
+    LANGUAGE plpgsql
+AS
+$$
+DECLARE
+    view_name             text;
+    projection_table_name text;
+BEGIN
+    view_name := 'v_' || name;
+    projection_table_name := 'p_' || name;
+
+    EXECUTE format('delete from %I.%I where %I = $1', schema, projection_table_name, pk_name)
+        using pk_value;
+
+    EXECUTE format('insert into %I.%I select * from %I.%I where %I = $1', schema, projection_table_name, schema, view_name, pk_name)
+        using pk_value;
+END
+$$;
+
+call create_pseudo_projection('bi', 'reward_data', $$
+select r.id                                                                                             as reward_id,
+       r.requested_at                                                                                   as timestamp,
+       date_trunc('day', r.requested_at)                                                                as day_timestamp,
+       date_trunc('week', r.requested_at)                                                               as week_timestamp,
+       date_trunc('month', r.requested_at)                                                              as month_timestamp,
+       date_trunc('quarter', r.requested_at)                                                            as quarter_timestamp,
+       date_trunc('year', r.requested_at)                                                               as year_timestamp,
+       r.recipient_id                                                                                   as contributor_id,
+       r.requestor_id                                                                                   as requestor_id,
+       r.project_id                                                                                     as project_id,
+       p.slug                                                                                           as project_slug,
+       rsd.amount_usd_equivalent                                                                        as usd_amount,
+       r.amount                                                                                         as amount,
+       r.currency_id                                                                                    as currency_id,
+       array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null )                 as ecosystem_ids,
+       array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )                     as program_ids,
+       array_agg(distinct lfe.language_id) filter ( where lfe.language_id is not null )                 as language_ids,
+       array_agg(distinct ppc.project_category_id) filter ( where ppc.project_category_id is not null ) as project_category_ids,
+       string_agg(currencies.name || ' ' || currencies.code, ' ')                                       as search
+from rewards r
+         join accounting.reward_status_data rsd ON rsd.reward_id = r.id
+         join projects p on p.id = r.project_id
+         join currencies on currencies.id = r.currency_id
+         left join projects_ecosystems pe on pe.project_id = r.project_id
+         left join m_programs_projects pp on pp.project_id = r.project_id
+         left join projects_project_categories ppc on ppc.project_id = r.project_id
+         left join reward_items ri on r.id = ri.reward_id
+         left join indexer_exp.contributions c on c.contributor_id = ri.recipient_id and
+                                                  c.repo_id = ri.repo_id and
+                                                  c.github_number = ri.number and
+                                                  c.type::text::contribution_type = ri.type
+         left join language_file_extensions lfe on lfe.extension = any (c.main_file_extensions)
+group by r.id,
+         r.requested_at,
+         r.recipient_id,
+         r.project_id,
+         rsd.amount_usd_equivalent,
+         r.amount,
+         r.currency_id,
+         p.slug
+    $$, 'reward_id');
+
+create index bi_p_reward_data_project_id_timestamp_idx on bi.p_reward_data (project_id, timestamp, currency_id);
+create index bi_p_reward_data_project_id_day_timestamp_idx on bi.p_reward_data (project_id, day_timestamp, currency_id);
+create index bi_p_reward_data_project_id_week_timestamp_idx on bi.p_reward_data (project_id, week_timestamp, currency_id);
+create index bi_p_reward_data_project_id_month_timestamp_idx on bi.p_reward_data (project_id, month_timestamp, currency_id);
+create index bi_p_reward_data_project_id_quarter_timestamp_idx on bi.p_reward_data (project_id, quarter_timestamp, currency_id);
+create index bi_p_reward_data_project_id_year_timestamp_idx on bi.p_reward_data (project_id, year_timestamp, currency_id);
+create index bi_p_reward_data_project_id_timestamp_idx_inv on bi.p_reward_data (timestamp, project_id, currency_id);
+create index bi_p_reward_data_project_id_day_timestamp_idx_inv on bi.p_reward_data (day_timestamp, project_id, currency_id);
+create index bi_p_reward_data_project_id_week_timestamp_idx_inv on bi.p_reward_data (week_timestamp, project_id, currency_id);
+create index bi_p_reward_data_project_id_month_timestamp_idx_inv on bi.p_reward_data (month_timestamp, project_id, currency_id);
+create index bi_p_reward_data_project_id_quarter_timestamp_idx_inv on bi.p_reward_data (quarter_timestamp, project_id, currency_id);
+create index bi_p_reward_data_project_id_year_timestamp_idx_inv on bi.p_reward_data (year_timestamp, project_id, currency_id);
+
+create index bi_p_reward_data_contributor_id_timestamp_idx on bi.p_reward_data (contributor_id, timestamp, currency_id);
+create index bi_p_reward_data_contributor_id_day_timestamp_idx on bi.p_reward_data (contributor_id, day_timestamp, currency_id);
+create index bi_p_reward_data_contributor_id_week_timestamp_idx on bi.p_reward_data (contributor_id, week_timestamp, currency_id);
+create index bi_p_reward_data_contributor_id_month_timestamp_idx on bi.p_reward_data (contributor_id, month_timestamp, currency_id);
+create index bi_p_reward_data_contributor_id_quarter_timestamp_idx on bi.p_reward_data (contributor_id, quarter_timestamp, currency_id);
+create index bi_p_reward_data_contributor_id_year_timestamp_idx on bi.p_reward_data (contributor_id, year_timestamp, currency_id);
+create index bi_p_reward_data_contributor_id_timestamp_idx_inv on bi.p_reward_data (timestamp, contributor_id, currency_id);
+create index bi_p_reward_data_contributor_id_day_timestamp_idx_inv on bi.p_reward_data (day_timestamp, contributor_id, currency_id);
+create index bi_p_reward_data_contributor_id_week_timestamp_idx_inv on bi.p_reward_data (week_timestamp, contributor_id, currency_id);
+create index bi_p_reward_data_contributor_id_month_timestamp_idx_inv on bi.p_reward_data (month_timestamp, contributor_id, currency_id);
+create index bi_p_reward_data_contributor_id_quarter_timestamp_idx_inv on bi.p_reward_data (quarter_timestamp, contributor_id, currency_id);
+create index bi_p_reward_data_contributor_id_year_timestamp_idx_inv on bi.p_reward_data (year_timestamp, contributor_id, currency_id);
 
 CREATE MATERIALIZED VIEW bi.m_project_grants_data AS
 SELECT abt.project_id,
