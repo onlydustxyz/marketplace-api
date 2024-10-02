@@ -534,12 +534,12 @@ public class AccountingService implements AccountingFacadePort {
             throw forbidden("User %s is not allowed to update deposit %s".formatted(userId, depositId));
         }
 
-        depositStoragePort.save(deposit.toBuilder()
+        final var updatedDeposit = deposit.toBuilder()
                 .status(Deposit.Status.PENDING)
                 .billingInformation(billingInformation)
-                .build());
-
-        depositObserverPort.onDepositSubmittedByUser(userId, deposit);
+                .build();
+        depositStoragePort.save(updatedDeposit);
+        depositObserverPort.onDepositSubmittedByUser(userId, updatedDeposit);
     }
 
     @Override

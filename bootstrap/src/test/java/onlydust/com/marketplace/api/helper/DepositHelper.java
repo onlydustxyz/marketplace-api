@@ -4,7 +4,10 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountingTransactionProjection;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.DepositStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
 import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.kernel.model.UserId;
@@ -21,6 +24,10 @@ public class DepositHelper {
     private DatabaseHelper databaseHelper;
     @Autowired
     private AccountingFacadePort accountingFacadePort;
+    @Autowired
+    private DepositStoragePort depositStoragePort;
+    @Autowired
+    private AccountBookStorage accountBookStorage;
 
     private final Faker faker = new Faker();
 
@@ -79,6 +86,9 @@ public class DepositHelper {
                 "status", status.name(),
                 "billingInformation", billingInformation
         ));
+
+        final var deposit = depositStoragePort.find(Deposit.Id.of(depositId)).orElseThrow();
+        accountBookStorage.save(AccountingTransactionProjection.of(deposit));
         return Deposit.Id.of(depositId);
     }
 }
