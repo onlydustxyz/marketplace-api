@@ -78,7 +78,8 @@ public class ProjectService implements ProjectFacadePort {
                 command.getEcosystemIds(),
                 command.getCategoryIds(),
                 command.getCategorySuggestions(),
-                true
+                true,
+                Optional.ofNullable(command.getContributorLabels()).orElse(List.of()).stream().map(l -> ProjectContributorLabel.of(projectId, l)).toList()
         );
 
         projectObserverPort.onProjectCreated(projectId, projectLeadId);
@@ -129,7 +130,8 @@ public class ProjectService implements ProjectFacadePort {
                 command.getRewardSettings(),
                 command.getEcosystemIds(),
                 command.getCategoryIds(),
-                command.getCategorySuggestions()
+                command.getCategorySuggestions(),
+                command.getContributorLabels()
         );
 
         if (!isNull(command.getGithubRepoIds()))

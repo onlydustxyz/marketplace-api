@@ -109,6 +109,8 @@ public class ProjectServiceTest {
         final ProjectId projectId = ProjectId.random();
         final UserId projectLeadId = UserId.random();
         final var categorySuggestions = List.of(faker.lorem().word(), faker.internet().slug());
+        final var contributorLabels = List.of(ProjectContributorLabel.of(projectId, faker.lorem().word()), ProjectContributorLabel.of(projectId,
+                faker.internet().slug()));
         final UpdateProjectCommand command = UpdateProjectCommand.builder()
                 .id(projectId)
                 .name(faker.pokemon().name())
@@ -128,6 +130,7 @@ public class ProjectServiceTest {
                                 faker.date().birthday()
                         ))
                 .categorySuggestions(categorySuggestions)
+                .contributorLabels(contributorLabels)
                 .build();
 
         // When
@@ -154,7 +157,8 @@ public class ProjectServiceTest {
                 command.getRewardSettings(),
                 command.getEcosystemIds(),
                 command.getCategoryIds(),
-                categorySuggestions);
+                categorySuggestions,
+                contributorLabels);
         verify(projectObserverPort).onLinkedReposChanged(projectId,
                 command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of(1L, 2L, 3L));
         verify(projectObserverPort).onRewardSettingsChanged(projectId);

@@ -1,12 +1,11 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
+import onlydust.com.marketplace.api.contract.model.ProjectRewardSettings;
+import onlydust.com.marketplace.api.contract.model.ProjectVisibility;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
-import onlydust.com.marketplace.project.domain.model.CreateProjectCommand;
-import onlydust.com.marketplace.project.domain.model.NamedLink;
-import onlydust.com.marketplace.project.domain.model.Project;
-import onlydust.com.marketplace.project.domain.model.UpdateProjectCommand;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.view.UserLinkView;
 
 import java.util.Date;
@@ -33,6 +32,7 @@ public interface ProjectMapper {
                 .ecosystemIds(createProjectRequest.getEcosystemIds())
                 .categoryIds(createProjectRequest.getCategoryIds())
                 .categorySuggestions(createProjectRequest.getCategorySuggestions())
+                .contributorLabels(createProjectRequest.getContributorLabels().stream().map(ProjectContributorLabelRequest::getName).toList())
                 .build();
     }
 
@@ -57,7 +57,13 @@ public interface ProjectMapper {
                 .ecosystemIds(updateProjectRequest.getEcosystemIds())
                 .categoryIds(updateProjectRequest.getCategoryIds())
                 .categorySuggestions(updateProjectRequest.getCategorySuggestions())
+                .contributorLabels(updateProjectRequest.getContributorLabels().stream().map(l -> toProjectContributorLabel(projectId, l)).toList())
                 .build();
+    }
+
+    static ProjectContributorLabel toProjectContributorLabel(ProjectId projectId, UpdateProjectRequestContributorLabelsInner label) {
+        return label.getId() == null ? ProjectContributorLabel.of(projectId, label.getName()) :
+                new ProjectContributorLabel(ProjectContributorLabel.Id.of(label.getId()), projectId, label.getName());
     }
 
     static ProjectRewardSettings mapRewardSettings(onlydust.com.marketplace.project.domain.model.ProjectRewardSettings rewardSettings) {

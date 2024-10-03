@@ -2,10 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.HiddenContributorEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategorySuggestionEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEcosystemEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectProjectCategoryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
@@ -114,7 +111,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                               List<Long> githubUserIdsAsProjectLeads,
                               ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings,
                               List<UUID> ecosystemIds, List<UUID> categoryIds, List<String> categorySuggestions,
-                              boolean botNotifyExternalApplications) {
+                              boolean botNotifyExternalApplications, List<ProjectContributorLabel> contributorLabels) {
         final ProjectEntity projectEntity =
                 ProjectEntity.builder()
                         .id(projectId.value())
@@ -149,6 +146,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         )
                         .rank(0)
                         .botNotifyExternalApplications(botNotifyExternalApplications)
+                        .contributorLabels(contributorLabels.stream().map(ProjectContributorLabelEntity::fromDomain).collect(toSet()))
                         .build();
 
         this.projectRepository.saveAndFlush(projectEntity);
@@ -162,7 +160,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                               List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
                               List<UserId> projectLeadersToKeep, String imageUrl,
                               ProjectRewardSettings rewardSettings,
-                              List<UUID> ecosystemIds, List<UUID> categoryIds, List<String> categorySuggestions) {
+                              List<UUID> ecosystemIds, List<UUID> categoryIds, List<String> categorySuggestions,
+                              List<ProjectContributorLabel> contributorLabels) {
         final var project = this.projectRepository.findById(projectId.value())
                 .orElseThrow(() -> notFound(format("Project %s not found", projectId.value())));
         project.setSlug(slug);
@@ -259,6 +258,13 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                     .filter(categorySuggestion -> project.getCategorySuggestions().stream()
                             .noneMatch(suggestion -> suggestion.getName().equals(categorySuggestion)))
                     .map(categorySuggestion -> new ProjectCategorySuggestionEntity(UUID.randomUUID(), categorySuggestion, projectId.value()))
+                    .collect(toSet()));
+        }
+
+        if (nonNull(contributorLabels)) {
+            project.getContributorLabels().clear();
+            project.getContributorLabels().addAll(contributorLabels.stream()
+                    .map(ProjectContributorLabelEntity::fromDomain)
                     .collect(toSet()));
         }
 

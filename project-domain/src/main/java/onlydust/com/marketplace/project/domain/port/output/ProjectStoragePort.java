@@ -19,13 +19,13 @@ public interface ProjectStoragePort {
                        List<Long> githubRepoIds, UserId firstProjectLeaderId, List<Long> githubUserIdsAsProjectLeads,
                        ProjectVisibility visibility
             , String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds, List<UUID> categoryIds, List<String> categorySuggestions,
-                       boolean botNotifyExternalApplications);
+                       boolean botNotifyExternalApplications, List<ProjectContributorLabel> contributorLabels);
 
     void updateProject(ProjectId id, String slug, String name, String shortDescription, String longDescription,
                        Boolean isLookingForContributors, List<NamedLink> moreInfos,
                        List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
                        List<UserId> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds,
-                       List<UUID> categoryIds, List<String> categorySuggestions);
+                       List<UUID> categoryIds, List<String> categorySuggestions, List<ProjectContributorLabel> contributorLabels);
 
     List<UserId> getProjectLeadIds(ProjectId projectId);
 

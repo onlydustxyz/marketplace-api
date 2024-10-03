@@ -25,4 +25,5 @@ public class UpdateProjectCommand {
     List<UUID> ecosystemIds;
     List<UUID> categoryIds;
     List<String> categorySuggestions;
+    List<ProjectContributorLabel> contributorLabels;
 }

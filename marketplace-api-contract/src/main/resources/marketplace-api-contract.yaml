@@ -7181,6 +7181,10 @@ components:
           type: integer
           description: Number of good first issues in the project
           example: 5
+        contributorLabels:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectContributorLabelResponse'
 
     ProjectMeResponse:
       type: object
@@ -8299,6 +8303,7 @@ components:
         - isLookingForContributors
         - inviteGithubUserIdsAsProjectLeads
         - githubRepoIds
+        - contributorLabels
       properties:
         name:
           type: string
@@ -8337,6 +8342,10 @@ components:
           type: array
           items:
             type: string
+        contributorLabels:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectContributorLabelRequest'
 
     UpdateProjectIgnoredContributionsRequest:
       type: object
@@ -8358,6 +8367,7 @@ components:
         - longDescription
         - moreInfo
         - isLookingForContributors
+        - contributorLabels
       properties:
         name:
           type: string
@@ -8430,6 +8440,15 @@ components:
             If null, no change will be made.
           items:
             type: string
+        contributorLabels:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/ProjectContributorLabelRequest'
+              - type: object
+                properties:
+                  id:
+                    $ref: '#/components/schemas/ProjectContributorLabelId'
 
     ProjectCategoriesResponse:
       type: object

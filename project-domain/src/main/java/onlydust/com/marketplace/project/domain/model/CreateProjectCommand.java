@@ -22,4 +22,5 @@ public class CreateProjectCommand {
     List<UUID> ecosystemIds;
     List<UUID> categoryIds;
     List<String> categorySuggestions;
+    List<String> contributorLabels;
 }
