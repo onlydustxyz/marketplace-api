@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.read.entities.project;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +25,10 @@ public class ProjectContributorLabelReadEntity {
     private @NonNull String slug;
     private @NonNull UUID projectId;
     private @NonNull String name;
+
+    @ManyToOne
+    @JoinColumn(name = "projectId", insertable = false, updatable = false)
+    private ProjectReadEntity project;
 
     public ProjectContributorLabelResponse toDto() {
         return new ProjectContributorLabelResponse()

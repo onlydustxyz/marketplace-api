@@ -8,4 +8,6 @@ import java.util.UUID;
 
 public interface ProjectContributorLabelReadRepository extends Repository<ProjectContributorLabelReadEntity, UUID> {
     List<ProjectContributorLabelReadEntity> findAllByProjectId(UUID projectId);
+
+    List<ProjectContributorLabelReadEntity> findAllByProjectSlug(String projectSlug);
 }
