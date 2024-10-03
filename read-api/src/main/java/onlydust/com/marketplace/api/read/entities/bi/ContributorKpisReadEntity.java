@@ -43,6 +43,8 @@ public class ContributorKpisReadEntity {
     List<LanguageResponse> languages;
     @JdbcTypeCode(SqlTypes.JSON)
     List<EcosystemLinkResponse> ecosystems;
+    @JdbcTypeCode(SqlTypes.JSON)
+    List<ProjectContributorLabelResponse> projectContributorLabels;
     String contributorCountry;
 
     BigDecimal totalRewardedUsdAmount;
@@ -82,6 +84,8 @@ public class ContributorKpisReadEntity {
                 .categories(categories == null ? null : categories.stream().sorted(comparing(ProjectCategoryResponse::getName)).toList())
                 .languages(languages == null ? null : languages.stream().sorted(comparing(LanguageResponse::getName)).toList())
                 .ecosystems(ecosystems == null ? null : ecosystems.stream().sorted(comparing(EcosystemLinkResponse::getName)).toList())
+                .projectContributorLabels(projectContributorLabels == null ? null :
+                        projectContributorLabels.stream().sorted(comparing(ProjectContributorLabelResponse::getName)).toList())
                 .countryCode(contributorCountry == null ? null : Country.fromIso3(contributorCountry).iso2Code())
                 .totalRewardedUsdAmount(toDecimalNumberKpi(prettyUsd(totalRewardedUsdAmount), prettyUsd(previousPeriodTotalRewardedUsdAmount)))
                 .rewardCount(toNumberKpi(rewardCount, previousPeriodRewardCount))
@@ -99,6 +103,8 @@ public class ContributorKpisReadEntity {
                 categories == null ? null : categories.stream().map(ProjectCategoryResponse::getName).sorted().collect(joining(",")),
                 languages == null ? null : languages.stream().map(LanguageResponse::getName).sorted().collect(joining(",")),
                 ecosystems == null ? null : ecosystems.stream().map(EcosystemLinkResponse::getName).sorted().collect(joining(",")),
+                projectContributorLabels == null ? null :
+                        projectContributorLabels.stream().map(ProjectContributorLabelResponse::getName).sorted().collect(joining(",")),
                 contributorCountry == null ? null : Country.fromIso3(contributorCountry).iso2Code(),
                 prettyUsd(totalRewardedUsdAmount),
                 rewardCount,

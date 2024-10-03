@@ -11426,6 +11426,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EcosystemLinkResponse'
+        projectContributorLabels:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectContributorLabelResponse'
         countryCode:
           $ref: '#/components/schemas/CountryCode'
         totalRewardedUsdAmount:
