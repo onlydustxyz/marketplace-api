@@ -45,7 +45,8 @@ public class ProjectDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.stats").isArray();
+                .jsonPath("$.stats").isArray()
+                .jsonPath("$.stats[0].timestamp").isEqualTo("2024-09-30T00:00:00Z");
     }
 
     @Test
