@@ -66,6 +66,16 @@ public class UserAuthHelper {
         return authenticateUser(user);
     }
 
+    public AuthenticatedUser signInUser(AuthenticatedUser user) {
+        return signInUser(user.user.getGithubUserId());
+    }
+
+    public AuthenticatedUser signInUser(long githubUserId) {
+        final var user = userRepository.findByGithubUserId(githubUserId).orElseThrow();
+        mockAuth0UserInfo(user);
+        return authenticateUser(user);
+    }
+
     public void mockAuth0UserInfo(UserEntity user) {
         mockAuth0UserInfo(user.getGithubUserId(), user.getGithubLogin(), user.getGithubLogin(),
                 user.getGithubAvatarUrl(), user.getEmail());
