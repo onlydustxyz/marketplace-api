@@ -3,22 +3,28 @@ package onlydust.com.marketplace.api.it.api;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
-import onlydust.com.marketplace.api.contract.model.CreateProjectResponse;
-import onlydust.com.marketplace.api.contract.model.OnlyDustError;
+import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ContributorProjectContributorLabelEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ContributorProjectContributorLabelRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.port.input.ProjectCategoryFacadePort;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.lang.String.format;
+import static java.util.Map.entry;
+import static java.util.stream.Collectors.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -33,6 +39,9 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     private static ProjectCategory gameCategory;
     private static ProjectCategory tutorialCategory;
     private static ProjectCategory cryptoCategory;
+
+    @Autowired
+    ContributorProjectContributorLabelRepository contributorProjectContributorLabelRepository;
 
     @Autowired
     private ProjectCategoryFacadePort projectCategoryFacadePort;
@@ -120,7 +129,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           "logoUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                           "ecosystemIds" : ["b599313c-a074-440f-af04-a466529ab2e7","99b6c284-f9bb-4f89-8ce7-03771465ef8e"],
                           "categoryIds": ["%s", "%s"],
-                          "categorySuggestions": ["finance"]
+                          "categorySuggestions": ["finance"],
+                          "contributorLabels": [{"name": "l1"}, {"name": "l2"}]
                         }
                         """.formatted(gameCategory.id(), tutorialCategory.id()))
                 .exchange()
@@ -183,7 +193,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.ecosystems[1].name").isEqualTo("Zama")
                 .jsonPath("$.categories[0].name").isEqualTo("Game")
                 .jsonPath("$.categories[1].name").isEqualTo("Tutorial")
-                .jsonPath("$.categorySuggestions[0]").isEqualTo("finance");
+                .jsonPath("$.categorySuggestions[0]").isEqualTo("finance")
+                .jsonPath("$.contributorLabels[0].name").isEqualTo("l1")
+                .jsonPath("$.contributorLabels[1].name").isEqualTo("l2")
+        ;
 
         verify(slackApiAdapter).onProjectCategorySuggested("finance", user.userId());
 
@@ -820,6 +833,107 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.name").isEqualTo("Updated Project")
                 .jsonPath("$.shortDescription").isEqualTo("This is a super updated project")
                 .jsonPath("$.longDescription").isEqualTo("This is a super awesome updated project with a nice description");
+    }
+
+    @Test
+    void should_update_contributor_labels() {
+        final var lead = userAuthHelper.create();
+        final var contributor = userAuthHelper.create();
+        final var projectId = projectHelper.create(lead).getLeft();
+        final var project = projectHelper.get(projectId);
+
+        final var label1Id = new MutableObject<UUID>();
+        final var label2Id = new MutableObject<UUID>();
+
+        // Add new labels
+        client.put()
+                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + lead.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(updateProjectRequest(project)
+                        .contributorLabels(List.of(
+                                new UpdateProjectRequestContributorLabelsInner("l1"),
+                                new UpdateProjectRequestContributorLabelsInner("l2"))
+                        ))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + projectId))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.contributorLabels[0].id").<String>value(v -> label1Id.setValue(UUID.fromString(v)))
+                .jsonPath("$.contributorLabels[0].name").isEqualTo("l1")
+                .jsonPath("$.contributorLabels[1].id").<String>value(v -> label2Id.setValue(UUID.fromString(v)))
+                .jsonPath("$.contributorLabels[1].name").isEqualTo("l2")
+        ;
+
+        // Assign labels to contributors
+        client.patch()
+                .uri(getApiURI(PROJECTS_CONTRIBUTORS.formatted(projectId.value())))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + lead.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new ContributorsLabelsRequest()
+                        .contributorsLabels(List.of(
+                                new ContributorLabelsRequest()
+                                        .githubUserId(contributor.githubUserId().value())
+                                        .labels(List.of(label1Id.getValue(), label2Id.getValue()))
+                        )))
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        // Remove label1, update label2 and add label3
+        client.put()
+                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + lead.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(updateProjectRequest(project)
+                        .contributorLabels(List.of(
+                                new UpdateProjectRequestContributorLabelsInner("l2-updated").id(label2Id.getValue()),
+                                new UpdateProjectRequestContributorLabelsInner("l3"))
+                        ))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+        client.get()
+                .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + projectId))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.contributorLabels[0].id").isEqualTo(label2Id.getValue().toString())
+                .jsonPath("$.contributorLabels[0].name").isEqualTo("l2-updated")
+                .jsonPath("$.contributorLabels[1].id").isNotEmpty()
+                .jsonPath("$.contributorLabels[1].name").isEqualTo("l3")
+        ;
+
+        // Check that the contributor has the updated labels
+        final var labelsByContributor = contributorProjectContributorLabelRepository.findAll().stream()
+                .collect(groupingBy(ContributorProjectContributorLabelEntity::getGithubUserId,
+                        mapping(ContributorProjectContributorLabelEntity::getLabelId,
+                                toList())));
+
+        assertThat(labelsByContributor).contains(
+                entry(contributor.githubUserId().value(), List.of(label2Id.getValue()))
+        );
+    }
+
+    private UpdateProjectRequest updateProjectRequest(Project project) {
+        return new UpdateProjectRequest()
+                .name(project.getName())
+                .shortDescription(project.getShortDescription())
+                .longDescription(project.getLongDescription())
+                .isLookingForContributors(true)
+                .contributorLabels(List.of());
     }
 
     private void assertProjectWasUpdated() {

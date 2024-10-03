@@ -142,6 +142,9 @@ public class ProjectReadEntity {
     @Getter(AccessLevel.NONE)
     Set<ProjectContributionStatReadEntity> contributionStats;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "project")
+    Set<ProjectContributorLabelReadEntity> contributorLabels;
+
     public Optional<ProjectContributionStatReadEntity> contributionStats() {
         return contributionStats.stream().findFirst();
     }
