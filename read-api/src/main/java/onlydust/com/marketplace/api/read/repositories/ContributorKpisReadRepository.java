@@ -50,9 +50,9 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                    coalesce(previous_period.pr_count, 0)                    as previous_period_pr_count,
                    coalesce(previous_period.code_review_count, 0)           as previous_period_code_review_count
             
-            FROM bi.select_contributors(:fromDate, :toDate, :programOrEcosystemIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis) d
+            FROM bi.select_contributors(:fromDate, :toDate, :dataSourceIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis) d
                      LEFT JOIN (
-                            select * from bi.select_contributors(:fromDatePreviousPeriod, :toDatePreviousPeriod, :programOrEcosystemIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis)
+                            select * from bi.select_contributors(:fromDatePreviousPeriod, :toDatePreviousPeriod, :dataSourceIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis)
                          ) previous_period ON previous_period.contributor_id = d.contributor_id
             
             WHERE (coalesce(:totalRewardedUsdAmountMin) is null or d.total_rewarded_usd_amount >= :totalRewardedUsdAmountMin)
@@ -79,7 +79,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
             """,
             countQuery = """
                     SELECT count(d.contributor_id)
-                    FROM bi.select_contributors(:fromDate, :toDate, :programOrEcosystemIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis) d
+                    FROM bi.select_contributors(:fromDate, :toDate, :dataSourceIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis) d
                     WHERE (coalesce(:totalRewardedUsdAmountMin) is null or d.total_rewarded_usd_amount >= :totalRewardedUsdAmountMin)
                       and (coalesce(:totalRewardedUsdAmountEq) is null or d.total_rewarded_usd_amount = :totalRewardedUsdAmountEq)
                       and (coalesce(:totalRewardedUsdAmountMax) is null or d.total_rewarded_usd_amount <= :totalRewardedUsdAmountMax)
@@ -107,7 +107,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                             @NonNull ZonedDateTime toDate,
                                             @NonNull ZonedDateTime fromDatePreviousPeriod,
                                             @NonNull ZonedDateTime toDatePreviousPeriod,
-                                            @NonNull UUID[] programOrEcosystemIds,
+                                            @NonNull UUID[] dataSourceIds,
                                             @NonNull Boolean showFilteredKpis,
                                             String search,
                                             Long[] contributorIds,

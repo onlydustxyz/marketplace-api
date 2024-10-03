@@ -72,6 +72,10 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     private final BiFinancialMonthlyStatsReadRepository biFinancialMonthlyStatsReadRepository;
     private final ProjectReadRepository projectReadRepository;
 
+    private static ZonedDateTime sanitizedDate(String fromDate, ZonedDateTime defaultFromDate) {
+        return Optional.ofNullable(DateMapper.parseNullable(fromDate)).map(DateMapper::toZoneDateTime).orElse(defaultFromDate);
+    }
+
     @Override
     public ResponseEntity<BiContributorsPageResponse> getBIContributors(BiContributorsQueryParams q) {
         final var page = findContributors(q);
@@ -123,13 +127,13 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
 
     @Override
     public ResponseEntity<BiContributorsStatsListResponse> getBIContributorsStats(TimeGroupingEnum timeGrouping, String fromDate, String toDate,
-                                                                                  List<UUID> programOrEcosystemIds) {
+                                                                                  List<UUID> dataSourceIds) {
         final var statsPerTimestamp = aggregatedKpisReadRepository.findAllContributors(
                         timeGrouping,
                         timeGrouping == TimeGroupingEnum.QUARTER ? "3 MONTHS" : "1 %s".formatted(timeGrouping.name()),
                         parseZonedNullable(fromDate),
                         parseZonedNullable(toDate),
-                        getFilteredProgramOrEcosystemIds(programOrEcosystemIds)).stream()
+                        getFilteredDataSourceIds(dataSourceIds)).stream()
                 .collect(Collectors.toMap(AggregatedKpisReadEntity::timestamp, Function.identity()));
 
         final var mergedStats = statsPerTimestamp.keySet().stream().map(timestamp -> {
@@ -205,14 +209,14 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     public ResponseEntity<BiProjectsStatsListResponse> getBIProjectsStats(TimeGroupingEnum timeGrouping,
                                                                           String fromDate,
                                                                           String toDate,
-                                                                          List<UUID> programOrEcosystemIds) {
+                                                                          List<UUID> dataSourceIds) {
 
         final var statsPerTimestamp = aggregatedKpisReadRepository.findAllProjects(
                         timeGrouping,
                         timeGrouping == TimeGroupingEnum.QUARTER ? "3 MONTHS" : "1 %s".formatted(timeGrouping.name()),
                         parseZonedNullable(fromDate),
                         sanitizedDate(toDate, ZonedDateTime.now()),
-                        getFilteredProgramOrEcosystemIds(programOrEcosystemIds)).stream()
+                        getFilteredDataSourceIds(dataSourceIds)).stream()
                 .collect(Collectors.toMap(AggregatedKpisReadEntity::timestamp, Function.identity()));
 
         final var mergedStats = statsPerTimestamp.keySet().stream().map(timestamp -> {
@@ -231,14 +235,13 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     public ResponseEntity<List<BiWorldMapItemResponse>> getBIWorldMap(WorldMapKpiEnum kpi,
                                                                       String fromDate,
                                                                       String toDate,
-                                                                      List<UUID> programOrEcosystemIds) {
-        final var filteredProgramOrEcosystemIds = getFilteredProgramOrEcosystemIds(programOrEcosystemIds);
+                                                                      List<UUID> dataSourceIds) {
 
         final var kpis = switch (kpi) {
             case ACTIVE_CONTRIBUTORS -> worldMapKpiReadRepository.findActiveContributorCount(
                     parseZonedNullable(fromDate),
                     parseZonedNullable(toDate),
-                    filteredProgramOrEcosystemIds
+                    getFilteredDataSourceIds(dataSourceIds)
             );
         };
 
@@ -247,21 +250,18 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 .toList());
     }
 
-    private static ZonedDateTime sanitizedDate(String fromDate, ZonedDateTime defaultFromDate) {
-        return Optional.ofNullable(DateMapper.parseNullable(fromDate)).map(DateMapper::toZoneDateTime).orElse(defaultFromDate);
-    }
-
-    private UUID[] getFilteredProgramOrEcosystemIds(List<UUID> programOrEcosystemIds) {
+    private UUID[] getFilteredDataSourceIds(List<UUID> dataSourceIds) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        final var userProgramOrEcosystemIds = Stream.concat(
-                        permissionsService.getLedProgramIds(authenticatedUser.id()).stream().map(ProgramId::value),
-                        permissionsService.getLedEcosystemIds(authenticatedUser.id()).stream().map(EcosystemId::value))
+        final var userProjectOrProgramOrEcosystemIds = Stream.concat(
+                        permissionsService.getLedProjectIds(authenticatedUser.id()).stream().map(ProjectId::value),
+                        Stream.concat(permissionsService.getLedProgramIds(authenticatedUser.id()).stream().map(ProgramId::value),
+                                permissionsService.getLedEcosystemIds(authenticatedUser.id()).stream().map(EcosystemId::value)))
                 .toList();
 
-        return Optional.ofNullable(programOrEcosystemIds)
-                .map(l -> l.stream().filter(userProgramOrEcosystemIds::contains).toArray(UUID[]::new))
-                .orElse(userProgramOrEcosystemIds.toArray(UUID[]::new));
+        return Optional.ofNullable(dataSourceIds)
+                .map(l -> l.stream().filter(userProjectOrProgramOrEcosystemIds::contains).toArray(UUID[]::new))
+                .orElse(userProjectOrProgramOrEcosystemIds.toArray(UUID[]::new));
     }
 
     private Page<ContributorKpisReadEntity> findContributors(BiContributorsQueryParams q) {
@@ -274,7 +274,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 sanitizedToDate,
                 fromDateOfPreviousPeriod,
                 sanitizedFromDate,
-                getFilteredProgramOrEcosystemIds(q.getProgramOrEcosystemIds()),
+                getFilteredDataSourceIds(q.getDataSourceIds()),
                 q.getShowFilteredKpis(),
                 q.getSearch(),
                 q.getContributorIds() == null ? null : q.getContributorIds().toArray(Long[]::new),
@@ -310,7 +310,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 sanitizedToDate,
                 fromDateOfPreviousPeriod,
                 sanitizedFromDate,
-                getFilteredProgramOrEcosystemIds(q.getProgramOrEcosystemIds()),
+                getFilteredDataSourceIds(q.getDataSourceIds()),
                 q.getShowFilteredKpis(),
                 q.getSearch(),
                 q.getProgramIds() == null ? null : q.getProgramIds().toArray(UUID[]::new),

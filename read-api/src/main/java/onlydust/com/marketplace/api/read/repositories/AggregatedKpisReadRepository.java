@@ -36,16 +36,18 @@ public class AggregatedKpisReadRepository {
                                                    from bi.p_contribution_data previous
                                                    where previous.project_id = d.project_id
                                                      and previous.#timeGrouping#_timestamp < d.#timeGrouping#_timestamp
-                                                     and (coalesce(:programOrEcosystemIds) is null
-                                                       or cast(:programOrEcosystemIds as uuid[]) && previous.program_ids
-                                                       or cast(:programOrEcosystemIds as uuid[]) && previous.ecosystem_ids)) previous on true
+                                                     and (coalesce(:dataSourceIds) is null
+                                                       or previous.project_id = any (cast(:dataSourceIds as uuid[]))
+                                                       or cast(:dataSourceIds as uuid[]) && previous.program_ids
+                                                       or cast(:dataSourceIds as uuid[]) && previous.ecosystem_ids)) previous on true
                       where
                         -- We need to get one interval before fromDate to calculate churned project count
                           d.#timeGrouping#_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz)) - cast(:timeGroupingInterval as interval)
                         and d.#timeGrouping#_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
-                        and (coalesce(:programOrEcosystemIds) is null
-                          or cast(:programOrEcosystemIds as uuid[]) && d.program_ids
-                          or cast(:programOrEcosystemIds as uuid[]) && d.ecosystem_ids)
+                        and (coalesce(:dataSourceIds) is null
+                          or d.project_id = any (cast(:dataSourceIds as uuid[]))
+                          or cast(:dataSourceIds as uuid[]) && d.program_ids
+                          or cast(:dataSourceIds as uuid[]) && d.ecosystem_ids)
                       group by 1),
             
                  aggregated_project_rewards_stats AS
@@ -54,9 +56,10 @@ public class AggregatedKpisReadRepository {
                       from bi.p_reward_data d
                       where d.#timeGrouping#_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
                         and d.#timeGrouping#_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
-                        and (coalesce(:programOrEcosystemIds) is null
-                          or cast(:programOrEcosystemIds as uuid[]) && d.program_ids
-                          or cast(:programOrEcosystemIds as uuid[]) && d.ecosystem_ids)
+                        and (coalesce(:dataSourceIds) is null
+                          or d.project_id = any (cast(:dataSourceIds as uuid[]))
+                          or cast(:dataSourceIds as uuid[]) && d.program_ids
+                          or cast(:dataSourceIds as uuid[]) && d.ecosystem_ids)
                       group by 1),
             
                  aggregated_project_grants_stats AS
@@ -65,9 +68,10 @@ public class AggregatedKpisReadRepository {
                       from bi.p_project_grants_data d
                       where d.#timeGrouping#_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
                         and d.#timeGrouping#_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
-                        and (coalesce(:programOrEcosystemIds) is null
-                          or d.program_id = any (cast(:programOrEcosystemIds as uuid[]))
-                          or cast(:programOrEcosystemIds as uuid[]) && d.ecosystem_ids)
+                        and (coalesce(:dataSourceIds) is null
+                          or d.project_id = any (cast(:dataSourceIds as uuid[]))
+                          or d.program_id = any (cast(:dataSourceIds as uuid[]))
+                          or cast(:dataSourceIds as uuid[]) && d.ecosystem_ids)
                       group by 1),
             
                  all_timestamps_to_return AS
@@ -113,16 +117,18 @@ public class AggregatedKpisReadRepository {
                                                    from bi.p_contribution_data previous
                                                    where previous.contributor_id = d.contributor_id
                                                      and previous.#timeGrouping#_timestamp < d.#timeGrouping#_timestamp
-                                                     and (coalesce(:programOrEcosystemIds) is null
-                                                       or cast(:programOrEcosystemIds as uuid[]) && previous.program_ids
-                                                       or cast(:programOrEcosystemIds as uuid[]) && previous.ecosystem_ids)) previous on true
+                                                     and (coalesce(:dataSourceIds) is null
+                                                       or previous.project_id = any (cast(:dataSourceIds as uuid[]))
+                                                       or cast(:dataSourceIds as uuid[]) && previous.program_ids
+                                                       or cast(:dataSourceIds as uuid[]) && previous.ecosystem_ids)) previous on true
                       where
                         -- We need to get one interval before fromDate to calculate churned contributor count
                           d.#timeGrouping#_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz)) - cast(:timeGroupingInterval as interval)
                         and d.#timeGrouping#_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
-                        and (coalesce(:programOrEcosystemIds) is null
-                          or cast(:programOrEcosystemIds as uuid[]) && d.program_ids
-                          or cast(:programOrEcosystemIds as uuid[]) && d.ecosystem_ids)
+                        and (coalesce(:dataSourceIds) is null
+                          or d.project_id = any (cast(:dataSourceIds as uuid[]))
+                          or cast(:dataSourceIds as uuid[]) && d.program_ids
+                          or cast(:dataSourceIds as uuid[]) && d.ecosystem_ids)
                       group by 1),
             
                  aggregated_project_rewards_stats AS
@@ -131,9 +137,10 @@ public class AggregatedKpisReadRepository {
                       from bi.p_reward_data d
                       where d.#timeGrouping#_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
                         and d.#timeGrouping#_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
-                        and (coalesce(:programOrEcosystemIds) is null
-                          or cast(:programOrEcosystemIds as uuid[]) && d.program_ids
-                          or cast(:programOrEcosystemIds as uuid[]) && d.ecosystem_ids)
+                        and (coalesce(:dataSourceIds) is null
+                          or d.project_id = any (cast(:dataSourceIds as uuid[]))
+                          or cast(:dataSourceIds as uuid[]) && d.program_ids
+                          or cast(:dataSourceIds as uuid[]) && d.ecosystem_ids)
                       group by 1),
             
                  aggregated_project_grants_stats AS
@@ -142,9 +149,10 @@ public class AggregatedKpisReadRepository {
                       from bi.p_project_grants_data d
                       where d.#timeGrouping#_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
                         and d.#timeGrouping#_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
-                        and (coalesce(:programOrEcosystemIds) is null
-                          or d.program_id = any (cast(:programOrEcosystemIds as uuid[]))
-                          or cast(:programOrEcosystemIds as uuid[]) && d.ecosystem_ids)
+                        and (coalesce(:dataSourceIds) is null
+                          or d.project_id = any (cast(:dataSourceIds as uuid[]))
+                          or d.program_id = any (cast(:dataSourceIds as uuid[]))
+                          or cast(:dataSourceIds as uuid[]) && d.ecosystem_ids)
                       group by 1),
             
                  all_timestamps_to_return AS
@@ -184,16 +192,16 @@ public class AggregatedKpisReadRepository {
                                                           @NonNull String timeGroupingInterval,
                                                           ZonedDateTime fromDate,
                                                           ZonedDateTime toDate,
-                                                          UUID[] programOrEcosystemIds) {
-        return findAll(Query.PROJECT, timeGrouping, timeGroupingInterval, fromDate, toDate, programOrEcosystemIds);
+                                                          UUID[] dataSourceIds) {
+        return findAll(Query.PROJECT, timeGrouping, timeGroupingInterval, fromDate, toDate, dataSourceIds);
     }
 
     public List<AggregatedKpisReadEntity> findAllContributors(@NonNull TimeGroupingEnum timeGrouping,
                                                               @NonNull String timeGroupingInterval,
                                                               ZonedDateTime fromDate,
                                                               ZonedDateTime toDate,
-                                                              UUID[] programOrEcosystemIds) {
-        return findAll(Query.CONTRIBUTOR, timeGrouping, timeGroupingInterval, fromDate, toDate, programOrEcosystemIds);
+                                                              UUID[] dataSourceIds) {
+        return findAll(Query.CONTRIBUTOR, timeGrouping, timeGroupingInterval, fromDate, toDate, dataSourceIds);
     }
 
     private List findAll(@NonNull Query query,
@@ -201,8 +209,8 @@ public class AggregatedKpisReadRepository {
                          @NonNull String timeGroupingInterval,
                          ZonedDateTime fromDate,
                          ZonedDateTime toDate,
-                         UUID[] programOrEcosystemIds) {
-        final var from = fromDate != null ? fromDate : findFirstContributionDate(programOrEcosystemIds).orElse(ZonedDateTime.now());
+                         UUID[] dataSourceIds) {
+        final var from = fromDate != null ? fromDate : findFirstContributionDate(dataSourceIds).orElse(ZonedDateTime.now());
         final var to = toDate != null ? toDate : ZonedDateTime.now();
         final var timestampColumnPrefix = timeGrouping.name().toLowerCase();
 
@@ -211,19 +219,20 @@ public class AggregatedKpisReadRepository {
                 .setParameter("timeGroupingInterval", timeGroupingInterval)
                 .setParameter("fromDate", from)
                 .setParameter("toDate", to)
-                .setParameter("programOrEcosystemIds", programOrEcosystemIds)
+                .setParameter("dataSourceIds", dataSourceIds)
                 .getResultList();
     }
 
-    private Optional<ZonedDateTime> findFirstContributionDate(UUID[] programOrEcosystemIds) {
+    private Optional<ZonedDateTime> findFirstContributionDate(UUID[] dataSourceIds) {
         final var query = entityManager.createNativeQuery("""
                 SELECT min(timestamp)
                 from bi.p_contribution_data
-                where (coalesce(:programOrEcosystemIds) is null
-                  or cast(:programOrEcosystemIds as uuid[]) && program_ids
-                  or cast(:programOrEcosystemIds as uuid[]) && ecosystem_ids)
+                where (coalesce(:dataSourceIds) is null
+                  or project_id = any (cast(:dataSourceIds as uuid[]))
+                  or cast(:dataSourceIds as uuid[]) && program_ids
+                  or cast(:dataSourceIds as uuid[]) && ecosystem_ids)
                 """, ZonedDateTime.class);
-        query.setParameter("programOrEcosystemIds", programOrEcosystemIds);
+        query.setParameter("dataSourceIds", dataSourceIds);
         return Optional.ofNullable((ZonedDateTime) query.getSingleResult());
     }
 }

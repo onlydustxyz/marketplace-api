@@ -24,7 +24,7 @@ paths:
         - $ref: '#/components/parameters/fromDateParam'
         - $ref: '#/components/parameters/toDateParam'
         - $ref: '#/components/parameters/timeGroupingParam'
-        - $ref: '#/components/parameters/programOrEcosystemIdsParam'
+        - $ref: '#/components/parameters/dataSourceIdsParam'
       responses:
         "200":
           description: 'Projects stats'
@@ -45,7 +45,7 @@ paths:
         - $ref: '#/components/parameters/fromDateParam'
         - $ref: '#/components/parameters/toDateParam'
         - $ref: '#/components/parameters/timeGroupingParam'
-        - $ref: '#/components/parameters/programOrEcosystemIdsParam'
+        - $ref: '#/components/parameters/dataSourceIdsParam'
       responses:
         "200":
           description: 'Contributors stats'
@@ -169,7 +169,7 @@ paths:
             $ref: '#/components/schemas/WorldMapKpiEnum'
         - $ref: '#/components/parameters/fromDateParam'
         - $ref: '#/components/parameters/toDateParam'
-        - $ref: '#/components/parameters/programOrEcosystemIdsParam'
+        - $ref: '#/components/parameters/dataSourceIdsParam'
       responses:
         "200":
           description: 'World map'
@@ -5243,8 +5243,8 @@ components:
       required: true
       schema:
         $ref: '#/components/schemas/TimeGroupingEnum'
-    programOrEcosystemIdsParam:
-      name: programOrEcosystemIds
+    dataSourceIdsParam:
+      name: dataSourceIds
       in: query
       required: false
       schema:
@@ -11155,7 +11155,7 @@ components:
           $ref: '#/components/schemas/FromDateParam'
         toDate:
           $ref: '#/components/schemas/ToDateParam'
-        programOrEcosystemIds:
+        dataSourceIds:
           type: array
           items:
             type: string
@@ -11321,7 +11321,7 @@ components:
           $ref: '#/components/schemas/FromDateParam'
         toDate:
           $ref: '#/components/schemas/ToDateParam'
-        programOrEcosystemIds:
+        dataSourceIds:
           type: array
           items:
             type: string

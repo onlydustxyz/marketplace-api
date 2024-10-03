@@ -186,7 +186,7 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
             client.get()
                     .uri(getApiURI(BI_WORLD_MAP, Map.of(
                             "kpi", "ACTIVE_CONTRIBUTORS",
-                            "programOrEcosystemIds", Stream.of(nethermind, ethereum).map(Object::toString).collect(joining(","))
+                            "dataSourceIds", Stream.of(nethermind, ethereum).map(Object::toString).collect(joining(","))
                     )))
                     .header("Authorization", BEARER_PREFIX + caller.jwt())
                     .exchange()

@@ -46,7 +46,7 @@ public class ProjectDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.stats").isArray()
-                .jsonPath("$.stats[0].timestamp").isEqualTo("2024-09-30T00:00:00Z");
+                .jsonPath("$.stats[0].timestamp").isEqualTo("2019-01-28T00:00:00Z");
     }
 
     @Test
@@ -171,7 +171,7 @@ public class ProjectDiagramKpisApiIT extends AbstractMarketplaceApiIT {
             // When
             client.get()
                     .uri(getApiURI(BI_STATS_PROJECTS, Map.of("timeGrouping", "DAY", "fromDate", "2021-01-01", "toDate", "2021-01-10",
-                            "programOrEcosystemIds",
+                            "dataSourceIds",
                             String.join(",", Stream.of(explorationTeam, nethermind, ethGrantingProgram).map(ProgramId::toString).toList()))))
                     .header("Authorization", BEARER_PREFIX + caller.jwt())
                     // Then
@@ -289,7 +289,7 @@ public class ProjectDiagramKpisApiIT extends AbstractMarketplaceApiIT {
             // When
             client.get()
                     .uri(getApiURI(BI_STATS_PROJECTS, Map.of("timeGrouping", "DAY", "fromDate", "2021-01-02", "toDate", "2021-01-02",
-                            "programOrEcosystemIds",
+                            "dataSourceIds",
                             String.join(",", Stream.of(explorationTeam, nethermind, ethGrantingProgram).map(ProgramId::toString).toList()))))
                     .header("Authorization", BEARER_PREFIX + caller.jwt())
                     // Then
@@ -320,7 +320,7 @@ public class ProjectDiagramKpisApiIT extends AbstractMarketplaceApiIT {
             // When
             client.get()
                     .uri(getApiURI(BI_STATS_PROJECTS, Map.of("timeGrouping", "WEEK", "fromDate", "2021-01-01", "toDate", "2021-01-10",
-                            "programOrEcosystemIds",
+                            "dataSourceIds",
                             String.join(",", Stream.of(explorationTeam, nethermind, ethGrantingProgram).map(ProgramId::toString).toList()))))
                     .header("Authorization", BEARER_PREFIX + caller.jwt())
                     // Then

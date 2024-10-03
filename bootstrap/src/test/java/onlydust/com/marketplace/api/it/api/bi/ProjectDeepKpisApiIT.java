@@ -560,7 +560,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             queryParams.put("pageSize", "100");
             queryParams.put("fromDate", "2021-01-01");
             queryParams.put("toDate", "2021-01-10");
-            queryParams.put("programOrEcosystemIds", allProgramOrEcosystemIds);
+            queryParams.put("dataSourceIds", allProgramOrEcosystemIds);
             queryParams.putAll(queryParamsWithValues);
             final var response = client.get()
                     .uri(getApiURI(BI_PROJECTS, queryParams))
