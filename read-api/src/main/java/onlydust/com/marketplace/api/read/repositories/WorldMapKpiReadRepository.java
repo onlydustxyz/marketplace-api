@@ -19,11 +19,12 @@ public interface WorldMapKpiReadRepository extends JpaRepository<WorldMapKpiRead
                                                 (cast(:fromDate as text) is null or cd.timestamp >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) and
                                                 (cast(:toDate as text) is null or date_trunc('day', cd.timestamp) < to_date(cast(:toDate as text), 'YYYY-MM-DD'))
                                        and cd.contributor_country is not null
-            where (coalesce(:programOrEcosystemIds) is null or
-                     p.program_ids && cast(array[:programOrEcosystemIds] as uuid[]) or
-                     p.ecosystem_ids && cast(array[:programOrEcosystemIds] as uuid[]))
+            where (coalesce(:dataSourceIds) is null or
+                     p.project_id = any(:dataSourceIds) or
+                     p.program_ids && cast(array[:dataSourceIds] as uuid[]) or
+                     p.ecosystem_ids && cast(array[:dataSourceIds] as uuid[]))
             group by cd.contributor_country
             order by cd.contributor_country
             """, nativeQuery = true)
-    List<WorldMapKpiReadEntity> findActiveContributorCount(ZonedDateTime fromDate, ZonedDateTime toDate, UUID[] programOrEcosystemIds);
+    List<WorldMapKpiReadEntity> findActiveContributorCount(ZonedDateTime fromDate, ZonedDateTime toDate, UUID[] dataSourceIds);
 }

@@ -484,6 +484,28 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                            "reward_count;issue_count;pr_count;code_review_count;contribution_count");
         }
 
+        @Test
+        public void should_get_contributors_stats_of_project() {
+            // When
+            final var response = client.get()
+                    .uri(getApiURI(BI_CONTRIBUTORS, Map.of("pageIndex", "0",
+                            "pageSize", "100",
+                            "fromDate", "2021-01-01",
+                            "toDate", "2021-01-07",
+                            "dataSourceIds", onlyDust.toString())))
+                    .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(BiContributorsPageResponse.class).returnResult().getResponseBody();
+
+            assertThat(response.getContributors()).isNotEmpty();
+            response.getContributors().forEach(contributor -> assertThat(contributor.getProjects())
+                    .extracting(ProjectLinkResponse::getName)
+                    .filteredOn(name -> name.contains("OnlyDust")).isNotEmpty());
+        }
+
         private void test_contributors_stats(String queryParam, String value, Consumer<BiContributorsPageResponse> asserter, boolean assertNotEmpty) {
             test_contributors_stats(Map.of(queryParam, value), asserter, assertNotEmpty);
         }
@@ -494,7 +516,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             queryParams.put("pageSize", "100");
             queryParams.put("fromDate", "2021-01-01");
             queryParams.put("toDate", "2021-01-10");
-            queryParams.put("programOrEcosystemIds", allProgramOrEcosystemIds);
+            queryParams.put("dataSourceIds", allProgramOrEcosystemIds);
             queryParams.putAll(queryParamsWithValues);
             final var response = client.get()
                     .uri(getApiURI(BI_CONTRIBUTORS, queryParams))

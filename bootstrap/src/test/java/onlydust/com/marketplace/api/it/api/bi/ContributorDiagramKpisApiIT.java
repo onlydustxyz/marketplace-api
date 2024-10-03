@@ -172,7 +172,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
             // When
             client.get()
                     .uri(getApiURI(BI_STATS_CONTRIBUTORS, Map.of("timeGrouping", "DAY", "fromDate", "2021-01-01", "toDate", "2021-01-10",
-                            "programOrEcosystemIds",
+                            "dataSourceIds",
                             String.join(",", Stream.of(explorationTeam, nethermind, ethGrantingProgram).map(ProgramId::toString).toList()))))
                     .header("Authorization", BEARER_PREFIX + caller.jwt())
                     // Then
@@ -290,7 +290,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
             // When
             client.get()
                     .uri(getApiURI(BI_STATS_CONTRIBUTORS, Map.of("timeGrouping", "DAY", "fromDate", "2021-01-02", "toDate", "2021-01-02",
-                            "programOrEcosystemIds",
+                            "dataSourceIds",
                             String.join(",", Stream.of(explorationTeam, nethermind, ethGrantingProgram).map(ProgramId::toString).toList()))))
                     .header("Authorization", BEARER_PREFIX + caller.jwt())
                     // Then
@@ -321,7 +321,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
             // When
             client.get()
                     .uri(getApiURI(BI_STATS_CONTRIBUTORS, Map.of("timeGrouping", "DAY", "fromDate", "2021-01-01", "toDate", "2021-01-10",
-                            "programOrEcosystemIds",
+                            "dataSourceIds",
                             String.join(",", Stream.of(ethereum).map(UUID::toString).toList()))))
                     .header("Authorization", BEARER_PREFIX + caller.jwt())
                     // Then
@@ -442,7 +442,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
             // When
             client.get()
                     .uri(getApiURI(BI_STATS_CONTRIBUTORS, Map.of("timeGrouping", "WEEK", "fromDate", "2021-01-01", "toDate", "2021-01-10",
-                            "programOrEcosystemIds",
+                            "dataSourceIds",
                             String.join(",", Stream.of(explorationTeam, nethermind, ethGrantingProgram).map(ProgramId::toString).toList()))))
                     .header("Authorization", BEARER_PREFIX + caller.jwt())
                     // Then

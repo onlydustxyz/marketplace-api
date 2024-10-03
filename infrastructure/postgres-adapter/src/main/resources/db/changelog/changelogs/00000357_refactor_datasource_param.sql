@@ -1,6 +1,35 @@
+DROP FUNCTION bi.select_projects(fromDate timestamptz,
+                                 toDate timestamptz,
+                                 programOrEcosystemIds uuid[],
+                                 programIds uuid[],
+                                 projectIds uuid[],
+                                 projectSlugs text[],
+                                 projectLeadIds uuid[],
+                                 categoryIds uuid[],
+                                 languageIds uuid[],
+                                 ecosystemIds uuid[],
+                                 searchQuery text,
+                                 showFilteredKpis boolean);
+
+DROP FUNCTION bi.select_contributors(fromDate timestamptz,
+                                     toDate timestamptz,
+                                     programOrEcosystemIds uuid[],
+                                     contributorIds bigint[],
+                                     projectIds uuid[],
+                                     projectSlugs text[],
+                                     categoryIds uuid[],
+                                     languageIds uuid[],
+                                     ecosystemIds uuid[],
+                                     countryCodes text[],
+                                     contributionStatuses indexer_exp.contribution_status[],
+                                     searchQuery text,
+                                     filteredKpis boolean);
+
+
+
 CREATE OR REPLACE FUNCTION bi.select_projects(fromDate timestamptz,
                                               toDate timestamptz,
-                                              programOrEcosystemIds uuid[],
+                                              dataSourceIds uuid[],
                                               programIds uuid[],
                                               projectIds uuid[],
                                               projectSlugs text[],
@@ -92,7 +121,7 @@ FROM bi.p_project_global_data p
                       and gd.timestamp < toDate
                     group by gd.project_id) gd on gd.project_id = p.project_id
 
-WHERE (p.program_ids && programOrEcosystemIds or p.ecosystem_ids && programOrEcosystemIds)
+WHERE (p.project_id = any (dataSourceIds) or p.program_ids && dataSourceIds or p.ecosystem_ids && dataSourceIds)
   and (ecosystemIds is null or p.ecosystem_ids && ecosystemIds)
   and (programIds is null or p.program_ids && programIds)
   and (projectIds is null or p.project_id = any (projectIds))
@@ -112,7 +141,7 @@ $$
 
 CREATE OR REPLACE FUNCTION bi.select_contributors(fromDate timestamptz,
                                                   toDate timestamptz,
-                                                  programOrEcosystemIds uuid[],
+                                                  dataSourceIds uuid[],
                                                   contributorIds bigint[],
                                                   projectIds uuid[],
                                                   projectSlugs text[],
@@ -169,7 +198,7 @@ FROM bi.p_contributor_global_data c
                     from bi.p_contribution_data cd
                     where cd.timestamp >= fromDate
                       and cd.timestamp < toDate
-                      and (cd.program_ids && programOrEcosystemIds or cd.ecosystem_ids && programOrEcosystemIds)
+                      and (cd.project_id = any (dataSourceIds) or cd.program_ids && dataSourceIds or cd.ecosystem_ids && dataSourceIds)
                       and (contributionStatuses is null or cd.contribution_status = any (contributionStatuses))
                       and (not filteredKpis or projectIds is null or cd.project_id = any (projectIds))
                       and (not filteredKpis or projectSlugs is null or cd.project_slug = any (projectSlugs))
@@ -184,7 +213,7 @@ FROM bi.p_contributor_global_data c
                     from bi.p_reward_data rd
                     where rd.timestamp >= fromDate
                       and rd.timestamp < toDate
-                      and (rd.program_ids && programOrEcosystemIds or rd.ecosystem_ids && programOrEcosystemIds)
+                      and (rd.project_id = any (dataSourceIds) or rd.program_ids && dataSourceIds or rd.ecosystem_ids && dataSourceIds)
                       and (not filteredKpis or projectIds is null or rd.project_id = any (projectIds))
                       and (not filteredKpis or projectSlugs is null or rd.project_slug = any (projectSlugs))
                       and (not filteredKpis or ecosystemIds is null or rd.ecosystem_ids && ecosystemIds)
@@ -192,7 +221,7 @@ FROM bi.p_contributor_global_data c
                       and (not filteredKpis or languageIds is null or rd.language_ids && languageIds)
                     group by rd.contributor_id) rd on rd.contributor_id = c.contributor_id
 
-WHERE (c.program_ids && programOrEcosystemIds or c.ecosystem_ids && programOrEcosystemIds)
+WHERE (c.project_ids && dataSourceIds or c.program_ids && dataSourceIds or c.ecosystem_ids && dataSourceIds)
   and (contributorIds is null or c.contributor_id = any (contributorIds))
   and (projectIds is null or c.project_ids && projectIds)
   and (projectSlugs is null or c.project_slugs && projectSlugs)
