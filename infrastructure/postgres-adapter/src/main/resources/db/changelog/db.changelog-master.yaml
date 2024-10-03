@@ -569,3 +569,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000354_improve_select_function_perfs.sql
   - include:
       file: db/changelog/changelogs/00000355_improve_perf_v_contribution_data.sql
+  - include:
+      file: db/changelog/changelogs/00000356_project_deposits_into_all_transactions.sql
