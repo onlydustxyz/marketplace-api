@@ -55,6 +55,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
         private static ProjectCategory gaming;
         private static ProjectId onlyDust;
         private static String onlyDustSlug;
+        private static ProjectId madara;
 
         private static String allProgramOrEcosystemIds;
 
@@ -124,7 +125,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             final var bridge_api = githubHelper.createRepo(bridge);
             final var bridge_frontend = githubHelper.createRepo(bridge);
 
-            final var madara = projectHelper.create(hayden, "Madara", List.of(universe, starknet)).getLeft();
+            madara = projectHelper.create(hayden, "Madara", List.of(universe, starknet)).getLeft();
             at("2021-01-06T00:00:00Z", () -> accountingHelper.grant(explorationTeam, madara, 120, STRK));
 
             final var madara_contracts = githubHelper.createRepo(madara);
@@ -492,7 +493,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                             "pageSize", "100",
                             "fromDate", "2021-01-01",
                             "toDate", "2021-03-01",
-                            "dataSourceIds", onlyDust.toString())))
+                            "dataSourceIds", madara.toString())))
                     .header("Authorization", BEARER_PREFIX + hayden.jwt())
                     // Then
                     .exchange()
