@@ -36,6 +36,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                    d.categories,
                    d.languages,
                    d.ecosystems,
+                   contributor_labels.list as project_contributor_labels,
                    -- /// filtered & computed data /// --
                    coalesce(d.total_rewarded_usd_amount, 0)                 as total_rewarded_usd_amount,
                    coalesce(d.reward_count, 0)                              as reward_count,
@@ -54,6 +55,14 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                      LEFT JOIN (
                             select * from bi.select_contributors(:fromDatePreviousPeriod, :toDatePreviousPeriod, :dataSourceIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis)
                          ) previous_period ON previous_period.contributor_id = d.contributor_id
+            
+                     LEFT JOIN LATERAL ( select jsonb_agg(jsonb_build_object('id', pcl.id, 'slug', pcl.slug, 'name', pcl.name)) as list
+                                         from contributor_project_contributor_labels cpcl
+                                            join project_contributor_labels pcl on pcl.id = cpcl.label_id
+                                            join projects p on p.id = pcl.project_id
+                                         where cpcl.github_user_id = d.contributor_id and
+                                               (coalesce(:projectIds) is null or p.id = any(:projectIds)) and
+                                               (coalesce(:projectSlugs) is null or p.slug = any(:projectSlugs))) contributor_labels ON true
             
             WHERE (coalesce(:totalRewardedUsdAmountMin) is null or d.total_rewarded_usd_amount >= :totalRewardedUsdAmountMin)
               and (coalesce(:totalRewardedUsdAmountEq) is null or d.total_rewarded_usd_amount = :totalRewardedUsdAmountEq)

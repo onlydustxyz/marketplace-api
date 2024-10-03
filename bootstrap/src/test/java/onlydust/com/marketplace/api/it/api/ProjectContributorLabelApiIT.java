@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.ContributorProje
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.ProjectContributorLabel;
+import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectContributorLabelStoragePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static onlydust.com.marketplace.api.helper.DateHelper.at;
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TagProject
@@ -26,6 +29,8 @@ public class ProjectContributorLabelApiIT extends AbstractMarketplaceApiIT {
     ProjectContributorLabelStoragePort projectContributorLabelStoragePort;
     @Autowired
     ContributorProjectContributorLabelRepository contributorProjectContributorLabelRepository;
+    @Autowired
+    ProjectFacadePort projectFacadePort;
 
     UserAuthHelper.AuthenticatedUser projectLead;
     ProjectId projectId;
@@ -180,6 +185,10 @@ public class ProjectContributorLabelApiIT extends AbstractMarketplaceApiIT {
 
         final var olivier = userAuthHelper.authenticateOlivier();
         final var pierre = userAuthHelper.authenticatePierre();
+        final var repo = at("2024-01-02T00:00:00Z", () -> githubHelper.createRepo(projectId));
+        at("2024-02-01T00:00:00Z", () -> githubHelper.createPullRequest(repo, olivier));
+        at("2024-02-02T00:00:02Z", () -> githubHelper.createPullRequest(repo, pierre));
+        projectFacadePort.refreshStats();
 
         // When
         client.patch()
@@ -237,5 +246,65 @@ public class ProjectContributorLabelApiIT extends AbstractMarketplaceApiIT {
         assertThat(result.keySet()).hasSize(2);
         assertThat(result.get(olivier.githubUserId().value())).containsExactlyInAnyOrder(label1.id().value(), label4.id().value());
         assertThat(result.get(pierre.githubUserId().value())).containsExactlyInAnyOrder(label1.id().value(), label2.id().value());
+
+        // When
+        client.get()
+                .uri(getApiURI(BI_CONTRIBUTORS, Map.of("pageIndex", "0",
+                        "pageSize", "100",
+                        "projectIds", projectId.value().toString())))
+                .header("Authorization", BEARER_PREFIX + projectLead.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "contributors": [
+                            {
+                              "contributor": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true,
+                                "id": "fc92397c-3431-4a84-8054-845376b630a0"
+                              },
+                              "projectContributorLabels": [
+                                {
+                                  "slug": "label-1001",
+                                  "name": "Label 1001"
+                                },
+                                {
+                                  "slug": "label-1002",
+                                  "name": "Label 1002"
+                                }
+                              ]
+                            },
+                            {
+                              "contributor": {
+                                "githubUserId": 595505,
+                                "login": "ofux",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                                "isRegistered": true,
+                                "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
+                              },
+                              "projectContributorLabels": [
+                                {
+                                  "slug": "label-1001",
+                                  "name": "Label 1001"
+                                },
+                                {
+                                  "slug": "label-1004",
+                                  "name": "Label 1004"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                        """);
     }
 }
