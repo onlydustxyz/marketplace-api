@@ -29,11 +29,14 @@ public class ProjectContributorLabelApiIT extends AbstractMarketplaceApiIT {
 
     UserAuthHelper.AuthenticatedUser projectLead;
     ProjectId projectId;
+    String projectSlug;
 
     @BeforeEach
     void setUp() {
         projectLead = userAuthHelper.create();
-        projectId = projectHelper.create(projectLead).getLeft();
+        final var project = projectHelper.create(projectLead);
+        projectId = project.getLeft();
+        projectSlug = project.getRight();
     }
 
     @Test
@@ -43,7 +46,7 @@ public class ProjectContributorLabelApiIT extends AbstractMarketplaceApiIT {
         projectContributorLabelStoragePort.save(label);
 
         client.post()
-                .uri(getApiURI(PROJECT_CONTRIBUTOR_LABELS.formatted(projectId.value())))
+                .uri(getApiURI(PROJECT_CONTRIBUTOR_LABELS.formatted(projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + other.jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -57,7 +60,7 @@ public class ProjectContributorLabelApiIT extends AbstractMarketplaceApiIT {
                 .isForbidden();
 
         client.put()
-                .uri(getApiURI(CONTRIBUTOR_LABEL_BY_ID.formatted(label.id().value())))
+                .uri(getApiURI(CONTRIBUTOR_LABEL_BY_ID.formatted(label.id())))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + other.jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -70,7 +73,7 @@ public class ProjectContributorLabelApiIT extends AbstractMarketplaceApiIT {
                 .isForbidden();
 
         client.delete()
-                .uri(getApiURI(CONTRIBUTOR_LABEL_BY_ID.formatted(label.id().value())))
+                .uri(getApiURI(CONTRIBUTOR_LABEL_BY_ID.formatted(label.id())))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + other.jwt())
                 .exchange()
                 // Then
@@ -81,7 +84,7 @@ public class ProjectContributorLabelApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_create_project_contributor_label() {
         client.post()
-                .uri(getApiURI(PROJECT_CONTRIBUTOR_LABELS.formatted(projectId.value())))
+                .uri(getApiURI(PROJECT_CONTRIBUTOR_LABELS.formatted(projectId)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + projectLead.jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -104,7 +107,7 @@ public class ProjectContributorLabelApiIT extends AbstractMarketplaceApiIT {
         projectContributorLabelStoragePort.save(label);
 
         client.put()
-                .uri(getApiURI(CONTRIBUTOR_LABEL_BY_ID.formatted(label.id().value())))
+                .uri(getApiURI(CONTRIBUTOR_LABEL_BY_ID.formatted(label.id())))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + projectLead.jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -118,7 +121,18 @@ public class ProjectContributorLabelApiIT extends AbstractMarketplaceApiIT {
 
         // Then
         client.get()
-                .uri(getApiURI(PROJECT_CONTRIBUTOR_LABELS.formatted(projectId.value())))
+                .uri(getApiURI(PROJECT_CONTRIBUTOR_LABELS.formatted(projectId)))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + projectLead.jwt())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.labels.length()").isEqualTo(1)
+                .jsonPath("$.labels[0].id").isEqualTo(label.id().value().toString())
+                .jsonPath("$.labels[0].name").isEqualTo("Updated Label 100");
+
+        client.get()
+                .uri(getApiURI(PROJECT_CONTRIBUTOR_LABELS.formatted(projectSlug)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + projectLead.jwt())
                 .exchange()
                 .expectStatus()
