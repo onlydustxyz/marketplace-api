@@ -4,7 +4,10 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.api.contract.ReadBiApi;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.read.entities.bi.*;
+import onlydust.com.marketplace.api.read.entities.bi.AggregatedKpisReadEntity;
+import onlydust.com.marketplace.api.read.entities.bi.ContributorKpisReadEntity;
+import onlydust.com.marketplace.api.read.entities.bi.ProjectKpisReadEntity;
+import onlydust.com.marketplace.api.read.entities.bi.WorldMapKpiReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.BiFinancialMonthlyStatsReadEntity;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.repositories.*;
@@ -60,8 +63,7 @@ import static org.springframework.http.ResponseEntity.status;
 public class ReadBiApiPostgresAdapter implements ReadBiApi {
     private static final ZonedDateTime DEFAULT_FROM_DATE = ZonedDateTime.parse("2007-10-20T05:24:19Z");
     private final PermissionService permissionService;
-    private final AggregatedProjectKpisReadRepository aggregatedProjectKpisReadRepository;
-    private final AggregatedContributorKpisReadRepository aggregatedContributorKpisReadRepository;
+    private final AggregatedKpisReadRepository aggregatedKpisReadRepository;
     private final WorldMapKpiReadRepository worldMapKpiReadRepository;
     private final ProjectKpisReadRepository projectKpisReadRepository;
     private final ContributorKpisReadRepository contributorKpisReadRepository;
@@ -122,18 +124,18 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     @Override
     public ResponseEntity<BiContributorsStatsListResponse> getBIContributorsStats(TimeGroupingEnum timeGrouping, String fromDate, String toDate,
                                                                                   List<UUID> programOrEcosystemIds) {
-        final var statsPerTimestamp = aggregatedContributorKpisReadRepository.findAll(
+        final var statsPerTimestamp = aggregatedKpisReadRepository.findAllContributors(
                         timeGrouping,
                         timeGrouping == TimeGroupingEnum.QUARTER ? "3 MONTHS" : "1 %s".formatted(timeGrouping.name()),
-                        sanitizedDate(fromDate, DEFAULT_FROM_DATE),
-                        sanitizedDate(toDate, ZonedDateTime.now()),
+                        parseZonedNullable(fromDate),
+                        parseZonedNullable(toDate),
                         getFilteredProgramOrEcosystemIds(programOrEcosystemIds)).stream()
-                .collect(Collectors.toMap(AggregatedContributorKpisReadEntity::timestamp, Function.identity()));
+                .collect(Collectors.toMap(AggregatedKpisReadEntity::timestamp, Function.identity()));
 
         final var mergedStats = statsPerTimestamp.keySet().stream().map(timestamp -> {
                     var stats = statsPerTimestamp.get(timestamp);
                     var statsOfPreviousPeriod = statsPerTimestamp.get(stats.timestampOfPreviousPeriod());
-                    return stats.toDto(statsOfPreviousPeriod);
+                    return stats.toContributorDto(statsOfPreviousPeriod);
                 })
                 .sorted(comparing(BiContributorsStatsListItemResponse::getTimestamp))
                 .skip(1) // Skip the first element as it is the previous period used to compute churned contributor count
@@ -204,18 +206,19 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                                                                           String fromDate,
                                                                           String toDate,
                                                                           List<UUID> programOrEcosystemIds) {
-        final var statsPerTimestamp = aggregatedProjectKpisReadRepository.findAll(
+
+        final var statsPerTimestamp = aggregatedKpisReadRepository.findAllProjects(
                         timeGrouping,
                         timeGrouping == TimeGroupingEnum.QUARTER ? "3 MONTHS" : "1 %s".formatted(timeGrouping.name()),
-                        sanitizedDate(fromDate, DEFAULT_FROM_DATE),
+                        parseZonedNullable(fromDate),
                         sanitizedDate(toDate, ZonedDateTime.now()),
                         getFilteredProgramOrEcosystemIds(programOrEcosystemIds)).stream()
-                .collect(Collectors.toMap(AggregatedProjectKpisReadEntity::timestamp, Function.identity()));
+                .collect(Collectors.toMap(AggregatedKpisReadEntity::timestamp, Function.identity()));
 
         final var mergedStats = statsPerTimestamp.keySet().stream().map(timestamp -> {
                     var stats = statsPerTimestamp.get(timestamp);
                     var statsOfPreviousPeriod = statsPerTimestamp.get(stats.timestampOfPreviousPeriod());
-                    return stats.toDto(statsOfPreviousPeriod);
+                    return stats.toProjectDto(statsOfPreviousPeriod);
                 })
                 .sorted(comparing(BiProjectsStatsListItemResponse::getTimestamp))
                 .skip(1) // Skip the first element as it is the previous period used to compute churned project count
