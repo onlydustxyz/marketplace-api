@@ -25,9 +25,10 @@ public abstract class PseudoProjectionRepository {
 
     @SneakyThrows
     protected int refresh(Map<String, Object> params) {
-        return entityManager.createNativeQuery("call refresh_pseudo_projection(:schema, :name, cast(:params as jsonb))")
+        return entityManager.createNativeQuery("call refresh_pseudo_projection(:schema, :name, :pkName, cast(:params as jsonb))")
                 .setParameter("schema", schema)
                 .setParameter("name", name)
+                .setParameter("pkName", primaryKey)
                 .setParameter("params", new ObjectMapper().writeValueAsString(params))
                 .executeUpdate();
     }
