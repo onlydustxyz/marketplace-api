@@ -46,7 +46,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.stats").isArray()
-                .jsonPath("$.stats[0].timestamp").isEqualTo("2024-09-30T00:00:00Z");
+                .jsonPath("$.stats[0].timestamp").isEqualTo("2019-01-28T00:00:00Z");
     }
 
     @Test

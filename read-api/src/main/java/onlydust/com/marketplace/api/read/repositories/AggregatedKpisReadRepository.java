@@ -228,7 +228,7 @@ public class AggregatedKpisReadRepository {
                 SELECT min(timestamp)
                 from bi.p_contribution_data
                 where (coalesce(:dataSourceIds) is null
-                  or project_id = any(:dataSourceIds)
+                  or project_id = any (cast(:dataSourceIds as uuid[]))
                   or cast(:dataSourceIds as uuid[]) && program_ids
                   or cast(:dataSourceIds as uuid[]) && ecosystem_ids)
                 """, ZonedDateTime.class);

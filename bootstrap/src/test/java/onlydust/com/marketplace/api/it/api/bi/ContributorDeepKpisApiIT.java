@@ -491,9 +491,9 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .uri(getApiURI(BI_CONTRIBUTORS, Map.of("pageIndex", "0",
                             "pageSize", "100",
                             "fromDate", "2021-01-01",
-                            "toDate", "2021-01-07",
+                            "toDate", "2021-03-01",
                             "dataSourceIds", onlyDust.toString())))
-                    .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                    .header("Authorization", BEARER_PREFIX + hayden.jwt())
                     // Then
                     .exchange()
                     .expectStatus()
@@ -503,7 +503,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             assertThat(response.getContributors()).isNotEmpty();
             response.getContributors().forEach(contributor -> assertThat(contributor.getProjects())
                     .extracting(ProjectLinkResponse::getName)
-                    .filteredOn(name -> name.contains("OnlyDust")).isNotEmpty());
+                    .filteredOn(name -> name.contains("Madara")).isNotEmpty());
         }
 
         private void test_contributors_stats(String queryParam, String value, Consumer<BiContributorsPageResponse> asserter, boolean assertNotEmpty) {
