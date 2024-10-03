@@ -178,7 +178,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                             "pageSize", "100",
                             "fromDate", "2021-01-01",
                             "toDate", "2021-01-07")))
-                    .header("Authorization", BEARER_PREFIX + caller.jwt())
+                    .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(caller).jwt())
                     // Then
                     .exchange()
                     .expectStatus()
@@ -446,7 +446,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                             "pageSize", "2",
                             "fromDate", "2021-01-01",
                             "toDate", "2021-01-10")))
-                    .header("Authorization", BEARER_PREFIX + caller.jwt())
+                    .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(caller).jwt())
                     // Then
                     .exchange()
                     .expectStatus()
@@ -470,7 +470,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                             "pageSize", "100",
                             "fromDate", "2021-01-01",
                             "toDate", "2021-01-10")))
-                    .header("Authorization", BEARER_PREFIX + caller.jwt())
+                    .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(caller).jwt())
                     .accept(MediaType.valueOf("text/csv"))
                     // Then
                     .exchange()
@@ -485,28 +485,27 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                            "reward_count;issue_count;pr_count;code_review_count;contribution_count");
         }
 
-        //TODO: weird authent mock issue when running this test after others. Fix it.
-//        @Test
-//        public void should_get_contributors_stats_of_project() {
-//            // When
-//            final var response = client.get()
-//                    .uri(getApiURI(BI_CONTRIBUTORS, Map.of("pageIndex", "0",
-//                            "pageSize", "100",
-//                            "fromDate", "2021-01-01",
-//                            "toDate", "2021-03-01",
-//                            "dataSourceIds", madara.toString())))
-//                    .header("Authorization", BEARER_PREFIX + hayden.jwt())
-//                    // Then
-//                    .exchange()
-//                    .expectStatus()
-//                    .is2xxSuccessful()
-//                    .expectBody(BiContributorsPageResponse.class).returnResult().getResponseBody();
-//
-//            assertThat(response.getContributors()).isNotEmpty();
-//            response.getContributors().forEach(contributor -> assertThat(contributor.getProjects())
-//                    .extracting(ProjectLinkResponse::getName)
-//                    .filteredOn(name -> name.contains("Madara")).isNotEmpty());
-//        }
+        @Test
+        public void should_get_contributors_stats_of_project() {
+            // When
+            final var response = client.get()
+                    .uri(getApiURI(BI_CONTRIBUTORS, Map.of("pageIndex", "0",
+                            "pageSize", "100",
+                            "fromDate", "2021-01-01",
+                            "toDate", "2021-03-01",
+                            "dataSourceIds", madara.toString())))
+                    .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(hayden).jwt())
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(BiContributorsPageResponse.class).returnResult().getResponseBody();
+
+            assertThat(response.getContributors()).isNotEmpty();
+            response.getContributors().forEach(contributor -> assertThat(contributor.getProjects())
+                    .extracting(ProjectLinkResponse::getName)
+                    .filteredOn(name -> name.contains("Madara")).isNotEmpty());
+        }
 
         private void test_contributors_stats(String queryParam, String value, Consumer<BiContributorsPageResponse> asserter, boolean assertNotEmpty) {
             test_contributors_stats(Map.of(queryParam, value), asserter, assertNotEmpty);
@@ -522,7 +521,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             queryParams.putAll(queryParamsWithValues);
             final var response = client.get()
                     .uri(getApiURI(BI_CONTRIBUTORS, queryParams))
-                    .header("Authorization", BEARER_PREFIX + caller.jwt())
+                    .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(caller).jwt())
                     .exchange()
                     .expectStatus()
                     .is2xxSuccessful()
