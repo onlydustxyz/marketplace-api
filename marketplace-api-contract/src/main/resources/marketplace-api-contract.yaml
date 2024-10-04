@@ -5198,9 +5198,17 @@ paths:
         Get contributions sort by date.
       parameters:
         - in: query
-          name: projectId
+          name: projectIds
           schema:
-            $ref: '#/components/schemas/ProjectId'
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: projectSlugs
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectSlug'
         - in: query
           name: statuses
           description: Contribution activity status filter
@@ -5209,7 +5217,7 @@ paths:
             items:
               $ref: '#/components/schemas/ContributionActivityStatus'
         - in: query
-          name: repositoryIds
+          name: repoIds
           description: Repository filter
           schema:
             type: array
@@ -11655,8 +11663,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ContributorResponse'
-            issuesLinked:
+            linkedIssues:
               type: array
-              description: issues linked to current contribution
+              description: linked issues to current contribution
               items:
                 $ref: '#/components/schemas/ContributionResponse'
+            totalRewardedAmount:
+              $ref: '#/components/schemas/RewardTotalAmountsResponse'
