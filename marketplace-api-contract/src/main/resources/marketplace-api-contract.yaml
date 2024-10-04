@@ -5186,6 +5186,80 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/contributions:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadContributions
+      summary: Get all contributions
+      operationId: getContributions
+      description: |
+        Get contributions sort by date.
+      parameters:
+        - in: query
+          name: projectId
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: statuses
+          description: Contribution activity status filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ContributionActivityStatus'
+        - in: query
+          name: repositoryIds
+          description: Repository filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GithubRepoId'
+        - in: query
+          name: contributorIds
+          description: Contributor filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GithubUserId'
+        - in: query
+          name: projectContributorLabelIds
+          description: Contributor label filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectContributorLabelId'
+        - in: query
+          name: hasBeenRewarded
+          description: filter rewarded contribution
+          schema:
+            type: boolean
+        - in: query
+          name: pageIndex
+          description: Page number
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          description: Number of items returned by page
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'Contribution list'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributionActivityPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -7742,6 +7816,15 @@ components:
         - COMPLETED
         - CANCELLED
 
+    ContributionActivityStatus:
+      type: string
+      enum:
+        - NOT_ASSIGNED
+        - IN_PROGRESS
+        - TO_REVIEW
+        - DONE
+        - ARCHIVED
+
     GithubStatus:
       type: string
       enum:
@@ -7935,6 +8018,10 @@ components:
           description: The body of the contribution.
         githubCodeReviewOutcome:
           $ref: '#/components/schemas/GithubCodeReviewState'
+        githubLabels:
+          type: array
+          items:
+            $ref: '#/components/schemas/GithubLabel'
 
     ContributionDetailsResponse:
       allOf:
@@ -11518,3 +11605,58 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectContributorLabelId'
+
+    # To rename to ContributionPageResponse when all the marketplace is migrated on the saas
+    ContributionActivityPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - contributions
+          properties:
+            contributions:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContributionActivityPageItemResponse'
+
+    # To rename to ContributionItemPageResponse when all the marketplace is migrated on the saas
+    ContributionActivityPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ContributionResponse'
+        - type: object
+          required:
+            - id
+            - createdAt
+            - lastUpdatedAt
+            - activityStatus
+          properties:
+            id:
+              type: string
+              description: The contribution ID is determined from its content's ID (ie PR / issue / code review ID)
+            createdAt:
+              type: string
+              format: date-time
+              description: When the contribution was created
+            completedAt:
+              type: string
+              format: date-time
+              description: When the contribution was completed
+            lastUpdatedAt:
+              type: string
+              format: date-time
+              description: When the contribution was last updated
+            activityStatus:
+              $ref: '#/components/schemas/ContributionActivityStatus'
+            contributors:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContributorResponse'
+            applicants:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContributorResponse'
+            issuesLinked:
+              type: array
+              description: issues linked to current contribution
+              items:
+                $ref: '#/components/schemas/ContributionResponse'
