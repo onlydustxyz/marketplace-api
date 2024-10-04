@@ -60,7 +60,7 @@ FROM (WITH user_countries as (select bpu.user_id as user_id,
                     coalesce(string_agg(distinct prog.name, ' '), ''))                                           as search
       FROM iam.all_users u
                LEFT JOIN user_countries uc on uc.user_id = u.user_id
-               LEFT JOIN bi.v_contribution_data cd on cd.contributor_id = u.github_user_id
+               LEFT JOIN bi.p_contribution_data cd on cd.contributor_id = u.github_user_id
                LEFT JOIN projects p on p.id = cd.project_id
                LEFT JOIN projects_ecosystems pe ON pe.project_id = p.id
                LEFT JOIN ecosystems e ON e.id = pe.ecosystem_id
