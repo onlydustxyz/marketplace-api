@@ -194,6 +194,11 @@
                 <artifactId>rsql-jpa-spring-boot-starter</artifactId>
                 <version>6.0.21</version>
             </dependency>
+            <dependency>
+                <groupId>com.datadoghq</groupId>
+                <artifactId>dd-trace-api</artifactId>
+                <version>1.40.0</version>
+            </dependency>
 
 
             <!-- AWS Dependencies -->

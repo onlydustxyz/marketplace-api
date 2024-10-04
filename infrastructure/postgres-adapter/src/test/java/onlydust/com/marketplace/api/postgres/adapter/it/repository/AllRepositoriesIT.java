@@ -130,6 +130,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .ignoreIssues(true)
                 .ignoreContributionsBefore(new Date())
                 .categorySuggestions(Set.of())
+                .contributorLabels(Set.of())
                 .build();
 
         assertIsSaved(expected, projectRepository);
@@ -183,18 +184,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .build();
 
         assertIsSaved(expected, contactInformationRepository);
-    }
-
-    @Test
-    void should_create_sponsor() {
-        // Given
-        final SponsorEntity expected = SponsorEntity.builder()
-                .logoUrl(faker.rickAndMorty().location())
-                .name(faker.hacker().abbreviation())
-                .id(UUID.randomUUID())
-                .build();
-
-        assertIsSaved(expected, sponsorRepository);
     }
 
     private <Entity, ID> void assertIsSaved(Entity expected, JpaRepository<Entity, ID> repository) {

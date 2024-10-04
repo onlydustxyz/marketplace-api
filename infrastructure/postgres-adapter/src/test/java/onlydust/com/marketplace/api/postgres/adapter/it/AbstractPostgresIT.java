@@ -19,7 +19,7 @@ import java.util.TimeZone;
 import static org.testcontainers.utility.MountableFile.forClasspathResource;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = PostgresConfiguration.class)
+@ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = {PostgresITConfiguration.class, PostgresConfiguration.class})
 @Testcontainers
 @DirtiesContext
 public class AbstractPostgresIT {

@@ -68,7 +68,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         final var result = postgresUserAdapter.getRegisteredUserByGithubId(user.getGithubUserId()).orElseThrow();
 
         // Then
-        assertThat(result.id()).isEqualTo(user.getId());
+        assertThat(result.id().value()).isEqualTo(user.getId());
         assertThat(result.githubUserId()).isEqualTo(user.getGithubUserId());
         assertThat(result.login()).isEqualTo(user.getGithubLogin());
         assertThat(result.avatarUrl()).isEqualTo(user.getGithubAvatarUrl());
@@ -100,7 +100,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         final var result = postgresUserAdapter.getRegisteredUserByGithubId(user.getGithubUserId()).orElseThrow();
 
         // Then
-        assertThat(result.id()).isEqualTo(user.getId());
+        assertThat(result.id().value()).isEqualTo(user.getId());
         assertThat(result.githubUserId()).isEqualTo(user.getGithubUserId());
         assertThat(result.login()).isEqualTo(user.getGithubLogin());
         assertThat(result.avatarUrl()).isEqualTo(user.getGithubAvatarUrl());
@@ -125,7 +125,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         final var result = postgresUserAdapter.getRegisteredUserByGithubId(user.getGithubUserId()).orElseThrow();
 
         // Then
-        assertThat(result.id()).isEqualTo(user.getId());
+        assertThat(result.id().value()).isEqualTo(user.getId());
         assertThat(result.githubUserId()).isEqualTo(user.getGithubUserId());
         assertThat(result.login()).isEqualTo(user.getGithubLogin());
         assertThat(result.avatarUrl()).isEqualTo(user.getGithubAvatarUrl());
@@ -180,7 +180,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
 
     @Test
     void should_support_concurrent_calls_to_tryCreateUser() throws InterruptedException {
-        final int numberOfThreads = 5;
+        final int numberOfThreads = 10;
         final int numberOfIterationPerThread = 50;
         final ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
         final CountDownLatch latch = new CountDownLatch(numberOfThreads);
@@ -203,15 +203,15 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
                 TransactionSynchronizationManager.initSynchronization();
                 try {
                     System.out.println("Thread " + Thread.currentThread().getName() + " started");
-                    final var user = AuthenticatedUser.builder()
-                            .githubUserId(githubUserId)
-                            .id(UserId.random())
-                            .login(userData.login())
-                            .avatarUrl(userData.avatarUrl())
-                            .email(userData.email())
-                            .roles(userData.roles())
-                            .build();
                     for (int i = 0; i < numberOfIterationPerThread; i++) {
+                        final var user = AuthenticatedUser.builder()
+                                .githubUserId(githubUserId)
+                                .id(UserId.random())
+                                .login(userData.login())
+                                .avatarUrl(userData.avatarUrl())
+                                .email(userData.email())
+                                .roles(userData.roles())
+                                .build();
                         try {
                             final var u = postgresUserAdapter.tryCreateUser(user);
                             retrievedGithubUsers.add(u);
