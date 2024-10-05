@@ -113,7 +113,10 @@ FROM (SELECT c.*,
 CREATE OR REPLACE VIEW bi.v_contribution_data AS
 SELECT v.*, md5(v::text) as hash
 FROM (with ranked_project_github_repos_relationship AS (SELECT *, row_number() OVER (PARTITION BY github_repo_id ORDER BY project_id) as row_number
-                                                        FROM project_github_repos)
+                                                        FROM project_github_repos),
+           first_contributions AS MATERIALIZED (select c.contributor_id, min(c.created_at) as first_contribution_date
+                                                from indexer_exp.contributions c
+                                                group by c.contributor_id)
       select c.id                                                                                             as contribution_id,
              c.repo_id                                                                                        as repo_id,
              p.id                                                                                             as project_id,
@@ -128,10 +131,7 @@ FROM (with ranked_project_github_repos_relationship AS (SELECT *, row_number() O
              date_trunc('month', c.created_at)                                                                as month_timestamp,
              date_trunc('quarter', c.created_at)                                                              as quarter_timestamp,
              date_trunc('year', c.created_at)                                                                 as year_timestamp,
-             (select not exists(select 1
-                                from indexer_exp.contributions cc
-                                where cc.contributor_id = c.contributor_id
-                                  and cc.created_at < c.created_at))                                          as is_first_contribution_on_onlydust,
+             c.created_at = fc.first_contribution_date                                                        as is_first_contribution_on_onlydust,
              (c.type = 'ISSUE')::int                                                                          as is_issue,
              (c.type = 'PULL_REQUEST')::int                                                                   as is_pr,
              (c.type = 'CODE_REVIEW')::int                                                                    as is_code_review,
@@ -153,6 +153,7 @@ FROM (with ranked_project_github_repos_relationship AS (SELECT *, row_number() O
                left join iam.users u on u.github_user_id = c.contributor_id
                left join accounting.billing_profiles_users bpu on bpu.user_id = u.id
                left join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id
+               left join first_contributions fc on fc.contributor_id = c.contributor_id
       group by c.id,
                c.repo_id,
                p.id,
@@ -161,6 +162,7 @@ FROM (with ranked_project_github_repos_relationship AS (SELECT *, row_number() O
                c.created_at,
                c.type,
                c.status,
-               u.id) v;
+               u.id,
+               fc.first_contribution_date) v;
 
 create index on indexer_exp.contributions (contributor_id, created_at);
