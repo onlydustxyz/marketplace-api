@@ -26,6 +26,7 @@ import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.NetworkMapper.map;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauthorized;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -42,6 +43,10 @@ public class SponsorsRestApi implements SponsorsApi {
     @Override
     public ResponseEntity<Void> allocateBudgetToProgram(UUID sponsorId, AllocateRequest request) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        // Block Henri L.
+        if (authenticatedUser.githubUserId().equals(22731646L)) {
+            throw unauthorized("You are not allowed to allocate a budget to a program");
+        }
         final var sponsor = sponsorFacadePort.findById(authenticatedUser.id(), SponsorId.of(sponsorId))
                 .orElseThrow(() -> notFound("Sponsor %s not found".formatted(sponsorId)));
 
