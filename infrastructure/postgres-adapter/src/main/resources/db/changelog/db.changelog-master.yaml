@@ -575,3 +575,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000357_refactor_datasource_param.sql
   - include:
       file: db/changelog/changelogs/00000358_fix_deadlocks.sql
+  - include:
+      file: db/changelog/changelogs/00000359_improve_perf_of_refreshes.sql
