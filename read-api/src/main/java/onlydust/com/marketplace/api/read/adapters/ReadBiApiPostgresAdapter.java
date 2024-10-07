@@ -291,9 +291,9 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getGte).orElse(null),
                 Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getEq).orElse(null),
                 Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(BiContributorsQueryParamsContributionCount::getGte).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(BiContributorsQueryParamsContributionCount::getEq).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(BiContributorsQueryParamsContributionCount::getLte).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(ContributorsQueryParamsContributionCount::getGte).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(ContributorsQueryParamsContributionCount::getEq).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(ContributorsQueryParamsContributionCount::getLte).orElse(null),
                 q.getContributionCount() == null ? null : q.getContributionCount().getTypes().stream().map(Enum::name).toArray(String[]::new),
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
                         ContributorKpisReadRepository.getSortProperty(q.getSort())))

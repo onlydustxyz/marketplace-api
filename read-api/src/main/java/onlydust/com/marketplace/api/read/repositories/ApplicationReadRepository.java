@@ -31,11 +31,11 @@ public interface ApplicationReadRepository extends Repository<ApplicationReadEnt
             JOIN FETCH a.project
             JOIN FETCH a.applicant u
             WHERE   (:projectId IS NULL OR a.projectId = :projectId) AND
-                    (:issueId IS NULL OR i.id = :issueId) AND
-                    (:applicantId IS NULL OR u.id = :applicantId) AND
-                    (:isApplicantProjectMember IS NULL OR 
-                        (:isApplicantProjectMember = TRUE AND exists (select 1 from ProjectMemberReadEntity m where m.projectId = a.projectId and m.githubUserId = u.githubUserId)) OR 
-                        (:isApplicantProjectMember = FALSE AND NOT exists (select 1 from ProjectMemberReadEntity m where m.projectId = a.projectId and m.githubUserId = u.githubUserId))
+                    (:issueId IS NULL OR a.issueId = :issueId) AND
+                    (:applicantId IS NULL OR a.applicantId = :applicantId) AND
+                    (:isApplicantProjectMember IS NULL OR
+                        (:isApplicantProjectMember = TRUE AND exists (select 1 from ProjectMemberReadEntity m where m.projectId = a.projectId and m.githubUserId = a.applicantId)) OR 
+                        (:isApplicantProjectMember = FALSE AND NOT exists (select 1 from ProjectMemberReadEntity m where m.projectId = a.projectId and m.githubUserId = a.applicantId))
                     ) AND
                     (:applicantLoginSearch IS NULL OR u.login ILIKE %:applicantLoginSearch%)
             """)
