@@ -113,6 +113,31 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/bi/world-map:
+    get:
+      tags:
+        - ReadBi
+      summary: Get KPI per country
+      operationId: getBIWorldMap
+      parameters:
+        - name: kpi
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/WorldMapKpiEnum'
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
+        - $ref: '#/components/parameters/dataSourceIdsParam'
+      responses:
+        "200":
+          description: 'World map'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiWorldMapListResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/bi/projects:
     get:
       tags:
@@ -155,28 +180,167 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/bi/world-map:
+
+  /api/v1/contributions:
     get:
+      security:
+        - bearerAuth: [ ]
       tags:
-        - ReadBi
-      summary: Get KPI per country
-      operationId: getBIWorldMap
+        - ReadContributions
+      summary: Get all contributions
+      operationId: getContributions
+      description: |
+        Get contributions.
       parameters:
-        - name: kpi
+        - name: queryParams
           in: query
-          required: true
           schema:
-            $ref: '#/components/schemas/WorldMapKpiEnum'
-        - $ref: '#/components/parameters/fromDateParam'
-        - $ref: '#/components/parameters/toDateParam'
-        - $ref: '#/components/parameters/dataSourceIdsParam'
+            $ref: '#/components/schemas/ContributionsQueryParams'
       responses:
         "200":
-          description: 'World map'
+          description: 'Contribution list'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BiWorldMapListResponse'
+                $ref: '#/components/schemas/ContributionActivityPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/contributions/{contributionId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadContributions
+      summary: Get contribution
+      operationId: getContributionById
+      description: |
+        Get contribution.
+      parameters:
+        - name: contributionId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContributionId'
+      responses:
+        "200":
+          description: 'Contribution'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributionActivityPageItemResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Contributions
+      summary: Change contribution assignees and/or linkedIssues
+      operationId: patchContribution
+      description: |
+        Change contribution assignees and/or linkedIssues
+      parameters:
+        - name: contributionId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContributionId'
+      requestBody:
+        description: 'Contribution patch'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContributionPatchRequest'
+      responses:
+        "204":
+          description: 'Contribution patched'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /api/v1/contributions/{contributionId}/events:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadContributions
+      summary: Get all contribution events
+      operationId: getContributionEvents
+      description: |
+        Get contribution events
+      parameters:
+        - name: contributionId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContributionId'
+      responses:
+        "200":
+          description: 'Contribution event list'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributionEventListResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/project/{projectId}/contributions/{contributionId}:
+    patch:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Contributions
+      summary: (Un)Archive contribution
+      operationId: patchContributionForProject
+      description: |
+        (Un)Archive contribution
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - in: path
+          name: contributionId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContributionId'
+      requestBody:
+        description: 'Contribution archiving status'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContributionArchivingRequest'
+      responses:
+        "204":
+          description: 'Contribution (un)archived'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -3236,6 +3400,40 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+  
+  
+  /api/v2/applications:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadProjectApplications
+      summary: Get applications of a project's issue or a user
+      operationId: getProjectsApplicationsV2
+      description: |
+        Get the list of all applications in a project or by a user.
+        At least one of the parameters projectId or applicantId must be provided.
+        Only project leaders or applicants can access this information.
+      parameters:
+        - in: query
+          name: params
+          schema:
+            $ref: '#/components/schemas/ApplicationsQueryParams'
+      responses:
+        "200":
+          description: 'List of applications'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectApplicationPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /api/v1/applications/{applicationId}:
     get:
@@ -3269,7 +3467,37 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+    patch:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ProjectApplications
+      summary: Update application status
+      operationId: patchProjectApplication
+      description: |
+        Patch an application. Only the project lead can patch an application.
+        The issue will be (un)assigned to the applicant on GitHub accordingly.
+      parameters:
+        - in: path
+          name: applicationId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectApplicationId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectApplicationPatchRequest'
+      responses:
+        "204":
+          description: 'The application was approved successfully.'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
     delete:
+      deprecated: true
       security:
         - bearerAuth: [ ]
       tags:
@@ -3294,6 +3522,7 @@ paths:
 
   /api/v1/applications/{applicationId}/accept:
     post:
+      deprecated: true
       security:
         - bearerAuth: [ ]
       tags:
@@ -5186,88 +5415,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/contributions:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - ReadContributions
-      summary: Get all contributions
-      operationId: getContributions
-      description: |
-        Get contributions sort by date.
-      parameters:
-        - in: query
-          name: projectIds
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/ProjectId'
-        - in: query
-          name: projectSlugs
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/ProjectSlug'
-        - in: query
-          name: statuses
-          description: Contribution activity status filter
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/ContributionActivityStatus'
-        - in: query
-          name: repoIds
-          description: Repository filter
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/GithubRepoId'
-        - in: query
-          name: contributorIds
-          description: Contributor filter
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/GithubUserId'
-        - in: query
-          name: projectContributorLabelIds
-          description: Contributor label filter
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/ProjectContributorLabelId'
-        - in: query
-          name: hasBeenRewarded
-          description: filter rewarded contribution
-          schema:
-            type: boolean
-        - in: query
-          name: pageIndex
-          description: Page number
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          description: Number of items returned by page
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: 'Contribution list'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ContributionActivityPageResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "403":
-          $ref: '#/components/responses/ProjectForbiddenError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
 components:
   securitySchemes:
     bearerAuth:
@@ -5481,6 +5628,12 @@ components:
       type: integer
       format: int64
       description: Github issue ID (databaseId)
+      example: 1678794252
+
+    PullRequestId:
+      type: integer
+      format: int64
+      description: Github PR ID (databaseId)
       example: 1678794252
 
     ProjectId:
@@ -6348,12 +6501,17 @@ components:
         - type: object
           required:
             - globalRank
+            - globalRankPercentile
             - globalRankCategory
           properties:
             globalRank:
               type: integer
               description: User rank on OnlyDust (the lower, the better)
               example: 42
+            globalRankPercentile:
+              type: number
+              description: User rank percentile between 0 and 100 on OnlyDust (the lower, the better)
+              example: 10
             globalRankCategory:
               $ref: '#/components/schemas/UserRankCategory'
 
@@ -8318,33 +8476,55 @@ components:
       maximum: 100
       description: A score between 0 and 100. The higher, the better.
 
+    ProjectApplicationStatus:
+      type: string
+      enum:
+        - PENDING
+        - ACCEPTED
+        - IGNORED
+
     ProjectApplicationPageItemResponse:
       type: object
       required:
         - id
+        - status
         - project
         - issue
         - applicant
         - receivedAt
-        - recommendationScore
+        - isApplicantProjectMember
       properties:
         id:
           $ref: '#/components/schemas/ProjectApplicationId'
+        status:
+          $ref: '#/components/schemas/ProjectApplicationStatus'
         project:
           $ref: '#/components/schemas/ProjectLinkResponse'
         issue:
           $ref: '#/components/schemas/GithubIssueLinkResponse'
         applicant:
-          $ref: '#/components/schemas/RankedContributorResponse'
+          $ref: '#/components/schemas/ApplicantResponse'
         receivedAt:
           type: string
           format: date-time
           description: When the application was created
+        isApplicantProjectMember:
+          type: boolean
+          description: True if the applicant has already contributed to the project or is a project lead
+
+    ProjectApplicationPatchRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/ProjectApplicationStatus'
 
     ProjectApplicationResponse:
       type: object
       required:
         - id
+        - status
         - projectId
         - issue
         - applicant
@@ -8353,6 +8533,8 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/ProjectApplicationId'
+        status:
+          $ref: '#/components/schemas/ProjectApplicationStatus'
         projectId:
           $ref: '#/components/schemas/ProjectId'
         issue:
@@ -11395,8 +11577,7 @@ components:
         contributionCount:
           $ref: '#/components/schemas/NumberKpi'
 
-
-    BiContributorsQueryParams:
+    PaginationQueryParams:
       type: object
       required:
         - pageIndex
@@ -11408,20 +11589,38 @@ components:
         pageSize:
           type: integer
           default: 5
+
+    ContributorsSortingQueryParams:
+      type: object
+      properties:
         sort:
           $ref: '#/components/schemas/ContributorKpiSortEnum'
         sortDirection:
           $ref: '#/components/schemas/SortDirection'
+
+    PeriodQueryParams:
+      type: object
+      properties:
         fromDate:
           $ref: '#/components/schemas/FromDateParam'
         toDate:
           $ref: '#/components/schemas/ToDateParam'
+
+    DataSourceQueryParams:
+      type: object
+      properties:
         dataSourceIds:
           type: array
           items:
             type: string
             format: uuid
+
+    ContributorsQueryParams:
+      type: object
+      properties:
         search:
+          type: string
+        searchByLogin:
           type: string
         showFilteredKpis:
           type: boolean
@@ -11474,6 +11673,60 @@ components:
                   type: array
                   items:
                     $ref: '#/components/schemas/ContributionType'
+
+    BiContributorsQueryParams:
+      allOf:
+        - $ref: '#/components/schemas/PaginationQueryParams'
+        - $ref: '#/components/schemas/ContributorsSortingQueryParams'
+        - $ref: '#/components/schemas/PeriodQueryParams'
+        - $ref: '#/components/schemas/DataSourceQueryParams'
+        - $ref: '#/components/schemas/ContributorsQueryParams'
+
+    ApplicationsQueryParams:
+      allOf:
+        - $ref: '#/components/schemas/PaginationQueryParams'
+        - type: object
+          properties:
+            u:
+              type: object
+              properties:
+                search:
+                  type: string
+                languageIds:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/LanguageId'
+                ecosystemIds:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/EcosystemId'
+                countryCodes:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CountryCode'
+                totalRewardedUsdAmount:
+                  $ref: '#/components/schemas/DecimalNumberKpiFilter'
+                rewardCount:
+                  $ref: '#/components/schemas/NumberKpiFilter'
+                contributionCount:
+                  allOf:
+                    - $ref: '#/components/schemas/NumberKpiFilter'
+                    - type: object
+                      required:
+                        - types
+                      properties:
+                        types:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/ContributionType'
+            projectId:
+              $ref: '#/components/schemas/ProjectId'
+            issueId:
+              $ref: '#/components/schemas/IssueId'
+            applicantId:
+              $ref: '#/components/schemas/GithubUserId'
+            isApplicantProjectMember:
+              type: boolean
 
     BiContributorsPageResponse:
       allOf:
@@ -11539,6 +11792,48 @@ components:
           $ref: '#/components/schemas/NumberKpi'
         contributionCount:
           $ref: '#/components/schemas/NumberKpi'
+
+    ApplicantResponse:
+      allOf:
+        - $ref: '#/components/schemas/RankedContributorResponse'
+      type: object
+      required:
+        - languages
+        - ecosystems
+        - countryCode
+        - totalRewardedUsdAmount
+        - rewardCount
+        - issueCount
+        - prCount
+        - codeReviewCount
+        - contributionCount
+      properties:
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageResponse'
+        ecosystems:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemLinkResponse'
+        projectContributorLabels:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectContributorLabelResponse'
+        countryCode:
+          $ref: '#/components/schemas/CountryCode'
+        totalRewardedUsdAmount:
+          type: number
+        rewardCount:
+          type: integer
+        issueCount:
+          type: integer
+        prCount:
+          type: integer
+        codeReviewCount:
+          type: integer
+        contributionCount:
+          type: integer
 
     BiWorldMapListResponse:
       type: array
@@ -11614,6 +11909,65 @@ components:
           items:
             $ref: '#/components/schemas/ProjectContributorLabelId'
 
+    ContributionsSortEnum:
+      type: string
+      enum:
+        - CREATED_AT
+        - TYPE
+
+    ContributionsQueryParams:
+      required:
+        - pageIndex
+        - pageSize
+      properties:
+        pageIndex:
+          type: integer
+          default: 0
+        pageSize:
+          type: integer
+          default: 5
+        sort:
+          $ref: '#/components/schemas/ContributionsSortEnum'
+        sortDirection:
+          $ref: '#/components/schemas/SortDirection'
+        dataSourceIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        search:
+          type: string
+        types:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributionType'
+        projectIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectId'
+        projectSlugs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectSlug'
+        statuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributionActivityStatus'
+        repoIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/GithubRepoId'
+        contributorIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/GithubUserId'
+        projectContributorLabelIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectContributorLabelId'
+        hasBeenRewarded:
+          type: boolean
+
     # To rename to ContributionPageResponse when all the marketplace is migrated on the saas
     ContributionActivityPageResponse:
       allOf:
@@ -11655,6 +12009,8 @@ components:
               description: When the contribution was last updated
             activityStatus:
               $ref: '#/components/schemas/ContributionActivityStatus'
+            project:
+              $ref: '#/components/schemas/ProjectLinkResponse'
             contributors:
               type: array
               items:
@@ -11663,6 +12019,15 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ContributorResponse'
+            assignees:
+              type: array
+              description: The list of assignees for this issue
+              items:
+                $ref: '#/components/schemas/GithubUserResponse'
+            languages:
+              type: array
+              items:
+                $ref: '#/components/schemas/LanguageResponse'
             linkedIssues:
               type: array
               description: linked issues to current contribution
@@ -11670,3 +12035,95 @@ components:
                 $ref: '#/components/schemas/ContributionResponse'
             totalRewardedAmount:
               $ref: '#/components/schemas/RewardTotalAmountsResponse'
+
+    ContributionEventListResponse:
+      type: object
+      required:
+        - events
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributionEventResponse'
+
+    ContributionEventResponse:
+      type: object
+      required:
+        - timestamp
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        assigneeAdded:
+          type: object
+          required:
+            - assignee
+          properties:
+            assignee:
+              $ref: '#/components/schemas/GithubUserResponse'
+        assigneeRemoved:
+          type: object
+          required:
+            - assignee
+          properties:
+            assignee:
+              $ref: '#/components/schemas/GithubUserResponse'
+        opened:
+          type: object
+          required:
+            - by
+          properties:
+            by:
+              $ref: '#/components/schemas/GithubUserResponse'
+        merged:
+          type: object
+          required:
+            - by
+          properties:
+            by:
+              $ref: '#/components/schemas/GithubUserResponse'
+        closed:
+          type: object
+          required:
+            - by
+          properties:
+            by:
+              $ref: '#/components/schemas/GithubUserResponse'
+        issueLinked:
+          type: object
+          required:
+            - issue
+          properties:
+            issue:
+              $ref: '#/components/schemas/GithubIssueLinkResponse'
+        issueUnlinked:
+          type: object
+          required:
+            - issue
+          properties:
+            issue:
+              $ref: '#/components/schemas/GithubIssueLinkResponse'
+
+    ContributionPatchRequest:
+      type: object
+      required:
+        - assignees
+      properties:
+        assignees:
+          type: array
+          items:
+            $ref: '#/components/schemas/GithubUserId'
+        linkedIssues:
+          type: array
+          items:
+            $ref: '#/components/schemas/IssueId'
+
+    ContributionArchivingRequest:
+      type: object
+      required:
+        - archived
+      properties:
+        archived:
+          type: boolean
+
+

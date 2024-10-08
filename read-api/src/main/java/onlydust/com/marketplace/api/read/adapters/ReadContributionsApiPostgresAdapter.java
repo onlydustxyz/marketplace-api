@@ -20,11 +20,8 @@ import java.util.UUID;
 public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi {
 
     @Override
-    public ResponseEntity<ContributionActivityPageResponse> getContributions(List<UUID> projectIds, List<String> projectSlugs,
-                                                                             List<ContributionActivityStatus> statuses, List<Long> repositoryIds,
-                                                                             List<Long> contributorIds, List<UUID> projectContributorLabelIds,
-                                                                             Boolean hasBeenRewarded, Integer pageIndex, Integer pageSize) {
-        return ResponseEntity.ok(getContributionsPageResponse(statuses.get(0)));
+    public ResponseEntity<ContributionActivityPageResponse> getContributions(ContributionsQueryParams queryParams) {
+        return ResponseEntity.ok(getContributionsPageResponse(queryParams.getStatuses().get(0)));
     }
 
     private ContributionActivityPageResponse getContributionsPageResponse(final ContributionActivityStatus contributionActivityStatus) {
@@ -153,26 +150,26 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
                                 .githubStatus(GithubStatus.OPEN)
                                 .githubLabels(List.of(new GithubLabel("GFI"), new GithubLabel("GFI2"), new GithubLabel("GFI3")))
                                 .contributors(List.of(new ContributorResponse()
-                                                .avatarUrl("https://avatars.githubusercontent.com/u/43467246?v=4")
-                                                .githubUserId(1L)
-                                                .login("Antho")
-                                                .isRegistered(true),
-                                        new ContributorResponse()
-                                                .avatarUrl("https://avatars.githubusercontent.com/u/628035?v=4")
-                                                .githubUserId(2L)
-                                                .login("acomminos")
-                                                .isRegistered(false),
-                                        new ContributorResponse()
-                                                .avatarUrl("https://avatars.githubusercontent.com/u/17259618?v=4")
-                                                .githubUserId(4L)
-                                                .login("alexbeno")
-                                                .isRegistered(true),
-                                        new ContributorResponse()
-                                                .avatarUrl("https://avatars.githubusercontent.com/u/100226?v=4")
-                                                .githubUserId(3L)
-                                                .login("bobeagan")
-                                                .isRegistered(true)
-                                       )
+                                                        .avatarUrl("https://avatars.githubusercontent.com/u/43467246?v=4")
+                                                        .githubUserId(1L)
+                                                        .login("Antho")
+                                                        .isRegistered(true),
+                                                new ContributorResponse()
+                                                        .avatarUrl("https://avatars.githubusercontent.com/u/628035?v=4")
+                                                        .githubUserId(2L)
+                                                        .login("acomminos")
+                                                        .isRegistered(false),
+                                                new ContributorResponse()
+                                                        .avatarUrl("https://avatars.githubusercontent.com/u/17259618?v=4")
+                                                        .githubUserId(4L)
+                                                        .login("alexbeno")
+                                                        .isRegistered(true),
+                                                new ContributorResponse()
+                                                        .avatarUrl("https://avatars.githubusercontent.com/u/100226?v=4")
+                                                        .githubUserId(3L)
+                                                        .login("bobeagan")
+                                                        .isRegistered(true)
+                                        )
                                 )
                                 .createdAt(ZonedDateTime.now().minusDays(2).minusHours(1).minusMinutes(5))
                 ));
@@ -194,26 +191,26 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
                                 .githubStatus(GithubStatus.COMMENTED)
                                 .githubLabels(List.of(new GithubLabel("GFI"), new GithubLabel("GFI2"), new GithubLabel("GFI3")))
                                 .contributors(List.of(new ContributorResponse()
-                                                .avatarUrl("https://avatars.githubusercontent.com/u/43467246?v=4")
-                                                .githubUserId(1L)
-                                                .login("Antho")
-                                                .isRegistered(true),
-                                        new ContributorResponse()
-                                                .avatarUrl("https://avatars.githubusercontent.com/u/628035?v=4")
-                                                .githubUserId(2L)
-                                                .login("acomminos")
-                                                .isRegistered(false),
-                                        new ContributorResponse()
-                                                .avatarUrl("https://avatars.githubusercontent.com/u/17259618?v=4")
-                                                .githubUserId(4L)
-                                                .login("alexbeno")
-                                                .isRegistered(true),
-                                        new ContributorResponse()
-                                                .avatarUrl("https://avatars.githubusercontent.com/u/100226?v=4")
-                                                .githubUserId(3L)
-                                                .login("bobeagan")
-                                                .isRegistered(true)
-                                       )
+                                                        .avatarUrl("https://avatars.githubusercontent.com/u/43467246?v=4")
+                                                        .githubUserId(1L)
+                                                        .login("Antho")
+                                                        .isRegistered(true),
+                                                new ContributorResponse()
+                                                        .avatarUrl("https://avatars.githubusercontent.com/u/628035?v=4")
+                                                        .githubUserId(2L)
+                                                        .login("acomminos")
+                                                        .isRegistered(false),
+                                                new ContributorResponse()
+                                                        .avatarUrl("https://avatars.githubusercontent.com/u/17259618?v=4")
+                                                        .githubUserId(4L)
+                                                        .login("alexbeno")
+                                                        .isRegistered(true),
+                                                new ContributorResponse()
+                                                        .avatarUrl("https://avatars.githubusercontent.com/u/100226?v=4")
+                                                        .githubUserId(3L)
+                                                        .login("bobeagan")
+                                                        .isRegistered(true)
+                                        )
                                 )
                                 .createdAt(ZonedDateTime.now().minusDays(2).minusHours(1).minusMinutes(5))
                 ));
@@ -235,26 +232,26 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
                                 .githubNumber(456L)
                                 .githubLabels(List.of(new GithubLabel("GFI"), new GithubLabel("GFI2"), new GithubLabel("GFI3")))
                                 .contributors(List.of(new ContributorResponse()
-                                                .avatarUrl("https://avatars.githubusercontent.com/u/43467246?v=4")
-                                                .githubUserId(1L)
-                                                .login("Antho")
-                                                .isRegistered(true),
-                                        new ContributorResponse()
-                                                .avatarUrl("https://avatars.githubusercontent.com/u/628035?v=4")
-                                                .githubUserId(2L)
-                                                .login("acomminos")
-                                                .isRegistered(false),
-                                        new ContributorResponse()
-                                                .avatarUrl("https://avatars.githubusercontent.com/u/17259618?v=4")
-                                                .githubUserId(4L)
-                                                .login("alexbeno")
-                                                .isRegistered(true),
-                                        new ContributorResponse()
-                                                .avatarUrl("https://avatars.githubusercontent.com/u/100226?v=4")
-                                                .githubUserId(3L)
-                                                .login("bobeagan")
-                                                .isRegistered(true)
-                                       )
+                                                        .avatarUrl("https://avatars.githubusercontent.com/u/43467246?v=4")
+                                                        .githubUserId(1L)
+                                                        .login("Antho")
+                                                        .isRegistered(true),
+                                                new ContributorResponse()
+                                                        .avatarUrl("https://avatars.githubusercontent.com/u/628035?v=4")
+                                                        .githubUserId(2L)
+                                                        .login("acomminos")
+                                                        .isRegistered(false),
+                                                new ContributorResponse()
+                                                        .avatarUrl("https://avatars.githubusercontent.com/u/17259618?v=4")
+                                                        .githubUserId(4L)
+                                                        .login("alexbeno")
+                                                        .isRegistered(true),
+                                                new ContributorResponse()
+                                                        .avatarUrl("https://avatars.githubusercontent.com/u/100226?v=4")
+                                                        .githubUserId(3L)
+                                                        .login("bobeagan")
+                                                        .isRegistered(true)
+                                        )
                                 )
                                 .createdAt(ZonedDateTime.now().minusDays(2).minusHours(1).minusMinutes(5))
                                 .completedAt(ZonedDateTime.now().minusDays(1).plusHours(5))
@@ -276,12 +273,12 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
                                                 .githubNumber(311L)
                                                 .githubStatus(GithubStatus.COMPLETED)
                                 )),
-                         new ContributionActivityPageItemResponse()
+                        new ContributionActivityPageItemResponse()
                                 .type(ContributionType.PULL_REQUEST)
                                 .githubTitle("PR done on Fix UI Bug on transaction history page #1")
                                 .id(UUID.randomUUID().toString())
                                 .activityStatus(ContributionActivityStatus.DONE)
-                                 .githubStatus(GithubStatus.MERGED)
+                                .githubStatus(GithubStatus.MERGED)
                                 .githubNumber(456L)
                                 .githubLabels(List.of(new GithubLabel("GFI"), new GithubLabel("GFI2"), new GithubLabel("GFI3")))
                                 .contributors(List.of(new ContributorResponse()
@@ -296,7 +293,7 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
                                                 .isRegistered(false))
                                 )
                                 .createdAt(ZonedDateTime.now().minusDays(2).minusHours(1).minusMinutes(5))
-                                 .completedAt(ZonedDateTime.now().minusDays(1))
+                                .completedAt(ZonedDateTime.now().minusDays(1))
                                 .totalRewardedAmount(new RewardTotalAmountsResponse().totalAmount(BigDecimal.valueOf(12345.8854)))
                                 .linkedIssues(List.of(
                                         new ContributionResponse()

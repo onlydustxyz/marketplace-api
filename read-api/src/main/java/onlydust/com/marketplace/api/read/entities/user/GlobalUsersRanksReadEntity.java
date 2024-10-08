@@ -8,6 +8,8 @@ import onlydust.com.marketplace.api.contract.model.UserRankCategory;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Immutable;
 
+import java.math.BigDecimal;
+
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
@@ -27,6 +29,9 @@ public class GlobalUsersRanksReadEntity {
 
     @NonNull
     Long rank;
+
+    @NonNull
+    BigDecimal rankPercentile;
 
     @Formula("""
             case
