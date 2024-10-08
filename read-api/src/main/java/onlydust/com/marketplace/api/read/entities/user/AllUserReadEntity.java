@@ -122,7 +122,7 @@ public class AllUserReadEntity {
     @NonNull
     Set<ProgramReadEntity> programs;
 
-    @OneToMany(mappedBy = "applicant", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "applicantId", fetch = FetchType.LAZY)
     @SQLRestriction("origin = 'GITHUB' and not exists(select 1 from indexer_exp.github_issues_assignees gia where gia.issue_id = issue_id)")
     @NonNull
     Set<ApplicationReadEntity> pendingApplications;

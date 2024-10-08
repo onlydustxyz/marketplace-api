@@ -46,7 +46,7 @@ public class ApplicationReadEntity {
 
     @NonNull
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "applicantId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
+    @JoinColumn(name = "applicantId", insertable = false, updatable = false)
     ContributorReadProjectionEntity applicant;
     Long applicantId;
 
