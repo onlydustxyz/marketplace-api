@@ -243,6 +243,37 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+    patch:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Contributions
+      summary: Change contribution assignees and/or linkedIssues
+      operationId: patchContribution
+      description: |
+        Change contribution assignees and/or linkedIssues
+      parameters:
+        - name: contributionId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContributionId'
+      requestBody:
+        description: 'Contribution patch'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContributionPatchRequest'
+      responses:
+        "204":
+          description: 'Contribution patched'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 
   /api/v1/contributions/{contributionId}/events:
     get:
@@ -276,70 +307,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/issues/{issueId}/assignees:
-    patch:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Issues
-      summary: Change issue assignees
-      operationId: patchIssueAssignees
-      description: |
-        Change issue assignees
-      parameters:
-        - in: path
-          name: issueId
-          required: true
-          schema:
-            $ref: '#/components/schemas/IssueId'
-      requestBody:
-        description: 'Issue assignees'
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/IssueAssigneesRequest'
-      responses:
-        "204":
-          description: 'Issue assignees updated'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
-  /api/v1/pull-requests/{pullRequestId}/issues:
-    post:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - PullRequests
-      summary: Link issue to PR
-      operationId: linkIssueToPullRequest
-      description: |
-        Link issue to PR
-      parameters:
-        - in: path
-          name: pullRequestId
-          required: true
-          schema:
-            $ref: '#/components/schemas/PullRequestId'
-      requestBody:
-        description: 'Issue to link'
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LinkPullRequestIssueRequest'
-      responses:
-        "204":
-          description: 'Issue linked to PR'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
   /api/v1/project/{projectId}/contributions/{contributionId}:
     patch:
       security:
@@ -347,7 +314,7 @@ paths:
       tags:
         - Contributions
       summary: (Un)Archive contribution
-      operationId: patchContribution
+      operationId: patchContributionForProject
       description: |
         (Un)Archive contribution
       parameters:
@@ -12079,7 +12046,7 @@ components:
             issue:
               $ref: '#/components/schemas/GithubIssueLinkResponse'
 
-    IssueAssigneesRequest:
+    ContributionPatchRequest:
       type: object
       required:
         - assignees
@@ -12088,14 +12055,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GithubUserId'
-
-    LinkPullRequestIssueRequest:
-      type: object
-      required:
-        - issue
-      properties:
-        issue:
-          $ref: '#/components/schemas/IssueId'
+        linkedIssues:
+          type: array
+          items:
+            $ref: '#/components/schemas/IssueId'
 
     ContributionArchivingRequest:
       type: object
