@@ -8188,6 +8188,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GithubLabel'
+        lastUpdatedAt:
+          type: string
+          format: date-time
+          description: When the contribution was last updated
 
     ContributionDetailsResponse:
       allOf:
