@@ -20,6 +20,35 @@ import java.util.UUID;
 public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi {
 
     @Override
+    public ResponseEntity<ContributionActivityPageItemResponse> getContributionById(String contributionId) {
+        return ResponseEntity.ok(getContributionsPageResponse(ContributionActivityStatus.DONE).getContributions().get(0));
+    }
+
+    @Override
+    public ResponseEntity<ContributionEventListResponse> getContributionEvents(String contributionId) {
+        return ResponseEntity.ok(new ContributionEventListResponse()
+                .events(List.of(
+                                new ContributionEventResponse()
+                                        .timestamp(ZonedDateTime.now().minusDays(2).minusHours(1).minusMinutes(5))
+                                        .assigneeAdded(new ContributionEventResponseAssigneeAdded()
+                                                .assignee(new GithubUserResponse()
+                                                        .avatarUrl("https://avatars.githubusercontent.com/u/43467246?v=4")
+                                                        .githubUserId(1L)
+                                                        .login("Antho")
+                                                )),
+                                new ContributionEventResponse()
+                                        .timestamp(ZonedDateTime.now().minusDays(2).minusHours(1).minusMinutes(5))
+                                        .opened(new ContributionEventResponseOpened()
+                                                .by(new GithubUserResponse()
+                                                        .avatarUrl("https://avatars.githubusercontent.com/u/43467246?v=4")
+                                                        .githubUserId(1L)
+                                                        .login("Antho")
+                                                ))
+                        )
+                ));
+    }
+
+    @Override
     public ResponseEntity<ContributionActivityPageResponse> getContributions(ContributionsQueryParams queryParams) {
         return ResponseEntity.ok(getContributionsPageResponse(queryParams.getStatuses().get(0)));
     }
