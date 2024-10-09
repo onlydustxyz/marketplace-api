@@ -20,6 +20,8 @@ export const options = {
 const ENV = 'staging';
 const BASE_URL = ENV === 'production' ? 'https://api.onlydust.com/api/v1' : `https://${ENV}-api.onlydust.com/api/v1`;
 const ACCESS_TOKEN = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IklNX3NVb0w3a1o3WVFTUTF5NlVYZCJ9.eyJpc3MiOiJodHRwczovL3N0YWdpbmctb25seWR1c3QuZXUuYXV0aDAuY29tLyIsInN1YiI6ImdpdGh1Ynw1OTU1MDUiLCJhdWQiOlsiaHR0cHM6Ly9zdGFnaW5nLWFwaS5vbmx5ZHVzdC5jb20vYXBpIiwiaHR0cHM6Ly9zdGFnaW5nLW9ubHlkdXN0LmV1LmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE3Mjg0NTkyNjYsImV4cCI6MTcyODQ2MDQ2Niwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCBvZmZsaW5lX2FjY2VzcyIsImF6cCI6IjdNWUR3RHg2elNtdUt0T2lkV3dzSVNXNVlFaE9OZUR6In0.CFtdg0gWchbVr2brEtCTGeGmNiFrVM1-gXgYCxithri8SvBipxokcLnb32-qOOnoX5nZShH0HRHga-IEDBwpFJKX24m07kDvwjY24JmomSSYEIgB5CvPIF5-JOqCJ5DUx27vm-P20DAc1a98_2enRYw_8OyYL6WXhft1IOecvy_Z4szClf2A6YRGE8-vVrZEUg8q2rn95ity8IixlvQZHI5N9xujFWZhdVjLl5iPJRjhihDFDywjx79f7U-HOqh0oIfEaXyR3_28OCpB5HUanBFMjgH2YzZfdkXI69QQZU2CHio0CHNtf0EThmLJQ_Pp5Xj3FfsvICFFJd31QxipWQ';
+const HACKATHON_SLUG = 'od-fu';
+
 
 function userIds() {
     return ENV === 'production' ? userIdsProduction : ENV === 'staging' ? userIdsStaging : userIdsDevelop;
@@ -51,12 +53,12 @@ function globalRequests(params) {
 }
 
 function hackathonsRequests(params) {
-    const hackathons = http.get(`${BASE_URL}/hackathons`, params);
-    const hackathonId = hackathons.json().hackathons[0].id;
-    const hackathonSlug = hackathons.json().hackathons[0].slug;
-    console.info(`Selected hackathon: ${hackathonSlug}`);
+    http.get(`${BASE_URL}/hackathons`, params);
+    const hackathon = http.get(`${BASE_URL}/hackathons/slug/${HACKATHON_SLUG}`, params);
+    const hackathonId = hackathon.json().id;
+    console.info(`Selected hackathon: ${HACKATHON_SLUG} (id: ${hackathonId})`);
     registerToHackathon(hackathonId, params);
-    hackathonRequests(hackathonSlug, params);
+    hackathonRequests(hackathonId, params);
 }
 
 function registerToHackathon(hackathonId, params) {
@@ -67,9 +69,7 @@ function registerToHackathon(hackathonId, params) {
     console.info(`User ${userId()} registered to hackathon ${hackathonId}`);
 }
 
-function hackathonRequests(hackathonSlug, params) {
-    const hackathon = http.get(`${BASE_URL}/hackathons/slug/${hackathonSlug}`, params);
-    const hackathonId = hackathon.json().id;
+function hackathonRequests(hackathonId, params) {
     const hackathonProjectIssues = http.get(`${BASE_URL}/hackathons/${hackathonId}/project-issues?statuses=OPEN`, params);
     const projectIds = hackathonProjectIssues.json().projects.map(p => p.project.id);
     console.info(`Hackathon projects: ${projectIds}`);
@@ -77,5 +77,7 @@ function hackathonRequests(hackathonSlug, params) {
 }
 
 function hackathonProjectsRequests(hackathonId, projectId, params) {
-    http.get(`${BASE_URL}/projects/${projectId}/public-issues?statuses=OPEN&hackathonId=${hackathonId}`, params);
+    const res = http.get(`${BASE_URL}/projects/${projectId}/public-issues?statuses=OPEN&hackathonId=${hackathonId}`, params);
+    const projectIssueCount = res.json().totalItemNumber;
+    console.info(`Fetched ${projectIssueCount} issues from project ${projectId}`);
 }
