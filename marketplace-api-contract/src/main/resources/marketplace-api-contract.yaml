@@ -307,42 +307,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/project/{projectId}/contributions/{contributionId}:
-    patch:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Contributions
-      summary: (Un)Archive contribution
-      operationId: patchContributionForProject
-      description: |
-        (Un)Archive contribution
-      parameters:
-        - in: path
-          name: projectId
-          required: true
-          schema:
-            $ref: '#/components/schemas/ProjectId'
-        - in: path
-          name: contributionId
-          required: true
-          schema:
-            $ref: '#/components/schemas/ContributionId'
-      requestBody:
-        description: 'Contribution archiving status'
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ContributionArchivingRequest'
-      responses:
-        "204":
-          description: 'Contribution (un)archived'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
 
   /api/v1/version:
     get:
@@ -12143,8 +12107,6 @@ components:
 
     ContributionPatchRequest:
       type: object
-      required:
-        - assignees
       properties:
         assignees:
           type: array
@@ -12154,13 +12116,5 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/IssueId'
-
-    ContributionArchivingRequest:
-      type: object
-      required:
-        - archived
-      properties:
         archived:
           type: boolean
-
-

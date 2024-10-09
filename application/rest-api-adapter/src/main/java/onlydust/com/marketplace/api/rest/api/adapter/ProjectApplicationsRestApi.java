@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ProjectApplicationsApi;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationPatchRequest;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.port.input.ApplicationFacadePort;
@@ -22,6 +23,12 @@ import static org.springframework.http.ResponseEntity.noContent;
 public class ProjectApplicationsRestApi implements ProjectApplicationsApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final ApplicationFacadePort applicationFacadePort;
+
+    @Override
+    public ResponseEntity<Void> patchProjectApplication(UUID applicationId, ProjectApplicationPatchRequest projectApplicationPatchRequest) {
+        // TODO
+        return noContent().build();
+    }
 
     @Override
     public ResponseEntity<Void> acceptProjectApplication(UUID applicationId) {
