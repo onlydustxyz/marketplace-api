@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @AllArgsConstructor
@@ -29,7 +28,7 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
                         new ContributionActivityPageItemResponse()
                                 .type(ContributionType.ISSUE)
                                 .githubTitle("Fix UI Bug on transaction history page")
-                                .id(UUID.randomUUID().toString())
+                                .id("6af85286-2b4f-447c-a265-56ace336cce7")
                                 .activityStatus(ContributionActivityStatus.NOT_ASSIGNED)
                                 .githubStatus(GithubStatus.OPEN)
                                 .githubNumber(1234L)
@@ -67,7 +66,7 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
                         new ContributionActivityPageItemResponse()
                                 .type(ContributionType.ISSUE)
                                 .githubTitle("Fix UI Bug on transaction history page")
-                                .id(UUID.randomUUID().toString())
+                                .id("aaf85286-2b4f-447c-a265-56ace336cce7")
                                 .activityStatus(ContributionActivityStatus.NOT_ASSIGNED)
                                 .githubStatus(GithubStatus.OPEN)
                                 .githubNumber(1234L)
@@ -105,7 +104,7 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
                         new ContributionActivityPageItemResponse()
                                 .type(ContributionType.ISSUE)
                                 .githubTitle("Fix UI Bug on transaction history page")
-                                .id(UUID.randomUUID().toString())
+                                .id("baf85286-2b4f-447c-a265-56ace336cce7")
                                 .activityStatus(ContributionActivityStatus.NOT_ASSIGNED)
                                 .githubStatus(GithubStatus.OPEN)
                                 .githubNumber(1234L)
@@ -153,7 +152,7 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
                         new ContributionActivityPageItemResponse()
                                 .type(ContributionType.ISSUE)
                                 .githubTitle("Fix UI Bug on transaction history page in progress")
-                                .id(UUID.randomUUID().toString())
+                                .id("caf85286-2b4f-447c-a265-56ace336cce7")
                                 .activityStatus(ContributionActivityStatus.IN_PROGRESS)
                                 .githubNumber(1234L)
                                 .githubStatus(GithubStatus.OPEN)
@@ -206,7 +205,7 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
                         new ContributionActivityPageItemResponse()
                                 .type(ContributionType.PULL_REQUEST)
                                 .githubTitle("PR to review on Fix UI Bug on transaction history page")
-                                .id(UUID.randomUUID().toString())
+                                .id("eaf85286-2b4f-447c-a265-56ace336cce7")
                                 .activityStatus(ContributionActivityStatus.TO_REVIEW)
                                 .githubNumber(456L)
                                 .githubStatus(GithubStatus.COMMENTED)
@@ -259,7 +258,7 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
                         new ContributionActivityPageItemResponse()
                                 .type(ContributionType.PULL_REQUEST)
                                 .githubTitle("PR done on Fix UI Bug on transaction history page #1")
-                                .id(UUID.randomUUID().toString())
+                                .id("1af85286-2b4f-447c-a265-56ace336cce7")
                                 .activityStatus(ContributionActivityStatus.DONE)
                                 .githubStatus(GithubStatus.MERGED)
                                 .githubNumber(456L)
@@ -321,7 +320,7 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
                         new ContributionActivityPageItemResponse()
                                 .type(ContributionType.PULL_REQUEST)
                                 .githubTitle("PR done on Fix UI Bug on transaction history page #1")
-                                .id(UUID.randomUUID().toString())
+                                .id("62f85286-2b4f-447c-a265-56ace336cce7")
                                 .activityStatus(ContributionActivityStatus.DONE)
                                 .githubStatus(GithubStatus.MERGED)
                                 .githubNumber(456L)
@@ -364,7 +363,7 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
                         new ContributionActivityPageItemResponse()
                                 .type(ContributionType.PULL_REQUEST)
                                 .githubTitle("PR archived on Fix UI Bug on transaction history page")
-                                .id(UUID.randomUUID().toString())
+                                .id("64f85286-2b4f-447c-a265-56ace336cce7")
                                 .activityStatus(ContributionActivityStatus.ARCHIVED)
                                 .githubStatus(GithubStatus.CLOSED)
                                 .githubNumber(456L)
