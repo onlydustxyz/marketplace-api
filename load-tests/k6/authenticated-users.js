@@ -6,11 +6,14 @@ import {userIds} from "./users/develop.js";
 
 export const options = {
     scenarios: {
-        display_homepage: {
-            executor: 'per-vu-iterations',
-            vus: 5,
-            iterations: 10,
-            startTime: '5s',
+        odhack: {
+            executor: 'ramping-vus',
+            startVUs: 0,
+            stages: [
+                {duration: '1s', target: 10},
+                {duration: '10s', target: 0},
+            ],
+            gracefulRampDown: '0s',
         },
     },
 };
@@ -29,4 +32,30 @@ export default function () {
 
     http.get(`${BASE_URL}/projects`, params);
     http.get(`${BASE_URL}/public-activity?pageIndex=0&pageSize=10`, params);
+}
+
+function globalRequests(params) {
+    http.get(`${BASE_URL}/me/billing-profiles`, params);
+    http.get(`${BASE_URL}/me/profile`, params);
+    http.get(`${BASE_URL}/me/onboarding`, params);
+    http.get(`${BASE_URL}/me/notifications/count?status=UNREAD`, params);
+    http.get(`${BASE_URL}/banner?hiddenIgnoredByMe=true`, params);
+}
+
+function hackathonsRequests(params) {
+    http.get(`${BASE_URL}/hackathons`, params);
+    http.get(`${BASE_URL}/hackathons/slug/odh-hayden-6`, params);
+    http.get(`${BASE_URL}/hackathons/ce24272b-377e-48d9-89b9-cb736a02e8e9/project-issues?statuses=OPEN`, params);
+}
+
+function hackathonRequests(params) {
+    const res = http.get(`${BASE_URL}/hackathons/slug/odh-hayden-6`, params);
+    const hackathonId = res.json().id;
+    http.get(`${BASE_URL}/hackathons/${hackathonId}/project-issues?statuses=OPEN`, params);
+    return hackathonId;
+}
+
+function hackathonProjectsRequests(hackathonId, params) {
+    const res = http.get(`${BASE_URL}/projects/slug/odh-hayden-6`, params);
+    http.get(`${BASE_URL}/projects/${res.json().id}/public-issues?statuses=OPEN&hackathonId=${hackathonId}`, params);
 }
