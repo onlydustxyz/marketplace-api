@@ -41,6 +41,9 @@ export default function () {
     };
 
     globalRequests(params);
+    homeRequests(params);
+
+    globalRequests(params);
     hackathonsRequests(params);
 }
 
@@ -48,8 +51,29 @@ function globalRequests(params) {
     http.get(`${BASE_URL}/me/billing-profiles`, params);
     http.get(`${BASE_URL}/me/profile`, params);
     http.get(`${BASE_URL}/me/onboarding`, params);
-    http.get(`${BASE_URL}/me/notifications/count?status=UNREAD`, params);
     http.get(`${BASE_URL}/banner?hiddenIgnoredByMe=true`, params);
+    notificationRequests(params);
+}
+
+function notificationRequests(params) {
+    http.get(`${BASE_URL}/me/notifications/count?status=UNREAD`, params);
+}
+
+//
+// Home :
+//
+// /me/rewards
+// /projects
+// /me/recommended-projects
+// /projects -> trending project
+// /public-activity
+function homeRequests(params) {
+    http.get(`${BASE_URL}/me/rewards`, params);
+    http.get(`${BASE_URL}/me/projects`, params);
+    http.get(`${BASE_URL}/me/recommended-projects`, params);
+    http.get(`${BASE_URL}/projects`, params);
+    http.get(`${BASE_URL}/public-activity`, params);
+    console.info('Home requests done');
 }
 
 function hackathonsRequests(params) {
@@ -80,4 +104,5 @@ function hackathonProjectsRequests(hackathonId, projectId, params) {
     const res = http.get(`${BASE_URL}/projects/${projectId}/public-issues?statuses=OPEN&hackathonId=${hackathonId}`, params);
     const projectIssueCount = res.json().totalItemNumber;
     console.info(`Fetched ${projectIssueCount} issues from project ${projectId}`);
+    notificationRequests(params);
 }
