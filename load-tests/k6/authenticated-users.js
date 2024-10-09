@@ -1,6 +1,7 @@
 // Run with: K6_WEB_DASHBOARD=true K6_WEB_DASHBOARD_EXPORT=html-report.html k6 run load-tests/k6/authenticated-users.js
+// For datadog: K6_STATSD_ENABLE_TAGS=true k6 run --tag test_run_id=1 --out output-statsd load-tests/k6/authenticated-users.js
 
-import {check} from 'k6';
+import {check, sleep} from 'k6';
 import http from 'k6/http';
 import exec from 'k6/execution';
 import {userIds as userIdsDevelop} from "./users/develop.js";
@@ -13,8 +14,8 @@ export const options = {
             executor: 'ramping-vus',
             startVUs: 1,
             stages: [
-                {duration: '10s', target: 1},
-                {duration: '1s', target: 1},
+                {duration: '120s', target: 5000},
+                {duration: '30s', target: 0},
             ],
             gracefulRampDown: '0s',
         },
@@ -22,8 +23,8 @@ export const options = {
 };
 
 const ENV = 'perf';
-const BASE_URL = `https://${ENV}-api.onlydust.com/api/v1`;
-const ACCESS_TOKEN = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InlvcHBLQzlTTFptT1pBbXhtV2J6NiJ9.eyJpc3MiOiJodHRwczovL3Byb2R1Y3Rpb24tb25seWR1c3QuZXUuYXV0aDAuY29tLyIsInN1YiI6ImdpdGh1Ynw1OTU1MDUiLCJhdWQiOlsiaHR0cHM6Ly9hcGkub25seWR1c3QuY29tL2FwaSIsImh0dHBzOi8vcHJvZHVjdGlvbi1vbmx5ZHVzdC5ldS5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNzI4NDc2MDc4LCJleHAiOjE3Mjg0NzcyNzgsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwgb2ZmbGluZV9hY2Nlc3MiLCJhenAiOiJ2TkxwYU1EQU1RZVIwZHJhdkxreHdZdlZpVGRXYzZUSSJ9.B4xOBCFoXbGSYlDyy31KJxow4ESEEmduiPwNab05_eHpi9Psr37QMQOkNHEMHz0H8N3ZPrCxBclF74IksKS9vPOFmpB022D7XuoRzb5BlYWteNqGvzHw0vGmvc45hwVO5QoOIRw62Q2yF5-HDOm0wLkv1U6u3F36jVv3YTydXC2mvEfGtOJp3wuFuZ4FfM7p5pWEpo-kdCoEDa6RfjSHkDwpbXsDJ40zEJTks9b5WRkb6o69bevPqKwtkI_Xzf_BUvnwOv3Z795j2NPVaxSdBinOBtKbN7n5SkK8n8Vvzu9wngGjIegB_KkReopPqzuUkEj9oNiW3vxC7u6exUgihw';
+const BASE_URL = `https://${ENV}-api.onlydust.com/api/v1`;//'http://localhost:9999/api/v1';
+const ACCESS_TOKEN = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InlvcHBLQzlTTFptT1pBbXhtV2J6NiJ9.eyJpc3MiOiJodHRwczovL3Byb2R1Y3Rpb24tb25seWR1c3QuZXUuYXV0aDAuY29tLyIsInN1YiI6ImdpdGh1Ynw1OTU1MDUiLCJhdWQiOlsiaHR0cHM6Ly9hcGkub25seWR1c3QuY29tL2FwaSIsImh0dHBzOi8vcHJvZHVjdGlvbi1vbmx5ZHVzdC5ldS5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNzI4NDkzMTk4LCJleHAiOjE3Mjg0OTQzOTgsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwgb2ZmbGluZV9hY2Nlc3MiLCJhenAiOiJ2TkxwYU1EQU1RZVIwZHJhdkxreHdZdlZpVGRXYzZUSSJ9.Qaoh2wS8cFCzb86QVqmXe3_6zPR3oxYV6XXpD2jD8rSEqPd8jyLf0Xa6zKaTsV7WOfoHPrFAmIWu6bY33EL9gcOJUIBtYrFi6L5ekigJLkTlzv-V7wWvWSSFGqXkmKGopwIgxhmbsfFyrFjWUuqNlTeSjiyjBl78sz3a5E2klafvrldZBCMpC2GiWx1Zy-jonHEoCUVmCf0dIrptEHEVgZJJEWc1TxFn4zvc69Gu0ragE9ekpzBqwpDMCCLrMQeIyWKcUtXTChrxL1IRpk_GSkrFSoDF9ir0tNMUZQ1WU_GI4Rn__z_toyN8VYuP4ObaaE9B7tySdw5bnul4W_YfSw';
 const HACKATHON_SLUG = 'odhack-80';
 
 
@@ -33,6 +34,10 @@ function userIds() {
 
 function userId() {
     return userIds()[exec.vu.idInTest % userIds().length];
+}
+
+function idle(min, max) {
+    sleep(Math.random() * (max - min) + min);
 }
 
 
@@ -45,17 +50,21 @@ export default function () {
         },
     };
 
-    console.info(`User ${userId()} started`);
-    globalRequests(params);
-    homeRequests(params);
-
-    globalRequests(params);
-    hackathonsRequests(params);
+    console.debug(`User ${userId()} started`);
+    notificationRequests(params);
+    //http.get(`${BASE_URL}/me/recommended-projects`, params);
+    sleep(5);
+    // globalRequests(params);
+    // homeRequests(params);
+    //
+    // idle(3, 10);
+    // globalRequests(params);
+    // hackathonsRequests(params);
 }
 
 function globalRequests(params) {
     http.get(`${BASE_URL}/me/billing-profiles`, params);
-    console.info(`User ${userId()} first global requests done`);
+    console.debug(`User ${userId()} first global requests done`);
     http.get(`${BASE_URL}/me/profile`, params);
     http.get(`${BASE_URL}/me/onboarding`, params);
     http.get(`${BASE_URL}/banner?hiddenIgnoredByMe=true`, params);
@@ -72,19 +81,22 @@ function homeRequests(params) {
     http.get(`${BASE_URL}/me/recommended-projects`, params);
     http.get(`${BASE_URL}/projects`, params);
     http.get(`${BASE_URL}/public-activity`, params);
-    console.info('Home requests done');
+    console.debug('Home requests done');
 }
 
 function hackathonsRequests(params) {
     http.get(`${BASE_URL}/hackathons`, params);
+    idle(1, 10);
+
     const hackathon = http.get(`${BASE_URL}/hackathons/slug/${HACKATHON_SLUG}`, params);
     const hackathonId = hackathon.json().id;
-    console.info(`Selected hackathon: ${HACKATHON_SLUG} (id: ${hackathonId})`);
+    console.debug(`Selected hackathon: ${HACKATHON_SLUG} (id: ${hackathonId})`);
     registerToHackathon(hackathonId, params);
     hackathonRequests(hackathonId, params);
 }
 
 function registerToHackathon(hackathonId, params) {
+    idle(10, 15);
     const profilePatchRes = http.patch(`${BASE_URL}/me/profile`, JSON.stringify({
         "contacts": [
             {
@@ -102,19 +114,20 @@ function registerToHackathon(hackathonId, params) {
     check(res, {
         'successfully registered to hackathon': (r) => r.status === 204,
     });
-    console.info(`User ${userId()} registered to hackathon ${hackathonId}`);
+    console.debug(`User ${userId()} registered to hackathon ${hackathonId}`);
 }
 
 function hackathonRequests(hackathonId, params) {
     const hackathonProjectIssues = http.get(`${BASE_URL}/hackathons/${hackathonId}/project-issues?statuses=OPEN`, params);
     const projectIds = hackathonProjectIssues.json().projects.map(p => p.project.id);
-    console.info(`Hackathon projects: ${projectIds}`);
+    console.debug(`Hackathon projects: ${projectIds}`);
     projectIds.forEach(projectId => hackathonProjectsRequests(hackathonId, projectId, params));
 }
 
 function hackathonProjectsRequests(hackathonId, projectId, params) {
+    idle(10, 20);
     const res = http.get(`${BASE_URL}/projects/${projectId}/public-issues?statuses=OPEN&hackathonId=${hackathonId}`, params);
     const projectIssueCount = res.json().totalItemNumber;
-    console.info(`Fetched ${projectIssueCount} issues from project ${projectId}`);
+    console.debug(`Fetched ${projectIssueCount} issues from project ${projectId}`);
     notificationRequests(params);
 }
