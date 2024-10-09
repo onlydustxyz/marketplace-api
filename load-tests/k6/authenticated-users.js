@@ -10,21 +10,25 @@ import {userIds as userIdsProduction} from "./users/production.js";
 export const options = {
     scenarios: {
         odhack: {
-            executor: 'constant-vus',
-            vus: 1,
-            duration: '60s',
+            executor: 'ramping-vus',
+            startVUs: 1,
+            stages: [
+                {duration: '10s', target: 1},
+                {duration: '1s', target: 1},
+            ],
+            gracefulRampDown: '0s',
         },
     },
 };
 
-const ENV = 'staging';
-const BASE_URL = ENV === 'production' ? 'https://api.onlydust.com/api/v1' : `https://${ENV}-api.onlydust.com/api/v1`;
-const ACCESS_TOKEN = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IklNX3NVb0w3a1o3WVFTUTF5NlVYZCJ9.eyJpc3MiOiJodHRwczovL3N0YWdpbmctb25seWR1c3QuZXUuYXV0aDAuY29tLyIsInN1YiI6ImdpdGh1Ynw1OTU1MDUiLCJhdWQiOlsiaHR0cHM6Ly9zdGFnaW5nLWFwaS5vbmx5ZHVzdC5jb20vYXBpIiwiaHR0cHM6Ly9zdGFnaW5nLW9ubHlkdXN0LmV1LmF1dGgwLmNvbS91c2VyaW5mbyJdLCJpYXQiOjE3Mjg0NTkyNjYsImV4cCI6MTcyODQ2MDQ2Niwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCBvZmZsaW5lX2FjY2VzcyIsImF6cCI6IjdNWUR3RHg2elNtdUt0T2lkV3dzSVNXNVlFaE9OZUR6In0.CFtdg0gWchbVr2brEtCTGeGmNiFrVM1-gXgYCxithri8SvBipxokcLnb32-qOOnoX5nZShH0HRHga-IEDBwpFJKX24m07kDvwjY24JmomSSYEIgB5CvPIF5-JOqCJ5DUx27vm-P20DAc1a98_2enRYw_8OyYL6WXhft1IOecvy_Z4szClf2A6YRGE8-vVrZEUg8q2rn95ity8IixlvQZHI5N9xujFWZhdVjLl5iPJRjhihDFDywjx79f7U-HOqh0oIfEaXyR3_28OCpB5HUanBFMjgH2YzZfdkXI69QQZU2CHio0CHNtf0EThmLJQ_Pp5Xj3FfsvICFFJd31QxipWQ';
-const HACKATHON_SLUG = 'od-fu';
+const ENV = 'perf';
+const BASE_URL = `https://${ENV}-api.onlydust.com/api/v1`;
+const ACCESS_TOKEN = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InlvcHBLQzlTTFptT1pBbXhtV2J6NiJ9.eyJpc3MiOiJodHRwczovL3Byb2R1Y3Rpb24tb25seWR1c3QuZXUuYXV0aDAuY29tLyIsInN1YiI6ImdpdGh1Ynw1OTU1MDUiLCJhdWQiOlsiaHR0cHM6Ly9hcGkub25seWR1c3QuY29tL2FwaSIsImh0dHBzOi8vcHJvZHVjdGlvbi1vbmx5ZHVzdC5ldS5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNzI4NDc2MDc4LCJleHAiOjE3Mjg0NzcyNzgsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwgb2ZmbGluZV9hY2Nlc3MiLCJhenAiOiJ2TkxwYU1EQU1RZVIwZHJhdkxreHdZdlZpVGRXYzZUSSJ9.B4xOBCFoXbGSYlDyy31KJxow4ESEEmduiPwNab05_eHpi9Psr37QMQOkNHEMHz0H8N3ZPrCxBclF74IksKS9vPOFmpB022D7XuoRzb5BlYWteNqGvzHw0vGmvc45hwVO5QoOIRw62Q2yF5-HDOm0wLkv1U6u3F36jVv3YTydXC2mvEfGtOJp3wuFuZ4FfM7p5pWEpo-kdCoEDa6RfjSHkDwpbXsDJ40zEJTks9b5WRkb6o69bevPqKwtkI_Xzf_BUvnwOv3Z795j2NPVaxSdBinOBtKbN7n5SkK8n8Vvzu9wngGjIegB_KkReopPqzuUkEj9oNiW3vxC7u6exUgihw';
+const HACKATHON_SLUG = 'odhack-80';
 
 
 function userIds() {
-    return ENV === 'production' ? userIdsProduction : ENV === 'staging' ? userIdsStaging : userIdsDevelop;
+    return ENV === 'perf' ? userIdsProduction : ENV === 'staging' ? userIdsStaging : userIdsDevelop;
 }
 
 function userId() {
@@ -37,9 +41,11 @@ export default function () {
         headers: {
             'Authorization': `Bearer ${ACCESS_TOKEN}`,
             'X-Impersonation-Claims': `{"sub":"github|${userId()}"}`,
+            'Content-Type': 'application/json',
         },
     };
 
+    console.info(`User ${userId()} started`);
     globalRequests(params);
     homeRequests(params);
 
@@ -49,6 +55,7 @@ export default function () {
 
 function globalRequests(params) {
     http.get(`${BASE_URL}/me/billing-profiles`, params);
+    console.info(`User ${userId()} first global requests done`);
     http.get(`${BASE_URL}/me/profile`, params);
     http.get(`${BASE_URL}/me/onboarding`, params);
     http.get(`${BASE_URL}/banner?hiddenIgnoredByMe=true`, params);
@@ -59,14 +66,6 @@ function notificationRequests(params) {
     http.get(`${BASE_URL}/me/notifications/count?status=UNREAD`, params);
 }
 
-//
-// Home :
-//
-// /me/rewards
-// /projects
-// /me/recommended-projects
-// /projects -> trending project
-// /public-activity
 function homeRequests(params) {
     http.get(`${BASE_URL}/me/rewards`, params);
     http.get(`${BASE_URL}/me/projects`, params);
@@ -86,9 +85,22 @@ function hackathonsRequests(params) {
 }
 
 function registerToHackathon(hackathonId, params) {
+    const profilePatchRes = http.patch(`${BASE_URL}/me/profile`, JSON.stringify({
+        "contacts": [
+            {
+                "channel": "TELEGRAM",
+                "contact": "t.me/foo",
+                "visibility": "public"
+            }
+        ]
+    }), params);
+    check(profilePatchRes, {
+        'successfully patched profile': (r) => r.status === 204,
+    });
+
     const res = http.put(`${BASE_URL}/me/hackathons/${hackathonId}/registrations`, null, params);
     check(res, {
-        'is status 200': (r) => r.status === 200,
+        'successfully registered to hackathon': (r) => r.status === 204,
     });
     console.info(`User ${userId()} registered to hackathon ${hackathonId}`);
 }
