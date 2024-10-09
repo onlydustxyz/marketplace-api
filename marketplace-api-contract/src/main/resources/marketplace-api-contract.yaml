@@ -2763,6 +2763,45 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v2/projects/{projectId}/rewards:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Projects
+      summary: Create rewards in bulk
+      operationId: createRewards
+      description: |
+        Create new rewards in bulk. The caller must be a leader of the project.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      requestBody:
+        description: 'New reward'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RewardsRequest'
+      responses:
+        "200":
+          description: 'Reward'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateRewardResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
 
   /api/v1/projects/{projectId}/rewards/{rewardId}:
     get:
@@ -3364,8 +3403,8 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  
-  
+
+
   /api/v2/applications:
     get:
       security:
@@ -7759,6 +7798,11 @@ components:
         repoId:
           type: integer
           format: int64
+
+    RewardsRequest:
+      type: array
+      items:
+        $ref: '#/components/schemas/RewardRequest'
 
     GithubIssueLinkResponse:
       type: object
