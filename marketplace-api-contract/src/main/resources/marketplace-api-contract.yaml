@@ -8154,6 +8154,7 @@ components:
         - type
         - repo
         - githubStatus
+        - githubId
         - githubNumber
         - githubAuthor
         - githubTitle
@@ -8165,6 +8166,11 @@ components:
           $ref: '#/components/schemas/ShortGithubRepoResponse'
         githubAuthor:
           $ref: '#/components/schemas/GithubUserResponse'
+        githubId:
+          type: integer
+          format: int64
+          description: Github item id
+          example: 6
         githubNumber:
           type: integer
           format: int64
