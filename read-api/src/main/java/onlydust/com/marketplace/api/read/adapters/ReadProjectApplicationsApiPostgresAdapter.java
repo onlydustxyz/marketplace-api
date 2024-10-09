@@ -85,7 +85,7 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
                 params.getIssueId(),
                 params.getApplicantId(),
                 params.getIsApplicantProjectMember(),
-                params.getU().getSearch(),
+                params.getU() == null ? null : params.getU().getSearch(),
                 PageRequest.of(params.getPageIndex(), params.getPageSize()));
 
         return ok(new ProjectApplicationPageResponse()
