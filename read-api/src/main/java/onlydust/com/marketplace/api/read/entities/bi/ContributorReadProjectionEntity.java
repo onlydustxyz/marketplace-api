@@ -44,19 +44,19 @@ public class ContributorReadProjectionEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     List<EcosystemLinkResponse> ecosystems;
 
-    BigDecimal totalRewardedUsdAmount;
-    Integer rewardCount;
-    Integer contributionCount;
-    Integer issueCount;
-    Integer prCount;
-    Integer codeReviewCount;
+//    BigDecimal totalRewardedUsdAmount;
+//    Integer rewardCount;
+//    Integer contributionCount;
+//    Integer issueCount;
+//    Integer prCount;
+//    Integer codeReviewCount;
 
     @OneToOne
     @JoinColumn(name = "contributorId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
     GlobalUsersRanksReadEntity globalUserRank;
 
-    public ApplicantResponse toApplicantResponse() {
-        return new ApplicantResponse()
+    public ContributorOverviewResponse toApplicantResponse() {
+        return new ContributorOverviewResponse()
                 .id(contributor.getId())
                 .githubUserId(contributorId)
                 .login(contributorLogin)
@@ -65,15 +65,18 @@ public class ContributorReadProjectionEntity {
                 .countryCode(contributorCountry == null ? null : Country.fromIso3(contributorCountry).iso2Code())
                 .languages(languages)
                 .ecosystems(ecosystems)
-                .totalRewardedUsdAmount(totalRewardedUsdAmount)
-                .rewardCount(rewardCount)
-                .contributionCount(contributionCount)
-                .issueCount(issueCount)
-                .prCount(prCount)
-                .codeReviewCount(codeReviewCount)
+                .totalRewardedUsdAmount(BigDecimal.valueOf(42))
+                .rewardCount(42)
+                .contributionCount(420)
+                .issueCount(69)
+                .prCount(42)
+                .codeReviewCount(5)
                 .globalRank(globalUserRank != null ? Math.toIntExact(globalUserRank.rank()) : null)
                 .globalRankPercentile(globalUserRank != null ? prettyRankPercentile(globalUserRank.rankPercentile()) : null)
-                .globalRankCategory(globalUserRank != null ? globalUserRank.rankCategory() : null);
+                .globalRankCategory(globalUserRank != null ? globalUserRank.rankCategory() : null)
+                .bio("I'm the best")
+                .contacts(List.of(new ContactInformation().channel(ContactInformationChannel.TELEGRAM).contact("t.me/foo")));
+
     }
 
     public ContributorResponse toContributorResponse() {

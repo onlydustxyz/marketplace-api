@@ -8508,7 +8508,7 @@ components:
         issue:
           $ref: '#/components/schemas/GithubIssueLinkResponse'
         applicant:
-          $ref: '#/components/schemas/ApplicantResponse'
+          $ref: '#/components/schemas/ContributorOverviewResponse'
         receivedAt:
           type: string
           format: date-time
@@ -11804,7 +11804,7 @@ components:
         contributionCount:
           $ref: '#/components/schemas/NumberKpi'
 
-    ApplicantResponse:
+    ContributorOverviewResponse:
       allOf:
         - $ref: '#/components/schemas/RankedContributorResponse'
       type: object
@@ -11845,6 +11845,26 @@ components:
           type: integer
         contributionCount:
           type: integer
+        bio:
+          type: string
+          description: User bio as in Github profile
+          example: Contributing to awesome open source projects.
+        signedUpOnGithubAt:
+          type: string
+          format: date-time
+          description: When the user signed up on Github
+        signedUpAt:
+          type: string
+          format: date-time
+          description: When the user signed up on OnlyDust
+        lastSeenAt:
+          type: string
+          format: date-time
+          description: The last time the user signed in on OnlyDust
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactInformation'
 
     BiWorldMapListResponse:
       type: array
@@ -12025,16 +12045,16 @@ components:
             contributors:
               type: array
               items:
-                $ref: '#/components/schemas/ContributorResponse'
+                $ref: '#/components/schemas/ContributorOverviewResponse'
             applicants:
               type: array
               items:
-                $ref: '#/components/schemas/ContributorResponse'
+                $ref: '#/components/schemas/ContributorOverviewResponse'
             assignees:
               type: array
               description: The list of assignees for this issue
               items:
-                $ref: '#/components/schemas/GithubUserResponse'
+                $ref: '#/components/schemas/ContributorOverviewResponse'
             languages:
               type: array
               items:
