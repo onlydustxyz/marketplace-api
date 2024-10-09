@@ -75,8 +75,8 @@ spring:
       connectionTimeout: 30000
       idleTimeout: 30000
       maxLifetime: 60000
-      maximumPoolSize: 200
-      minimumIdle: 10
+      maximumPoolSize: ${MAX_DB_CONNECTIONS}
+      minimumIdle: ${MIN_DB_CONNECTIONS}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
