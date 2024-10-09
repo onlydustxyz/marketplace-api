@@ -81,6 +81,7 @@ public class ApplicationReadEntity {
                 .applicant(applicant.toApplicantResponse())
                 .receivedAt(receivedAt)
                 .isApplicantProjectMember(isApplicantProjectMember)
+                .isIgnored(false) //TODO: implement isIgnored
                 ;
     }
 

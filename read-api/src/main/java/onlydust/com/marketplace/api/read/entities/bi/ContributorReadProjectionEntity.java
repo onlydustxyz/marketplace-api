@@ -52,7 +52,7 @@ public class ContributorReadProjectionEntity {
     Integer codeReviewCount;
 
     @OneToOne
-    @MapsId
+    @JoinColumn(name = "contributorId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
     GlobalUsersRanksReadEntity globalUserRank;
 
     public ApplicantResponse toApplicantResponse() {

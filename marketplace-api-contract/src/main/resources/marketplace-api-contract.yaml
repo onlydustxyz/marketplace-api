@@ -8497,6 +8497,7 @@ components:
         - applicant
         - receivedAt
         - isApplicantProjectMember
+        - isIgnored
       properties:
         id:
           $ref: '#/components/schemas/ProjectApplicationId'
@@ -8515,6 +8516,10 @@ components:
         isApplicantProjectMember:
           type: boolean
           description: True if the applicant has already contributed to the project or is a project lead
+        isIgnored:
+          type: boolean
+          description: True if the application has been ignored
+
 
     ProjectApplicationPatchRequest:
       type: object
@@ -11730,6 +11735,8 @@ components:
             applicantId:
               $ref: '#/components/schemas/GithubUserId'
             isApplicantProjectMember:
+              type: boolean
+            isIgnored:
               type: boolean
 
     BiContributorsPageResponse:
