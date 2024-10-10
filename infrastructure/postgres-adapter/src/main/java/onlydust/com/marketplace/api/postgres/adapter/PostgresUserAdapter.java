@@ -63,7 +63,8 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     @Override
     @Transactional(readOnly = true)
     public Optional<AuthenticatedUser> getRegisteredUserByGithubId(Long githubId) {
-        return userViewRepository.findByGithubUserId(githubId).map(this::getUserDetails);
+        return userRepository.findByGithubUserId(githubId).map(UserMapper::mapCreatedUserToDomain);
+        //return userViewRepository.findByGithubUserId(githubId).map(this::getUserDetails);
     }
 
     @Override
