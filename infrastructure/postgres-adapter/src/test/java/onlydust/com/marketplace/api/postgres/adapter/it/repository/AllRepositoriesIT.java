@@ -1,14 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.AllocatedTimeEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRankingRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.UserViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ContactInformationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
@@ -21,13 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Transactional
@@ -46,8 +42,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    UserViewRepository userViewRepository;
-    @Autowired
     CustomProjectRankingRepository customProjectRankingRepository;
 
     @Test
@@ -64,37 +58,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
 
         userRepository.deleteAll();
         assertIsSaved(expected, userRepository);
-    }
-
-    @Test
-    void should_read_user_onboarding() {
-        // Given
-        final UserEntity user = UserEntity.builder()
-                .id(UUID.randomUUID())
-                .githubUserId(faker.number().randomNumber(15, true))
-                .githubLogin(faker.name().name())
-                .githubAvatarUrl(faker.internet().avatar())
-                .email(faker.internet().emailAddress())
-                .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN})
-                .lastSeenAt(new Date())
-                .build();
-        final OnboardingEntity onboarding = OnboardingEntity.builder().userId(user.getId())
-                .termsAndConditionsAcceptanceDate(new Date())
-                .completionDate(new Date())
-                .build();
-
-        userRepository.deleteAll();
-
-        // When
-        assertIsSaved(user, userRepository);
-        assertIsSaved(onboarding, onboardingRepository);
-        final UserViewEntity result = userViewRepository.findById(user.getId()).orElseThrow();
-
-        // Then
-        assertThat(userRepository.findAll()).hasSize(1);
-        assertThat(result.onboarding().getCompletionDate()).isEqualToIgnoringNanos(onboarding.getCompletionDate().toInstant().atZone(ZoneOffset.UTC));
-        assertThat(result.onboarding().getTermsAndConditionsAcceptanceDate()).isEqualToIgnoringNanos(onboarding.getTermsAndConditionsAcceptanceDate().toInstant().atZone(ZoneOffset.UTC));
-        assertThat(result.githubUserId()).isEqualTo(user.getGithubUserId());
     }
 
     @Test
