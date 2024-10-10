@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.AllUserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.AuthenticatedUserReadEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorQueryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.GithubUserWithTelegramQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationSettingsForProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
@@ -31,14 +34,14 @@ import onlydust.com.marketplace.project.domain.view.RewardItemView;
 import onlydust.com.marketplace.user.domain.model.CreatedUser;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.port.output.AppUserStoragePort;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.*;
 
 import static java.lang.String.format;
-import static onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper.*;
+import static onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper.mapCreatedUserToDomain;
+import static onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper.mapUserToEntity;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
@@ -46,24 +49,22 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
 
     private final CustomContributorRepository customContributorRepository;
     private final UserRepository userRepository;
-    private final UserViewRepository userViewRepository;
+    private final AuthenticatedUserReadRepository authenticatedUserReadRepository;
     private final AllUserViewRepository allUserViewRepository;
     private final OnboardingRepository onboardingRepository;
     private final ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     private final ProjectLeadRepository projectLeadRepository;
     private final UserProfileInfoRepository userProfileInfoRepository;
     private final CustomRewardRepository customRewardRepository;
-    private final ProjectLedIdRepository projectLedIdRepository;
     private final RewardViewRepository rewardViewRepository;
     private final CurrencyRepository currencyRepository;
-    private final BillingProfileUserRepository billingProfileUserRepository;
     private final GithubUserWithTelegramQueryRepository githubUserWithTelegramQueryRepository;
     private final NotificationSettingsForProjectRepository notificationSettingsForProjectRepository;
 
     @Override
     @Transactional(readOnly = true)
     public Optional<AuthenticatedUser> getRegisteredUserByGithubId(Long githubId) {
-        return userViewRepository.findByGithubUserId(githubId).map(this::getUserDetails);
+        return authenticatedUserReadRepository.findByGithubUserId(githubId).map(AuthenticatedUserReadEntity::toDomain);
     }
 
     @Override
@@ -75,15 +76,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     @Override
     @Transactional(readOnly = true)
     public Optional<AuthenticatedUser> getRegisteredUserById(UserId userId) {
-        return userViewRepository.findById(userId.value()).map(this::getUserDetails);
-    }
-
-    private AuthenticatedUser getUserDetails(@NotNull UserViewEntity user) {
-        final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(user.id()).stream()
-                .sorted(Comparator.comparing(ProjectLedIdQueryEntity::getProjectSlug))
-                .toList();
-        final var billingProfiles = billingProfileUserRepository.findByUserId(user.id());
-        return mapUserToDomain(user, projectLedIdsByUserId, billingProfiles);
+        return authenticatedUserReadRepository.findById(userId.value()).map(AuthenticatedUserReadEntity::toDomain);
     }
 
     @Override
