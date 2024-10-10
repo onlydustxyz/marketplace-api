@@ -1,18 +1,26 @@
 package onlydust.com.marketplace.api.read.repositories;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.api.contract.model.ContributorKpiSortEnum;
+import onlydust.com.marketplace.accounting.domain.model.Country;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.bi.ContributorKpisReadEntity;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.sanitizedDate;
+
 public interface ContributorKpisReadRepository extends Repository<ContributorKpisReadEntity, Long> {
+    ZonedDateTime DEFAULT_FROM_DATE = ZonedDateTime.parse("2007-10-20T05:24:19Z");
 
     static String getSortProperty(ContributorKpiSortEnum sort) {
         return sort == null ? "contributor_login" : switch (sort) {
@@ -112,11 +120,11 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                       ) <= :contributionCountMax)
                     """,
             nativeQuery = true)
-    Page<ContributorKpisReadEntity> findAll(@NonNull ZonedDateTime fromDate,
-                                            @NonNull ZonedDateTime toDate,
-                                            @NonNull ZonedDateTime fromDatePreviousPeriod,
-                                            @NonNull ZonedDateTime toDatePreviousPeriod,
-                                            @NonNull UUID[] dataSourceIds,
+    Page<ContributorKpisReadEntity> findAll(ZonedDateTime fromDate,
+                                            ZonedDateTime toDate,
+                                            ZonedDateTime fromDatePreviousPeriod,
+                                            ZonedDateTime toDatePreviousPeriod,
+                                            UUID[] dataSourceIds,
                                             @NonNull Boolean showFilteredKpis,
                                             String search,
                                             Long[] contributorIds,
@@ -138,4 +146,72 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                             Integer contributionCountMax,
                                             String[] contributionTypes,
                                             Pageable pageable);
+
+    default Page<ContributorKpisReadEntity> findAll(BiContributorsQueryParams q) {
+        final var sanitizedFromDate = sanitizedDate(q.getFromDate(), DEFAULT_FROM_DATE).truncatedTo(ChronoUnit.DAYS);
+        final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now()).truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        final var fromDateOfPreviousPeriod = sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
+
+        return findAll(
+                sanitizedFromDate,
+                sanitizedToDate,
+                fromDateOfPreviousPeriod,
+                sanitizedFromDate,
+                q.getDataSourceIds() == null ? null : q.getDataSourceIds().toArray(UUID[]::new),
+                q.getShowFilteredKpis(),
+                q.getSearch(),
+                q.getContributorIds() == null ? null : q.getContributorIds().toArray(Long[]::new),
+                q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
+                q.getProjectSlugs() == null ? null : q.getProjectSlugs().toArray(String[]::new),
+                q.getCategoryIds() == null ? null : q.getCategoryIds().toArray(UUID[]::new),
+                q.getLanguageIds() == null ? null : q.getLanguageIds().toArray(UUID[]::new),
+                q.getEcosystemIds() == null ? null : q.getEcosystemIds().toArray(UUID[]::new),
+                q.getCountryCodes() == null ? null : q.getCountryCodes().stream().map(c -> Country.fromIso2(c).iso3Code()).toArray(String[]::new),
+                q.getContributionStatuses() == null ? null : q.getContributionStatuses().stream().map(Enum::name).toArray(String[]::new),
+                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(ContributorsQueryParamsContributionCount::getGte).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(ContributorsQueryParamsContributionCount::getEq).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(ContributorsQueryParamsContributionCount::getLte).orElse(null),
+                q.getContributionCount() == null ? null : q.getContributionCount().getTypes().stream().map(Enum::name).toArray(String[]::new),
+                PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
+                        ContributorKpisReadRepository.getSortProperty(q.getSort())))
+        );
+    }
+
+    default Page<ContributorKpisReadEntity> findAll(ApplicantsQueryParams q) {
+        return findAll(
+                null,
+                null,
+                null,
+                null,
+                null,
+                q.getShowFilteredKpis(),
+                q.getSearch(),
+                q.getContributorIds() == null ? null : q.getContributorIds().toArray(Long[]::new),
+                q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
+                q.getProjectSlugs() == null ? null : q.getProjectSlugs().toArray(String[]::new),
+                q.getCategoryIds() == null ? null : q.getCategoryIds().toArray(UUID[]::new),
+                q.getLanguageIds() == null ? null : q.getLanguageIds().toArray(UUID[]::new),
+                q.getEcosystemIds() == null ? null : q.getEcosystemIds().toArray(UUID[]::new),
+                q.getCountryCodes() == null ? null : q.getCountryCodes().stream().map(c -> Country.fromIso2(c).iso3Code()).toArray(String[]::new),
+                q.getContributionStatuses() == null ? null : q.getContributionStatuses().stream().map(Enum::name).toArray(String[]::new),
+                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(ContributorsQueryParamsContributionCount::getGte).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(ContributorsQueryParamsContributionCount::getEq).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(ContributorsQueryParamsContributionCount::getLte).orElse(null),
+                q.getContributionCount() == null ? null : q.getContributionCount().getTypes().stream().map(Enum::name).toArray(String[]::new),
+                PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
+                        ContributorKpisReadRepository.getSortProperty(q.getSort())))
+        );
+    }
 }

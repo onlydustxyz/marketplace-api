@@ -747,4 +747,551 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
 
         assertThat(applicationRepository.findById(application.id()).orElseThrow().ignoredAt()).isNull();
     }
+
+    @Test
+    void should_list_applications() {
+        client.get()
+                .uri(getApiURI(ISSUES_BY_ID_APPLICANTS.formatted(1736474921L)))
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.applicants[?(!@.applicationId)]").isEmpty()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 3,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "applicants": [
+                            {
+                              "contributor": {
+                                "githubUserId": 595505,
+                                "login": "ofux",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                                "isRegistered": true,
+                                "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
+                              },
+                              "projects": [
+                                {
+                                  "id": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
+                                  "slug": "b-conseil",
+                                  "name": "B Conseil",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png"
+                                },
+                                {
+                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                  "slug": "mooooooonlight",
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                },
+                                {
+                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
+                                  "slug": "no-sponsors",
+                                  "name": "No sponsors",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
+                                  "slug": "pizzeria-yoshi-",
+                                  "name": "Pizzeria Yoshi !",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png"
+                                },
+                                {
+                                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                                  "slug": "qa-new-contributions",
+                                  "name": "QA new contributions",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                  "slug": "zama",
+                                  "name": "Zama",
+                                  "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M"
+                                },
+                                {
+                                  "id": "dc60d963-4b5f-4a96-928c-8440b4657138",
+                                  "slug": "zero-title-4",
+                                  "name": "Zero title 4",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                  "slug": "kaaper",
+                                  "name": "kaaper",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "61076487-6ec5-4751-ab0d-3b876c832239",
+                                  "slug": "toto",
+                                  "name": "toto",
+                                  "logoUrl": null
+                                }
+                              ],
+                              "categories": null,
+                              "languages": [
+                                {
+                                  "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
+                                  "slug": "cairo",
+                                  "name": "Cairo",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
+                                },
+                                {
+                                  "id": "6b3f8a21-8ae9-4f73-81df-06aeaddbaf42",
+                                  "slug": "java",
+                                  "name": "Java",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-java.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-java.png"
+                                },
+                                {
+                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
+                                  "slug": "javascript",
+                                  "name": "Javascript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                                },
+                                {
+                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
+                                  "slug": "python",
+                                  "name": "Python",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
+                                },
+                                {
+                                  "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
+                                  "slug": "rust",
+                                  "name": "Rust",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
+                                },
+                                {
+                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                  "slug": "typescript",
+                                  "name": "Typescript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                }
+                              ],
+                              "ecosystems": [
+                                {
+                                  "id": "397df411-045d-4d9f-8d65-8284c88f9208",
+                                  "name": "Avail",
+                                  "url": "https://www.availproject.org/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png",
+                                  "bannerUrl": null,
+                                  "slug": "avail",
+                                  "hidden": null
+                                },
+                                {
+                                  "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                                  "name": "Aztec",
+                                  "url": "https://aztec.network/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg",
+                                  "bannerUrl": null,
+                                  "slug": "aztec",
+                                  "hidden": null
+                                },
+                                {
+                                  "id": "f7821bfb-df73-464c-9d87-a94dfb4f5aef",
+                                  "name": "Lava",
+                                  "url": "https://www.lavanet.xyz/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15939879525439639427.jpg",
+                                  "bannerUrl": null,
+                                  "slug": "lava",
+                                  "hidden": null
+                                },
+                                {
+                                  "id": "dd6f737e-2a9d-40b9-be62-8f64ec157989",
+                                  "name": "Optimism",
+                                  "url": "https://www.optimism.io/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12058007825795511084.png",
+                                  "bannerUrl": null,
+                                  "slug": "optimism",
+                                  "hidden": null
+                                },
+                                {
+                                  "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                                  "name": "Starknet",
+                                  "url": "https://www.starknet.io/en",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
+                                  "bannerUrl": null,
+                                  "slug": "starknet",
+                                  "hidden": null
+                                }
+                              ],
+                              "projectContributorLabels": null,
+                              "countryCode": null,
+                              "totalRewardedUsdAmount": {
+                                "value": 20855.02,
+                                "trend": "STABLE"
+                              },
+                              "rewardCount": {
+                                "value": 15,
+                                "trend": "STABLE"
+                              },
+                              "issueCount": {
+                                "value": 2,
+                                "trend": "STABLE"
+                              },
+                              "prCount": {
+                                "value": 266,
+                                "trend": "STABLE"
+                              },
+                              "codeReviewCount": {
+                                "value": 338,
+                                "trend": "STABLE"
+                              },
+                              "contributionCount": {
+                                "value": 606,
+                                "trend": "STABLE"
+                              }
+                            },
+                            {
+                              "contributor": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true,
+                                "id": "fc92397c-3431-4a84-8054-845376b630a0"
+                              },
+                              "projects": [
+                                {
+                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                  "slug": "mooooooonlight",
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                },
+                                {
+                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
+                                  "slug": "no-sponsors",
+                                  "name": "No sponsors",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                                  "slug": "qa-new-contributions",
+                                  "name": "QA new contributions",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "dc60d963-4b5f-4a96-928c-8440b4657138",
+                                  "slug": "zero-title-4",
+                                  "name": "Zero title 4",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                  "slug": "kaaper",
+                                  "name": "kaaper",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "61076487-6ec5-4751-ab0d-3b876c832239",
+                                  "slug": "toto",
+                                  "name": "toto",
+                                  "logoUrl": null
+                                }
+                              ],
+                              "categories": null,
+                              "languages": [
+                                {
+                                  "id": "6b3f8a21-8ae9-4f73-81df-06aeaddbaf42",
+                                  "slug": "java",
+                                  "name": "Java",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-java.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-java.png"
+                                },
+                                {
+                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
+                                  "slug": "python",
+                                  "name": "Python",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
+                                },
+                                {
+                                  "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
+                                  "slug": "rust",
+                                  "name": "Rust",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
+                                },
+                                {
+                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                  "slug": "typescript",
+                                  "name": "Typescript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                }
+                              ],
+                              "ecosystems": [
+                                {
+                                  "id": "397df411-045d-4d9f-8d65-8284c88f9208",
+                                  "name": "Avail",
+                                  "url": "https://www.availproject.org/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png",
+                                  "bannerUrl": null,
+                                  "slug": "avail",
+                                  "hidden": null
+                                },
+                                {
+                                  "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                                  "name": "Aztec",
+                                  "url": "https://aztec.network/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg",
+                                  "bannerUrl": null,
+                                  "slug": "aztec",
+                                  "hidden": null
+                                },
+                                {
+                                  "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                                  "name": "Starknet",
+                                  "url": "https://www.starknet.io/en",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
+                                  "bannerUrl": null,
+                                  "slug": "starknet",
+                                  "hidden": null
+                                }
+                              ],
+                              "projectContributorLabels": null,
+                              "countryCode": null,
+                              "totalRewardedUsdAmount": {
+                                "value": 6060.00,
+                                "trend": "STABLE"
+                              },
+                              "rewardCount": {
+                                "value": 6,
+                                "trend": "STABLE"
+                              },
+                              "issueCount": {
+                                "value": 0,
+                                "trend": "STABLE"
+                              },
+                              "prCount": {
+                                "value": 30,
+                                "trend": "STABLE"
+                              },
+                              "codeReviewCount": {
+                                "value": 118,
+                                "trend": "STABLE"
+                              },
+                              "contributionCount": {
+                                "value": 148,
+                                "trend": "STABLE"
+                              }
+                            },
+                            {
+                              "contributor": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                "isRegistered": true,
+                                "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4"
+                              },
+                              "projects": [
+                                {
+                                  "id": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
+                                  "slug": "b-conseil",
+                                  "name": "B Conseil",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png"
+                                },
+                                {
+                                  "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                  "slug": "bretzel",
+                                  "name": "Bretzel",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                                },
+                                {
+                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                  "slug": "mooooooonlight",
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                },
+                                {
+                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
+                                  "slug": "no-sponsors",
+                                  "name": "No sponsors",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
+                                  "slug": "pizzeria-yoshi-",
+                                  "name": "Pizzeria Yoshi !",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png"
+                                },
+                                {
+                                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                                  "slug": "qa-new-contributions",
+                                  "name": "QA new contributions",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                  "slug": "zama",
+                                  "name": "Zama",
+                                  "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M"
+                                },
+                                {
+                                  "id": "dc60d963-4b5f-4a96-928c-8440b4657138",
+                                  "slug": "zero-title-4",
+                                  "name": "Zero title 4",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                  "slug": "kaaper",
+                                  "name": "kaaper",
+                                  "logoUrl": null
+                                }
+                              ],
+                              "categories": null,
+                              "languages": [
+                                {
+                                  "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
+                                  "slug": "cairo",
+                                  "name": "Cairo",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
+                                },
+                                {
+                                  "id": "6b3f8a21-8ae9-4f73-81df-06aeaddbaf42",
+                                  "slug": "java",
+                                  "name": "Java",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-java.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-java.png"
+                                },
+                                {
+                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
+                                  "slug": "javascript",
+                                  "name": "Javascript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                                },
+                                {
+                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
+                                  "slug": "python",
+                                  "name": "Python",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
+                                },
+                                {
+                                  "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
+                                  "slug": "rust",
+                                  "name": "Rust",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
+                                },
+                                {
+                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                  "slug": "typescript",
+                                  "name": "Typescript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                }
+                              ],
+                              "ecosystems": [
+                                {
+                                  "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                                  "name": "Aptos",
+                                  "url": "https://aptosfoundation.org/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png",
+                                  "bannerUrl": null,
+                                  "slug": "aptos",
+                                  "hidden": null
+                                },
+                                {
+                                  "id": "397df411-045d-4d9f-8d65-8284c88f9208",
+                                  "name": "Avail",
+                                  "url": "https://www.availproject.org/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png",
+                                  "bannerUrl": null,
+                                  "slug": "avail",
+                                  "hidden": null
+                                },
+                                {
+                                  "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                                  "name": "Aztec",
+                                  "url": "https://aztec.network/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg",
+                                  "bannerUrl": null,
+                                  "slug": "aztec",
+                                  "hidden": null
+                                },
+                                {
+                                  "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                                  "name": "Ethereum",
+                                  "url": "https://ethereum.foundation/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png",
+                                  "bannerUrl": null,
+                                  "slug": "ethereum",
+                                  "hidden": null
+                                },
+                                {
+                                  "id": "f7821bfb-df73-464c-9d87-a94dfb4f5aef",
+                                  "name": "Lava",
+                                  "url": "https://www.lavanet.xyz/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15939879525439639427.jpg",
+                                  "bannerUrl": null,
+                                  "slug": "lava",
+                                  "hidden": null
+                                },
+                                {
+                                  "id": "dd6f737e-2a9d-40b9-be62-8f64ec157989",
+                                  "name": "Optimism",
+                                  "url": "https://www.optimism.io/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12058007825795511084.png",
+                                  "bannerUrl": null,
+                                  "slug": "optimism",
+                                  "hidden": null
+                                },
+                                {
+                                  "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                                  "name": "Starknet",
+                                  "url": "https://www.starknet.io/en",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
+                                  "bannerUrl": null,
+                                  "slug": "starknet",
+                                  "hidden": null
+                                },
+                                {
+                                  "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                                  "name": "Zama",
+                                  "url": "https://www.zama.ai/",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png",
+                                  "bannerUrl": null,
+                                  "slug": "zama",
+                                  "hidden": null
+                                }
+                              ],
+                              "projectContributorLabels": null,
+                              "countryCode": "FR",
+                              "totalRewardedUsdAmount": {
+                                "value": 2692632.50,
+                                "trend": "STABLE"
+                              },
+                              "rewardCount": {
+                                "value": 21,
+                                "trend": "STABLE"
+                              },
+                              "issueCount": {
+                                "value": 15,
+                                "trend": "STABLE"
+                              },
+                              "prCount": {
+                                "value": 517,
+                                "trend": "STABLE"
+                              },
+                              "codeReviewCount": {
+                                "value": 406,
+                                "trend": "STABLE"
+                              },
+                              "contributionCount": {
+                                "value": 938,
+                                "trend": "STABLE"
+                              }
+                            }
+                          ]
+                        }
+                        """);
+    }
 }

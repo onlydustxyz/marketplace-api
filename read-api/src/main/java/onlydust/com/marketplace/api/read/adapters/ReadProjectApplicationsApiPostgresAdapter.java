@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.read.adapters;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadProjectApplicationsApi;
-import onlydust.com.marketplace.api.contract.model.ApplicationsQueryParams;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationPageResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationPageSort;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationResponse;
@@ -35,7 +34,6 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
     private final PermissionService permissionService;
     private final ApplicationReadRepository applicationReadRepository;
 
-
     @Override
     public ResponseEntity<ProjectApplicationPageResponse> getProjectsApplications(Integer pageIndex,
                                                                                   Integer pageSize, UUID projectId,
@@ -64,29 +62,6 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .nextPageIndex(page.hasNext() ? pageIndex + 1 : pageIndex)
-                .hasMore(page.hasNext())
-                .applications(page.getContent().stream().map(ApplicationReadEntity::toPageItemDto).toList())
-        );
-    }
-
-    @Override
-    public ResponseEntity<ProjectApplicationPageResponse> getProjectsApplicationsV2(ApplicationsQueryParams params) {
-        if (params.getProjectId() == null && params.getApplicantId() == null) {
-            throw OnlyDustException.badRequest("At least one of projectId and applicantId must be provided");
-        }
-
-        final var page = applicationReadRepository.findAll(
-                params.getProjectId(),
-                params.getIssueId(),
-                params.getApplicantId(),
-                params.getIsApplicantProjectMember(),
-                params.getU() == null ? null : params.getU().getSearch(),
-                PageRequest.of(params.getPageIndex(), params.getPageSize()));
-
-        return ok(new ProjectApplicationPageResponse()
-                .totalItemNumber((int) page.getTotalElements())
-                .totalPageNumber(page.getTotalPages())
-                .nextPageIndex(page.hasNext() ? params.getPageIndex() + 1 : params.getPageIndex())
                 .hasMore(page.hasNext())
                 .applications(page.getContent().stream().map(ApplicationReadEntity::toPageItemDto).toList())
         );

@@ -61,6 +61,8 @@ public class ApplicationReadEntity {
 
     String problemSolvingApproach;
 
+    ZonedDateTime ignoredAt;
+
     @NonNull
     @Enumerated(EnumType.STRING)
     ProjectApplicationOrigin origin;
