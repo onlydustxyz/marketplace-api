@@ -6,7 +6,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationOrigin;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationPageItemResponse;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationResponse;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationShortResponse;
 import onlydust.com.marketplace.api.read.entities.bi.ContributorReadProjectionEntity;
 import onlydust.com.marketplace.api.read.entities.github.GithubIssueReadEntity;
 import org.hibernate.annotations.Formula;
@@ -75,7 +78,6 @@ public class ApplicationReadEntity {
     public ProjectApplicationPageItemResponse toPageItemDto() {
         return new ProjectApplicationPageItemResponse()
                 .id(id)
-                .status(ProjectApplicationStatus.PENDING) //TODO: implement status
                 .project(project.toLinkResponse())
                 .issue(issue.toLinkDto())
                 .applicant(applicant.toApplicantResponse())

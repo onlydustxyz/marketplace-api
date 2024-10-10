@@ -8485,18 +8485,10 @@ components:
       maximum: 100
       description: A score between 0 and 100. The higher, the better.
 
-    ProjectApplicationStatus:
-      type: string
-      enum:
-        - PENDING
-        - ACCEPTED
-        - IGNORED
-
     ProjectApplicationPageItemResponse:
       type: object
       required:
         - id
-        - status
         - project
         - issue
         - applicant
@@ -8506,8 +8498,6 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/ProjectApplicationId'
-        status:
-          $ref: '#/components/schemas/ProjectApplicationStatus'
         project:
           $ref: '#/components/schemas/ProjectLinkResponse'
         issue:
@@ -8531,14 +8521,13 @@ components:
       required:
         - status
       properties:
-        status:
-          $ref: '#/components/schemas/ProjectApplicationStatus'
+        isIgnored:
+          type: boolean
 
     ProjectApplicationResponse:
       type: object
       required:
         - id
-        - status
         - projectId
         - issue
         - applicant
@@ -8547,8 +8536,6 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/ProjectApplicationId'
-        status:
-          $ref: '#/components/schemas/ProjectApplicationStatus'
         projectId:
           $ref: '#/components/schemas/ProjectId'
         issue:

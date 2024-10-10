@@ -8,7 +8,6 @@ import onlydust.com.marketplace.project.domain.model.GithubIssue;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface ProjectApplicationStoragePort {
 

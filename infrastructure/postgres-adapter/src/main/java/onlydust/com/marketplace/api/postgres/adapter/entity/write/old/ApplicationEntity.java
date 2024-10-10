@@ -20,6 +20,7 @@ import java.util.UUID;
 @Builder(access = AccessLevel.PRIVATE)
 @Table(name = "applications", schema = "public")
 @Accessors(fluent = true, chain = true)
+@AllArgsConstructor
 public class ApplicationEntity {
     @Id
     @EqualsAndHashCode.Include
@@ -43,6 +44,8 @@ public class ApplicationEntity {
     @NonNull
     String motivations;
     String problemSolvingApproach;
+
+    ZonedDateTime ignoredAt;
 
     public ApplicationEntity(@NonNull UUID id, @NonNull ZonedDateTime receivedAt, @NonNull UUID projectId, @NonNull Long applicantId,
                              @NonNull Application.Origin origin, @NonNull Long issueId, @NonNull Long commentId,
@@ -69,6 +72,7 @@ public class ApplicationEntity {
                 .commentId(application.commentId().value())
                 .motivations(application.motivations())
                 .problemSolvingApproach(application.problemSolvingApproach())
+                .ignoredAt(application.ignoredAt())
                 .build();
     }
 
@@ -82,6 +86,7 @@ public class ApplicationEntity {
                 GithubIssue.Id.of(issueId),
                 GithubComment.Id.of(commentId),
                 motivations,
-                problemSolvingApproach);
+                problemSolvingApproach,
+                ignoredAt);
     }
 }

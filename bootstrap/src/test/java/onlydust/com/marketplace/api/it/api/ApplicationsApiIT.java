@@ -1,42 +1,46 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationPatchRequest;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.project.domain.model.Application;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 @TagProject
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     private ApplicationRepository applicationRepository;
 
-    final UUID projectAppliedTo1 = UUID.fromString("3c22af5d-2cf8-48a1-afa0-c3441df7fb3b");
-    final UUID projectAppliedTo2 = UUID.fromString("6239cb20-eece-466a-80a0-742c1071dd3c");
+    private final static UUID projectAppliedTo1 = UUID.fromString("3c22af5d-2cf8-48a1-afa0-c3441df7fb3b");
+    private final static UUID projectAppliedTo2 = UUID.fromString("6239cb20-eece-466a-80a0-742c1071dd3c");
 
-    @Test
-    @Order(0)
-    void setupOnce() {
+    private static List<ApplicationEntity> applications;
+
+    private final static AtomicBoolean setupDone = new AtomicBoolean();
+
+    @BeforeEach
+    synchronized void setupOnce() {
+        if (setupDone.compareAndExchange(false, true)) return;
+
         final var pierre = userAuthHelper.authenticatePierre();
         final var antho = userAuthHelper.authenticateAntho();
         final var olivier = userAuthHelper.authenticateOlivier();
-
-        applicationRepository.saveAll(List.of(
+        applications = List.of(
                 fakeApplication(projectAppliedTo1, pierre, 1736474921L, 112L),
                 fakeApplication(projectAppliedTo2, pierre, 1736474921L, 113L),
                 fakeApplication(projectAppliedTo2, pierre, 1736504583L, 113L),
@@ -45,7 +49,9 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                 fakeApplication(projectAppliedTo2, antho, 1736504583L, 113L),
 
                 fakeApplication(projectAppliedTo1, olivier, 1736474921L, 112L)
-        ));
+        );
+
+        applicationRepository.saveAll(applications);
     }
 
     public static ApplicationEntity fakeApplication(UUID projectId,
@@ -66,7 +72,6 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    @Order(1)
     void should_return_forbidden_status_when_caller_is_not_lead() {
         // Given
         final String jwt = userAuthHelper.authenticateHayden().jwt();
@@ -87,7 +92,6 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    @Order(1)
     void should_return_applications_for_project_and_issue() {
         // Given
         final String jwt = userAuthHelper.authenticateGregoire().jwt();
@@ -348,7 +352,6 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    @Order(1)
     void should_return_applications_for_project_and_issue_and_is_project_member() {
         // Given
         final String jwt = userAuthHelper.authenticateGregoire().jwt();
@@ -375,7 +378,6 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    @Order(1)
     void should_return_applications_for_project_and_issue_and_is_not_project_member() {
         // Given
         final String jwt = userAuthHelper.authenticateGregoire().jwt();
@@ -483,7 +485,6 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    @Order(1)
     void should_return_applications_for_applicant() {
         // Given
         final var pierre = userAuthHelper.authenticatePierre();
@@ -623,7 +624,6 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    @Order(10)
     void should_return_not_found_when_application_by_id_does_not_exist() {
         // Given
         final var pierre = userAuthHelper.authenticatePierre();
@@ -639,7 +639,6 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    @Order(10)
     void should_return_forbidden_when_caller_is_not_applicant_not_leader() {
         // Given
         final var camille = userAuthHelper.authenticateHayden();
@@ -667,7 +666,6 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    @Order(10)
     void should_return_application_by_id() {
         // Given
         final var olivier = userAuthHelper.authenticateOlivier();
@@ -714,5 +712,39 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                           "problemSolvingApproach": "Do the math"
                         }
                         """);
+    }
+
+    @Test
+    void should_ignore_application() {
+        // Given
+        final var projectLead = userAuthHelper.authenticateGregoire();
+        final var application = applications.get(0);
+
+        // When
+        client.patch()
+                .uri(getApiURI(APPLICATIONS_BY_ID.formatted(application.id())))
+                .header("Authorization", BEARER_PREFIX + projectLead.jwt())
+                .bodyValue(new ProjectApplicationPatchRequest()
+                        .isIgnored(true))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        assertThat(applicationRepository.findById(application.id()).orElseThrow().ignoredAt()).isNotNull();
+
+
+        // When
+        client.patch()
+                .uri(getApiURI(APPLICATIONS_BY_ID.formatted(application.id())))
+                .header("Authorization", BEARER_PREFIX + projectLead.jwt())
+                .bodyValue(new ProjectApplicationPatchRequest()
+                        .isIgnored(false))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        assertThat(applicationRepository.findById(application.id()).orElseThrow().ignoredAt()).isNull();
     }
 }

@@ -25,12 +25,6 @@ public class ProjectApplicationsRestApi implements ProjectApplicationsApi {
     private final ApplicationFacadePort applicationFacadePort;
 
     @Override
-    public ResponseEntity<Void> patchProjectApplication(UUID applicationId, ProjectApplicationPatchRequest projectApplicationPatchRequest) {
-        // TODO
-        return noContent().build();
-    }
-
-    @Override
     public ResponseEntity<Void> acceptProjectApplication(UUID applicationId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         applicationFacadePort.acceptApplication(Application.Id.of(applicationId), authenticatedUser.id());
@@ -44,4 +38,10 @@ public class ProjectApplicationsRestApi implements ProjectApplicationsApi {
         return noContent().build();
     }
 
+    @Override
+    public ResponseEntity<Void> patchProjectApplication(UUID applicationId, ProjectApplicationPatchRequest request) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        applicationFacadePort.updateApplication(authenticatedUser.id(), Application.Id.of(applicationId), request.getIsIgnored());
+        return noContent().build();
+    }
 }

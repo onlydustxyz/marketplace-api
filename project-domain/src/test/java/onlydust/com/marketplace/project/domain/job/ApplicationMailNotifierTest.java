@@ -71,6 +71,7 @@ class ApplicationMailNotifierTest {
                 issue.id(),
                 GithubComment.Id.random(),
                 faker.lorem().sentence(),
+                null,
                 null
         );
 
