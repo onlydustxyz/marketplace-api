@@ -75,11 +75,6 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
             throw OnlyDustException.badRequest("At least one of projectId and applicantId must be provided");
         }
 
-        final var caller = authenticatedAppUserService.getAuthenticatedUser();
-        if (!caller.githubUserId().equals(params.getApplicantId()) && !permissionService.isUserProjectLead(ProjectId.of(params.getProjectId()), caller.id())) {
-            throw forbidden("Only project leads can get project applications");
-        }
-
         final var page = applicationReadRepository.findAll(
                 params.getProjectId(),
                 params.getIssueId(),

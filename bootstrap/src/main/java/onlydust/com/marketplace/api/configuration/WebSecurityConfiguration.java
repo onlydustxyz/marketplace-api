@@ -139,6 +139,7 @@ public class WebSecurityConfiguration {
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/ecosystems/slug/**")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/ecosystems")).hasAuthority(USER.name())
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v2/ecosystems")).permitAll()
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/api/v2/applications")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/project-categories")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/public-activity")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/currencies")).hasAuthority(USER.name())
