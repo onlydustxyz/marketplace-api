@@ -14,13 +14,13 @@ public interface BillingProfileUserRightsViewRepository extends JpaRepository<Bi
                    bpu.role                                             as user_role,
                    bp.type                                              as billing_profile_type,
                    (select count(*)
-                    from rewards r
-                             join accounting.reward_statuses rs on rs.reward_id = r.id and rs.status >= 'PROCESSING'
-                    where r.billing_profile_id = :billingProfileId)     as billing_profile_processing_rewards_count,
+                    from accounting.reward_statuses r
+                    where r.status >= 'PROCESSING'
+                      and r.billing_profile_id = :billingProfileId)     as billing_profile_processing_rewards_count,
                    (select count(*)
-                    from rewards r
-                             join accounting.reward_statuses rs on rs.reward_id = r.id and rs.status >= 'PROCESSING'
-                    where r.billing_profile_id = :billingProfileId
+                    from accounting.reward_statuses r
+                    where r.status >= 'PROCESSING'
+                      and r.billing_profile_id = :billingProfileId
                       and r.recipient_id = u.github_user_id)            as user_processing_rewards_count,
                    bpui.role                                            as invited_role,
                    bpui.invited_at                                      as invited_at,

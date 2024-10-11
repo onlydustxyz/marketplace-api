@@ -20,7 +20,7 @@ public interface RewardDetailsReadRepository extends JpaRepository<RewardDetails
 
     @Language("PostgreSQL")
     String SELECT = """
-            SELECT r.id                         AS id,
+            SELECT r.reward_id                  AS id,
                    r.requested_at               AS requested_at,
                    r.project_id                 AS project_id,
                    r.amount                     AS amount,
@@ -37,10 +37,8 @@ public interface RewardDetailsReadRepository extends JpaRepository<RewardDetails
                    github_requestor.login       AS requestor_login,
                    user_avatar_url(github_requestor.id, github_requestor.avatar_url)  AS requestor_avatar_url,
                    github_requestor.html_url    AS requestor_html_url
-            from rewards r
-                 JOIN accounting.reward_status_data rsd ON rsd.reward_id = r.id
-                 JOIN accounting.reward_statuses rs ON rs.reward_id = r.id
-                 JOIN LATERAL (SELECT count(*) as count from reward_items ri where reward_id = r.id) ri ON TRUE
+            from accounting.reward_statuses r
+                 JOIN LATERAL (SELECT count(*) as count from reward_items ri where reward_id = r.reward_id) ri ON TRUE
                  JOIN indexer_exp.github_accounts github_recipient ON github_recipient.id = r.recipient_id
                  LEFT JOIN iam.users recipient ON recipient.github_user_id = r.recipient_id
                  JOIN iam.users requestor ON requestor.id = r.requestor_id
@@ -54,9 +52,9 @@ public interface RewardDetailsReadRepository extends JpaRepository<RewardDetails
         };
         final Sort defaultSort = Sort.by(jpaSortDirection, "requested_at");
         return isNull(sort) ? defaultSort : switch (sort) {
-            case AMOUNT -> JpaSort.unsafe(jpaSortDirection, "coalesce(rsd.amount_usd_equivalent, 0)").and(Sort.by("requested_at").descending());
+            case AMOUNT -> JpaSort.unsafe(jpaSortDirection, "coalesce(r.amount_usd_equivalent, 0)").and(Sort.by("requested_at").descending());
             case CONTRIBUTION -> Sort.by(jpaSortDirection, "contribution_count").and(Sort.by("requested_at").descending());
-            case STATUS -> Sort.by(jpaSortDirection, "rs.status").and(Sort.by("requested_at").descending());
+            case STATUS -> Sort.by(jpaSortDirection, "r.status").and(Sort.by("requested_at").descending());
             case REQUESTED_AT -> defaultSort;
         };
     }
@@ -81,7 +79,7 @@ public interface RewardDetailsReadRepository extends JpaRepository<RewardDetails
               AND (coalesce(:projectIds) IS NULL OR r.project_id IN (:projectIds))
               AND (coalesce(:fromDate) IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
               AND (coalesce(:toDate) IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
-              AND (coalesce(:rewardStatus) is null or rs.status = cast(:rewardStatus as accounting.reward_status))
+              AND (coalesce(:rewardStatus) is null or r.status = cast(:rewardStatus as accounting.reward_status))
             """, nativeQuery = true)
     Page<RewardDetailsReadEntity> findUserRewards(Long githubUserId, List<UUID> currencyIds, List<UUID> projectIds, List<UUID> administratedBillingProfileIds,
                                                   String rewardStatus, String fromDate, String toDate, Pageable pageable);

@@ -16,9 +16,9 @@ public interface BackofficeRewardViewRepository extends JpaRepository<BoRewardQu
 
     @Language("PostgreSQL")
     String SELECT = """
-                select r.id                                     id,
+                select r.reward_id                                     id,
                        r.requested_at                           requested_at,
-                       rsd.paid_at                              processed_at,
+                       r.paid_at                              processed_at,
                        r.recipient_id                           recipient_id,
                        r.requestor_id                           requestor_id,
                                g_urls.urls                              github_urls,
@@ -50,9 +50,7 @@ public interface BackofficeRewardViewRepository extends JpaRepository<BoRewardQu
             
                        batch_payment.id                         batch_payment_id
             
-                        from rewards r
-                                 join accounting.reward_statuses rs on rs.reward_id = r.id
-                                 join accounting.reward_status_data rsd on rsd.reward_id = r.id
+                        from accounting.reward_statuses r
                                  join currencies c on c.id = r.currency_id
                                  join projects p on r.project_id = p.id
             
@@ -61,7 +59,7 @@ public interface BackofficeRewardViewRepository extends JpaRepository<BoRewardQu
                                  left join accounting.kyb kyb on kyb.billing_profile_id = i.billing_profile_id
                                  left join accounting.kyc kyc on kyc.billing_profile_id = i.billing_profile_id
             
-                                 left join lateral (select batch_payment_id as id from accounting.batch_payment_rewards bpr where bpr.reward_id = r.id limit 1) batch_payment on true
+                                 left join lateral (select batch_payment_id as id from accounting.batch_payment_rewards bpr where bpr.reward_id = r.reward_id limit 1) batch_payment on true
             
                                  left join (select creator.id, jsonb_build_object(
                                                     'login', coalesce(creator_ga.login, creator.github_login),
@@ -79,7 +77,7 @@ public interface BackofficeRewardViewRepository extends JpaRepository<BoRewardQu
                                             from sponsors s
                                                join accounting.all_transactions abt on abt.sponsor_id = s.id
                                             where abt.payment_id is null
-                                            group by abt.reward_id) s2 on s2.reward_id = r.id
+                                            group by abt.reward_id) s2 on s2.reward_id = r.reward_id
                                  left join iam.users u on u.github_user_id = r.recipient_id
                                  left join user_profile_info upi on upi.id = u.id
                                  left join (select ri.reward_id, jsonb_agg(coalesce(gpr.html_url, gcr.html_url, gi.html_url)) urls
@@ -87,15 +85,15 @@ public interface BackofficeRewardViewRepository extends JpaRepository<BoRewardQu
                                                 left join indexer_exp.github_pull_requests gpr on cast(gpr.id as text) = ri.id
                                                 left join indexer_exp.github_code_reviews gcr on gcr.id = ri.id
                                                 left join indexer_exp.github_issues gi on cast(gi.id as text) = ri.id
-                                       group by ri.reward_id) g_urls on g_urls.reward_id = r.id
+                                       group by ri.reward_id) g_urls on g_urls.reward_id = r.reward_id
             """;
 
     @Query(value = SELECT + """
-            where (coalesce(:statuses) is null or cast(rs.status as text) in (:statuses))
+            where (coalesce(:statuses) is null or cast(r.status as text) in (:statuses))
                 and (coalesce(:fromRequestedAt) is null or date_trunc('day', r.requested_at) >= cast(cast(:fromRequestedAt as text) as timestamp))
                 and (coalesce(:toRequestedAt)   is null or date_trunc('day', r.requested_at) <= cast(cast(:toRequestedAt   as text) as timestamp))
-                and (coalesce(:fromProcessedAt) is null or date_trunc('day', rsd.paid_at)  >= cast(cast(:fromProcessedAt as text) as timestamp))
-                and (coalesce(:toProcessedAt)   is null or date_trunc('day', rsd.paid_at)  <= cast(cast(:toProcessedAt   as text) as timestamp))
+                and (coalesce(:fromProcessedAt) is null or date_trunc('day', r.paid_at)  >= cast(cast(:fromProcessedAt as text) as timestamp))
+                and (coalesce(:toProcessedAt)   is null or date_trunc('day', r.paid_at)  <= cast(cast(:toProcessedAt   as text) as timestamp))
                 and (coalesce(:billingProfileIds) is null or i.billing_profile_id in (:billingProfileIds))
                 and (coalesce(:recipients) is null or r.recipient_id in (:recipients))
             """, nativeQuery = true)
@@ -107,10 +105,10 @@ public interface BackofficeRewardViewRepository extends JpaRepository<BoRewardQu
                                                         Pageable pageable);
 
     @Query(value = SELECT + """
-            where r.id in (:rewardIds)
+            where r.reward_id in (:rewardIds)
             """, nativeQuery = true)
     List<BoRewardQueryEntity> findAllByRewardIds(@NonNull List<UUID> rewardIds);
 
-    @Query(nativeQuery = true, value = SELECT + " where rsd.paid_at is not null and r.payment_notified_at is null")
+    @Query(nativeQuery = true, value = SELECT + " where r.paid_at is not null and r.payment_notified_at is null")
     List<BoRewardQueryEntity> findPaidRewardsToNotify();
 }
