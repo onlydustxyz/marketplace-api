@@ -2691,18 +2691,9 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/GithubUserId'
-        - in: query
-          name: fromDate
-          description: Date filter
-          schema:
-            type: string
-            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
-        - in: query
-          name: toDate
-          description: Date filter
-          schema:
-            type: string
-            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
+        - $ref: '#/components/parameters/searchParam'
         - in: query
           name: sort
           description: Sort order
