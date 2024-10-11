@@ -25,9 +25,9 @@ public interface RewardRepository extends JpaRepository<RewardEntity, UUID> {
                 set billing_profile_id = :billingProfileId
                 from accounting.reward_statuses rs
                 where
-                    project_id = :projectId and 
-                    recipient_id in (select github_user_id from iam.users where id = :recipientUserId) and
                     rs.reward_id = id and
+                    rs.project_id = :projectId and
+                    rs.recipient_user_id = :recipientUserId and
                     rs.status < 'PROCESSING'
             """)
     void updateBillingProfileForRecipientUserIdAndProjectId(UUID billingProfileId, UUID recipientUserId, UUID projectId);

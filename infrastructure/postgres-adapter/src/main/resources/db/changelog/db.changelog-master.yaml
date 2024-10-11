@@ -583,3 +583,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000360_add_ignored_applications.sql
   - include:
       file: db/changelog/changelogs/00000361_create_pseudo_projection_user_project_recommendations.sql
+  - include:
+      file: db/changelog/changelogs/00000362_optimize_reward_statuses_usage.sql
