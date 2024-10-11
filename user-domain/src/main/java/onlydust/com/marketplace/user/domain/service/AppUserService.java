@@ -34,7 +34,9 @@ public class AppUserService implements AppUserFacadePort {
     public AuthenticatedUser getUserByGithubIdentity(GithubUserIdentity githubUserIdentity, boolean readOnly) {
         return appUserStoragePort.getRegisteredUserByGithubId(githubUserIdentity.githubUserId()).map(user -> {
             if (!readOnly && user.lastSeenAt().isBefore(ZonedDateTime.now().minusDays(1))) {
-                appUserStoragePort.updateUserLastSeenAt(user.id());
+                final var now = ZonedDateTime.now();
+                appUserStoragePort.updateUserLastSeenAt(user.id(), now);
+                user = user.toBuilder().lastSeenAt(now).build();
             }
             return user;
         }).orElseGet(() -> {

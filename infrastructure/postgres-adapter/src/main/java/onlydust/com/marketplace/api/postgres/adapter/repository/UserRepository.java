@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
@@ -34,9 +35,9 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID>, JpaSpec
 
     @Modifying
     @Query(value = """
-            UPDATE iam.users SET last_seen_at = now() WHERE id = :userId
+            UPDATE iam.users SET last_seen_at = :now WHERE id = :userId
             """, nativeQuery = true)
-    void updateLastSeenAt(UUID userId);
+    void updateLastSeenAt(UUID userId, ZonedDateTime now);
 
     @Modifying
     @Query(value = """

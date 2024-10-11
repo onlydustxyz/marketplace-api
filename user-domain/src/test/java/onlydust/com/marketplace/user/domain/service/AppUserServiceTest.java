@@ -60,9 +60,9 @@ class AppUserServiceTest {
         final AuthenticatedUser userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
-        verify(userStoragePort, times(1)).updateUserLastSeenAt(eq(user.id()));
+        verify(userStoragePort, times(1)).updateUserLastSeenAt(eq(user.id()), any());
         verify(userObserverPort, never()).onUserSignedUp(any());
-        assertEquals(user, userByGithubIdentity);
+        assertEquals(user.toBuilder().lastSeenAt(null).build(), userByGithubIdentity.toBuilder().lastSeenAt(null).build());
         assertEquals(0, userByGithubIdentity.billingProfiles().size());
     }
 
@@ -81,9 +81,9 @@ class AppUserServiceTest {
         final AuthenticatedUser userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
-        verify(userStoragePort, times(1)).updateUserLastSeenAt(eq(user.id()));
+        verify(userStoragePort, times(1)).updateUserLastSeenAt(eq(user.id()), any());
         verify(userObserverPort, never()).onUserSignedUp(any());
-        assertEquals(user, userByGithubIdentity);
+        assertEquals(user.toBuilder().lastSeenAt(null).build(), userByGithubIdentity.toBuilder().lastSeenAt(null).build());
         assertEquals(0, userByGithubIdentity.billingProfiles().size());
     }
 
@@ -100,7 +100,7 @@ class AppUserServiceTest {
         final AuthenticatedUser userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, true);
 
         // Then
-        verify(userStoragePort, never()).updateUserLastSeenAt(any());
+        verify(userStoragePort, never()).updateUserLastSeenAt(any(), any());
         verify(userObserverPort, never()).onUserSignedUp(any());
         assertEquals(user, userByGithubIdentity);
         assertEquals(0, userByGithubIdentity.billingProfiles().size());
@@ -120,7 +120,7 @@ class AppUserServiceTest {
         final AuthenticatedUser userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
-        verify(userStoragePort, never()).updateUserLastSeenAt(any());
+        verify(userStoragePort, never()).updateUserLastSeenAt(any(), any());
         verify(userObserverPort, never()).onUserSignedUp(any());
         assertEquals(user, userByGithubIdentity);
         assertEquals(0, userByGithubIdentity.billingProfiles().size());
@@ -145,7 +145,7 @@ class AppUserServiceTest {
         final AuthenticatedUser userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
-        verify(userStoragePort, never()).updateUserLastSeenAt(any());
+        verify(userStoragePort, never()).updateUserLastSeenAt(any(), any());
         verify(userObserverPort, times(1)).onUserSignedUp(any());
         assertThat(userByGithubIdentity.id()).isNotNull();
         assertEquals(AuthenticatedUser.builder().id(userByGithubIdentity.id()).avatarUrl(githubUserIdentity.avatarUrl()).githubUserId(githubUserIdentity.githubUserId()).login(githubUserIdentity.login()).roles(List.of(AuthenticatedUser.Role.USER)).build(), userByGithubIdentity);
@@ -161,7 +161,7 @@ class AppUserServiceTest {
         when(userStoragePort.getRegisteredUserByGithubId(githubUserIdentity.githubUserId())).thenReturn(Optional.empty());
 
         // Then
-        verify(userStoragePort, never()).updateUserLastSeenAt(any());
+        verify(userStoragePort, never()).updateUserLastSeenAt(any(), any());
         verify(userObserverPort, never()).onUserSignedUp(any());
         assertThatThrownBy(() -> userService.getUserByGithubIdentity(githubUserIdentity, true))
                 .isInstanceOf(OnlyDustException.class)
