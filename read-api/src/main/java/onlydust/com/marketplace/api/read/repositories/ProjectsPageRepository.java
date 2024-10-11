@@ -194,7 +194,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                     left join (select pgfi.project_id, count(*) > 0 exist
                                         from projects_good_first_issues pgfi
                                         group by pgfi.project_id) has_good_first_issues on has_good_first_issues.project_id = p.id
-                    left join project_recommendations pr on pr.project_id = p.id and pr.user_id = :userId
+                    left join p_user_project_recommendations pr on pr.project_id = p.id and pr.user_id = :userId
             where r_count.repo_count > 0
               and (p.visibility = 'PUBLIC' 
                        or (p.visibility = 'PRIVATE' 

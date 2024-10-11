@@ -67,7 +67,8 @@ public class PostgresConfiguration {
                                                  final BiContributionDataRepository biContributionDataRepository,
                                                  final BiProjectGrantsDataRepository biProjectGrantsDataRepository,
                                                  final BiProjectGlobalDataRepository biProjectGlobalDataRepository,
-                                                 final BiContributorGlobalDataRepository biContributorGlobalDataRepository) {
+                                                 final BiContributorGlobalDataRepository biContributorGlobalDataRepository,
+                                                 final UserProjectRecommendationsRepository userProjectRecommendationsRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -88,7 +89,8 @@ public class PostgresConfiguration {
                 biContributionDataRepository,
                 biProjectGrantsDataRepository,
                 biProjectGlobalDataRepository,
-                biContributorGlobalDataRepository
+                biContributorGlobalDataRepository,
+                userProjectRecommendationsRepository
         );
     }
 
@@ -118,7 +120,8 @@ public class PostgresConfiguration {
                                                            final BiContributionDataRepository biContributionDataRepository,
                                                            final BiProjectGrantsDataRepository biProjectGrantsDataRepository,
                                                            final BiProjectGlobalDataRepository biProjectGlobalDataRepository,
-                                                           final BiContributorGlobalDataRepository biContributorGlobalDataRepository) {
+                                                           final BiContributorGlobalDataRepository biContributorGlobalDataRepository,
+                                                           final UserProjectRecommendationsRepository userProjectRecommendationsRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -139,7 +142,8 @@ public class PostgresConfiguration {
                 biContributionDataRepository,
                 biProjectGrantsDataRepository,
                 biProjectGlobalDataRepository,
-                biContributorGlobalDataRepository
+                biContributorGlobalDataRepository,
+                userProjectRecommendationsRepository
         );
     }
 
@@ -485,15 +489,22 @@ public class PostgresConfiguration {
     }
 
     @Bean
+    public UserProjectRecommendationsRepository userProjectRecommendationsRepository(final EntityManager entityManager) {
+        return new UserProjectRecommendationsRepository(entityManager);
+    }
+
+    @Bean
     PostgresBiProjectorAdapter postgresBiProjectorAdapter(final BiRewardDataRepository biRewardDataRepository,
                                                           final BiContributionDataRepository biContributionDataRepository,
                                                           final BiProjectGrantsDataRepository biProjectGrantsDataRepository,
                                                           final BiProjectGlobalDataRepository biProjectGlobalDataRepository,
-                                                          final BiContributorGlobalDataRepository biContributorGlobalDataRepository) {
+                                                          final BiContributorGlobalDataRepository biContributorGlobalDataRepository,
+                                                          final UserProjectRecommendationsRepository userProjectRecommendationsRepository) {
         return new PostgresBiProjectorAdapter(biRewardDataRepository,
                 biContributionDataRepository,
                 biProjectGrantsDataRepository,
                 biProjectGlobalDataRepository,
-                biContributorGlobalDataRepository);
+                biContributorGlobalDataRepository,
+                userProjectRecommendationsRepository);
     }
 }

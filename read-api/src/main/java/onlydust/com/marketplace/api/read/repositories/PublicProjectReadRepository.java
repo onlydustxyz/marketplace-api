@@ -13,17 +13,15 @@ public interface PublicProjectReadRepository extends Repository<PublicProjectRea
     @Query(value = """
             select p.*
             from public_projects p
-                     left join project_recommendations pr on pr.project_id = p.id and pr.github_user_id = :githubUserId
-            order by pr.score desc nulls last,
-                     -p.rank,
+            order by p.rank desc nulls last,
                      p.name
             """, countQuery = "select count(*) from public_projects", nativeQuery = true)
     Page<PublicProjectReadEntity> findAllRecommendedForUser(Long githubUserId, Pageable pageable);
 
     @Query(value = """
             select p.*
-            from top_project_recommendations pr
-                     join public_projects p on p.id = pr.project_id
+            from foo.p_user_project_recommendations pr
+                    join projects p on p.id = pr.project_id
             where pr.github_user_id = :githubUserId
             order by pr.rank,
                      p.name
