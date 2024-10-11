@@ -52,9 +52,9 @@ public interface RewardDetailsReadRepository extends JpaRepository<RewardDetails
         };
         final Sort defaultSort = Sort.by(jpaSortDirection, "requested_at");
         return isNull(sort) ? defaultSort : switch (sort) {
-            case AMOUNT -> JpaSort.unsafe(jpaSortDirection, "coalesce(r.amount_usd_equivalent, 0)").and(Sort.by("requested_at").descending());
+            case AMOUNT -> JpaSort.unsafe(jpaSortDirection, "coalesce(amount_usd_equivalent, 0)").and(Sort.by("requested_at").descending());
             case CONTRIBUTION -> Sort.by(jpaSortDirection, "contribution_count").and(Sort.by("requested_at").descending());
-            case STATUS -> Sort.by(jpaSortDirection, "r.status").and(Sort.by("requested_at").descending());
+            case STATUS -> Sort.by(jpaSortDirection, "status").and(Sort.by("requested_at").descending());
             case REQUESTED_AT -> defaultSort;
         };
     }
