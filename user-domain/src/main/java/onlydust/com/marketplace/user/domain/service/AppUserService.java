@@ -14,7 +14,7 @@ import onlydust.com.marketplace.user.domain.port.output.GithubUserStoragePort;
 import onlydust.com.marketplace.user.domain.port.output.IdentityProviderPort;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -33,8 +33,9 @@ public class AppUserService implements AppUserFacadePort {
     @Transactional
     public AuthenticatedUser getUserByGithubIdentity(GithubUserIdentity githubUserIdentity, boolean readOnly) {
         return appUserStoragePort.getRegisteredUserByGithubId(githubUserIdentity.githubUserId()).map(user -> {
-            if (!readOnly) appUserStoragePort.updateUserLastSeenAt(user.id(), new Date());
-
+            if (!readOnly && user.lastSeenAt().isBefore(ZonedDateTime.now().minusDays(1))) {
+                appUserStoragePort.updateUserLastSeenAt(user.id());
+            }
             return user;
         }).orElseGet(() -> {
             if (readOnly) {

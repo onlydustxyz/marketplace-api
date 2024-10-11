@@ -5,7 +5,6 @@ import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.user.domain.model.CreatedUser;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 
-import java.util.Date;
 import java.util.Optional;
 
 public interface AppUserStoragePort {
@@ -18,7 +17,7 @@ public interface AppUserStoragePort {
 
     Optional<AuthenticatedUser> getRegisteredUserByGithubId(Long githubId);
 
-    void updateUserLastSeenAt(UserId userId, Date lastSeenAt);
+    void updateUserLastSeenAt(UserId userId);
 
     CreatedUser tryCreateUser(AuthenticatedUser user);
 }

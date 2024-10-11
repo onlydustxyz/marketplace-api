@@ -34,6 +34,12 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID>, JpaSpec
 
     @Modifying
     @Query(value = """
+            UPDATE iam.users SET last_seen_at = now() WHERE id = :userId
+            """, nativeQuery = true)
+    void updateLastSeenAt(UUID userId);
+
+    @Modifying
+    @Query(value = """
             REFRESH MATERIALIZED VIEW CONCURRENTLY contributions_stats_per_user;
             REFRESH MATERIALIZED VIEW CONCURRENTLY contributions_stats_per_user_per_week;
             REFRESH MATERIALIZED VIEW CONCURRENTLY contributions_stats_per_ecosystem_per_user;
