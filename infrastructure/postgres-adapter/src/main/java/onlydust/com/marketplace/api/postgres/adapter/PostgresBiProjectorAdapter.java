@@ -23,6 +23,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     private final BiProjectGrantsDataRepository biProjectGrantsDataRepository;
     private final BiProjectGlobalDataRepository biProjectGlobalDataRepository;
     private final BiContributorGlobalDataRepository biContributorGlobalDataRepository;
+    private final UserProjectRecommendationsRepository userProjectRecommendationsRepository;
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
@@ -122,5 +123,6 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     @Transactional
     public void onUserSignedUp(AuthenticatedUser user) {
         biContributorGlobalDataRepository.refresh(user.githubUserId());
+        userProjectRecommendationsRepository.refresh(user.githubUserId());
     }
 }

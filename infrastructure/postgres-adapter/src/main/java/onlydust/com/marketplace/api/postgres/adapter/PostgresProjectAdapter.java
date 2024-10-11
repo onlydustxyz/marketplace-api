@@ -61,6 +61,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final BiProjectGrantsDataRepository biProjectGrantsDataRepository;
     private final BiProjectGlobalDataRepository biProjectGlobalDataRepository;
     private final BiContributorGlobalDataRepository biContributorGlobalDataRepository;
+    private final UserProjectRecommendationsRepository userProjectRecommendationsRepository;
 
     @Override
     public Optional<ProjectId> getProjectIdBySlug(String slug) {
@@ -468,7 +469,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     @Transactional
     public void refreshRecommendations() {
-        projectRepository.refreshRecommendations();
+        userProjectRecommendationsRepository.refresh();
     }
 
     @Override
