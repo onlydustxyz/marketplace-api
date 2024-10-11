@@ -449,7 +449,7 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
 
     @Override
     public ResponseEntity<ContributionActivityPageResponse> getContributions(ContributionsQueryParams queryParams) {
-        return ResponseEntity.ok(getContributionsPageResponse(queryParams.getStatuses().get(0)));
+        return ResponseEntity.ok(getContributionsPageResponse(queryParams.getStatuses().stream().findFirst().orElse(ContributionActivityStatus.IN_PROGRESS)));
     }
 
     private ContributionActivityPageResponse getContributionsPageResponse(final ContributionActivityStatus contributionActivityStatus) {
