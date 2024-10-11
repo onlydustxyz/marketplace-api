@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.AllUserViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.AuthenticatedUserReadEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.AuthenticatedUserQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.GithubUserWithTelegramQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
@@ -64,7 +64,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     @Override
     @Transactional(readOnly = true)
     public Optional<AuthenticatedUser> getRegisteredUserByGithubId(Long githubId) {
-        return authenticatedUserReadRepository.findByGithubUserId(githubId).map(AuthenticatedUserReadEntity::toDomain);
+        return authenticatedUserReadRepository.findByGithubUserId(githubId).map(AuthenticatedUserQueryEntity::toDomain);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     @Override
     @Transactional(readOnly = true)
     public Optional<AuthenticatedUser> getRegisteredUserById(UserId userId) {
-        return authenticatedUserReadRepository.findById(userId.value()).map(AuthenticatedUserReadEntity::toDomain);
+        return authenticatedUserReadRepository.findById(userId.value()).map(AuthenticatedUserQueryEntity::toDomain);
     }
 
     @Override

@@ -25,7 +25,7 @@ import java.util.UUID;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Immutable
-public class AuthenticatedUserReadEntity {
+public class AuthenticatedUserQueryEntity {
     @Id
     @NonNull
     UUID id;

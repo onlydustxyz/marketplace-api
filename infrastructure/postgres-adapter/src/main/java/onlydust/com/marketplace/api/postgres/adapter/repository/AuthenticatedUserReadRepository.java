@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.AuthenticatedUserReadEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.AuthenticatedUserQueryEntity;
 import org.intellij.lang.annotations.Language;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
@@ -8,7 +8,7 @@ import org.springframework.data.repository.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface AuthenticatedUserReadRepository extends Repository<AuthenticatedUserReadEntity, UUID> {
+public interface AuthenticatedUserReadRepository extends Repository<AuthenticatedUserQueryEntity, UUID> {
 
     @Language("PostgreSQL")
     String SELECT = """
@@ -30,8 +30,8 @@ public interface AuthenticatedUserReadRepository extends Repository<Authenticate
             """;
 
     @Query(value = SELECT + " WHERE u.id = :id", nativeQuery = true)
-    Optional<AuthenticatedUserReadEntity> findById(UUID id);
+    Optional<AuthenticatedUserQueryEntity> findById(UUID id);
 
     @Query(value = SELECT + " WHERE u.github_user_id = :githubId", nativeQuery = true)
-    Optional<AuthenticatedUserReadEntity> findByGithubUserId(Long githubId);
+    Optional<AuthenticatedUserQueryEntity> findByGithubUserId(Long githubId);
 }
