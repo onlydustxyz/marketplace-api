@@ -261,7 +261,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
 
         return Optional.ofNullable(dataSourceIds)
                 .map(l -> l.stream().filter(userProjectOrProgramOrEcosystemIds::contains).toList())
-                .orElse(List.of());
+                .orElse(userProjectOrProgramOrEcosystemIds);
     }
 
     private Page<ProjectKpisReadEntity> findProjects(BiProjectsQueryParams q) {
