@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -449,7 +450,10 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
 
     @Override
     public ResponseEntity<ContributionActivityPageResponse> getContributions(ContributionsQueryParams queryParams) {
-        return ResponseEntity.ok(getContributionsPageResponse(queryParams.getStatuses().stream().findFirst().orElse(ContributionActivityStatus.IN_PROGRESS)));
+        final var status = Optional.ofNullable(queryParams.getStatuses())
+                .flatMap(statuses -> statuses.stream().findFirst())
+                .orElse(ContributionActivityStatus.IN_PROGRESS);
+        return ResponseEntity.ok(getContributionsPageResponse(status));
     }
 
     private ContributionActivityPageResponse getContributionsPageResponse(final ContributionActivityStatus contributionActivityStatus) {
