@@ -642,18 +642,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
     void should_return_forbidden_when_caller_is_not_applicant_not_leader() {
         // Given
         final var camille = userAuthHelper.authenticateHayden();
-        final UUID applicationId = UUID.randomUUID();
-        applicationRepository.save(new ApplicationEntity(
-                applicationId,
-                ZonedDateTime.now(),
-                projectAppliedTo1,
-                userAuthHelper.authenticatePierre().user().getGithubUserId(),
-                Application.Origin.GITHUB,
-                1736504583L,
-                112L,
-                "Highly motivated",
-                "Do the math"
-        ));
+        final var applicationId = applications.get(0).id();
 
         // When (no application for this issue on project 1)
         client.get()
@@ -669,18 +658,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
     void should_return_application_by_id() {
         // Given
         final var olivier = userAuthHelper.authenticateOlivier();
-        final UUID applicationId = UUID.randomUUID();
-        applicationRepository.save(new ApplicationEntity(
-                applicationId,
-                ZonedDateTime.now(),
-                projectAppliedTo1,
-                olivier.user().getGithubUserId(),
-                Application.Origin.GITHUB,
-                1736504583L,
-                112L,
-                "Highly motivated",
-                "Do the math"
-        ));
+        final UUID applicationId = applications.get(5).id();
 
         // When (no application for this issue on project 1)
         client.get()
@@ -695,11 +673,11 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                         {
                           "projectId": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
                           "issue": {
-                            "id": 1736504583,
-                            "number": 1112,
-                            "title": "Monthly contracting subscription",
+                            "id": 1736474921,
+                            "number": 1111,
+                            "title": "Documentation by AnthonyBuisset",
                             "status": "OPEN",
-                            "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1112"
+                            "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111"
                           },
                           "applicant": {
                             "githubUserId": 595505,
@@ -707,9 +685,9 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                             "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                             "isRegistered": true
                           },
-                          "origin": "GITHUB",
-                          "motivation": "Highly motivated",
-                          "problemSolvingApproach": "Do the math"
+                          "origin": "MARKETPLACE",
+                          "motivation": "ofux motivations on 1736474921/3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
+                          "problemSolvingApproach": null
                         }
                         """);
     }
