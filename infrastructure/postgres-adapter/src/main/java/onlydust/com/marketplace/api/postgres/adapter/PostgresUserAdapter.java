@@ -93,14 +93,8 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     }
 
     @Override
-    public void updateUserLastSeenAt(UserId userId, Date lastSeenAt) {
-        userRepository.findById(userId.value())
-                .ifPresentOrElse(userEntity -> {
-                    userEntity.setLastSeenAt(lastSeenAt);
-                    userRepository.saveAndFlush(userEntity);
-                }, () -> {
-                    throw notFound(format("User with id %s not found", userId));
-                });
+    public void updateUserLastSeenAt(UserId userId, ZonedDateTime now) {
+        userRepository.updateLastSeenAt(userId.value(), now);
     }
 
     @Override

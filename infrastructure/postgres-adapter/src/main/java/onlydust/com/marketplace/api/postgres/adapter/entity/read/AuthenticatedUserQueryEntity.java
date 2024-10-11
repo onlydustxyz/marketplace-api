@@ -16,6 +16,7 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,6 +38,10 @@ public class AuthenticatedUserQueryEntity {
     String githubAvatarUrl;
     @NonNull
     String email;
+    @NonNull
+    ZonedDateTime createdAt;
+    @NonNull
+    ZonedDateTime lastSeenAt;
 
     @Type(
             value = EnumArrayType.class,
@@ -63,6 +68,8 @@ public class AuthenticatedUserQueryEntity {
                 .login(githubLogin)
                 .avatarUrl(githubAvatarUrl)
                 .email(email)
+                .createdAt(createdAt)
+                .lastSeenAt(lastSeenAt)
                 .roles(roles == null ? List.of() : List.of(roles))
                 .projectsLed(projectLedIds == null ? List.of() : List.of(projectLedIds))
                 .billingProfiles(billingProfiles == null ? List.of() : billingProfiles)

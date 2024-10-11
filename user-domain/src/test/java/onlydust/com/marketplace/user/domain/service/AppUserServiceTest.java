@@ -16,6 +16,7 @@ import onlydust.com.marketplace.user.domain.port.output.IdentityProviderPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +52,8 @@ class AppUserServiceTest {
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).avatarUrl(faker.internet().avatar()).login(faker.hacker().verb()).email(faker.internet().emailAddress()).build();
 
         final AuthenticatedUser user =
-                AuthenticatedUser.builder().id(UserId.random()).avatarUrl(githubUserIdentity.avatarUrl()).githubUserId(githubUserIdentity.githubUserId()).login(githubUserIdentity.login()).email(githubUserIdentity.email()).build();
+                AuthenticatedUser.builder().id(UserId.random()).avatarUrl(githubUserIdentity.avatarUrl()).githubUserId(githubUserIdentity.githubUserId()).login(githubUserIdentity.login()).email(githubUserIdentity.email())
+                        .lastSeenAt(ZonedDateTime.now().minusDays(5)).build();
 
         // When
         when(userStoragePort.getRegisteredUserByGithubId(githubUserIdentity.githubUserId())).thenReturn(Optional.of(user));
@@ -60,7 +62,7 @@ class AppUserServiceTest {
         // Then
         verify(userStoragePort, times(1)).updateUserLastSeenAt(eq(user.id()), any());
         verify(userObserverPort, never()).onUserSignedUp(any());
-        assertEquals(user, userByGithubIdentity);
+        assertEquals(user.toBuilder().lastSeenAt(null).build(), userByGithubIdentity.toBuilder().lastSeenAt(null).build());
         assertEquals(0, userByGithubIdentity.billingProfiles().size());
     }
 
@@ -71,7 +73,8 @@ class AppUserServiceTest {
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).avatarUrl(faker.internet().avatar()).login(faker.hacker().verb()).email(faker.internet().emailAddress()).build();
 
         final AuthenticatedUser user =
-                AuthenticatedUser.builder().id(UserId.random()).avatarUrl(githubUserIdentity.avatarUrl()).githubUserId(githubUserIdentity.githubUserId()).login(githubUserIdentity.login()).email(githubUserIdentity.email()).build();
+                AuthenticatedUser.builder().id(UserId.random()).avatarUrl(githubUserIdentity.avatarUrl()).githubUserId(githubUserIdentity.githubUserId()).login(githubUserIdentity.login()).email(githubUserIdentity.email())
+                        .lastSeenAt(ZonedDateTime.now().minusDays(5)).build();
 
         // When
         when(userStoragePort.getRegisteredUserByGithubId(githubUserIdentity.githubUserId())).thenReturn(Optional.of(user));
@@ -80,7 +83,7 @@ class AppUserServiceTest {
         // Then
         verify(userStoragePort, times(1)).updateUserLastSeenAt(eq(user.id()), any());
         verify(userObserverPort, never()).onUserSignedUp(any());
-        assertEquals(user, userByGithubIdentity);
+        assertEquals(user.toBuilder().lastSeenAt(null).build(), userByGithubIdentity.toBuilder().lastSeenAt(null).build());
         assertEquals(0, userByGithubIdentity.billingProfiles().size());
     }
 
@@ -95,6 +98,26 @@ class AppUserServiceTest {
         // When
         when(userStoragePort.getRegisteredUserByGithubId(githubUserIdentity.githubUserId())).thenReturn(Optional.of(user));
         final AuthenticatedUser userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, true);
+
+        // Then
+        verify(userStoragePort, never()).updateUserLastSeenAt(any(), any());
+        verify(userObserverPort, never()).onUserSignedUp(any());
+        assertEquals(user, userByGithubIdentity);
+        assertEquals(0, userByGithubIdentity.billingProfiles().size());
+    }
+
+    @Test
+    void should_find_user_given_a_github_id_but_not_update_it_when_lastSeenAt_is_in_last_24_hours() {
+        // Given
+        final GithubUserIdentity githubUserIdentity =
+                GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).avatarUrl(faker.internet().avatar()).login(faker.hacker().verb()).build();
+        final AuthenticatedUser user =
+                AuthenticatedUser.builder().id(UserId.random()).avatarUrl(githubUserIdentity.avatarUrl()).githubUserId(githubUserIdentity.githubUserId()).login(githubUserIdentity.login())
+                        .lastSeenAt(ZonedDateTime.now().minusHours(5)).build();
+
+        // When
+        when(userStoragePort.getRegisteredUserByGithubId(githubUserIdentity.githubUserId())).thenReturn(Optional.of(user));
+        final AuthenticatedUser userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
         verify(userStoragePort, never()).updateUserLastSeenAt(any(), any());

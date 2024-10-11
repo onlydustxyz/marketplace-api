@@ -245,13 +245,13 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_update_last_seen_at() {
         // Given
-        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+        final UserAuthHelper.AuthenticatedUser olivier = userAuthHelper.authenticateOlivier();
         final var before = new Date();
 
         // When
         client.get()
                 .uri(ME)
-                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                .header("Authorization", BEARER_PREFIX + olivier.jwt())
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful();
@@ -259,7 +259,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         final var after = new Date();
 
         // Then
-        final var user = userRepository.findByGithubUserId(pierre.user().getGithubUserId()).orElseThrow();
+        final var user = userRepository.findByGithubUserId(olivier.user().getGithubUserId()).orElseThrow();
         assertThat(user.getLastSeenAt()).isAfter(before);
         assertThat(user.getLastSeenAt()).isBefore(after);
     }
