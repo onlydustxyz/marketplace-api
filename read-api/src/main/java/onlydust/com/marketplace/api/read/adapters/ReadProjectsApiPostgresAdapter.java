@@ -388,8 +388,9 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
     @Override
     public ResponseEntity<RewardsPageResponse> getProjectRewards(UUID projectId, Integer pageIndex, Integer pageSize, List<UUID> currencies,
-                                                                 List<Long> contributors, String fromDate, String toDate, RewardsSort sort,
-                                                                 SortDirection direction) {
+                                                                 List<Long> contributors, String fromDate, String toDate, String search,
+                                                                 RewardsSort sort, SortDirection direction) {
+        // TODO implement search
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
 
