@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.service.ProjectCategoryService;
 import org.junit.jupiter.api.Test;
@@ -13,10 +15,17 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 
 @TagMe
 public class MeReadApiIT extends AbstractMarketplaceApiIT {
+    @Autowired
+    private PostgresBiProjectorAdapter postgresBiProjectorAdapter;
+
     @Test
     void should_get_recommended_projects() {
         // Given
         final var anthony = userAuthHelper.authenticateAntho();
+        // refresh the recommendations as if Anthony had just signed up
+        postgresBiProjectorAdapter.onUserSignedUp(AuthenticatedUser.builder()
+                .githubUserId(anthony.githubUserId().value())
+                .build());
 
         // When
         client.get()
@@ -35,39 +44,11 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                           "nextPageIndex": 1,
                           "projects": [
                             {
-                              "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
-                              "slug": "taco-tuesday",
-                              "name": "Taco Tuesday",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg",
-                              "shortDescription": "A projects for the midweek lovers"
-                            },
-                            {
                               "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
                               "slug": "calcom",
                               "name": "Cal.com",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png",
                               "shortDescription": "Scheduling infrastructure for everyone."
-                            },
-                            {
-                              "id": "e41f44a2-464c-4c96-817f-81acb06b2523",
-                              "slug": "zero-title-5",
-                              "name": "Zero title 5",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1458710211645943860.png",
-                              "shortDescription": "Missing short description"
-                            },
-                            {
-                              "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
-                              "slug": "zero-title-11",
-                              "name": "Zero title 11",
-                              "logoUrl": null,
-                              "shortDescription": "Missing short description"
-                            },
-                            {
-                              "id": "b0f54343-3732-4118-8054-dba40f1ffb85",
-                              "slug": "pacos-project",
-                              "name": "Paco's project",
-                              "logoUrl": "https://dl.airtable.com/.attachments/01f2dd7497313a1fa13b4c5546429318/764531e3/8bUn9t8ORk6LLyMRcu78",
-                              "shortDescription": "A special project for Paco"
                             },
                             {
                               "id": "f39b827f-df73-498c-8853-99bc3f562723",
@@ -103,10 +84,38 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                               "name": "Bretzel 196",
                               "logoUrl": null,
                               "shortDescription": "bretzel gives you wings"
+                            },
+                            {
+                              "id": "e41f44a2-464c-4c96-817f-81acb06b2523",
+                              "slug": "zero-title-5",
+                              "name": "Zero title 5",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1458710211645943860.png",
+                              "shortDescription": "Missing short description"
+                            },
+                            {
+                              "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
+                              "slug": "taco-tuesday",
+                              "name": "Taco Tuesday",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg",
+                              "shortDescription": "A projects for the midweek lovers"
+                            },
+                            {
+                              "id": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
+                              "slug": "pizzeria-yoshi-",
+                              "name": "Pizzeria Yoshi !",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png",
+                              "shortDescription": "Miaaaam une pizza !"
+                            },
+                            {
+                              "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
+                              "slug": "zero-title-11",
+                              "name": "Zero title 11",
+                              "logoUrl": null,
+                              "shortDescription": "Missing short description"
                             }
                           ]
                         }
-                        """, true);
+                        """);
     }
 
     @Test
