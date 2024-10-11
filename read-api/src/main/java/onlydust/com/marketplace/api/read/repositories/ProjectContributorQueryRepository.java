@@ -24,22 +24,22 @@ public interface ProjectContributorQueryRepository extends Repository<ProjectCon
                    to_rewards_stats.pull_request_count                 as prs_to_reward,
                    to_rewards_stats.issue_count                        as issues_to_reward,
                    to_rewards_stats.code_review_count                  as code_reviews_to_reward,
-                        
+            
                    coalesce(totals_earned.total_dollars_equivalent, 0) as earned,
                    totals_earned.totals_earned_per_currency            as totals_earned,
-                        
+            
                    hc.contributor_github_user_id is not null           as is_hidden
-                        
+            
             from projects_contributors pc
                      join indexer_exp.github_accounts ga on ga.id = pc.github_user_id
                      left join iam.users u on u.github_user_id = ga.id
-                        
+            
                      left join hidden_contributors hc
                                on hc.contributor_github_user_id = pc.github_user_id and 
                                   hc.project_id = :projectId and
                                   hc.project_lead_id = :projectLeadId and
                                   :projectLeadId is not null
-                        
+            
                      left join (select count(distinct c.id)                                          as total_count,
                                        count(distinct c.id) filter ( where c.type = 'PULL_REQUEST' ) as pull_request_count,
                                        count(distinct c.id) filter ( where c.type = 'CODE_REVIEW' )  as code_review_count,
@@ -61,7 +61,7 @@ public interface ProjectContributorQueryRepository extends Repository<ProjectCon
                                   and ic.project_id is null
                                 group by pgr.project_id, c.contributor_id) to_rewards_stats
                                on to_rewards_stats.contributor_id = ga.id and to_rewards_stats.project_id = pc.project_id
-                        
+            
                      left join (select user_rewards.recipient_id                  as recipient_id,
                                        user_rewards.project_id                    as project_id,
                                        sum(user_rewards.total_dollars_equivalent) as total_dollars_equivalent,
@@ -77,20 +77,18 @@ public interface ProjectContributorQueryRepository extends Repository<ProjectCon
                                 from (select r.project_id                                as project_id,
                                              r.recipient_id                              as recipient_id,
                                              sum(r.amount)                               as total_amount,
-                                             coalesce(sum(rsd.amount_usd_equivalent), 0) as total_dollars_equivalent,
+                                             coalesce(sum(r.amount_usd_equivalent), 0) as total_dollars_equivalent,
                                              c.id                                        as currency_id,
                                              c.code                                      as currency_code,
                                              c.name                                      as currency_name,
                                              c.decimals                                  as currency_decimals,
                                              c.logo_url                                  as currency_logo_url
-                                      from rewards r
-                                               join accounting.reward_status_data rsd on rsd.reward_id = r.id
-                                               join accounting.reward_statuses rs on rs.reward_id = r.id
+                                      from accounting.reward_statuses r
                                                join currencies c on c.id = r.currency_id
                                       group by r.recipient_id, c.id, r.project_id) as user_rewards
                                 group by user_rewards.recipient_id, user_rewards.project_id) totals_earned
                          on totals_earned.recipient_id = ga.id and totals_earned.project_id = pc.project_id
-                        
+            
             where pc.project_id = :projectId
               and (:login is null or ga.login ilike '%' || :login || '%')
               and (hc.contributor_github_user_id is null or :showHidden)

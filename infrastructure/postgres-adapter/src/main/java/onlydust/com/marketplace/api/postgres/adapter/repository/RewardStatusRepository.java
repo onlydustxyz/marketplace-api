@@ -21,8 +21,7 @@ public interface RewardStatusRepository extends JpaRepository<RewardStatusDataEn
 
     @Query(value = """
             SELECT rsd.* FROM accounting.reward_status_data rsd
-            JOIN public.rewards r on r.id = rsd.reward_id
-            JOIN accounting.reward_statuses rs on r.id = rs.reward_id AND rs.status <= 'PENDING_REQUEST'
+            JOIN accounting.reward_statuses r on r.reward_id = rsd.reward_id AND r.status <= 'PENDING_REQUEST'
             JOIN iam.users u on r.recipient_id = u.github_user_id
             JOIN accounting.payout_preferences pp ON pp.project_id = r.project_id AND pp.user_id = u.id
             JOIN accounting.billing_profiles bp ON bp.id = pp.billing_profile_id AND bp.id = :billingProfileId
