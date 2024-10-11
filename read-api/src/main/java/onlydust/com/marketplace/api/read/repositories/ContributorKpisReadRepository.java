@@ -62,7 +62,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
             FROM bi.select_contributors(:fromDate, :toDate, :dataSourceIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis) d
                      LEFT JOIN (
                             select * from bi.select_contributors(:fromDatePreviousPeriod, :toDatePreviousPeriod, :dataSourceIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis)
-                         ) previous_period ON previous_period.contributor_id = d.contributor_id
+                         ) previous_period ON coalesce(:fromDatePreviousPeriod, :toDatePreviousPeriod) is not null and previous_period.contributor_id = d.contributor_id
             
                      LEFT JOIN LATERAL ( select jsonb_agg(jsonb_build_object('id', pcl.id, 'slug', pcl.slug, 'name', pcl.name)) as list
                                          from contributor_project_contributor_labels cpcl

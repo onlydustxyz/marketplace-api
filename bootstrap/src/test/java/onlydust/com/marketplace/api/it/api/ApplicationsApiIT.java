@@ -975,27 +975,27 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                               "countryCode": "FR",
                               "totalRewardedUsdAmount": {
                                 "value": 2692632.50,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "rewardCount": {
                                 "value": 21,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "issueCount": {
                                 "value": 15,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "prCount": {
                                 "value": 517,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "codeReviewCount": {
                                 "value": 406,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "contributionCount": {
                                 "value": 938,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               }
                             },
                             {
@@ -1108,11 +1108,11 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                               "countryCode": null,
                               "totalRewardedUsdAmount": {
                                 "value": 6060.00,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "rewardCount": {
                                 "value": 6,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "issueCount": {
                                 "value": 0,
@@ -1120,15 +1120,15 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                               },
                               "prCount": {
                                 "value": 30,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "codeReviewCount": {
                                 "value": 118,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "contributionCount": {
                                 "value": 148,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               }
                             },
                             {
@@ -1182,19 +1182,19 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                               "countryCode": null,
                               "totalRewardedUsdAmount": {
                                 "value": 85057.50,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "rewardCount": {
                                 "value": 64,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "issueCount": {
                                 "value": 2,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "prCount": {
                                 "value": 3,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "codeReviewCount": {
                                 "value": 0,
@@ -1202,7 +1202,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                               },
                               "contributionCount": {
                                 "value": 5,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               }
                             },
                             {
@@ -1365,27 +1365,27 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                               "countryCode": null,
                               "totalRewardedUsdAmount": {
                                 "value": 20855.02,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "rewardCount": {
                                 "value": 15,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "issueCount": {
                                 "value": 2,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "prCount": {
                                 "value": 266,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "codeReviewCount": {
                                 "value": 338,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               },
                               "contributionCount": {
                                 "value": 606,
-                                "trend": "STABLE"
+                                "trend": "UP"
                               }
                             }
                           ]
