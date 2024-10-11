@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.read.adapters;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadProjectApplicationsApi;
-import onlydust.com.marketplace.api.contract.model.ApplicationsQueryParams;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationPageResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationPageSort;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationResponse;
@@ -34,7 +33,6 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final PermissionService permissionService;
     private final ApplicationReadRepository applicationReadRepository;
-
 
     @Override
     public ResponseEntity<ProjectApplicationPageResponse> getProjectsApplications(Integer pageIndex,
@@ -70,39 +68,11 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
     }
 
     @Override
-    public ResponseEntity<ProjectApplicationPageResponse> getProjectsApplicationsV2(ApplicationsQueryParams params) {
-        if (params.getProjectId() == null && params.getApplicantId() == null) {
-            throw OnlyDustException.badRequest("At least one of projectId and applicantId must be provided");
-        }
-
-        final var caller = authenticatedAppUserService.getAuthenticatedUser();
-        if (!caller.githubUserId().equals(params.getApplicantId()) && !permissionService.isUserProjectLead(ProjectId.of(params.getProjectId()), caller.id())) {
-            throw forbidden("Only project leads can get project applications");
-        }
-
-        final var page = applicationReadRepository.findAll(
-                params.getProjectId(),
-                params.getIssueId(),
-                params.getApplicantId(),
-                params.getIsApplicantProjectMember(),
-                params.getU() == null ? null : params.getU().getSearch(),
-                PageRequest.of(params.getPageIndex(), params.getPageSize()));
-
-        return ok(new ProjectApplicationPageResponse()
-                .totalItemNumber((int) page.getTotalElements())
-                .totalPageNumber(page.getTotalPages())
-                .nextPageIndex(page.hasNext() ? params.getPageIndex() + 1 : params.getPageIndex())
-                .hasMore(page.hasNext())
-                .applications(page.getContent().stream().map(ApplicationReadEntity::toPageItemDto).toList())
-        );
-    }
-
-    @Override
     public ResponseEntity<ProjectApplicationResponse> getProjectApplication(UUID applicationId) {
         final var caller = authenticatedAppUserService.getAuthenticatedUser();
         final var application =
                 applicationReadRepository.findById(applicationId).orElseThrow(() -> notFound("Application %s not found".formatted(applicationId)));
-        if (!caller.githubUserId().equals(application.applicant().contributorId()) &&
+        if (!caller.githubUserId().equals(application.applicant().githubUserId()) &&
             !permissionService.isUserProjectLead(ProjectId.of(application.projectId()), caller.id())) {
             throw forbidden("Only project leads and applicant can get application details");
         }

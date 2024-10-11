@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.read.adapters;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.api.contract.ReadBiApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.bi.AggregatedKpisReadEntity;
@@ -78,7 +77,8 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
 
     @Override
     public ResponseEntity<BiContributorsPageResponse> getBIContributors(BiContributorsQueryParams q) {
-        final var page = findContributors(q);
+        q.setDataSourceIds(getFilteredDataSourceIds(q.getDataSourceIds()));
+        final var page = contributorKpisReadRepository.findAll(q);
 
         return ok(new BiContributorsPageResponse()
                 .contributors(page.stream().map(ContributorKpisReadEntity::toDto).toList())
@@ -93,8 +93,8 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
             produces = "text/csv"
     )
     public ResponseEntity<String> exportBIContributors(BiContributorsQueryParams q) {
-
-        final var page = findContributors(q);
+        q.setDataSourceIds(getFilteredDataSourceIds(q.getDataSourceIds()));
+        final var page = contributorKpisReadRepository.findAll(q);
         final var format = CSVFormat.DEFAULT.builder()
                 .setDelimiter(';')
                 .build();
@@ -133,7 +133,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                         timeGrouping == TimeGroupingEnum.QUARTER ? "3 MONTHS" : "1 %s".formatted(timeGrouping.name()),
                         parseZonedNullable(fromDate),
                         parseZonedNullable(toDate),
-                        getFilteredDataSourceIds(dataSourceIds)).stream()
+                        getFilteredDataSourceIds(dataSourceIds).toArray(UUID[]::new)).stream()
                 .collect(Collectors.toMap(AggregatedKpisReadEntity::timestamp, Function.identity()));
 
         final var mergedStats = statsPerTimestamp.keySet().stream().map(timestamp -> {
@@ -216,7 +216,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                         timeGrouping == TimeGroupingEnum.QUARTER ? "3 MONTHS" : "1 %s".formatted(timeGrouping.name()),
                         parseZonedNullable(fromDate),
                         sanitizedDate(toDate, ZonedDateTime.now()),
-                        getFilteredDataSourceIds(dataSourceIds)).stream()
+                        getFilteredDataSourceIds(dataSourceIds).toArray(UUID[]::new)).stream()
                 .collect(Collectors.toMap(AggregatedKpisReadEntity::timestamp, Function.identity()));
 
         final var mergedStats = statsPerTimestamp.keySet().stream().map(timestamp -> {
@@ -241,7 +241,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
             case ACTIVE_CONTRIBUTORS -> worldMapKpiReadRepository.findActiveContributorCount(
                     parseZonedNullable(fromDate),
                     parseZonedNullable(toDate),
-                    getFilteredDataSourceIds(dataSourceIds)
+                    getFilteredDataSourceIds(dataSourceIds).toArray(UUID[]::new)
             );
         };
 
@@ -250,7 +250,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 .toList());
     }
 
-    private UUID[] getFilteredDataSourceIds(List<UUID> dataSourceIds) {
+    private List<UUID> getFilteredDataSourceIds(List<UUID> dataSourceIds) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         final var userProjectOrProgramOrEcosystemIds = Stream.concat(
@@ -260,44 +260,8 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 .toList();
 
         return Optional.ofNullable(dataSourceIds)
-                .map(l -> l.stream().filter(userProjectOrProgramOrEcosystemIds::contains).toArray(UUID[]::new))
-                .orElse(userProjectOrProgramOrEcosystemIds.toArray(UUID[]::new));
-    }
-
-    private Page<ContributorKpisReadEntity> findContributors(BiContributorsQueryParams q) {
-        final var sanitizedFromDate = sanitizedDate(q.getFromDate(), DEFAULT_FROM_DATE).truncatedTo(ChronoUnit.DAYS);
-        final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now()).truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        final var fromDateOfPreviousPeriod = sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
-
-        return contributorKpisReadRepository.findAll(
-                sanitizedFromDate,
-                sanitizedToDate,
-                fromDateOfPreviousPeriod,
-                sanitizedFromDate,
-                getFilteredDataSourceIds(q.getDataSourceIds()),
-                q.getShowFilteredKpis(),
-                q.getSearch(),
-                q.getContributorIds() == null ? null : q.getContributorIds().toArray(Long[]::new),
-                q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
-                q.getProjectSlugs() == null ? null : q.getProjectSlugs().toArray(String[]::new),
-                q.getCategoryIds() == null ? null : q.getCategoryIds().toArray(UUID[]::new),
-                q.getLanguageIds() == null ? null : q.getLanguageIds().toArray(UUID[]::new),
-                q.getEcosystemIds() == null ? null : q.getEcosystemIds().toArray(UUID[]::new),
-                q.getCountryCodes() == null ? null : q.getCountryCodes().stream().map(c -> Country.fromIso2(c).iso3Code()).toArray(String[]::new),
-                q.getContributionStatuses() == null ? null : q.getContributionStatuses().stream().map(Enum::name).toArray(String[]::new),
-                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(ContributorsQueryParamsContributionCount::getGte).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(ContributorsQueryParamsContributionCount::getEq).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(ContributorsQueryParamsContributionCount::getLte).orElse(null),
-                q.getContributionCount() == null ? null : q.getContributionCount().getTypes().stream().map(Enum::name).toArray(String[]::new),
-                PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
-                        ContributorKpisReadRepository.getSortProperty(q.getSort())))
-        );
+                .map(l -> l.stream().filter(userProjectOrProgramOrEcosystemIds::contains).toList())
+                .orElse(userProjectOrProgramOrEcosystemIds);
     }
 
     private Page<ProjectKpisReadEntity> findProjects(BiProjectsQueryParams q) {
@@ -310,7 +274,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 sanitizedToDate,
                 fromDateOfPreviousPeriod,
                 sanitizedFromDate,
-                getFilteredDataSourceIds(q.getDataSourceIds()),
+                getFilteredDataSourceIds(q.getDataSourceIds()).toArray(UUID[]::new),
                 q.getShowFilteredKpis(),
                 q.getSearch(),
                 q.getProgramIds() == null ? null : q.getProgramIds().toArray(UUID[]::new),

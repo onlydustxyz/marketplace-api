@@ -10,6 +10,7 @@ import onlydust.com.marketplace.project.domain.port.output.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -541,6 +542,110 @@ public class ApplicationServiceTest {
             verify(githubApiPort).assign(githubToken.token(), issue.repoId(), issue.number(), applicant.login());
             verify(applicationObserver).onApplicationAccepted(application, userId);
             verify(applicationObserver).onApplicationRefused(refusedApplication);
+        }
+    }
+
+    @Nested
+    class UpdateProjectApplication {
+        final Application application = Application.fromMarketplace(
+                projectId,
+                githubUserId,
+                issue.id(),
+                GithubComment.Id.random(),
+                faker.lorem().sentence(),
+                faker.lorem().sentence()
+        );
+
+        @BeforeEach
+        void setup() {
+            when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+            when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(userId));
+        }
+
+        @Test
+        void should_ignore_application() {
+            // When
+            applicationService.updateApplication(userId, application.id(), true);
+
+            // Then
+            final var applicationCaptor = ArgumentCaptor.forClass(Application.class);
+            verify(projectApplicationStoragePort).save(applicationCaptor.capture());
+            final var savedApplication = applicationCaptor.getValue();
+            assertThat(savedApplication.ignoredAt()).isNotNull();
+        }
+
+        @Test
+        void should_unignore_application() {
+            // Given
+            application.ignore();
+
+            // When
+            applicationService.updateApplication(userId, application.id(), false);
+
+            // Then
+            final var applicationCaptor = ArgumentCaptor.forClass(Application.class);
+            verify(projectApplicationStoragePort).save(applicationCaptor.capture());
+            final var savedApplication = applicationCaptor.getValue();
+            assertThat(savedApplication.ignoredAt()).isNull();
+        }
+
+        @Test
+        void should_not_update_application() {
+            {
+                // Given
+                application.ignore();
+
+                // When
+                applicationService.updateApplication(userId, application.id(), null);
+
+                // Then
+                final var applicationCaptor = ArgumentCaptor.forClass(Application.class);
+                verify(projectApplicationStoragePort).save(applicationCaptor.capture());
+                final var savedApplication = applicationCaptor.getValue();
+                assertThat(savedApplication.ignoredAt()).isNotNull();
+            }
+
+            clearInvocations(projectApplicationStoragePort);
+
+            {
+                // Given
+                application.unIgnore();
+
+                // When
+                applicationService.updateApplication(userId, application.id(), null);
+
+                // Then
+                final var applicationCaptor = ArgumentCaptor.forClass(Application.class);
+                verify(projectApplicationStoragePort).save(applicationCaptor.capture());
+                final var savedApplication = applicationCaptor.getValue();
+                assertThat(savedApplication.ignoredAt()).isNull();
+            }
+        }
+
+        @Test
+        void should_prevent_to_update_non_existing_application() {
+            // Given
+            when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() ->
+                    applicationService.updateApplication(userId, application.id(), true))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Application %s not found".formatted(application.id()));
+        }
+
+        @Test
+        void should_prevent_non_project_lead_to_update_application() {
+            // Given
+            when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(UserId.random()));
+
+            // When
+            assertThatThrownBy(() ->
+                    applicationService.updateApplication(userId, application.id(), true))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("User is not authorized to update this application");
         }
     }
 }

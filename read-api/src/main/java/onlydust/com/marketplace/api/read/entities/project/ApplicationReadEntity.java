@@ -6,10 +6,12 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.read.entities.bi.ContributorReadProjectionEntity;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationOrigin;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationPageItemResponse;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationResponse;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationShortResponse;
 import onlydust.com.marketplace.api.read.entities.github.GithubIssueReadEntity;
-import org.hibernate.annotations.Formula;
+import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
 
 import java.time.ZonedDateTime;
@@ -46,17 +48,16 @@ public class ApplicationReadEntity {
 
     @NonNull
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "applicantId", insertable = false, updatable = false)
-    ContributorReadProjectionEntity applicant;
+    @JoinColumn(name = "applicantId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
+    AllUserReadEntity applicant;
     Long applicantId;
-
-    @Formula("EXISTS (SELECT 1 FROM project_members m WHERE m.project_id = project_id AND m.github_user_id = applicant_id)")
-    Boolean isApplicantProjectMember;
 
     @NonNull
     String motivations;
 
     String problemSolvingApproach;
+
+    ZonedDateTime ignoredAt;
 
     @NonNull
     @Enumerated(EnumType.STRING)
@@ -75,13 +76,10 @@ public class ApplicationReadEntity {
     public ProjectApplicationPageItemResponse toPageItemDto() {
         return new ProjectApplicationPageItemResponse()
                 .id(id)
-                .status(ProjectApplicationStatus.PENDING) //TODO: implement status
                 .project(project.toLinkResponse())
                 .issue(issue.toLinkDto())
-                .applicant(applicant.toApplicantResponse())
+                .applicant(applicant.toRankedContributorResponse())
                 .receivedAt(receivedAt)
-                .isApplicantProjectMember(isApplicantProjectMember)
-                .isIgnored(false) //TODO: implement isIgnored
                 ;
     }
 

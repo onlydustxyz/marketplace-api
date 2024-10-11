@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.Optional;
 
 import static java.util.Objects.isNull;
 
@@ -31,5 +32,9 @@ public interface DateMapper {
 
     static ZonedDateTime parseZonedNullable(final String date) {
         return toZoneDateTime(parseNullable(date));
+    }
+
+    static ZonedDateTime sanitizedDate(String fromDate, ZonedDateTime defaultFromDate) {
+        return Optional.ofNullable(DateMapper.parseNullable(fromDate)).map(DateMapper::toZoneDateTime).orElse(defaultFromDate);
     }
 }

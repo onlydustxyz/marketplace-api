@@ -3,34 +3,51 @@ package onlydust.com.marketplace.project.domain.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
+import onlydust.com.marketplace.project.domain.gateway.CurrentDateProvider;
 
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Getter
 @Accessors(fluent = true)
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Application {
     @NonNull
-    private final Id id;
+    final Id id;
     @NonNull
-    private final ProjectId projectId;
+    final ProjectId projectId;
     @NonNull
-    private final Long applicantId;
+    final Long applicantId;
     @NonNull
-    private final Origin origin;
+    Origin origin;
     @NonNull
-    private final ZonedDateTime appliedAt;
+    final ZonedDateTime appliedAt;
     @NonNull
-    private final GithubIssue.Id issueId;
+    final GithubIssue.Id issueId;
     @NonNull
-    private final GithubComment.Id commentId;
+    final GithubComment.Id commentId;
     @NonNull
-    private final String motivations;
-    private final String problemSolvingApproach;
+    String motivations;
+    String problemSolvingApproach;
+    ZonedDateTime ignoredAt;
+
+    public Application(final @NonNull Id id,
+                       final @NonNull ProjectId projectId,
+                       final @NonNull Long applicantId,
+                       final @NonNull Origin origin,
+                       final @NonNull ZonedDateTime appliedAt,
+                       final @NonNull GithubIssue.Id issueId,
+                       final @NonNull GithubComment.Id commentId,
+                       final @NonNull String motivation,
+                       String problemSolvingApproach) {
+        this(id, projectId, applicantId, origin, appliedAt, issueId, commentId, motivation, problemSolvingApproach, null);
+    }
 
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
@@ -60,7 +77,8 @@ public class Application {
                 issueId,
                 commentId,
                 motivations,
-                problemSolvingApproach);
+                problemSolvingApproach,
+                null);
     }
 
     public static Application fromGithubComment(@NonNull GithubComment comment, @NonNull ProjectId projectId) {
@@ -72,20 +90,23 @@ public class Application {
                 comment.issueId(),
                 comment.id(),
                 comment.body(),
+                null,
                 null);
     }
 
-    public Application update(@NonNull String motivations,
-                              String problemSolvingApproach) {
-        return new Application(id,
-                projectId,
-                applicantId,
-                Origin.MARKETPLACE,
-                appliedAt,
-                issueId,
-                commentId,
-                motivations,
-                problemSolvingApproach);
+    public void updateMotivations(@NonNull String motivations,
+                                  String problemSolvingApproach) {
+        this.origin = Origin.MARKETPLACE;
+        this.motivations = motivations;
+        this.problemSolvingApproach = problemSolvingApproach;
+    }
+
+    public void ignore() {
+        this.ignoredAt = CurrentDateProvider.now().toInstant().atZone(ZoneOffset.UTC);
+    }
+
+    public void unIgnore() {
+        this.ignoredAt = null;
     }
 
     public enum Origin {GITHUB, MARKETPLACE}

@@ -13,6 +13,8 @@ import onlydust.com.marketplace.project.domain.port.input.ApplicationFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import org.springframework.transaction.annotation.Transactional;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
 @AllArgsConstructor
@@ -165,11 +167,28 @@ public class ApplicationService implements ApplicationFacadePort {
 
         final var personalAccessToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
 
-        final var updated = application.update(motivation, problemSolvingApproach);
-        projectApplicationStoragePort.save(updated);
+        application.updateMotivations(motivation, problemSolvingApproach);
+        projectApplicationStoragePort.save(application);
 
         githubApiPort.updateComment(personalAccessToken, issue.repoId(), application.commentId(), formatComment(project, motivation, problemSolvingApproach));
 
-        return updated;
+        return application;
+    }
+
+    @Override
+    public void updateApplication(@NonNull UserId userId, @NonNull Application.Id applicationId, Boolean isIgnored) {
+        final var application = projectApplicationStoragePort.findApplication(applicationId)
+                .orElseThrow(() -> notFound("Application %s not found".formatted(applicationId)));
+
+        if (!projectStoragePort.getProjectLeadIds(application.projectId()).contains(userId))
+            throw forbidden("User is not authorized to update this application");
+
+        if (TRUE.equals(isIgnored))
+            application.ignore();
+
+        if (FALSE.equals(isIgnored))
+            application.unIgnore();
+
+        projectApplicationStoragePort.save(application);
     }
 }

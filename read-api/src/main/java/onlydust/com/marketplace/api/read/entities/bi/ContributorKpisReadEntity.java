@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
 import org.apache.commons.csv.CSVPrinter;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -113,5 +114,25 @@ public class ContributorKpisReadEntity {
                 codeReviewCount,
                 contributionCount
         );
+    }
+
+    public IssueApplicantsPageItemResponse toIssueApplicant(ApplicationReadEntity application) {
+        return new IssueApplicantsPageItemResponse()
+                .applicationId(application.id())
+                .contributor(contributor)
+                .projects(projects == null ? null : projects.stream().sorted(comparing(ProjectLinkResponse::getName)).toList())
+                .categories(categories == null ? null : categories.stream().sorted(comparing(ProjectCategoryResponse::getName)).toList())
+                .languages(languages == null ? null : languages.stream().sorted(comparing(LanguageResponse::getName)).toList())
+                .ecosystems(ecosystems == null ? null : ecosystems.stream().sorted(comparing(EcosystemLinkResponse::getName)).toList())
+                .projectContributorLabels(projectContributorLabels == null ? null :
+                        projectContributorLabels.stream().sorted(comparing(ProjectContributorLabelResponse::getName)).toList())
+                .countryCode(contributorCountry == null ? null : Country.fromIso3(contributorCountry).iso2Code())
+                .totalRewardedUsdAmount(toDecimalNumberKpi(prettyUsd(totalRewardedUsdAmount), prettyUsd(previousPeriodTotalRewardedUsdAmount)))
+                .rewardCount(toNumberKpi(rewardCount, previousPeriodRewardCount))
+                .contributionCount(toNumberKpi(contributionCount, previousPeriodContributionCount))
+                .issueCount(toNumberKpi(issueCount, previousPeriodIssueCount))
+                .prCount(toNumberKpi(prCount, previousPeriodPrCount))
+                .codeReviewCount(toNumberKpi(codeReviewCount, previousPeriodCodeReviewCount))
+                ;
     }
 }

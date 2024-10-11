@@ -3396,30 +3396,31 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
 
-  /api/v2/applications:
+  /api/v1/issues/{issueId}/applicants:
     get:
-      security:
-        - bearerAuth: [ ]
       tags:
-        - ReadProjectApplications
-      summary: Get applications of a project's issue or a user
-      operationId: getProjectsApplicationsV2
+        - ReadIssues
+      summary: Get applicants to an issue
+      operationId: getIssueApplicants
       description: |
-        Get the list of all applications in a project or by a user.
-        At least one of the parameters projectId or applicantId must be provided.
-        Only project leaders or applicants can access this information.
+        Get the list of all users that applied to an issue.
       parameters:
+        - in: path
+          name: issueId
+          required: true
+          schema:
+            $ref: '#/components/schemas/IssueId'
         - in: query
           name: params
           schema:
-            $ref: '#/components/schemas/ApplicationsQueryParams'
+            $ref: '#/components/schemas/ApplicantsQueryParams'
       responses:
         "200":
           description: 'List of applications'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectApplicationPageResponse'
+                $ref: '#/components/schemas/IssueApplicantsPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -8479,66 +8480,67 @@ components:
               items:
                 $ref: '#/components/schemas/ProjectApplicationPageItemResponse'
 
+    IssueApplicantsPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - applicants
+          properties:
+            applicants:
+              type: array
+              items:
+                $ref: '#/components/schemas/IssueApplicantsPageItemResponse'
+
+    IssueApplicantsPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/BiContributorsPageItemResponse'
+        - type: object
+          properties:
+            applicationId:
+              $ref: '#/components/schemas/ProjectApplicationId'
+
     ScorePercentage:
       type: integer
       minimum: 0
       maximum: 100
       description: A score between 0 and 100. The higher, the better.
 
-    ProjectApplicationStatus:
-      type: string
-      enum:
-        - PENDING
-        - ACCEPTED
-        - IGNORED
-
     ProjectApplicationPageItemResponse:
       type: object
       required:
         - id
-        - status
         - project
         - issue
         - applicant
         - receivedAt
-        - isApplicantProjectMember
-        - isIgnored
+        - recommendationScore
       properties:
         id:
           $ref: '#/components/schemas/ProjectApplicationId'
-        status:
-          $ref: '#/components/schemas/ProjectApplicationStatus'
         project:
           $ref: '#/components/schemas/ProjectLinkResponse'
         issue:
           $ref: '#/components/schemas/GithubIssueLinkResponse'
         applicant:
-          $ref: '#/components/schemas/ContributorOverviewResponse'
+          $ref: '#/components/schemas/RankedContributorResponse'
         receivedAt:
           type: string
           format: date-time
           description: When the application was created
-        isApplicantProjectMember:
-          type: boolean
-          description: True if the applicant has already contributed to the project or is a project lead
-        isIgnored:
-          type: boolean
-          description: True if the application has been ignored
-
 
     ProjectApplicationPatchRequest:
       type: object
       required:
         - status
       properties:
-        status:
-          $ref: '#/components/schemas/ProjectApplicationStatus'
+        isIgnored:
+          type: boolean
 
     ProjectApplicationResponse:
       type: object
       required:
         - id
-        - status
         - projectId
         - issue
         - applicant
@@ -8547,8 +8549,6 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/ProjectApplicationId'
-        status:
-          $ref: '#/components/schemas/ProjectApplicationStatus'
         projectId:
           $ref: '#/components/schemas/ProjectId'
         issue:
@@ -11696,49 +11696,13 @@ components:
         - $ref: '#/components/schemas/DataSourceQueryParams'
         - $ref: '#/components/schemas/ContributorsQueryParams'
 
-    ApplicationsQueryParams:
+    ApplicantsQueryParams:
       allOf:
         - $ref: '#/components/schemas/PaginationQueryParams'
+        - $ref: '#/components/schemas/ContributorsSortingQueryParams'
+        - $ref: '#/components/schemas/ContributorsQueryParams'
         - type: object
           properties:
-            u:
-              type: object
-              properties:
-                search:
-                  type: string
-                languageIds:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/LanguageId'
-                ecosystemIds:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/EcosystemId'
-                countryCodes:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/CountryCode'
-                totalRewardedUsdAmount:
-                  $ref: '#/components/schemas/DecimalNumberKpiFilter'
-                rewardCount:
-                  $ref: '#/components/schemas/NumberKpiFilter'
-                contributionCount:
-                  allOf:
-                    - $ref: '#/components/schemas/NumberKpiFilter'
-                    - type: object
-                      required:
-                        - types
-                      properties:
-                        types:
-                          type: array
-                          items:
-                            $ref: '#/components/schemas/ContributionType'
-            projectId:
-              $ref: '#/components/schemas/ProjectId'
-            issueId:
-              $ref: '#/components/schemas/IssueId'
-            applicantId:
-              $ref: '#/components/schemas/GithubUserId'
             isApplicantProjectMember:
               type: boolean
             isIgnored:
