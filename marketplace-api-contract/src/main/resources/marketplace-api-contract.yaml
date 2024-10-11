@@ -8514,8 +8514,7 @@ components:
         - issue
         - applicant
         - receivedAt
-        - isApplicantProjectMember
-        - isIgnored
+        - recommendationScore
       properties:
         id:
           $ref: '#/components/schemas/ProjectApplicationId'
@@ -8524,18 +8523,11 @@ components:
         issue:
           $ref: '#/components/schemas/GithubIssueLinkResponse'
         applicant:
-          $ref: '#/components/schemas/ContributorOverviewResponse'
+          $ref: '#/components/schemas/RankedContributorResponse'
         receivedAt:
           type: string
           format: date-time
           description: When the application was created
-        isApplicantProjectMember:
-          type: boolean
-          description: True if the applicant has already contributed to the project or is a project lead
-        isIgnored:
-          type: boolean
-          description: True if the application has been ignored
-
 
     ProjectApplicationPatchRequest:
       type: object

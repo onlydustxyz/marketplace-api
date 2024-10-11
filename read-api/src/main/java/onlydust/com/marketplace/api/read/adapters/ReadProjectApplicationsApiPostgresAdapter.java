@@ -72,7 +72,7 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
         final var caller = authenticatedAppUserService.getAuthenticatedUser();
         final var application =
                 applicationReadRepository.findById(applicationId).orElseThrow(() -> notFound("Application %s not found".formatted(applicationId)));
-        if (!caller.githubUserId().equals(application.applicant().contributorId()) &&
+        if (!caller.githubUserId().equals(application.applicant().githubUserId()) &&
             !permissionService.isUserProjectLead(ProjectId.of(application.projectId()), caller.id())) {
             throw forbidden("Only project leads and applicant can get application details");
         }

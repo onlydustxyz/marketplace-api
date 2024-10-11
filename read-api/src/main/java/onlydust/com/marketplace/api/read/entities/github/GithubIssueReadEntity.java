@@ -10,7 +10,6 @@ import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
 import onlydust.com.marketplace.api.contract.model.GithubOrganizationInstallationStatus;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAppInstallationViewEntity;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
-import onlydust.com.marketplace.api.read.entities.bi.ContributorReadProjectionEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
@@ -141,7 +140,7 @@ public class GithubIssueReadEntity {
                 .body(body)
                 .commentCount(commentsCount)
                 .labels(labels.stream().map(GithubLabelReadEntity::toDto).toList())
-                .applicants(applications.stream().map(ApplicationReadEntity::applicant).map(ContributorReadProjectionEntity::toGithubUserResponse).toList())
+                .applicants(applications.stream().map(ApplicationReadEntity::applicant).map(AllUserReadEntity::toGithubUserResponse).toList())
                 .assignees(assignees.stream().map(AllUserReadEntity::toGithubUserResponse).toList())
                 .languages(repo.languages().stream().distinct().map(LanguageReadEntity::toDto).toList());
 

@@ -39,7 +39,7 @@ public interface ApplicationReadRepository extends Repository<ApplicationReadEnt
                         (:isApplicantProjectMember = TRUE AND exists (select 1 from ProjectMemberReadEntity m where m.projectId = a.projectId and m.githubUserId = a.applicantId)) OR 
                         (:isApplicantProjectMember = FALSE AND NOT exists (select 1 from ProjectMemberReadEntity m where m.projectId = a.projectId and m.githubUserId = a.applicantId))
                     ) AND
-                    (:applicantLoginSearch IS NULL OR u.contributorLogin ILIKE %:applicantLoginSearch%)
+                    (:applicantLoginSearch IS NULL OR u.login ILIKE %:applicantLoginSearch%)
             """)
     Page<ApplicationReadEntity> findAll(UUID projectId,
                                         Long issueId,
@@ -55,7 +55,7 @@ public interface ApplicationReadRepository extends Repository<ApplicationReadEnt
             WHERE a.issueId = :issueId AND
                   (:isIgnored IS NULL OR (:isIgnored = TRUE and a.ignoredAt is not null) OR (:isIgnored = FALSE and a.ignoredAt is null)) AND
                   (:isApplicantProjectMember IS NULL OR (:isApplicantProjectMember = TRUE and m.githubUserId is not null) OR (:isApplicantProjectMember = FALSE and m.githubUserId is null)) AND
-                  (:search IS NULL OR a.applicant.contributorLogin ILIKE %:search%)
+                  (:search IS NULL OR a.applicant.login ILIKE %:search%)
             """)
     List<ApplicationReadEntity> findAllByIssueId(@NonNull Long issueId,
                                                  Boolean isIgnored,
