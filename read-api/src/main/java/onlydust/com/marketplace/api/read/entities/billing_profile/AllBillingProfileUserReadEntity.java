@@ -46,7 +46,7 @@ public class AllBillingProfileUserReadEntity {
     boolean invitationAccepted;
 
     public ShortBillingProfileResponse toShortResponse() {
-        return billingProfile.toShortResponse(githubUserId);
+        return billingProfile.toShortResponse(role, invitationAccepted);
     }
 
     @EqualsAndHashCode

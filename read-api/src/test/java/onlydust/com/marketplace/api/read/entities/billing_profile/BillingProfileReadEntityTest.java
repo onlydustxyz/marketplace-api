@@ -23,8 +23,8 @@ class BillingProfileReadEntityTest {
                                 .role(BillingProfileCoworkerRole.ADMIN)
                                 .invitationAccepted(true)
                 ))
-                .stats(new BillingProfileStatsReadEntity()
-                        .invoiceableRewardCount(42)
+                .stats(Set.of(new BillingProfileStatsReadEntity()
+                        .invoiceableRewardCount(42))
                 );
 
         // When
@@ -46,8 +46,8 @@ class BillingProfileReadEntityTest {
                                 .role(BillingProfileCoworkerRole.ADMIN)
                                 .invitationAccepted(false)
                 ))
-                .stats(new BillingProfileStatsReadEntity()
-                        .invoiceableRewardCount(42)
+                .stats(Set.of(new BillingProfileStatsReadEntity()
+                        .invoiceableRewardCount(42))
                 );
 
         // When
@@ -69,8 +69,8 @@ class BillingProfileReadEntityTest {
                                 .role(BillingProfileCoworkerRole.MEMBER)
                                 .invitationAccepted(true)
                 ))
-                .stats(new BillingProfileStatsReadEntity()
-                        .invoiceableRewardCount(42)
+                .stats(Set.of(new BillingProfileStatsReadEntity()
+                        .invoiceableRewardCount(42))
                 );
 
         // When
