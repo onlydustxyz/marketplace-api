@@ -585,3 +585,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000361_create_pseudo_projection_user_project_recommendations.sql
   - include:
       file: db/changelog/changelogs/00000362_optimize_reward_statuses_usage.sql
+  - include:
+      file: db/changelog/changelogs/00000363_optimize_all_billing_profile_users_view.sql
