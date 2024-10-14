@@ -1,3 +1,8 @@
+call drop_pseudo_projection('bi', 'project_global_data');
+call drop_pseudo_projection('bi', 'contribution_data');
+
+
+
 call create_pseudo_projection('bi', 'contribution_data', $$
 with project_contributions AS (select distinct on (c.id) c.*,
                                                          pgr.project_id as project_id,
@@ -33,7 +38,9 @@ select c.id                                                                     
        array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null )                 as ecosystem_ids,
        array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )                     as program_ids,
        array_agg(distinct ppc.project_category_id) filter ( where ppc.project_category_id is not null ) as project_category_ids,
-       string_agg(distinct lfe.name, ' ')                                                               as languages
+       string_agg(distinct lfe.name, ' ')                                                               as languages,
+       bool_or(gl.name ~~* '%good%first%issue%')                                                        as is_good_first_issue,
+       array_agg(distinct gia.user_id) filter ( where gia.user_id is not null )                         as assignee_ids
 from project_contributions c
          join (select cc.contributor_id, min(cc.created_at) as created_at
                from project_contributions cc
@@ -47,6 +54,9 @@ from project_contributions c
          left join v_programs_projects pp on pp.project_id = c.project_id
          left join projects_project_categories ppc on ppc.project_id = c.project_id
          left join registered_users ru on ru.github_user_id = c.contributor_id
+         left join indexer_exp.github_issues_labels gil ON gil.issue_id = c.issue_id
+         left join indexer_exp.github_labels gl ON gil.label_id = gl.id
+         left join indexer_exp.github_issues_assignees gia ON gia.issue_id = c.issue_id
 group by c.id,
          c.repo_id,
          c.project_id,
@@ -60,19 +70,29 @@ group by c.id,
          ru.country
 $$, 'contribution_id');
 
+create index on bi.p_contribution_data (project_id);
+create index on bi.p_contribution_data (project_slug);
+create index on bi.p_contribution_data (contributor_id);
+create index on bi.p_contribution_data (contributor_user_id);
+
 
 
 call create_pseudo_projection('bi', 'project_global_data', $$
-SELECT p.id                                                                                                       as project_id,
-       p.slug                                                                                                     as project_slug,
-       p.created_at                                                                                               as created_at,
+SELECT p.id                                                                                                            as project_id,
+       p.slug                                                                                                          as project_slug,
+       p.created_at                                                                                                    as created_at,
+       p.rank                                                                                                          as rank,
        jsonb_build_object('id', p.id,
                           'slug', p.slug,
                           'name', p.name,
-                          'logoUrl', p.logo_url)                                                                  as project,
-       p.name                                                                                                     as project_name,
-       max(budgets.available_budget_usd)                                                                          as available_budget_usd,
-       max(budgets.percent_spent_budget_usd)                                                                      as percent_spent_budget_usd,
+                          'logoUrl', p.logo_url,
+                          'shortDescription', p.short_description,
+                          'hiring', p.hiring,
+                          'visibility', p.visibility)                                                                  as project,
+       p.name                                                                                                          as project_name,
+       p.visibility                                                                                                    as project_visibility,
+       max(budgets.available_budget_usd)                                                                               as available_budget_usd,
+       max(budgets.percent_spent_budget_usd)                                                                           as percent_spent_budget_usd,
        coalesce(jsonb_agg(distinct jsonb_build_object('availableBudgetUsd', budgets.available_budget_usd,
                                                       'percentSpentBudgetUsd', budgets.percent_spent_budget_usd,
                                                       'availableBudgetPerCurrency', budgets.available_budget_per_currency,
@@ -81,41 +101,51 @@ SELECT p.id                                                                     
                                                       'grantedAmountPerCurrency', budgets.granted_amount_per_currency,
                                                       'rewardedAmountUsd', budgets.rewarded_amount_usd,
                                                       'rewardedAmountPerCurrency', budgets.rewarded_amount_per_currency))
-                filter ( where budgets.project_id is not null ), '[]'::jsonb) -> 0                                as budget,
-       array_agg(distinct u.id) filter ( where u.id is not null )                                                 as project_lead_ids,
-       array_agg(distinct pc.id) filter ( where pc.id is not null )                                               as project_category_ids,
-       array_agg(distinct l.id) filter ( where l.id is not null )                                                 as language_ids,
-       array_agg(distinct e.id) filter ( where e.id is not null )                                                 as ecosystem_ids,
-       array_agg(distinct prog.id) filter ( where prog.id is not null )                                           as program_ids,
+                filter ( where budgets.project_id is not null ), '[]'::jsonb) -> 0                                     as budget,
+       array_agg(distinct uleads.id) filter ( where uleads.id is not null )                                            as project_lead_ids,
+       array_agg(distinct uinvleads.id) filter ( where uinvleads.id is not null )                                      as invited_project_lead_ids,
+       array_agg(distinct pc.id) filter ( where pc.id is not null )                                                    as project_category_ids,
+       array_agg(distinct pc.slug) filter ( where pc.slug is not null )                                                as project_category_slugs,
+       array_agg(distinct l.id) filter ( where l.id is not null )                                                      as language_ids,
+       array_agg(distinct l.slug) filter ( where l.slug is not null )                                                  as language_slugs,
+       array_agg(distinct e.id) filter ( where e.id is not null )                                                      as ecosystem_ids,
+       array_agg(distinct e.slug) filter ( where e.slug is not null )                                                  as ecosystem_slugs,
+       array_agg(distinct prog.id) filter ( where prog.id is not null )                                                as program_ids,
+       array_agg(distinct pgr.github_repo_id) filter ( where pgr.github_repo_id is not null )                          as repo_ids,
+       array_agg(distinct pt.tag) filter ( where pt.tag is not null )                                                  as tags,
 
-       jsonb_agg(distinct jsonb_build_object('id', u.id,
-                                             'login', u.github_login,
-                                             'githubUserId', u.github_user_id,
-                                             'avatarUrl', u.github_avatar_url)) filter ( where u.id is not null ) as leads,
+       jsonb_agg(distinct jsonb_build_object('id', uleads.id,
+                                             'login', uleads.github_login,
+                                             'githubUserId', uleads.github_user_id,
+                                             'avatarUrl', user_avatar_url(uleads.github_user_id, uleads.github_avatar_url)
+                                             )) filter ( where uleads.id is not null )                                 as leads,
 
        jsonb_agg(distinct jsonb_build_object('id', pc.id,
                                              'slug', pc.slug,
                                              'name', pc.name,
                                              'description', pc.description,
-                                             'iconSlug', pc.icon_slug)) filter ( where pc.id is not null )        as categories,
+                                             'iconSlug', pc.icon_slug)) filter ( where pc.id is not null )             as categories,
 
        jsonb_agg(distinct jsonb_build_object('id', l.id,
                                              'slug', l.slug,
                                              'name', l.name,
                                              'logoUrl', l.logo_url,
-                                             'bannerUrl', l.banner_url)) filter ( where l.id is not null )        as languages,
+                                             'bannerUrl', l.banner_url)) filter ( where l.id is not null )             as languages,
 
        jsonb_agg(distinct jsonb_build_object('id', e.id,
                                              'slug', e.slug,
                                              'name', e.name,
                                              'logoUrl', e.logo_url,
                                              'bannerUrl', e.banner_url,
-                                             'url', e.url)) filter ( where e.id is not null )                     as ecosystems,
+                                             'url', e.url)) filter ( where e.id is not null )                          as ecosystems,
 
        jsonb_agg(distinct jsonb_build_object('id', prog.id,
                                              'name', prog.name,
-                                             'logoUrl', prog.logo_url)) filter ( where prog.id is not null )      as programs,
-       concat(coalesce(string_agg(distinct u.github_login, ' '), ''), ' ',
+                                             'logoUrl', prog.logo_url)) filter ( where prog.id is not null )           as programs,
+
+       count(distinct pgr.github_repo_id) > count(distinct agr.repo_id)                                                as has_repos_without_github_app_installed,
+
+       concat(coalesce(string_agg(distinct uleads.github_login, ' '), ''), ' ',
               coalesce(string_agg(distinct p.name, ' '), ''), ' ',
               coalesce(string_agg(distinct p.slug, ' '), ''), ' ',
               coalesce(string_agg(distinct pc.name, ' '), ''), ' ',
@@ -123,7 +153,7 @@ SELECT p.id                                                                     
               coalesce(string_agg(distinct e.name, ' '), ''), ' ',
               coalesce(string_agg(distinct currencies.name, ' '), ''), ' ',
               coalesce(string_agg(distinct currencies.code, ' '), ''), ' ',
-              coalesce(string_agg(distinct prog.name, ' '), ''))                                                  as search
+              coalesce(string_agg(distinct prog.name, ' '), ''))                                                       as search
 FROM projects p
          LEFT JOIN projects_ecosystems pe ON pe.project_id = p.id
          LEFT JOIN ecosystems e ON e.id = pe.ecosystem_id
@@ -134,7 +164,12 @@ FROM projects p
          LEFT JOIN v_programs_projects pp ON pp.project_id = p.id
          LEFT JOIN programs prog ON prog.id = pp.program_id
          LEFT JOIN project_leads pleads ON pleads.project_id = p.id
-         LEFT JOIN iam.users u ON u.id = pleads.user_id
+         LEFT JOIN iam.users uleads ON uleads.id = pleads.user_id
+         LEFT JOIN pending_project_leader_invitations ppli ON ppli.project_id = p.id
+         LEFT JOIN iam.users uinvleads ON uinvleads.github_user_id = ppli.github_user_id
+         LEFT JOIN projects_tags pt ON pt.project_id = p.id
+         LEFT JOIN project_github_repos pgr ON pgr.project_id = p.id
+         LEFT JOIN indexer_exp.authorized_github_repos agr on agr.repo_id = pgr.github_repo_id
          LEFT JOIN LATERAL (select distinct c.name, c.code
                             from bi.p_reward_data rd
                                      full outer join bi.p_project_grants_data gd on gd.project_id = rd.project_id
@@ -198,3 +233,5 @@ FROM projects p
                             group by gd.project_id ) budgets on budgets.project_id = p.id
 GROUP BY p.id
 $$, 'project_id');
+
+create unique index on bi.p_project_global_data (project_slug);

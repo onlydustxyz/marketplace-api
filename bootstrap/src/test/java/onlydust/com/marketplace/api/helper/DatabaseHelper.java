@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManagerFactory;
 import org.intellij.lang.annotations.Language;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.shaded.org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Map;
@@ -43,4 +44,8 @@ public class DatabaseHelper {
     }
 
 
+    @Transactional
+    public void executeInTransaction(Runnable runnable) {
+        runnable.run();
+    }
 }

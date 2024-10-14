@@ -2,126 +2,99 @@ package onlydust.com.marketplace.api.read.entities.project;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-import static java.util.Objects.isNull;
+import static java.util.Comparator.comparing;
 import static java.util.Objects.nonNull;
 
-@Entity
+@NoArgsConstructor(force = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Immutable
+@Entity
 public class ProjectPageItemQueryEntity {
     @Id
-    @Column(name = "id")
-    UUID projectId;
-    Boolean hiring;
-    @Column(name = "logo_url")
-    String logoUrl;
+    UUID id;
     String slug;
     String name;
-    @Column(name = "short_description")
     String shortDescription;
+    String logoUrl;
+    Boolean hiring;
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "project_visibility")
     ProjectVisibility visibility;
     Integer repoCount;
-    Integer contributorsCount;
-    Boolean isPendingProjectLead;
+    Integer contributorCount;
     @JdbcTypeCode(SqlTypes.JSON)
-    List<Ecosystem> ecosystems;
+    List<RegisteredUserResponse> projectLeads;
     @JdbcTypeCode(SqlTypes.JSON)
-    List<ProjectLead> projectLeads;
+    List<ProjectCategoryResponse> categories;
     @JdbcTypeCode(SqlTypes.JSON)
-    List<Tag> tags;
+    List<EcosystemLinkResponse> ecosystems;
     @JdbcTypeCode(SqlTypes.JSON)
-    List<LanguageReadEntity> languages;
+    List<LanguageResponse> languages;
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    List<ProjectTag> tags;
+    BigDecimal remainingUsdBudget;
+    Boolean hasGoodFirstIssues;
+    Boolean hasReposWithoutGithubAppInstalled;
+    Boolean isInvitedAsProjectLead;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id", insertable = false, updatable = false)
-    ProjectLeadInfoQueryEntity projectLeadInfo;
-
-    public static String getEcosystemsJsonPath(List<String> ecosystemSlugs) {
-        if (isNull(ecosystemSlugs) || ecosystemSlugs.isEmpty()) {
-            return null;
-        }
-        return "$[*] ? (" + String.join(" || ", ecosystemSlugs.stream().map(s -> "@.slug == \"" + s + "\"").toList()) + ")";
+    public List<RegisteredUserResponse> projectLeads() {
+        return projectLeads == null ? List.of() : projectLeads.stream().sorted(comparing(RegisteredUserResponse::getLogin)).toList();
     }
 
-    public static String getTagsJsonPath(List<String> tags) {
-        if (isNull(tags) || tags.isEmpty()) {
-            return null;
-        }
-        return "$[*] ? (" + String.join(" || ", tags.stream().map(s -> "@.name == \"" + s + "\"").toList()) + ")";
+    public List<ProjectCategoryResponse> categories() {
+        return categories == null ? List.of() : categories.stream().sorted(comparing(ProjectCategoryResponse::getName)).toList();
     }
 
-    public static String getLanguagesJsonPath(List<String> languageSlugs) {
-        if (isNull(languageSlugs) || languageSlugs.isEmpty()) {
-            return null;
-        }
-        return "$[*] ? (" + String.join(" || ", languageSlugs.stream().map(s -> "@.slug == \"" + s + "\"").toList()) + ")";
+    public List<EcosystemLinkResponse> ecosystems() {
+        return ecosystems == null ? List.of() : ecosystems.stream().sorted(comparing(EcosystemLinkResponse::getName)).toList();
+    }
+
+    public List<LanguageResponse> languages() {
+        return languages == null ? List.of() : languages.stream().sorted(comparing(LanguageResponse::getName)).toList();
+    }
+
+    public List<ProjectTag> tags() {
+        return tags == null ? List.of() : tags.stream().sorted(comparing(ProjectTag::name)).toList();
     }
 
     public ProjectPageItemResponse toDto(UUID userId) {
-        final var isProjectLead = nonNull(userId) && nonNull(this.projectLeads) && this.projectLeads.stream().anyMatch(lead -> lead.id().equals(userId));
+        final var isProjectLead = nonNull(userId) && nonNull(this.projectLeads) && this.projectLeads.stream().anyMatch(lead -> lead.getId().equals(userId));
 
         return new ProjectPageItemResponse()
-                .id(this.projectId)
+                .id(this.id)
                 .slug(this.slug)
                 .name(this.name)
                 .shortDescription(this.shortDescription)
                 .logoUrl(this.logoUrl)
                 .hiring(this.hiring)
                 .visibility(this.visibility)
-                .contributorCount(this.contributorsCount)
-                .remainingUsdBudget(isProjectLead ? projectLeadInfo.getRemainingUsdBudget() : null)
+                .contributorCount(this.contributorCount)
+                .remainingUsdBudget(isProjectLead ? remainingUsdBudget : null)
                 .repoCount(this.repoCount)
-                .tags(isNull(this.tags) ? List.of() : this.tags.stream().map(Tag::name).map(ProjectTag::valueOf).toList())
-                .ecosystems(isNull(this.ecosystems) ? List.of() : this.ecosystems.stream().map(ecosystem -> new EcosystemLinkResponse()
-                        .id(ecosystem.id)
-                        .logoUrl(ecosystem.logoUrl)
-                        .name(ecosystem.name)
-                        .slug(ecosystem.slug)
-                        .url(ecosystem.url)
-                        .hidden(ecosystem.hidden)
-                ).toList())
-                .leaders(isNull(this.projectLeads) ? List.of() : this.projectLeads.stream().map(projectLead -> new RegisteredUserResponse()
-                        .id(projectLead.id)
-                        .githubUserId(projectLead.githubId)
-                        .avatarUrl(projectLead.avatarUrl)
-                        .login(projectLead.login)
-                ).toList())
-                .languages(languages.stream().map(LanguageReadEntity::toDto).toList())
-                .isInvitedAsProjectLead(this.isPendingProjectLead)
-                .hasMissingGithubAppInstallation(isProjectLead ? projectLeadInfo.getIsMissingGithubAppInstallation() : null);
-    }
-
-    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-    @Getter
-    @Accessors(fluent = true)
-    public static class ProjectLead {
-        @EqualsAndHashCode.Include
-        @JsonProperty("id")
-        UUID id;
-        @JsonProperty("url")
-        String url;
-        @JsonProperty("avatarUrl")
-        String avatarUrl;
-        @JsonProperty("login")
-        String login;
-        @JsonProperty("githubId")
-        Long githubId;
+                .tags(this.tags())
+                .ecosystems(this.ecosystems())
+                .leaders(this.projectLeads())
+                .languages(this.languages())
+                .isInvitedAsProjectLead(this.isInvitedAsProjectLead)
+                .hasMissingGithubAppInstallation(isProjectLead ? hasReposWithoutGithubAppInstalled : null);
     }
 
     @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -151,14 +124,5 @@ public class ProjectPageItemQueryEntity {
                     .url(url)
                     .hidden(hidden);
         }
-    }
-
-    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-    @Getter
-    @Accessors(fluent = true)
-    public static class Tag {
-        @EqualsAndHashCode.Include
-        @JsonProperty("name")
-        String name;
     }
 }

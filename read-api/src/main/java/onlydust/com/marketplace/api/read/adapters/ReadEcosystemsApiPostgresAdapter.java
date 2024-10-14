@@ -7,7 +7,6 @@ import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.ecosystem.EcosystemReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectCategoryReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectEcosystemCardReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectPageItemQueryEntity;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import org.springframework.context.annotation.Profile;
@@ -22,6 +21,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper.getPostgresOffsetFromPagination;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
@@ -49,7 +49,7 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
                                                                              ProjectTag tag) {
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
-        final String tagJsonPath = Optional.ofNullable(tag).map(Enum::name).map(List::of).map(ProjectPageItemQueryEntity::getTagsJsonPath).orElse(null);
+        final String tagJsonPath = Optional.ofNullable(tag).map(Enum::name).map(List::of).map(ReadEcosystemsApiPostgresAdapter::getTagsJsonPath).orElse(null);
         final List<ProjectEcosystemCardReadEntity> projects = projectEcosystemCardReadEntityRepository.findAllBy(ecosystemSlug,
                 hasGoodFirstIssues, featuredOnly, getPostgresOffsetFromPagination(sanitizePageSize, sanitizePageIndex), sanitizePageSize,
                 Optional.ofNullable(sortBy).map(Enum::name).orElse(null), tagJsonPath
@@ -68,6 +68,13 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
         return response.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
                 ResponseEntity.ok(response);
+    }
+
+    public static String getTagsJsonPath(List<String> tags) {
+        if (isNull(tags) || tags.isEmpty()) {
+            return null;
+        }
+        return "$[*] ? (" + String.join(" || ", tags.stream().map(s -> "@.name == \"" + s + "\"").toList()) + ")";
     }
 
     @Override
