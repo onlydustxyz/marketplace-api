@@ -31,7 +31,7 @@ public class KybReadEntity {
     @NonNull
     UUID billingProfileId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "billingProfileId", insertable = false, updatable = false)
     BillingProfileReadEntity billingProfile;
 

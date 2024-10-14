@@ -24,7 +24,7 @@ public class BillingProfileStatsReadEntity {
     @NonNull
     UUID billingProfileId;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "billingProfileId", insertable = false, updatable = false)
     @NonNull
     BillingProfileReadEntity billingProfile;

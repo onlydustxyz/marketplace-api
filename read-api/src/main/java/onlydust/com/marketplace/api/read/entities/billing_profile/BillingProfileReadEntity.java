@@ -50,25 +50,37 @@ public class BillingProfileReadEntity {
     @NonNull
     VerificationStatus verificationStatus;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "billingProfile")
-    KycReadEntity kyc;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "billingProfile")
+    Set<KycReadEntity> kyc;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "billingProfile")
-    KybReadEntity kyb;
+    public KycReadEntity kyc() {
+        return kyc.stream().findFirst().orElse(null);
+    }
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "billingProfile")
+    Set<KybReadEntity> kyb;
+
+    public KybReadEntity kyb() {
+        return kyb.stream().findFirst().orElse(null);
+    }
 
     Boolean enabled;
 
-    @OneToMany(mappedBy = "billingProfile")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "billingProfile")
     @NonNull
     Set<AllBillingProfileUserReadEntity> users;
 
-    @OneToMany(mappedBy = "billingProfile")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "billingProfile")
     @NonNull
     Set<BillingProfileUserInvitationReadEntity> invitations;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "billingProfile")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "billingProfile")
     @NonNull
-    BillingProfileStatsReadEntity stats;
+    Set<BillingProfileStatsReadEntity> stats;
+
+    public BillingProfileStatsReadEntity stats() {
+        return stats.stream().findFirst().orElse(null);
+    }
 
     @Formula("(select gs.invoice_mandate_latest_version_date from global_settings gs where gs.id=1)")
     ZonedDateTime invoiceMandateLatestVersionDate;
@@ -101,15 +113,17 @@ public class BillingProfileReadEntity {
         return missingPayoutInfoRewards.stream().flatMap(r -> Arrays.stream(r.statusData().networks())).toList();
     }
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "billingProfile")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "billingProfile")
     @Getter(AccessLevel.NONE)
-    PayoutInfoReadEntity payoutInfo;
+    Set<PayoutInfoReadEntity> payoutInfo;
 
     public PayoutInfoReadEntity payoutInfo() {
-        return Optional.ofNullable(payoutInfo).orElseGet(() -> new PayoutInfoReadEntity(this));
+        return payoutInfo.stream().findFirst().orElseGet(() -> new PayoutInfoReadEntity(this));
     }
 
     public BillingProfileShortResponse toBoShortResponse() {
+        final var kyc = kyc();
+        final var kyb = kyb();
         return new BillingProfileShortResponse()
                 .id(id)
                 .subject(kyc != null ? kyc.subject() : kyb != null ? kyb.subject() : null)
@@ -122,6 +136,8 @@ public class BillingProfileReadEntity {
     }
 
     public UserSearchBillingProfile toUserSearch() {
+        final var kyc = kyc();
+        final var kyb = kyb();
         return new UserSearchBillingProfile()
                 .id(id)
                 .name(name)
@@ -133,6 +149,7 @@ public class BillingProfileReadEntity {
     }
 
     public ShortBillingProfileResponse toShortResponse(Long callerGithubUserId) {
+        final var stats = stats();
         final var caller = users.stream().filter(u -> u.githubUserId().equals(callerGithubUserId)).findFirst();
         return new ShortBillingProfileResponse()
                 .id(id)
@@ -157,8 +174,37 @@ public class BillingProfileReadEntity {
                 .verificationBlocked(isVerificationBlocked());
     }
 
+    public ShortBillingProfileResponse toShortResponse(BillingProfileCoworkerRole role, boolean invitationAccepted) {
+        final var stats = stats();
+        return new ShortBillingProfileResponse()
+                .id(id)
+                .type(switch (type) {
+                    case INDIVIDUAL -> onlydust.com.marketplace.api.contract.model.BillingProfileType.INDIVIDUAL;
+                    case COMPANY -> onlydust.com.marketplace.api.contract.model.BillingProfileType.COMPANY;
+                    case SELF_EMPLOYED -> onlydust.com.marketplace.api.contract.model.BillingProfileType.SELF_EMPLOYED;
+                })
+                .name(name)
+                .enabled(enabled)
+                .role(role)
+                .invoiceMandateAccepted(isInvoiceMandateAccepted())
+                .rewardCount(stats.rewardCount())
+                .invoiceableRewardCount(stats.invoiceableRewardCount())
+                .currentYearPaymentLimit(stats.currentYearPaymentLimit())
+                .currentYearPaymentAmount(stats.currentYearPaymentAmount())
+                .individualLimitReached(stats.individualLimitReached())
+                .missingPayoutInfo(stats.missingPayoutInfo())
+                .missingVerification(stats.missingVerification())
+                .pendingInvitationResponse(!invitationAccepted)
+                .requestableRewardCount(requestableRewardCount(role, invitationAccepted))
+                .verificationBlocked(isVerificationBlocked());
+    }
+
+    private Integer requestableRewardCount(BillingProfileCoworkerRole role, boolean invitationAccepted) {
+        return role == BillingProfileCoworkerRole.ADMIN && invitationAccepted ? stats().invoiceableRewardCount() : 0;
+    }
+
     private Integer requestableRewardCount(Optional<AllBillingProfileUserReadEntity> user) {
-        return user.map(u -> u.role() == BillingProfileCoworkerRole.ADMIN && u.invitationAccepted() ? stats.invoiceableRewardCount() : 0).orElse(null);
+        return user.map(u -> u.role() == BillingProfileCoworkerRole.ADMIN && u.invitationAccepted() ? stats().invoiceableRewardCount() : 0).orElse(null);
     }
 
     private boolean isInvoiceMandateAccepted() {
@@ -182,10 +228,15 @@ public class BillingProfileReadEntity {
     }
 
     public String subject() {
+        final var kyc = kyc();
+        final var kyb = kyb();
         return kyc != null ? kyc.subject() : kyb != null ? kyb.subject() : null;
     }
 
     public BillingProfileResponse toBoResponse() {
+        final var kyc = kyc();
+        final var kyb = kyb();
+        final var payoutInfo = payoutInfo();
         return new BillingProfileResponse()
                 .id(id)
                 .subject(subject())
@@ -205,6 +256,9 @@ public class BillingProfileReadEntity {
     }
 
     public onlydust.com.marketplace.api.contract.model.BillingProfileResponse toResponse() {
+        final var kyc = kyc();
+        final var kyb = kyb();
+        final var stats = stats();
         return new onlydust.com.marketplace.api.contract.model.BillingProfileResponse()
                 .id(id)
                 .name(name)
@@ -243,4 +297,6 @@ public class BillingProfileReadEntity {
             case SELF_EMPLOYED -> onlydust.com.marketplace.api.contract.model.BillingProfileType.SELF_EMPLOYED;
         };
     }
+
+
 }

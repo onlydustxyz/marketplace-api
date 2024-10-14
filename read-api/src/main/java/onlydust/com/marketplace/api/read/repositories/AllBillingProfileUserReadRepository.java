@@ -12,7 +12,7 @@ public interface AllBillingProfileUserReadRepository extends JpaRepository<AllBi
     @Query("""
             select bpu
             from AllBillingProfileUserReadEntity bpu
-                join fetch bpu.billingProfile
+                join fetch bpu.billingProfile bp
             where bpu.userId=:userId
             """)
     List<AllBillingProfileUserReadEntity> findAllByUserId(UUID userId);
