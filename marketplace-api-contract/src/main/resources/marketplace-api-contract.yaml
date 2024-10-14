@@ -11764,7 +11764,7 @@ components:
         - contributionCount
       properties:
         contributor:
-          $ref: '#/components/schemas/ContributorResponse'
+          $ref: '#/components/schemas/RankedContributorResponse'
         projects:
           type: array
           items:

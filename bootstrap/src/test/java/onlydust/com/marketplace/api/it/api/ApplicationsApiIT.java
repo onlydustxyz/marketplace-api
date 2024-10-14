@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.it.api;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.api.contract.model.ContributorResponse;
 import onlydust.com.marketplace.api.contract.model.IssueApplicantsPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.IssueApplicantsPageResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationPatchRequest;
+import onlydust.com.marketplace.api.contract.model.RankedContributorResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
@@ -795,7 +795,10 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": true,
-                                "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4"
+                                "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                                "globalRank": 1,
+                                "globalRankPercentile": 0.00004317789291882556,
+                                "globalRankCategory": "A"
                               },
                               "projects": [
                                 {
@@ -1005,7 +1008,10 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true,
-                                "id": "fc92397c-3431-4a84-8054-845376b630a0"
+                                "id": "fc92397c-3431-4a84-8054-845376b630a0",
+                                "globalRank": 5,
+                                "globalRankPercentile": 0.0002158894645941278,
+                                "globalRankCategory": "A"
                               },
                               "projects": [
                                 {
@@ -1138,7 +1144,10 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "gregcha",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                                 "isRegistered": true,
-                                "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                                "id": "45e98bf6-25c2-4edf-94da-e340daba8964",
+                                "globalRank": 6,
+                                "globalRankPercentile": 0.00025906735751295336,
+                                "globalRankCategory": "A"
                               },
                               "projects": [
                                 {
@@ -1212,7 +1221,10 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "ofux",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                                 "isRegistered": true,
-                                "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
+                                "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
+                                "globalRank": 4,
+                                "globalRankPercentile": 0.00017271157167530224,
+                                "globalRankCategory": "A"
                               },
                               "projects": [
                                 {
@@ -1430,7 +1442,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
             assertThat(response.getApplicants())
                     .isNotEmpty()
                     .extracting(IssueApplicantsPageItemResponse::getContributor)
-                    .extracting(ContributorResponse::getGithubUserId)
+                    .extracting(RankedContributorResponse::getGithubUserId)
                     .allMatch(id -> id.equals(gregoire.githubUserId().value()));
         });
 
@@ -1440,7 +1452,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
             assertThat(response.getApplicants())
                     .isNotEmpty()
                     .extracting(IssueApplicantsPageItemResponse::getContributor)
-                    .extracting(ContributorResponse::getGithubUserId)
+                    .extracting(RankedContributorResponse::getGithubUserId)
                     .allMatch(id -> !id.equals(gregoire.githubUserId().value()));
         });
     }

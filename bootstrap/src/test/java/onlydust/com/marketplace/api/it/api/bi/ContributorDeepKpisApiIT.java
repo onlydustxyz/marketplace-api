@@ -548,7 +548,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> assertThat(response.getContributors())
                             .hasSize(1)
                             .extracting(BiContributorsPageItemResponse::getContributor)
-                            .extracting(ContributorResponse::getGithubUserId)
+                            .extracting(RankedContributorResponse::getGithubUserId)
                             .contains(mehdi.githubUserId().value()), true);
             test_contributors_stats("projectIds", onlyDust.toString(),
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getProjects())
