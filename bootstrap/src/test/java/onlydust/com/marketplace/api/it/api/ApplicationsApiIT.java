@@ -781,6 +781,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.applicants[?(!@.applicationId)]").isEmpty()
+                .jsonPath("$.applicants[?(!@.appliedAt)]").isEmpty()
                 .json("""
                         {
                           "totalPageNumber": 1,

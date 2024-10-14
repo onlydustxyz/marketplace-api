@@ -8521,6 +8521,10 @@ components:
           properties:
             applicationId:
               $ref: '#/components/schemas/ProjectApplicationId'
+            appliedAt:
+              type: string
+              format: date-time
+              description: When the application was created
 
     ScorePercentage:
       type: integer
