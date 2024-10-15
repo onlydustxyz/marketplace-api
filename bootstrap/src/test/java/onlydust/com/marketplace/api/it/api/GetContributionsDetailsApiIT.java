@@ -441,7 +441,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                           "githubPullRequestReviewState": null,
                           "rewards": []
                         }
-                                                
+                        
                         """)
         ;
     }

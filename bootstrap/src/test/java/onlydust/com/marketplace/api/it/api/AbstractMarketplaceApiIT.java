@@ -283,6 +283,8 @@ public class AbstractMarketplaceApiIT {
     @Autowired
     protected CurrencyHelper currencyHelper;
     @Autowired
+    protected DatabaseHelper databaseHelper;
+    @Autowired
     OutboxConsumerJob indexerOutboxJob;
     @Autowired
     OutboxConsumerJob trackingOutboxJob;

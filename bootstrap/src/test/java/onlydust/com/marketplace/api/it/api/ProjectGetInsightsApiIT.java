@@ -304,8 +304,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                     .is2xxSuccessful()
                     .expectBody()
                     .json("""
-                                                    
-                                {
+                            {
                               "contributors": [
                                 {
                                   "githubUserId": 143011364,
@@ -314,7 +313,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                                   "isRegistered": false,
                                   "cover": "MAGENTA",
                                   "location": null,
-                                  "bio": "Frontend Dev"
+                                  "bio": "Frontend Developer, API Enthusiast"
                                 },
                                 {
                                   "githubUserId": 45264458,
@@ -323,13 +322,9 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                                   "isRegistered": false,
                                   "cover": "BLUE",
                                   "location": "Genesis",
-                                  "bio": "Starknet Exploration Lead\\r\\n.\\r\\nΞthereum Core Developer\\r\\n.\\r\\nΞIP-1559 Champion\\r\\n.\\r\\nBitcoin lover"
+                                  "bio": "Building Starknet.\\r\\n#Bitcoin minimalist\\r\\nnpub1hr6v96g0phtxwys4x0tm3khawuuykz6s28uzwtj5j0zc7lunu99snw2e29"
                                 }
-                              ],
-                              "hasMore": false,
-                              "totalPageNumber": 1,
-                              "totalItemNumber": 2,
-                              "nextPageIndex": 0
+                              ]
                             }
                             """);
         } finally {

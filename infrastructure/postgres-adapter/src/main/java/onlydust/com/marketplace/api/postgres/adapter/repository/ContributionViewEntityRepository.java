@@ -167,7 +167,8 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                     c.contributor_id = r.recipient_id AND
                     r.project_id = p.id
             ) AS rewards ON TRUE
-            WHERE 
+            WHERE
+                c.contributor_id IS NOT NULL AND
                 (COALESCE(:contributorIds) IS NULL OR c.contributor_id IN (:contributorIds)) AND
                 (COALESCE(:projectIds) IS NULL OR p.id IN (:projectIds)) AND
                 (COALESCE(:repoIds) IS NULL OR c.repo_id IN (:repoIds)) AND

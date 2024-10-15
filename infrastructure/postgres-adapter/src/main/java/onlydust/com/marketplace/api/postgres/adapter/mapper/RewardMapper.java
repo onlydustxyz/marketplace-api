@@ -14,7 +14,7 @@ public interface RewardMapper {
                 .authorAvatarUrl(rewardItemViewEntity.getAuthorAvatarUrl())
                 .createdAt(rewardItemViewEntity.getCreatedAt())
                 .title(rewardItemViewEntity.getTitle())
-                .authorGithubUrl(rewardItemViewEntity.getAuthorAvatarUrl())
+                .authorGithubUrl(rewardItemViewEntity.getAuthorProfileUrl())
                 .githubAuthorId(rewardItemViewEntity.getAuthorId())
                 .githubUrl(rewardItemViewEntity.getGithubUrl())
                 .commentsCount(rewardItemViewEntity.getCommentsCount())

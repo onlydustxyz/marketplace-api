@@ -330,7 +330,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 },
                 {
                   "githubUserId": 45264458,
-                  "login": "abdelhamidbakhta",
+                  "login": "AbdelStark",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
                   "isRegistered": false,
                   "contributionCount": 21,
@@ -787,7 +787,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 },
                 {
                   "githubUserId": 45264458,
-                  "login": "abdelhamidbakhta",
+                  "login": "AbdelStark",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
                   "isRegistered": false,
                   "contributionCount": 21,
@@ -1134,18 +1134,6 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                     "totalAmount": 35210.00,
                     "details": [
                       {
-                        "amount": 20.5,
-                        "prettyAmount": 20.5,
-                        "currency": {
-                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                          "code": "ETH",
-                          "name": "Ether",
-                          "logoUrl": null,
-                          "decimals": 18
-                        },
-                        "usdEquivalent": 31426.5
-                      },
-                      {
                         "amount": 450,
                         "prettyAmount": 450,
                         "currency": {
@@ -1182,6 +1170,18 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                         "usdEquivalent": 2020.00
                       },
                       {
+                        "amount": 20.5,
+                        "prettyAmount": 20.5,
+                        "currency": {
+                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                          "code": "ETH",
+                          "name": "Ether",
+                          "logoUrl": null,
+                          "decimals": 18
+                        },
+                        "usdEquivalent": 31426.5
+                      },
+                      {
                         "amount": 500000,
                         "prettyAmount": 500000,
                         "currency": {
@@ -1202,20 +1202,21 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "hidden": false
                 },
                 {
-                  "githubUserId": 43467246,
-                  "login": "AnthonyBuisset",
-                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                  "isRegistered": true,
-                  "contributionCount": 885,
+                  "githubUserId": 45264458,
+                  "login": "AbdelStark",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
+                  "isRegistered": false,
+                  "id": null,
+                  "contributionCount": 21,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
                     "details": []
                   },
-                  "contributionToRewardCount": 797,
-                  "pullRequestToReward": 416,
-                  "issueToReward": 11,
-                  "codeReviewToReward": 370,
+                  "contributionToRewardCount": 21,
+                  "pullRequestToReward": 8,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 13,
                   "hidden": false
                 }
               ]
@@ -1250,7 +1251,8 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                           "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                           "decimals": 6
                         },
-                        "usdEquivalent": 6060.00
+                        "usdEquivalent": 6060.00,
+                        "usdConversionRate": null
                       }
                     ]
                   },
@@ -1261,20 +1263,20 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                   "hidden": false
                 },
                 {
-                  "githubUserId": 43467246,
-                  "login": "AnthonyBuisset",
-                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                  "isRegistered": true,
-                  "contributionCount": 885,
+                  "githubUserId": 45264458,
+                  "login": "AbdelStark",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
+                  "isRegistered": false,
+                  "contributionCount": 21,
                   "rewardCount": 0,
                   "earned": {
                     "totalAmount": 0,
                     "details": []
                   },
-                  "contributionToRewardCount": 797,
-                  "pullRequestToReward": 416,
-                  "issueToReward": 11,
-                  "codeReviewToReward": 370,
+                  "contributionToRewardCount": 21,
+                  "pullRequestToReward": 8,
+                  "issueToReward": 0,
+                  "codeReviewToReward": 13,
                   "hidden": false
                 }
               ]

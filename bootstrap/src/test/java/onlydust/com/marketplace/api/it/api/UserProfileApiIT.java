@@ -51,7 +51,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
               "location": "Vence, France",
               "bio": "FullStack engineerr",
               "website": "https://linktr.ee/abuisset",
-              "signedUpOnGithubAt": "2018-09-21T00:00:00Z",
+              "signedUpOnGithubAt": "2018-09-21T08:45:50Z",
               "signedUpAt": "2022-12-12T09:51:58.48559Z",
               "contacts": [
                 {

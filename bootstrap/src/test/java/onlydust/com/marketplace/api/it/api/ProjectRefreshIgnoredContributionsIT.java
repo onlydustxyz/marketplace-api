@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.it.api;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CustomIgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
@@ -11,17 +12,16 @@ import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,6 +71,14 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     void beforeEach() {
         indexerApiWireMockServer.stubFor(WireMock.post("/api/v1/events/on-repo-link-changed")
                 .willReturn(WireMock.noContent()));
+        databaseHelper.executeQuery("DELETE FROM indexer_exp.contributions where id != all(:ids)",
+                Map.of("ids", Stream.concat(repo1ContributionIds.stream(), repo2ContributionIds.stream()).toArray(String[]::new)));
+    }
+
+    @SneakyThrows
+    @AfterAll
+    static void cleanUp() {
+        restoreIndexerDump();
     }
 
     @Test

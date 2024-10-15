@@ -156,7 +156,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                               "githubAuthorId": 16590657,
                               "authorLogin": "PierreOucif",
                               "authorAvatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                              "authorGithubUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                              "authorGithubUrl": "https://github.com/PierreOucif",
                               "githubBody": null
                             },
                             {
@@ -176,7 +176,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                               "githubAuthorId": 16590657,
                               "authorLogin": "PierreOucif",
                               "authorAvatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                              "authorGithubUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                              "authorGithubUrl": "https://github.com/PierreOucif",
                               "githubBody": null
                             }
                           ],
@@ -216,7 +216,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                               "githubAuthorId": 43467246,
                               "authorLogin": "AnthonyBuisset",
                               "authorAvatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                              "authorGithubUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                              "authorGithubUrl": "https://github.com/AnthonyBuisset",
                               "githubBody": "IT test structure\\nDocker container support\\nFirst API integration test: create project"
                             }
                           ],
@@ -265,7 +265,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
                               "githubAuthorId": 8495664,
                               "authorLogin": "doomed-theory",
                               "authorAvatarUrl": "https://avatars.githubusercontent.com/u/8495664?v=4",
-                              "authorGithubUrl": "https://avatars.githubusercontent.com/u/8495664?v=4",
+                              "authorGithubUrl": "https://github.com/doomed-theory",
                               "githubBody": "Grammar"
                             }
                           ],
