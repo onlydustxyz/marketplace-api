@@ -65,6 +65,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     private final NotificationSettingsChannelReadRepository notificationSettingsChannelReadRepository;
     private final ProgramReadRepository programReadRepository;
     private final ProjectReadRepository projectReadRepository;
+    private final HackathonReadRepository hackathonReadRepository;
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -288,5 +289,12 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
         final AuthenticatedUser authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final Boolean isRead = isReadFromContract(status);
         return ok(new NotificationCountResponse(notificationReadRepository.countAllInAppByStatusForUserId(isRead, authenticatedUser.id().value())));
+    }
+
+    @Override
+    public ResponseEntity<HackathonRegistrationResponse> getHackathonRegistration(UUID hackathonId) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var isRegistered = hackathonReadRepository.isRegisteredToHackathon(authenticatedUser.id().value(), hackathonId);
+        return ok(new HackathonRegistrationResponse().isRegistered(isRegistered));
     }
 }
