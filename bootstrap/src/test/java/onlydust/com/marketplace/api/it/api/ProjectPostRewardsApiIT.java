@@ -23,6 +23,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
@@ -249,5 +250,53 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                 .withRequestBody(matchingJsonPath("$.properties['project_id']", equalTo(projectId.toString())))
                 .withRequestBody(matchingJsonPath("$.properties['sender_id']", equalTo(pierre.user().getId().toString())))
                 .withRequestBody(matchingJsonPath("$.properties['currency']", equalTo("ETH"))));
+
+
+        // Given
+        final List<RewardRequest> rewardRequests = List.of(new RewardRequest()
+                        .amount(BigDecimal.valueOf(150))
+                        .currencyId(CurrencyHelper.ETH.value())
+                        .recipientId(pierre.user().getGithubUserId())
+                        .items(List.of(
+                                new RewardItemRequest().id("issue1")
+                                        .type(RewardType.ISSUE)
+                                        .number(5L)
+                                        .repoId(6L)
+                        ))
+                ,
+                new RewardRequest()
+                        .amount(BigDecimal.valueOf(200))
+                        .currencyId(CurrencyHelper.ETH.value())
+                        .recipientId(pierre.user().getGithubUserId())
+                        .items(List.of(
+                                new RewardItemRequest().id("pr1")
+                                        .type(RewardType.PULL_REQUEST)
+                                        .number(7L)
+                                        .repoId(8L)
+                        ))
+        );
+
+        // When
+        client.post()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS_V2, projectId)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .body(BodyInserters.fromValue(rewardRequests))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of("sort", "REQUESTED_AT", "direction", "DESC")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.rewards[0].amount.amount").isEqualTo(BigDecimal.valueOf(200))
+                .jsonPath("$.rewards[1].amount.amount").isEqualTo(BigDecimal.valueOf(150));
+
     }
+
 }
