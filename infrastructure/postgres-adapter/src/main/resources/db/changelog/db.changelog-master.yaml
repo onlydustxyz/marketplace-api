@@ -589,3 +589,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000363_optimize_all_billing_profile_users_view.sql
   - include:
       file: db/changelog/changelogs/00000364_optimize_get_projects.sql
+  - include:
+      file: db/changelog/changelogs/00000365_improve_projects_projections.sql
