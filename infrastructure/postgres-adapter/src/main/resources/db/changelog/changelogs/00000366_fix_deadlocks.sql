@@ -52,6 +52,8 @@ $$;
 
 
 
+-- Keep the comment below to allow finding this when doing cmd+shift+f 'contribution_data'
+--call create_pseudo_projection('bi', 'contribution_data', $$ ... $$);
 CREATE OR REPLACE VIEW bi.v_contribution_data AS
 SELECT v.*, md5(v::text) as hash
 FROM (with ranked_project_github_repos_relationship AS (SELECT *, row_number() OVER (PARTITION BY github_repo_id ORDER BY project_id) as row_number
