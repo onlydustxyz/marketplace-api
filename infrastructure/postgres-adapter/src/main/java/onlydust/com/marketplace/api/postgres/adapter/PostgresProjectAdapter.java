@@ -60,6 +60,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final BiContributionDataRepository biContributionDataRepository;
     private final BiProjectGrantsDataRepository biProjectGrantsDataRepository;
     private final BiProjectGlobalDataRepository biProjectGlobalDataRepository;
+    private final BiProjectBudgetDataRepository biProjectBudgetDataRepository;
+    private final BiProjectContributionsDataRepository biProjectContributionsDataRepository;
     private final BiContributorGlobalDataRepository biContributorGlobalDataRepository;
     private final UserProjectRecommendationsRepository userProjectRecommendationsRepository;
 
@@ -480,6 +482,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         biContributionDataRepository.refresh();
         biProjectGrantsDataRepository.refresh();
         biProjectGlobalDataRepository.refresh();
+        biProjectBudgetDataRepository.refresh();
+        biProjectContributionsDataRepository.refresh();
         biContributorGlobalDataRepository.refresh();
     }
 }

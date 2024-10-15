@@ -32,4 +32,14 @@ public abstract class PseudoProjectionRepository {
                 .setParameter("params", new ObjectMapper().writeValueAsString(params))
                 .executeUpdate();
     }
+
+    @SneakyThrows
+    protected int refreshUnsafe(String condition) {
+        return entityManager.createNativeQuery("call refresh_pseudo_projection_unsafe(:schema, :name, :pkName, :condition)")
+                .setParameter("schema", schema)
+                .setParameter("name", name)
+                .setParameter("pkName", primaryKey)
+                .setParameter("condition", condition)
+                .executeUpdate();
+    }
 }

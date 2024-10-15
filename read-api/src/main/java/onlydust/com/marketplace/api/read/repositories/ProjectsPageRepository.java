@@ -20,31 +20,22 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                    p.project ->> 'hiring'                                                        as hiring,
                    p.project ->> 'visibility'                                                    as visibility,
                    coalesce(array_length(p.repo_ids, 1), 0)                                      as repo_count,
-                   coalesce(cd.contributor_count, 0)                                             as contributor_count,
+                   coalesce(pcd.contributor_count, 0)                                            as contributor_count,
                    p.leads                                                                       as project_leads,
                    p.categories                                                                  as categories,
                    p.ecosystems                                                                  as ecosystems,
                    p.languages                                                                   as languages,
                    p.tags                                                                        as tags,
-                   coalesce(cast(p.budget ->> 'availableBudgetUsd' as numeric), 0)
+                   coalesce(cast(pb.budget ->> 'availableBudgetUsd' as numeric), 0)
                                                                                                  as remaining_usd_budget,
-                   coalesce(cd.good_first_issue_count, 0) > 0                                    as has_good_first_issues,
+                   coalesce(pcd.good_first_issue_count, 0) > 0                                   as has_good_first_issues,
                    p.has_repos_without_github_app_installed                                      as has_repos_without_github_app_installed,
                    (:userId is not null and
                     p.invited_project_lead_ids is not null and :userId = any (p.invited_project_lead_ids) and
                     not (p.project_lead_ids is not null and :userId = any (p.project_lead_ids))) as is_invited_as_project_lead
             FROM bi.p_project_global_data p
-                     LEFT JOIN (select cd.project_id,
-                                       count(distinct cd.contributor_id)                                               as contributor_count,
-                                       count(cd.contribution_id) filter ( where cd.is_good_first_issue and
-                                                                                coalesce(array_length(cd.assignee_ids, 1), 0) = 0 and
-                                                                                cd.contribution_status != 'COMPLETED' and
-                                                                                cd.contribution_status != 'CANCELLED') as good_first_issue_count
-                                from bi.p_contribution_data cd
-                                group by cd.project_id) cd
-                               on cd.project_id = p.project_id
-            
-            
+                     JOIN bi.p_project_budget_data pb on p.project_id = pb.project_id
+                     JOIN bi.p_project_contributions_data pcd on p.project_id = pcd.project_id
             
             WHERE (p.project_visibility = 'PUBLIC' and array_length(p.repo_ids, 1) > 0 or
                    :userId = any (p.project_lead_ids) or
@@ -63,8 +54,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
               and (cast(:languageSlugs as text[]) is null or p.language_slugs && cast(:languageSlugs as text[]))
               and (cast(:tags as project_tag[]) is null or p.tags && cast(:tags as project_tag[]))
               and (cast(:hasGoodFirstIssues as boolean) is null or
-                   cast(:hasGoodFirstIssues as boolean) is true and cd.good_first_issue_count > 0 or
-                   cast(:hasGoodFirstIssues as boolean) is false and cd.good_first_issue_count = 0)
+                   cast(:hasGoodFirstIssues as boolean) is true and pcd.good_first_issue_count > 0 or
+                   cast(:hasGoodFirstIssues as boolean) is false and pcd.good_first_issue_count = 0)
               and (cast(:search as text) is null or p.search ilike '%' || cast(:search as text) || '%')
             """, nativeQuery = true)
     Page<ProjectPageItemQueryEntity> findAll(UUID userId,
