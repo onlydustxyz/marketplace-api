@@ -591,3 +591,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000364_optimize_get_projects.sql
   - include:
       file: db/changelog/changelogs/00000365_improve_projects_projections.sql
+  - include:
+      file: db/changelog/changelogs/00000366_fix_deadlocks.sql
