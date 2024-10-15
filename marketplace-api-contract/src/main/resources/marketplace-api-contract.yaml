@@ -1280,6 +1280,32 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /api/v1/me/hackathons/{hackathonId}/registrations:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadMe
+      summary: Get my registration for the given hackathon
+      operationId: getHackathonRegistration
+      description: |
+        Get hackathon registration
+      parameters:
+        - in: path
+          name: hackathonId
+          required: true
+          schema:
+            $ref: '#/components/schemas/HackathonId'
+      responses:
+        "200":
+          description: 'Hackathon registration'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HackathonRegistrationResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
     put:
       security:
         - bearerAuth: [ ]
@@ -10388,13 +10414,14 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/HackathonsEventItemResponse'
-            me:
-              type: object
-              required:
-                - hasRegistered
-              properties:
-                hasRegistered:
-                  type: boolean
+
+    HackathonRegistrationResponse:
+      type: object
+      required:
+        - isRegistered
+      properties:
+        isRegistered:
+          type: boolean
 
     CommitteeResponse:
       type: object

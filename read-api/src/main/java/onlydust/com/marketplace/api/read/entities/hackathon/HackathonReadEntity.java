@@ -10,7 +10,10 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.HackathonStatus;
 import onlydust.com.backoffice.api.contract.model.HackathonsEvent;
-import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.contract.model.HackathonsDetailsResponse;
+import onlydust.com.marketplace.api.contract.model.HackathonsEventItemResponse;
+import onlydust.com.marketplace.api.contract.model.ProjectShortResponse;
+import onlydust.com.marketplace.api.contract.model.SimpleLink;
 import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
@@ -91,12 +94,11 @@ public class HackathonReadEntity {
     Set<HackathonEventReadEntity> events;
 
 
-    public HackathonsDetailsResponse toResponse(final Boolean isRegistered) {
+    public HackathonsDetailsResponse toResponse() {
         return new HackathonsDetailsResponse()
                 .id(this.id)
                 .slug(this.slug)
                 .index(this.index)
-                .me(Optional.ofNullable(isRegistered).map(value -> new HackathonsDetailsResponseAllOfMe().hasRegistered(value)).orElse(null))
                 .title(this.title)
                 .description(this.description)
                 .location(this.location)

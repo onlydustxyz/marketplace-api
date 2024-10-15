@@ -176,7 +176,6 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                               "value": "Google"
                             }
                           ],
-                          "me": null,
                           "subscriberCount": 0,
                           "issueCount": 0,
                           "openIssueCount": 0,
@@ -268,18 +267,18 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
     void should_register_to_hackathon() {
         // When
         client.get()
-                .uri(getApiURI(HACKATHONS_BY_SLUG.formatted("hackathon-1")))
+                .uri(getApiURI(ME_HACKATHON_REGISTRATIONS.formatted(hackathonId1.value().toString())))
                 .header("Authorization", BEARER_PREFIX + olivier.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.me.hasRegistered").isEqualTo(false);
+                .jsonPath("$.isRegistered").isEqualTo(false);
 
         // When
         client.put()
-                .uri(getApiURI(ME_PUT_HACKATHON_REGISTRATIONS.formatted(hackathonId1.value().toString())))
+                .uri(getApiURI(ME_HACKATHON_REGISTRATIONS.formatted(hackathonId1.value().toString())))
                 .header("Authorization", BEARER_PREFIX + olivier.jwt())
                 .exchange()
                 // Then
@@ -290,18 +289,18 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(HACKATHONS_BY_SLUG.formatted("hackathon-1")))
+                .uri(getApiURI(ME_HACKATHON_REGISTRATIONS.formatted(hackathonId1.value().toString())))
                 .header("Authorization", BEARER_PREFIX + olivier.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.me.hasRegistered").isEqualTo(true);
+                .jsonPath("$.isRegistered").isEqualTo(true);
 
         // When
         client.put()
-                .uri(getApiURI(ME_PUT_HACKATHON_REGISTRATIONS.formatted(UUID.randomUUID().toString())))
+                .uri(getApiURI(ME_HACKATHON_REGISTRATIONS.formatted(UUID.randomUUID().toString())))
                 .header("Authorization", BEARER_PREFIX + olivier.jwt())
                 .exchange()
                 // Then

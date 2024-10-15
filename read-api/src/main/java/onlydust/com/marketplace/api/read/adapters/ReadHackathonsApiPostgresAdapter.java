@@ -16,9 +16,7 @@ import onlydust.com.marketplace.api.read.repositories.HackathonItemReadRepositor
 import onlydust.com.marketplace.api.read.repositories.HackathonProjectIssuesReadRepository;
 import onlydust.com.marketplace.api.read.repositories.HackathonReadRepository;
 import onlydust.com.marketplace.api.read.repositories.LanguageReadRepository;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -42,7 +40,6 @@ import static org.springframework.http.ResponseEntity.ok;
 public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
 
     private final Cache cache;
-    private final AuthenticatedAppUserService authenticatedAppUserService;
     private final HackathonReadRepository hackathonReadRepository;
     private final HackathonProjectIssuesReadRepository hackathonProjectIssuesReadRepository;
     private final LanguageReadRepository languageReadRepository;
@@ -50,13 +47,11 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
 
     @Override
     public ResponseEntity<HackathonsDetailsResponse> getHackathonBySlug(String hackathonSlug) {
-        final var authenticatedUser = authenticatedAppUserService.tryGetAuthenticatedUser();
         final var hackathon = hackathonReadRepository.findBySlug(hackathonSlug)
                 .orElseThrow(() -> OnlyDustException.notFound("Hackathon not found for slug %s".formatted(hackathonSlug)));
-        final Boolean isRegistered = authenticatedUser.map(AuthenticatedUser::id)
-                .map(userId -> hackathonReadRepository.isRegisteredToHackathon(userId.value(), hackathon.id()))
-                .orElse(null);
-        return ok(hackathon.toResponse(isRegistered));
+        return ok()
+                .cacheControl(cache.forEverybody(S))
+                .body(hackathon.toResponse());
     }
 
     @Override
