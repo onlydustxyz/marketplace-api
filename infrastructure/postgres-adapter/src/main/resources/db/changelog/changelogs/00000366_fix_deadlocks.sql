@@ -43,8 +43,9 @@ BEGIN
                    schema, projection_table_name, pk_name,
                    pk_name, schema, projection_table_name, condition);
 
-    EXECUTE format(
-            'insert into %I.%I select * from %I.%I v where %s and not exists(select 1 from %I.%I p where p.%I = v.%I) order by %I on conflict (%I) do nothing',
-            schema, projection_table_name, schema, view_name, condition, schema, projection_table_name, pk_name, pk_name, pk_name, pk_name);
+    EXECUTE format('with to_insert as materialized (select * from %I.%I v where %s)' ||
+                   'insert into %I.%I select * from to_insert where not exists(select 1 from %I.%I p where p.%I = to_insert.%I) order by %I on conflict (%I) do nothing',
+                   schema, view_name, condition,
+                   schema, projection_table_name, schema, projection_table_name, pk_name, pk_name, pk_name, pk_name);
 END
 $$;
