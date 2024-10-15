@@ -19,8 +19,8 @@ BEGIN
             pk_name, schema, projection_table_name,
             schema, materialized_view_name, pk_name, projection_table_name, pk_name, projection_table_name);
 
-    EXECUTE format('insert into %I.%I select * from %I.%I order by %I on conflict (%I) do nothing',
-                   schema, projection_table_name, schema, materialized_view_name, pk_name, pk_name);
+    EXECUTE format('insert into %I.%I select * from %I.%I m where not exists(select 1 from %I.%I p where p.%I = m.%I) order by %I on conflict (%I) do nothing',
+                   schema, projection_table_name, schema, materialized_view_name, schema, projection_table_name, pk_name, pk_name, pk_name, pk_name);
 END
 $$;
 
@@ -43,7 +43,8 @@ BEGIN
                    schema, projection_table_name, pk_name,
                    pk_name, schema, projection_table_name, condition);
 
-    EXECUTE format('insert into %I.%I select * from %I.%I where %s order by %I on conflict (%I) do nothing',
-                   schema, projection_table_name, schema, view_name, condition, pk_name, pk_name);
+    EXECUTE format(
+            'insert into %I.%I select * from %I.%I v where %s and not exists(select 1 from %I.%I p where p.%I = v.%I) order by %I on conflict (%I) do nothing',
+            schema, projection_table_name, schema, view_name, condition, schema, projection_table_name, pk_name, pk_name, pk_name, pk_name);
 END
 $$;
