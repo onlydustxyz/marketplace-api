@@ -68,6 +68,7 @@ public class Cache {
      */
     public CacheControl forEverybody(long maxAge, TimeUnit unit) {
         return sanitize(maxAge(maxAge, unit)
+                .cachePublic()
                 .staleWhileRevalidate(Duration.ofSeconds(min(defaultStaleWhileRevalidateSeconds, unit.toSeconds(maxAge)))));
     }
 
@@ -79,6 +80,7 @@ public class Cache {
      */
     public CacheControl forEverybody(Duration duration) {
         return sanitize(maxAge(duration)
+                .cachePublic()
                 .staleWhileRevalidate(Duration.ofSeconds(min(defaultStaleWhileRevalidateSeconds, duration.getSeconds()))));
     }
 
