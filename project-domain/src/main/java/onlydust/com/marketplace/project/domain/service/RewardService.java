@@ -14,6 +14,7 @@ import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -61,6 +62,14 @@ public class RewardService implements RewardFacadePort {
 
         accountingServicePort.createReward(command.getProjectId(), rewardId, command.getAmount(), command.getCurrencyId());
         return rewardId;
+    }
+
+    @Override
+    @Transactional
+    public void createRewards(UserId projectLeadId, List<RequestRewardCommand> rewardRequestCommands) {
+        for (RequestRewardCommand rewardRequestCommand : rewardRequestCommands) {
+            createReward(projectLeadId, rewardRequestCommand);
+        }
     }
 
     @Override
