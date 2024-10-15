@@ -54,25 +54,18 @@ $$;
 
 CREATE OR REPLACE VIEW bi.v_contribution_data AS
 SELECT v.*, md5(v::text) as hash
-FROM (with project_contributions AS (select distinct on (c.id) c.*,
-                                                               pgr.project_id as project_id,
-                                                               p.slug         as project_slug
-                                     from indexer_exp.contributions c
-                                              join project_github_repos pgr on pgr.github_repo_id = c.repo_id
-                                              join projects p on p.id = pgr.project_id),
-           registered_users as (select u.id             as id,
-                                       u.github_user_id as github_user_id,
-                                       kyc.country      as country
-                                from iam.users u
-                                         join accounting.billing_profiles_users bpu on bpu.user_id = u.id
-                                         join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id)
+FROM (with ranked_project_github_repos_relationship AS (SELECT *, row_number() OVER (PARTITION BY github_repo_id ORDER BY project_id) as row_number
+                                                        FROM project_github_repos),
+           first_contributions AS MATERIALIZED (select c.contributor_id, min(c.created_at) as first_contribution_date
+                                                from indexer_exp.contributions c
+                                                group by c.contributor_id)
       select c.id                                                                                             as contribution_id,
              c.repo_id                                                                                        as repo_id,
-             c.project_id                                                                                     as project_id,
-             c.project_slug                                                                                   as project_slug,
+             p.id                                                                                             as project_id,
+             p.slug                                                                                           as project_slug,
              c.contributor_id                                                                                 as contributor_id,
-             ru.id                                                                                            as contributor_user_id,
-             ru.country                                                                                       as contributor_country,
+             u.id                                                                                             as contributor_user_id,
+             (array_agg(kyc.country) filter (where kyc.country is not null))[1]                               as contributor_country,
              c.created_at                                                                                     as timestamp,
              c.status                                                                                         as contribution_status,
              date_trunc('day', c.created_at)                                                                  as day_timestamp,
@@ -80,7 +73,7 @@ FROM (with project_contributions AS (select distinct on (c.id) c.*,
              date_trunc('month', c.created_at)                                                                as month_timestamp,
              date_trunc('quarter', c.created_at)                                                              as quarter_timestamp,
              date_trunc('year', c.created_at)                                                                 as year_timestamp,
-             c.created_at = first.created_at                                                                  as is_first_contribution_on_onlydust,
+             c.created_at = fc.first_contribution_date                                                        as is_first_contribution_on_onlydust,
              (c.type = 'ISSUE')::int                                                                          as is_issue,
              (c.type = 'PULL_REQUEST')::int                                                                   as is_pr,
              (c.type = 'CODE_REVIEW')::int                                                                    as is_code_review,
@@ -91,30 +84,30 @@ FROM (with project_contributions AS (select distinct on (c.id) c.*,
              string_agg(distinct lfe.name, ' ')                                                               as languages,
              bool_or(gl.name ~~* '%good%first%issue%')                                                        as is_good_first_issue,
              array_agg(distinct gia.user_id) filter ( where gia.user_id is not null )                         as assignee_ids
-      from project_contributions c
-               join (select cc.contributor_id, min(cc.created_at) as created_at
-                     from project_contributions cc
-                     group by cc.contributor_id) first
-                    on first.contributor_id = c.contributor_id
+      from indexer_exp.contributions c
+               left join ranked_project_github_repos_relationship pgr on pgr.github_repo_id = c.repo_id and pgr.row_number = 1
+               left join projects p on p.id = pgr.project_id
                left join lateral ( select distinct lfe_1.language_id, l.name
                                    from language_file_extensions lfe_1
                                             join languages l on l.id = lfe_1.language_id
                                    where lfe_1.extension = any (c.main_file_extensions)) lfe on true
-               left join projects_ecosystems pe on pe.project_id = c.project_id
-               left join v_programs_projects pp on pp.project_id = c.project_id
-               left join projects_project_categories ppc on ppc.project_id = c.project_id
-               left join registered_users ru on ru.github_user_id = c.contributor_id
+               left join projects_ecosystems pe on pe.project_id = p.id
+               left join v_programs_projects pp on pp.project_id = p.id
+               left join projects_project_categories ppc on ppc.project_id = p.id
+               left join iam.users u on u.github_user_id = c.contributor_id
+               left join accounting.billing_profiles_users bpu on bpu.user_id = u.id
+               left join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id
+               left join first_contributions fc on fc.contributor_id = c.contributor_id
                left join indexer_exp.github_issues_labels gil ON gil.issue_id = c.issue_id
                left join indexer_exp.github_labels gl ON gil.label_id = gl.id
                left join indexer_exp.github_issues_assignees gia ON gia.issue_id = c.issue_id
       group by c.id,
                c.repo_id,
-               c.project_id,
-               c.project_slug,
+               p.id,
+               p.slug,
                c.contributor_id,
                c.created_at,
                c.type,
                c.status,
-               first.created_at,
-               ru.id,
-               ru.country) v;
+               u.id,
+               fc.first_contribution_date) v;
