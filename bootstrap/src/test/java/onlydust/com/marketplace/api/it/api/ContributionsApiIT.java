@@ -20,6 +20,71 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TagProject
 public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
+    void should_get_contribution() {
+        // When
+        client.get()
+                .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("43506983"), Map.of("pageSize", "1")))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "type": "PULL_REQUEST",
+                          "repo": {
+                            "id": 40652912,
+                            "owner": "IonicaBizau",
+                            "name": "node-cobol",
+                            "description": ":tv: COBOL bridge for NodeJS which allows you to run COBOL code from NodeJS.",
+                            "htmlUrl": "https://github.com/IonicaBizau/node-cobol"
+                          },
+                          "githubAuthor": {
+                            "githubUserId": 1814312,
+                            "login": "krzkaczor",
+                            "avatarUrl": "https://avatars.githubusercontent.com/u/1814312?v=4"
+                          },
+                          "githubId": 43506983,
+                          "githubNumber": 8,
+                          "githubStatus": "CLOSED",
+                          "githubTitle": "Support for promises",
+                          "githubHtmlUrl": "https://github.com/IonicaBizau/node-cobol/pull/8",
+                          "githubBody": "https://github.com/IonicaBizau/node-cobol/issues/7\\n",
+                          "githubLabels": null,
+                          "lastUpdatedAt": "2023-11-24T10:32:31.763233Z",
+                          "createdAt": "2015-08-27T11:38:25Z",
+                          "completedAt": "2015-08-30T19:18:14Z",
+                          "activityStatus": "DONE",
+                          "project": {
+                            "id": "a852e8fd-de3c-4a14-813e-4b592af40d54",
+                            "slug": "onlydust-marketplace",
+                            "name": "OnlyDust Marketplace",
+                            "logoUrl": null
+                          },
+                          "contributors": [
+                            {
+                              "githubUserId": 1814312,
+                              "login": "krzkaczor",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/1814312?v=4"
+                            }
+                          ],
+                          "applicants": null,
+                          "languages": [
+                            {
+                              "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
+                              "slug": "javascript",
+                              "name": "Javascript",
+                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
+                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                            }
+                          ],
+                          "linkedIssues": null,
+                          "totalRewardedUsdAmount": null
+                        }
+                        """);
+    }
+
+    @Test
     void should_get_contributions() {
         // When
         client.get()

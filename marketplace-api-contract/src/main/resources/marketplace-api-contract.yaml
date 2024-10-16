@@ -234,7 +234,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/contributions/{contributionId}:
+  /api/v1/contributions/{contributionGithubId}:
     get:
       security:
         - bearerAuth: [ ]
@@ -245,11 +245,11 @@ paths:
       description: |
         Get contribution.
       parameters:
-        - name: contributionId
+        - name: contributionGithubId
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/ContributionId'
+            $ref: '#/components/schemas/IssueId'
       responses:
         "200":
           description: 'Contribution'
@@ -275,11 +275,11 @@ paths:
       description: |
         Change contribution assignees and/or linkedIssues
       parameters:
-        - name: contributionId
+        - name: contributionGithubId
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/ContributionId'
+            $ref: '#/components/schemas/IssueId'
       requestBody:
         description: 'Contribution patch'
         content:

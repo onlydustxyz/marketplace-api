@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Profile("api")
 public class ContributionsRestApi implements ContributionsApi {
     @Override
-    public ResponseEntity<Void> patchContribution(String contributionId, ContributionPatchRequest contributionPatchRequest) {
+    public ResponseEntity<Void> patchContribution(Long contributionGithubId, ContributionPatchRequest contributionPatchRequest) {
         // TODO
         return ResponseEntity.noContent().build();
     }
