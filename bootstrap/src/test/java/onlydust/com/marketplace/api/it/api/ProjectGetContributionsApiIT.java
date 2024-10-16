@@ -59,7 +59,6 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
                               "githubTitle": "\\uD83D\\uDCDD update project description",
                               "githubHtmlUrl": "https://github.com/onlydustxyz/kaaper/pull/1",
                               "githubBody": null,
-                              "githubCodeReviewOutcome": null,
                               "id": "f78954de50fec850fa0726247457c790387a866872c00653339f09ca2f32690f",
                               "createdAt": "2022-05-18T09:40:28Z",
                               "completedAt": "2022-05-18T09:40:33Z",

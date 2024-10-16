@@ -31,11 +31,11 @@ public class BiContributionRewardDataRepository extends PseudoProjectionReposito
 
     @Trace(operationName = "pseudo_projection.refresh", resourceName = "refresh:bi.contribution_reward_data")
     public int refresh(final ProjectId projectId) {
-        return refresh(Map.of("project_id", projectId));
+        return refresh(Map.of("project_id", projectId.value()));
     }
 
     @Trace(operationName = "pseudo_projection.refresh", resourceName = "refresh:bi.contribution_reward_data")
     public int refresh(final RewardId rewardId) {
-        return refreshUnsafe("%s = any(reward_ids)".formatted(rewardId));
+        return refreshUnsafe("'%s' = any(reward_ids)".formatted(rewardId.value()));
     }
 }
