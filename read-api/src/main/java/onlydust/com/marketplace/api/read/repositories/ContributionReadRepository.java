@@ -82,7 +82,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                            'githubHtmlUrl', i.html_url
                                       ))
                    filter ( where i.id is not null )                                                                   as linked_issues,
-                   sum(round(rd.usd_amount, 2))                                                                        as total_rewarded_usd_amount
+                   rd.usd_amount                                                                                       as total_rewarded_usd_amount
             FROM bi.p_contribution_data c
                      join indexer_exp.github_repos gr on gr.id = c.repo_id
                      join iam.all_users author on author.github_user_id = c.github_author_id
@@ -94,8 +94,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                      left join bi.p_contributor_global_data applicant on applicant.contributor_id = a.applicant_id
                      left join indexer_exp.github_pull_requests_closing_issues prci on prci.pull_request_id = c.github_id
                      left join indexer_exp.github_issues i on i.id = prci.issue_id
-                     left join reward_items ri on ri.type = cast(cast(c.contribution_type as text) as contribution_type) and ri.repo_id = c.repo_id and ri.number = c.github_number
-                     left join bi.p_reward_data rd on rd.reward_id = ri.reward_id
+                     left join bi.p_contribution_reward_data rd on rd.contribution_id = c.contribution_id
             group by c.contribution_id, gr.id, author.github_user_id, author.login, author.avatar_url, p.id
             """,
             nativeQuery = true)

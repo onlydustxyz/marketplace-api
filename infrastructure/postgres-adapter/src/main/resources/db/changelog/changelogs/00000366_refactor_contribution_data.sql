@@ -266,6 +266,26 @@ create unique index on bi.p_project_contributions_data (project_id, contributor_
 create index on bi.p_project_contributions_data using gin (repo_ids);
 
 
+call create_pseudo_projection('bi', 'contribution_reward_data', $$
+select cd.contribution_id                                                         as contribution_id,
+       cd.project_id                                                              as project_id,
+       cd.repo_id                                                                 as repo_id,
+       array_agg(distinct rd.reward_id) filter ( where rd.reward_id is not null ) as reward_ids,
+       sum(round(rd.usd_amount, 2))                                               as total_rewarded_usd_amount
+from bi.p_contribution_data cd
+         left join reward_items ri on ri.type = cast(cast(cd.contribution_type as text) as contribution_type) and
+                                      ri.repo_id = cd.repo_id and
+                                      ri.number = cd.github_number
+         left join bi.p_reward_data rd on rd.reward_id = ri.reward_id
+group by cd.contribution_id, cd.project_id, cd.repo_id
+$$, 'contribution_id');
+
+create unique index on bi.p_contribution_reward_data (repo_id, contribution_id);
+create unique index on bi.p_contribution_reward_data (project_id, contribution_id);
+create index on bi.p_contribution_reward_data using gin (reward_ids);
+
+
+
 
 CREATE TYPE contribution_identity AS
 (
