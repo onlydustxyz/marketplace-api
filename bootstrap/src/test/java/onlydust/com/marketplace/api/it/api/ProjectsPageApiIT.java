@@ -4425,11 +4425,341 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 0,
-                          "totalItemNumber": 0,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "projects": [],
+                          "totalPageNumber": 2,
+                          "totalItemNumber": 6,
+                          "hasMore": true,
+                          "nextPageIndex": 1,
+                          "projects": [
+                            {
+                              "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
+                              "slug": "calcom",
+                              "name": "Cal.com",
+                              "shortDescription": "Scheduling infrastructure for everyone.",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png",
+                              "hiring": true,
+                              "visibility": "PUBLIC",
+                              "repoCount": 1,
+                              "contributorCount": 935,
+                              "remainingUsdBudget": null,
+                              "leaders": [
+                                {
+                                  "githubUserId": 117665867,
+                                  "login": "gilbertVDB17",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/117665867?v=4",
+                                  "id": "9a779f53-5762-4110-94b8-5596bbbd74ec"
+                                }
+                              ],
+                              "ecosystems": [
+                                {
+                                  "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                                  "name": "Starknet",
+                                  "url": "https://www.starknet.io/en",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
+                                  "bannerUrl": null,
+                                  "slug": "starknet",
+                                  "hidden": null
+                                }
+                              ],
+                              "languages": [
+                                {
+                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
+                                  "slug": "javascript",
+                                  "name": "Javascript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                                },
+                                {
+                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                  "slug": "typescript",
+                                  "name": "Typescript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                }
+                              ],
+                              "isInvitedAsProjectLead": false,
+                              "hasMissingGithubAppInstallation": null,
+                              "tags": [
+                                "FAST_AND_FURIOUS",
+                                "HAS_GOOD_FIRST_ISSUES",
+                                "HOT_COMMUNITY",
+                                "NEWBIES_WELCOME",
+                                "WORK_IN_PROGRESS"
+                              ]
+                            },
+                            {
+                              "id": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
+                              "slug": "pizzeria-yoshi-",
+                              "name": "Pizzeria Yoshi !",
+                              "shortDescription": "Miaaaam une pizza !",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png",
+                              "hiring": false,
+                              "visibility": "PUBLIC",
+                              "repoCount": 5,
+                              "contributorCount": 1865,
+                              "remainingUsdBudget": null,
+                              "leaders": [
+                                {
+                                  "githubUserId": 134493681,
+                                  "login": "croziflette74",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/134493681?v=4",
+                                  "id": "44e078b7-d095-49f2-a7b3-647149337dc5"
+                                },
+                                {
+                                  "githubUserId": 8642470,
+                                  "login": "gregcha",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                                  "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                                },
+                                {
+                                  "githubUserId": 31901905,
+                                  "login": "kaelsky",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
+                                  "id": "a0da3c1e-6493-4ea1-8bd0-8c46d653f274"
+                                },
+                                {
+                                  "githubUserId": 139852598,
+                                  "login": "mat-yas",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/139852598?v=4",
+                                  "id": "bdc705b5-cf8e-488f-926a-258e1800ed79"
+                                },
+                                {
+                                  "githubUserId": 21149076,
+                                  "login": "oscarwroche",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
+                                  "id": "dd0ab03c-5875-424b-96db-a35522eab365"
+                                }
+                              ],
+                              "ecosystems": [],
+                              "languages": [
+                                {
+                                  "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
+                                  "slug": "cairo",
+                                  "name": "Cairo",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
+                                },
+                                {
+                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
+                                  "slug": "javascript",
+                                  "name": "Javascript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                                },
+                                {
+                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
+                                  "slug": "python",
+                                  "name": "Python",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
+                                },
+                                {
+                                  "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
+                                  "slug": "solidity",
+                                  "name": "Solidity",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
+                                },
+                                {
+                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                  "slug": "typescript",
+                                  "name": "Typescript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                }
+                              ],
+                              "isInvitedAsProjectLead": false,
+                              "hasMissingGithubAppInstallation": null,
+                              "tags": [
+                                "BIG_WHALE",
+                                "FAST_AND_FURIOUS",
+                                "HAS_GOOD_FIRST_ISSUES",
+                                "HOT_COMMUNITY",
+                                "LIKELY_TO_REWARD",
+                                "NEWBIES_WELCOME",
+                                "WORK_IN_PROGRESS"
+                              ]
+                            },
+                            {
+                              "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
+                              "slug": "taco-tuesday",
+                              "name": "Taco Tuesday",
+                              "shortDescription": "A projects for the midweek lovers",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg",
+                              "hiring": false,
+                              "visibility": "PUBLIC",
+                              "repoCount": 3,
+                              "contributorCount": 47,
+                              "remainingUsdBudget": null,
+                              "leaders": [
+                                {
+                                  "githubUserId": 141839618,
+                                  "login": "Blumebee",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/16582211468658783329.webp",
+                                  "id": "46fec596-7a91-422e-8532-5f479e790217"
+                                },
+                                {
+                                  "githubUserId": 122993337,
+                                  "login": "GregGamb",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11849964898247380166.webp",
+                                  "id": "743e096e-c922-4097-9e6f-8ea503055336"
+                                },
+                                {
+                                  "githubUserId": 134493681,
+                                  "login": "croziflette74",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/134493681?v=4",
+                                  "id": "44e078b7-d095-49f2-a7b3-647149337dc5"
+                                },
+                                {
+                                  "githubUserId": 8642470,
+                                  "login": "gregcha",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                                  "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                                },
+                                {
+                                  "githubUserId": 31901905,
+                                  "login": "kaelsky",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
+                                  "id": "a0da3c1e-6493-4ea1-8bd0-8c46d653f274"
+                                },
+                                {
+                                  "githubUserId": 139852598,
+                                  "login": "mat-yas",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/139852598?v=4",
+                                  "id": "bdc705b5-cf8e-488f-926a-258e1800ed79"
+                                }
+                              ],
+                              "ecosystems": [],
+                              "languages": [
+                                {
+                                  "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
+                                  "slug": "cairo",
+                                  "name": "Cairo",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
+                                },
+                                {
+                                  "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
+                                  "slug": "rust",
+                                  "name": "Rust",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
+                                },
+                                {
+                                  "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
+                                  "slug": "solidity",
+                                  "name": "Solidity",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
+                                },
+                                {
+                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                  "slug": "typescript",
+                                  "name": "Typescript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                }
+                              ],
+                              "isInvitedAsProjectLead": false,
+                              "hasMissingGithubAppInstallation": null,
+                              "tags": [
+                                "BIG_WHALE",
+                                "FAST_AND_FURIOUS",
+                                "HAS_GOOD_FIRST_ISSUES",
+                                "HOT_COMMUNITY",
+                                "LIKELY_TO_REWARD",
+                                "NEWBIES_WELCOME",
+                                "WORK_IN_PROGRESS"
+                              ]
+                            },
+                            {
+                              "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                              "slug": "zama",
+                              "name": "Zama",
+                              "shortDescription": "A super description for Zama",
+                              "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
+                              "hiring": false,
+                              "visibility": "PUBLIC",
+                              "repoCount": 1,
+                              "contributorCount": 26,
+                              "remainingUsdBudget": null,
+                              "leaders": [],
+                              "ecosystems": [],
+                              "languages": [
+                                {
+                                  "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
+                                  "slug": "cairo",
+                                  "name": "Cairo",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
+                                },
+                                {
+                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
+                                  "slug": "python",
+                                  "name": "Python",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
+                                }
+                              ],
+                              "isInvitedAsProjectLead": false,
+                              "hasMissingGithubAppInstallation": null,
+                              "tags": [
+                                "FAST_AND_FURIOUS",
+                                "HAS_GOOD_FIRST_ISSUES",
+                                "HOT_COMMUNITY",
+                                "NEWBIES_WELCOME",
+                                "WORK_IN_PROGRESS"
+                              ]
+                            },
+                            {
+                              "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
+                              "slug": "zero-title-11",
+                              "name": "Zero title 11",
+                              "shortDescription": "Missing short description",
+                              "logoUrl": null,
+                              "hiring": false,
+                              "visibility": "PUBLIC",
+                              "repoCount": 1,
+                              "contributorCount": 803,
+                              "remainingUsdBudget": null,
+                              "leaders": [],
+                              "ecosystems": [
+                                {
+                                  "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                                  "name": "Starknet",
+                                  "url": "https://www.starknet.io/en",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
+                                  "bannerUrl": null,
+                                  "slug": "starknet",
+                                  "hidden": null
+                                }
+                              ],
+                              "languages": [
+                                {
+                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
+                                  "slug": "javascript",
+                                  "name": "Javascript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                                },
+                                {
+                                  "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
+                                  "slug": "solidity",
+                                  "name": "Solidity",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
+                                }
+                              ],
+                              "isInvitedAsProjectLead": false,
+                              "hasMissingGithubAppInstallation": null,
+                              "tags": [
+                                "FAST_AND_FURIOUS",
+                                "HAS_GOOD_FIRST_ISSUES",
+                                "HOT_COMMUNITY",
+                                "NEWBIES_WELCOME",
+                                "WORK_IN_PROGRESS"
+                              ]
+                            }
+                          ],
                           "languages": [
                             {
                               "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",

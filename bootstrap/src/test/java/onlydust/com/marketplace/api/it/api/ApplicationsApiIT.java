@@ -792,8 +792,6 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                             {
                               "contributor": {
                                 "bio": "FullStack engineerr",
-                                "signedUpOnGithubAt": "2018-09-21T08:45:50Z",
-                                "signedUpAt": "2022-12-12T09:51:58.48559Z",
                                 "contacts": [
                                   {
                                     "channel": "TELEGRAM",
@@ -1025,8 +1023,6 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                             {
                               "contributor": {
                                 "bio": "Je me lève très tôt et mange à midi pile, n'en déplaise aux grincheux",
-                                "signedUpOnGithubAt": "2016-01-07T09:19:45Z",
-                                "signedUpAt": "2023-07-22T17:04:19.169178Z",
                                 "contacts": null,
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
@@ -1165,8 +1161,6 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                             {
                               "contributor": {
                                 "bio": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-                                "signedUpOnGithubAt": "2014-09-03T13:37:18Z",
-                                "signedUpAt": "2023-01-02T10:57:58.844811Z",
                                 "contacts": [
                                   {
                                     "channel": "TELEGRAM",
@@ -1267,8 +1261,6 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                             {
                               "contributor": {
                                 "bio": "totot",
-                                "signedUpOnGithubAt": "2011-02-01T20:08:09Z",
-                                "signedUpAt": "2022-12-12T15:52:23.593172Z",
                                 "contacts": [
                                   {
                                     "channel": "TWITTER",
