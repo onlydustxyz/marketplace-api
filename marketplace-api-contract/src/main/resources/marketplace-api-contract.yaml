@@ -7988,15 +7988,6 @@ components:
         - COMPLETED
         - CANCELLED
 
-    GithubCodeReviewState:
-      type: string
-      enum:
-        - PENDING
-        - COMMENTED
-        - APPROVED
-        - CHANGES_REQUESTED
-        - DISMISSED
-
     ContributionStatus:
       type: string
       enum:
@@ -8170,6 +8161,39 @@ components:
               type: boolean
               description: True if the contribution is made by the same user
 
+    # TODO: rename to ContributionLinkResponse
+    ContributionShortLinkResponse:
+      type: object
+      required:
+        - type
+        - githubStatus
+        - githubId
+        - githubNumber
+        - githubTitle
+        - githubHtmlUrl
+      properties:
+        type:
+          $ref: '#/components/schemas/ContributionType'
+        githubId:
+          type: integer
+          format: int64
+          description: Github item id
+          example: 6
+        githubNumber:
+          type: integer
+          format: int64
+          description: Github item number
+          example: 6
+        githubStatus:
+          $ref: '#/components/schemas/GithubStatus'
+        githubTitle:
+          type: string
+          description: Github item title
+        githubHtmlUrl:
+          type: string
+          format: url
+          description: The public Github URL of the contribution.
+
     ContributionResponse:
       type: object
       required:
@@ -8210,8 +8234,6 @@ components:
         githubBody:
           type: string
           description: The body of the contribution.
-        githubCodeReviewOutcome:
-          $ref: '#/components/schemas/GithubCodeReviewState'
         githubLabels:
           type: array
           items:
@@ -12041,16 +12063,11 @@ components:
             contributors:
               type: array
               items:
-                $ref: '#/components/schemas/ContributorOverviewResponse'
+                $ref: '#/components/schemas/GithubUserResponse'
             applicants:
               type: array
               items:
-                $ref: '#/components/schemas/ContributorOverviewResponse'
-            assignees:
-              type: array
-              description: The list of assignees for this issue
-              items:
-                $ref: '#/components/schemas/ContributorOverviewResponse'
+                $ref: '#/components/schemas/GithubUserResponse'
             languages:
               type: array
               items:
@@ -12059,9 +12076,9 @@ components:
               type: array
               description: linked issues to current contribution
               items:
-                $ref: '#/components/schemas/ContributionResponse'
-            totalRewardedAmount:
-              $ref: '#/components/schemas/RewardTotalAmountsResponse'
+                $ref: '#/components/schemas/ContributionShortLinkResponse'
+            totalRewardedUsdAmount:
+              type: number
 
     ContributionEventListResponse:
       type: object
