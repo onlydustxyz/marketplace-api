@@ -150,7 +150,6 @@ select c.id                                                                     
        c.github_title                                                                                   as github_title,
        c.github_html_url                                                                                as github_html_url,
        c.github_body                                                                                    as github_body,
-       c.pr_review_state                                                                                as github_code_review_state,
        c.created_at                                                                                     as created_at,
        c.updated_at                                                                                     as updated_at,
        c.completed_at                                                                                   as completed_at,
@@ -163,6 +162,25 @@ select c.id                                                                     
        (c.type = 'ISSUE')::int                                                                          as is_issue,
        (c.type = 'PULL_REQUEST')::int                                                                   as is_pr,
        (c.type = 'CODE_REVIEW')::int                                                                    as is_code_review,
+       case
+           when c.type = 'ISSUE' then
+               case
+                   when c.github_status = 'OPEN' AND array_agg(gia.user_id) is null then 'NOT_ASSIGNED'
+                   when c.github_status = 'OPEN' AND array_agg(gia.user_id) is not null then 'IN_PROGRESS'
+                   else 'DONE'
+                   end
+           when c.type = 'PULL_REQUEST' then
+               case
+                   when c.github_status = 'DRAFT' then 'IN_PROGRESS'
+                   when c.github_status = 'OPEN' then 'TO_REVIEW'
+                   else 'DONE'
+                   end
+           when c.type = 'CODE_REVIEW' then
+               case
+                   when c.pr_review_state in ('PENDING_REVIEWER', 'UNDER_REVIEW') then 'IN_PROGRESS'
+                   else 'DONE'
+                   end
+           end                                                                                          as activity_status,
        array_agg(distinct lfe.language_id) filter ( where lfe.language_id is not null )                 as language_ids,
        array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null )                 as ecosystem_ids,
        array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )                     as program_ids,
@@ -170,7 +188,9 @@ select c.id                                                                     
        string_agg(distinct lfe.name, ' ')                                                               as languages,
        bool_or(gl.name ~~* '%good%first%issue%')                                                        as is_good_first_issue,
        array_agg(distinct gia.user_id) filter ( where gia.user_id is not null )                         as assignee_ids,
-       array_agg(distinct gil.label_id) filter ( where gil.label_id is not null )                       as github_label_ids
+       array_agg(distinct gil.label_id) filter ( where gil.label_id is not null )                       as github_label_ids,
+       array_agg(distinct ci.issue_id) filter ( where ci.issue_id is not null )                         as closing_issue_ids,
+       array_agg(distinct a.applicant_id) filter ( where a.applicant_id is not null )                   as applicant_ids
 from indexer_exp.contributions c
          left join ranked_project_github_repos_relationship pgr on pgr.github_repo_id = c.repo_id and pgr.row_number = 1
          left join projects p on p.id = pgr.project_id
@@ -189,6 +209,8 @@ from indexer_exp.contributions c
          left join indexer_exp.github_labels gl ON gil.label_id = gl.id
          left join indexer_exp.github_issues_assignees gia ON gia.issue_id = c.issue_id
          left join indexer_exp.github_code_reviews cr on cr.id = c.code_review_id
+         left join indexer_exp.github_pull_requests_closing_issues ci on ci.pull_request_id = c.pull_request_id
+         left join applications a on a.issue_id = c.issue_id
 group by c.id,
          c.repo_id,
          p.id,
@@ -248,7 +270,6 @@ create index bi_contribution_data_contributor_id_quarter_timestamp_idx_inv on bi
 
 create index bi_contribution_data_contributor_id_year_timestamp_idx_inv on bi.p_contribution_data (year_timestamp, contributor_id);
 
-
 call create_pseudo_projection('bi', 'project_contributions_data', $$
 SELECT p.id                                                                            as project_id,
        array_agg(distinct cd.repo_id)                                                  as repo_ids,
@@ -280,6 +301,7 @@ from bi.p_contribution_data cd
 group by cd.contribution_id, cd.project_id, cd.repo_id
 $$, 'contribution_id');
 
+create unique index on bi.p_contribution_reward_data (contribution_id, total_rewarded_usd_amount);
 create unique index on bi.p_contribution_reward_data (repo_id, contribution_id);
 create unique index on bi.p_contribution_reward_data (project_id, contribution_id);
 create index on bi.p_contribution_reward_data using gin (reward_ids);

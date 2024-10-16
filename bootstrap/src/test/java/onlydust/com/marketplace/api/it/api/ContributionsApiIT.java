@@ -30,50 +30,38 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 57700,
-                          "totalItemNumber": 57700,
+                          "totalPageNumber": 45508,
+                          "totalItemNumber": 45508,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "contributions": [
                             {
-                              "type": "PULL_REQUEST",
+                              "type": "ISSUE",
                               "repo": {
-                                "id": 40652912,
-                                "owner": "IonicaBizau",
-                                "name": "node-cobol",
-                                "description": ":tv: COBOL bridge for NodeJS which allows you to run COBOL code from NodeJS.",
-                                "htmlUrl": "https://github.com/IonicaBizau/node-cobol"
+                                "id": 21339768,
+                                "owner": "reactjs",
+                                "name": "react-tutorial",
+                                "description": "Code from the React tutorial.",
+                                "htmlUrl": "https://github.com/reactjs/react-tutorial"
                               },
                               "githubAuthor": {
-                                "githubUserId": 1717382,
-                                "login": "BernhardBehrendt",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/1717382?v=4"
+                                "githubUserId": 116432,
+                                "login": "simonwhitaker",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/116432?v=4"
                               },
-                              "githubId": 42703857,
-                              "githubNumber": 3,
-                              "githubStatus": "MERGED",
-                              "githubTitle": "German press article",
-                              "githubHtmlUrl": "https://github.com/IonicaBizau/node-cobol/pull/3",
-                              "githubBody": "by Alexander Neumann published on heise online\\n",
+                              "githubId": 39536039,
+                              "githubNumber": 1,
+                              "githubStatus": "COMPLETED",
+                              "githubTitle": "Tutorial uses POST with SimpleHTTPServer",
+                              "githubHtmlUrl": "https://github.com/reactjs/react-tutorial/issues/1",
+                              "githubBody": "The tutorial suggests [using `python -m SimpleHTTPServer`](http://facebook.github.io/react/docs/tutorial.html#updating-state) to serve content, but subsequently introduces a mechanism for [submitting comments via a POST request](http://facebook.github.io/react/docs/tutorial.html#callbacks-as-props), which `SimpleHTTPServer` doesn't support. It appears that at this point the tutorial assumes you're using the sample node.js server packaged with [the tutorial's GitHub repo](https://github.com/reactjs/react-tutorial) but that isn't explained.\\n",
                               "githubLabels": null,
-                              "lastUpdatedAt": "2023-11-24T10:32:31.695306Z",
-                              "id": "93545fddecd2e42b0fccd23f62415dab09e37ef3ea1b131e68a472b67062cd48",
-                              "createdAt": "2015-08-18T14:19:08Z",
-                              "completedAt": "2015-08-18T16:25:53Z",
+                              "lastUpdatedAt": "2023-11-24T10:34:07.322779Z",
+                              "createdAt": "2014-08-05T16:19:44Z",
+                              "completedAt": "2015-01-16T21:21:47Z",
                               "activityStatus": "DONE",
-                              "project": {
-                                "id": "a852e8fd-de3c-4a14-813e-4b592af40d54",
-                                "slug": "onlydust-marketplace",
-                                "name": "OnlyDust Marketplace",
-                                "logoUrl": null
-                              },
-                              "contributors": [
-                                {
-                                  "githubUserId": 1717382,
-                                  "login": "BernhardBehrendt",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/1717382?v=4"
-                                }
-                              ],
+                              "project": null,
+                              "contributors": null,
                               "applicants": null,
                               "languages": null,
                               "linkedIssues": null,

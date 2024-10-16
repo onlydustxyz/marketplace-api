@@ -1457,11 +1457,16 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
         });
     }
 
-
     private void ignore(ApplicationEntity application, UserAuthHelper.AuthenticatedUser projectLead, boolean isIgnored) {
-        client.patch().uri(getApiURI(APPLICATIONS_BY_ID.formatted(application.id()))).header("Authorization", BEARER_PREFIX + projectLead.jwt()).bodyValue(new ProjectApplicationPatchRequest().isIgnored(isIgnored))
+        client.patch()
+                .uri(getApiURI(APPLICATIONS_BY_ID.formatted(application.id())))
+                .header("Authorization", BEARER_PREFIX + projectLead.jwt())
+                .bodyValue(new ProjectApplicationPatchRequest()
+                        .isIgnored(isIgnored))
                 // Then
-                .exchange().expectStatus().isNoContent();
+                .exchange()
+                .expectStatus()
+                .isNoContent();
     }
 
     private void assertApplications(final @NonNull Long issueId,

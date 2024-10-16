@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.read.entities.bi;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
@@ -25,11 +22,14 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Immutable
 @Accessors(fluent = true)
+@IdClass(ContributionReadEntity.PrimaryKey.class)
 public class ContributionReadEntity {
     @Id
     @NonNull
-    String contributionId;
+    Long githubId;
 
+    @Id
+    @NonNull
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     ContributionType contributionType;
@@ -40,13 +40,12 @@ public class ContributionReadEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     GithubUserResponse githubAuthor;
 
-    Long githubId;
     Long githubNumber;
 
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     GithubStatus githubStatus;
-    
+
     String githubTitle;
     String githubHtmlUrl;
     String githubBody;
@@ -82,7 +81,6 @@ public class ContributionReadEntity {
 
     public ContributionActivityPageItemResponse toDto() {
         return new ContributionActivityPageItemResponse()
-                .id(contributionId)
                 .type(contributionType)
                 .repo(githubRepo)
                 .githubAuthor(githubAuthor)
@@ -104,5 +102,11 @@ public class ContributionReadEntity {
                 .linkedIssues(linkedIssues)
                 .totalRewardedUsdAmount(totalRewardedUsdAmount)
                 ;
+    }
+
+    @EqualsAndHashCode
+    public static class PrimaryKey {
+        Long githubId;
+        ContributionType contributionType;
     }
 }

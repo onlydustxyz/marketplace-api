@@ -12028,14 +12028,11 @@ components:
         - $ref: '#/components/schemas/ContributionResponse'
         - type: object
           required:
-            - id
+            - githubId
             - createdAt
             - lastUpdatedAt
             - activityStatus
           properties:
-            id:
-              type: string
-              description: The contribution ID is determined from its content's ID (ie PR / issue / code review ID)
             createdAt:
               type: string
               format: date-time
