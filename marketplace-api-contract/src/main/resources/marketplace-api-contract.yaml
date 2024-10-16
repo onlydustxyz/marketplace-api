@@ -270,7 +270,7 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Contributions
-      summary: Change contribution assignees and/or linkedIssues
+      summary: Change contribution assignees and/or linkedIssues and/or archive status
       operationId: patchContribution
       description: |
         Change contribution assignees and/or linkedIssues
@@ -11700,6 +11700,17 @@ components:
             type: string
             format: uuid
 
+    ContributionIdentity:
+      type: object
+      required:
+        - githubId
+        - type
+      properties:
+        githubId:
+          $ref: '#/components/schemas/IssueId'
+        type:
+          $ref: '#/components/schemas/ContributionType'
+
     ContributorsQueryParams:
       type: object
       properties:
@@ -11714,10 +11725,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GithubUserId'
-        contributionGithubIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/IssueId'
+        contributedTo:
+          $ref: '#/components/schemas/ContributionIdentity'
         projectIds:
           type: array
           items:

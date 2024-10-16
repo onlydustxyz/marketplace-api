@@ -59,9 +59,11 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                    coalesce(previous_period.pr_count, 0)                    as previous_period_pr_count,
                    coalesce(previous_period.code_review_count, 0)           as previous_period_code_review_count
             
-            FROM bi.select_contributors(:fromDate, :toDate, :dataSourceIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis) d
+            FROM bi.select_contributors(:fromDate, :toDate, :dataSourceIds, :contributorIds, ROW(:contributedToContribGithubId, cast(:contributedToContribType as indexer_exp.contribution_type)),
+                                        :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis) d
                      LEFT JOIN (
-                            select * from bi.select_contributors(:fromDatePreviousPeriod, :toDatePreviousPeriod, :dataSourceIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis)
+                            select * from bi.select_contributors(:fromDatePreviousPeriod, :toDatePreviousPeriod, :dataSourceIds, :contributorIds, ROW(:contributedToContribGithubId, cast(:contributedToContribType as indexer_exp.contribution_type)),
+                                                                 :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis)
                          ) previous_period ON coalesce(:fromDatePreviousPeriod, :toDatePreviousPeriod) is not null and previous_period.contributor_id = d.contributor_id
             
                      LEFT JOIN LATERAL ( select jsonb_agg(jsonb_build_object('id', pcl.id, 'slug', pcl.slug, 'name', pcl.name)) as list
@@ -96,7 +98,8 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
             """,
             countQuery = """
                     SELECT count(d.contributor_id)
-                    FROM bi.select_contributors(:fromDate, :toDate, :dataSourceIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis) d
+                    FROM bi.select_contributors(:fromDate, :toDate, :dataSourceIds, :contributorIds, ROW(:contributedToContribGithubId, cast(:contributedToContribType as indexer_exp.contribution_type)),
+                                                :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis) d
                     WHERE (coalesce(:totalRewardedUsdAmountMin) is null or d.total_rewarded_usd_amount >= :totalRewardedUsdAmountMin)
                       and (coalesce(:totalRewardedUsdAmountEq) is null or d.total_rewarded_usd_amount = :totalRewardedUsdAmountEq)
                       and (coalesce(:totalRewardedUsdAmountMax) is null or d.total_rewarded_usd_amount <= :totalRewardedUsdAmountMax)
@@ -128,6 +131,8 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                             @NonNull Boolean showFilteredKpis,
                                             String search,
                                             Long[] contributorIds,
+                                            Long contributedToContribGithubId,
+                                            ContributionType contributedToContribType,
                                             UUID[] projectIds,
                                             String[] projectSlugs,
                                             UUID[] categoryIds,
@@ -161,6 +166,8 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                 q.getShowFilteredKpis(),
                 q.getSearch(),
                 q.getContributorIds() == null ? null : q.getContributorIds().toArray(Long[]::new),
+                q.getContributedTo() == null ? null : q.getContributedTo().getGithubId(),
+                q.getContributedTo() == null ? null : q.getContributedTo().getType(),
                 q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
                 q.getProjectSlugs() == null ? null : q.getProjectSlugs().toArray(String[]::new),
                 q.getCategoryIds() == null ? null : q.getCategoryIds().toArray(UUID[]::new),
@@ -193,6 +200,8 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                 q.getShowFilteredKpis(),
                 q.getSearch(),
                 q.getContributorIds() == null ? null : q.getContributorIds().toArray(Long[]::new),
+                null,
+                null,
                 q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
                 q.getProjectSlugs() == null ? null : q.getProjectSlugs().toArray(String[]::new),
                 q.getCategoryIds() == null ? null : q.getCategoryIds().toArray(UUID[]::new),
