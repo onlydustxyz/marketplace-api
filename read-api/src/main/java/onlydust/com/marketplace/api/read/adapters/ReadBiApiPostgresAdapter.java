@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.read.entities.bi.ProjectKpisReadEntity;
 import onlydust.com.marketplace.api.read.entities.bi.WorldMapKpiReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.BiFinancialMonthlyStatsReadEntity;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
+import onlydust.com.marketplace.api.read.properties.Cache;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
@@ -61,6 +62,7 @@ import static org.springframework.http.ResponseEntity.status;
 @Profile("api")
 public class ReadBiApiPostgresAdapter implements ReadBiApi {
     private static final ZonedDateTime DEFAULT_FROM_DATE = ZonedDateTime.parse("2007-10-20T05:24:19Z");
+    private final Cache cache;
     private final PermissionService permissionService;
     private final AggregatedKpisReadRepository aggregatedKpisReadRepository;
     private final WorldMapKpiReadRepository worldMapKpiReadRepository;
@@ -73,6 +75,17 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
 
     private static ZonedDateTime sanitizedDate(String fromDate, ZonedDateTime defaultFromDate) {
         return Optional.ofNullable(DateMapper.parseNullable(fromDate)).map(DateMapper::toZoneDateTime).orElse(defaultFromDate);
+    }
+
+    @Override
+    public ResponseEntity<BiContributorsPageItemResponse> getBIContributor(Long contributorId) {
+        final var page = contributorKpisReadRepository.findAll(new BiContributorsQueryParams()
+                .contributorIds(List.of(contributorId))
+                .pageIndex(0).pageSize(1));
+        return ok()
+                .cacheControl(cache.forEverybody(Cache.S))
+                .body(page.stream().findFirst().map(ContributorKpisReadEntity::toDto)
+                        .orElseThrow(() -> notFound("Contributor with id %d not found".formatted(contributorId))));
     }
 
     @Override

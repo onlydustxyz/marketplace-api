@@ -119,12 +119,13 @@ public class GithubHelper {
         parameters.put("mainFileExtensions", mainFileExtensions == null ? new String[]{} : mainFileExtensions.toArray(String[]::new));
 
         databaseHelper.executeQuery("""
-                insert into indexer_exp.github_pull_requests(id, repo_id, number, title, status, created_at, closed_at, merged_at, author_id, html_url, body, comments_count, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url, review_state, commit_count, main_file_extensions)
+                insert into indexer_exp.github_pull_requests(id, repo_id, number, title, status, created_at, updated_at, closed_at, merged_at, author_id, html_url, body, comments_count, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url, review_state, commit_count, main_file_extensions)
                 select :prId,
                        gr.id,
                        :githubNumber,
                        :githubTitle,
                        'MERGED',
+                       :createdAt,
                        :createdAt,
                        :completedAt,
                        :completedAt,
@@ -181,12 +182,13 @@ public class GithubHelper {
 
         databaseHelper.executeQuery(
                 """
-                        INSERT INTO indexer_exp.github_issues (id, repo_id, number, title, status, created_at, closed_at, author_id, html_url, body, comments_count, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url)
+                        INSERT INTO indexer_exp.github_issues (id, repo_id, number, title, status, created_at, updated_at, closed_at, author_id, html_url, body, comments_count, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url)
                         SELECT  :issueId,
                                 gr.id,
                                 :number,
                                 :title,
                                 cast(:status as indexer_exp.github_issue_status),
+                                :createdAt,
                                 :createdAt,
                                 :closedAt,
                                 ga.id,
@@ -257,7 +259,7 @@ public class GithubHelper {
 
     private void createContributionFromPullRequest(Long prId, Long contributorId) {
         databaseHelper.executeQuery("""
-                insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, pull_request_id, created_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
+                insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, pull_request_id, created_at, updated_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
                 select  :contributionId,
                         gpr.repo_id,
                         ga.id,
@@ -265,6 +267,7 @@ public class GithubHelper {
                         'COMPLETED',
                         gpr.id,
                         gpr.created_at,
+                        gpr.updated_at,
                         gpr.closed_at,
                         gpr.number,
                         'MERGED',
@@ -293,11 +296,12 @@ public class GithubHelper {
                 "contributorId", contributorId));
 
         addRepoContributorFromPullRequest(prId, contributorId);
+        addUserMainFileExtensionsFromPullRequest(prId, contributorId);
     }
 
     private void createContributionFromIssue(Long issueId, Long contributorId) {
         databaseHelper.executeQuery("""
-                      insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, issue_id, created_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
+                      insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, issue_id, created_at, updated_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
                         select  :contributionId,
                                 gi.repo_id,
                                 ga.id,
@@ -305,6 +309,7 @@ public class GithubHelper {
                                 'COMPLETED',
                                 gi.id,
                                 gi.created_at,
+                                gi.updated_at,
                                 gi.closed_at,
                                 gi.number,
                                 'COMPLETED',
@@ -374,6 +379,18 @@ public class GithubHelper {
                 "contributorId", contributorId));
     }
 
+    private void addUserMainFileExtensionsFromPullRequest(Long pullRequestId, Long contributorId) {
+        databaseHelper.executeQuery("""
+                insert into indexer_exp.github_user_file_extensions(user_id, file_extension, commit_count, file_count, modification_count)
+                select distinct :contributorId, file_extension, 1, 1, 1
+                from indexer_exp.github_pull_requests gpr
+                    cross join unnest(gpr.main_file_extensions) as file_extension
+                where gpr.id = :pullRequestId
+                on conflict (user_id, file_extension) do nothing;
+                """, Map.of("pullRequestId", pullRequestId,
+                "contributorId", contributorId));
+    }
+
     public void createCodeReview(GithubRepo repo, Long prId, UserAuthHelper.AuthenticatedUser contributor) {
         final var id = faker.random().hex();
         final var prNumber = faker.random().nextInt(1000);
@@ -406,8 +423,8 @@ public class GithubHelper {
                 insert into indexer_exp.github_code_reviews(id, pull_request_id, author_id, state, requested_at, submitted_at, number, title, html_url, body, comments_count, repo_owner_login, repo_name, repo_id, repo_html_url, author_login, author_html_url, author_avatar_url)
                 values (:codeReviewId, :prId, :contributorId, 'APPROVED', :createdAt, :completedAt, :githubNumber, :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoId, :repoHtmlUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl);
                 
-                insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, code_review_id, created_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
-                values (:id, :repoId, :contributorId, 'CODE_REVIEW', 'COMPLETED', :codeReviewId, :createdAt, :completedAt, :githubNumber, 'APPROVED', :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :contributorId, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, 'APPROVED', null);
+                insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, code_review_id, created_at, updated_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
+                values (:id, :repoId, :contributorId, 'CODE_REVIEW', 'COMPLETED', :codeReviewId, :createdAt, :createdAt, :completedAt, :githubNumber, 'APPROVED', :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :contributorId, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, 'APPROVED', null);
                 """, parameters);
 
         addRepoContributorFromCodeReview(id, contributor.user().getGithubUserId());

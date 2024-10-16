@@ -25,6 +25,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     private final BiProjectBudgetDataRepository biProjectBudgetDataRepository;
     private final BiProjectContributionsDataRepository biProjectContributionsDataRepository;
     private final BiContributorGlobalDataRepository biContributorGlobalDataRepository;
+    private final BiContributionRewardDataRepository biContributionRewardDataRepository;
     private final UserProjectRecommendationsRepository userProjectRecommendationsRepository;
 
     @Override
@@ -40,16 +41,19 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     @Override
     public void onRewardCreated(RewardId rewardId, AccountBookFacade accountBookFacade) {
         biRewardDataRepository.refresh(rewardId);
+        biContributionRewardDataRepository.refresh(rewardId);
     }
 
     @Override
     public void onRewardCancelled(RewardId rewardId) {
         biRewardDataRepository.refresh(rewardId);
+        biContributionRewardDataRepository.refresh(rewardId);
     }
 
     @Override
     public void onRewardPaid(RewardId rewardId) {
         biRewardDataRepository.refresh(rewardId);
+        biContributionRewardDataRepository.refresh(rewardId);
     }
 
     @Override
@@ -96,6 +100,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     public void onContributionsChanged(Long repoId) {
         biContributionDataRepository.refreshByRepo(repoId);
         biProjectContributionsDataRepository.refresh(repoId);
+        biContributionRewardDataRepository.refresh(repoId);
     }
 
     @Override
@@ -105,6 +110,8 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         unlinkedRepoIds.forEach(biContributionDataRepository::refreshByRepo);
         biProjectGlobalDataRepository.refresh(projectId);
         biProjectContributionsDataRepository.refresh(projectId);
+        linkedRepoIds.forEach(biContributionRewardDataRepository::refresh);
+        unlinkedRepoIds.forEach(biContributionRewardDataRepository::refresh);
     }
 
     @Override
@@ -118,6 +125,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         biProjectGlobalDataRepository.refresh(projectId);
         biProjectBudgetDataRepository.refresh(projectId);
         biProjectContributionsDataRepository.refresh(projectId);
+        biContributionRewardDataRepository.refresh(projectId);
     }
 
     @Override

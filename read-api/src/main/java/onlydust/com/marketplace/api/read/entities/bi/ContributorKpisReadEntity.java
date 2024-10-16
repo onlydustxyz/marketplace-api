@@ -35,7 +35,7 @@ public class ContributorKpisReadEntity {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @NonNull
-    ContributorResponse contributor;
+    ContributorOverviewResponse contributor;
     @JdbcTypeCode(SqlTypes.JSON)
     List<ProjectLinkResponse> projects;
     @JdbcTypeCode(SqlTypes.JSON)
@@ -119,6 +119,7 @@ public class ContributorKpisReadEntity {
     public IssueApplicantsPageItemResponse toIssueApplicant(ApplicationReadEntity application) {
         return new IssueApplicantsPageItemResponse()
                 .applicationId(application.id())
+                .appliedAt(application.receivedAt())
                 .contributor(contributor)
                 .projects(projects == null ? null : projects.stream().sorted(comparing(ProjectLinkResponse::getName)).toList())
                 .categories(categories == null ? null : categories.stream().sorted(comparing(ProjectCategoryResponse::getName)).toList())

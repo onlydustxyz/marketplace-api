@@ -56,6 +56,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
         private static ProjectId onlyDust;
         private static String onlyDustSlug;
         private static ProjectId madara;
+        private static Long prId;
 
         private static String allProgramOrEcosystemIds;
 
@@ -142,7 +143,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
 
 
             at("2021-01-02T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho, List.of("rs")));
-            final var prId = at("2021-01-05T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden, List.of("ts")));
+            prId = at("2021-01-05T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden, List.of("ts")));
             at("2021-01-03T00:00:03Z", () -> githubHelper.createCodeReview(marketplace_frontend, prId, mehdi));
             at("2021-01-04T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi, List.of("ts")));
             at("2021-01-06T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
@@ -531,6 +532,22 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             asserter.accept(response);
         }
 
+        private void test_bad_request(Map<String, String> queryParamsWithValues) {
+            final var queryParams = new HashMap<String, String>();
+            queryParams.put("pageIndex", "0");
+            queryParams.put("pageSize", "100");
+            queryParams.put("fromDate", "2021-01-01");
+            queryParams.put("toDate", "2021-01-10");
+            queryParams.put("dataSourceIds", allProgramOrEcosystemIds);
+            queryParams.putAll(queryParamsWithValues);
+            client.get()
+                    .uri(getApiURI(BI_CONTRIBUTORS, queryParams))
+                    .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(caller).jwt())
+                    .exchange()
+                    .expectStatus()
+                    .is4xxClientError();
+        }
+
         @Test
         public void should_get_contributors_stats_with_filters() {
             test_contributors_stats("search", "gaming",
@@ -548,8 +565,16 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> assertThat(response.getContributors())
                             .hasSize(1)
                             .extracting(BiContributorsPageItemResponse::getContributor)
-                            .extracting(ContributorResponse::getGithubUserId)
+                            .extracting(ContributorOverviewResponse::getGithubUserId)
                             .contains(mehdi.githubUserId().value()), true);
+            test_contributors_stats(Map.of("contributedTo.githubId", prId.toString(), "contributedTo.type", "PULL_REQUEST"),
+                    response -> assertThat(response.getContributors())
+                            .hasSize(1)
+                            .extracting(BiContributorsPageItemResponse::getContributor)
+                            .extracting(ContributorOverviewResponse::getGithubUserId)
+                            .contains(hayden.githubUserId().value()), true);
+            test_bad_request(Map.of("contributedTo.githubId", prId.toString()));
+            test_bad_request(Map.of("contributedTo.type", "ISSUE"));
             test_contributors_stats("projectIds", onlyDust.toString(),
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getProjects())
                             .extracting(ProjectLinkResponse::getName)
@@ -623,6 +648,81 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             test_contributors_stats(Map.of("sort", "PR_COUNT", "sortDirection", "ASC"),
                     response -> assertThat(response.getContributors()).isSortedAccordingTo(comparing(c -> c.getPrCount().getValue())), true
             );
+        }
+
+        @Test
+        public void should_get_contributor_by_id() {
+            // When
+            client.get()
+                    .uri(getApiURI(BI_CONTRIBUTORS_BY_ID.formatted(antho.githubUserId().toString())))
+                    .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(hayden).jwt())
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .json("""
+                            {
+                              "contributor": {
+                                "bio": null,
+                                "signedUpOnGithubAt": null,
+                                "contacts": null,
+                                "login": "antho",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/antho",
+                                "isRegistered": true,
+                                "globalRank": null,
+                                "globalRankPercentile": null,
+                                "globalRankCategory": "F"
+                              },
+                              "categories": [
+                                {
+                                  "slug": "defi",
+                                  "name": "DeFi"
+                                }
+                              ],
+                              "languages": [
+                                {
+                                  "slug": "java",
+                                  "name": "Java"
+                                },
+                                {
+                                  "slug": "rust",
+                                  "name": "Rust"
+                                }
+                              ],
+                              "ecosystems": [
+                                {
+                                  "name": "Universe ecosystem"
+                                }
+                              ],
+                              "projectContributorLabels": null,
+                              "countryCode": "FR",
+                              "totalRewardedUsdAmount": {
+                                "value": 1.5,
+                                "trend": "UP"
+                              },
+                              "rewardCount": {
+                                "value": 2,
+                                "trend": "UP"
+                              },
+                              "issueCount": {
+                                "value": 0,
+                                "trend": "STABLE"
+                              },
+                              "prCount": {
+                                "value": 3,
+                                "trend": "UP"
+                              },
+                              "codeReviewCount": {
+                                "value": 0,
+                                "trend": "STABLE"
+                              },
+                              "contributionCount": {
+                                "value": 3,
+                                "trend": "UP"
+                              }
+                            }
+                            """);
         }
     }
 }

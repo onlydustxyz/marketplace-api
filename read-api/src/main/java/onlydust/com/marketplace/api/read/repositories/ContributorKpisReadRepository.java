@@ -17,7 +17,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.sanitizedDate;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseZonedNullable;
 
 public interface ContributorKpisReadRepository extends Repository<ContributorKpisReadEntity, Long> {
     ZonedDateTime DEFAULT_FROM_DATE = ZonedDateTime.parse("2007-10-20T05:24:19Z");
@@ -59,9 +59,11 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                    coalesce(previous_period.pr_count, 0)                    as previous_period_pr_count,
                    coalesce(previous_period.code_review_count, 0)           as previous_period_code_review_count
             
-            FROM bi.select_contributors(:fromDate, :toDate, :dataSourceIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis) d
+            FROM bi.select_contributors(:fromDate, :toDate, :dataSourceIds, :contributorIds, ROW(:contributedToContribGithubId, cast(:contributedToContribType as indexer_exp.contribution_type)),
+                                        :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis) d
                      LEFT JOIN (
-                            select * from bi.select_contributors(:fromDatePreviousPeriod, :toDatePreviousPeriod, :dataSourceIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis)
+                            select * from bi.select_contributors(:fromDatePreviousPeriod, :toDatePreviousPeriod, :dataSourceIds, :contributorIds, ROW(:contributedToContribGithubId, cast(:contributedToContribType as indexer_exp.contribution_type)),
+                                                                 :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis)
                          ) previous_period ON coalesce(:fromDatePreviousPeriod, :toDatePreviousPeriod) is not null and previous_period.contributor_id = d.contributor_id
             
                      LEFT JOIN LATERAL ( select jsonb_agg(jsonb_build_object('id', pcl.id, 'slug', pcl.slug, 'name', pcl.name)) as list
@@ -70,7 +72,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                             join projects p on p.id = pcl.project_id
                                          where cpcl.github_user_id = d.contributor_id and
                                                (coalesce(:projectIds) is null or p.id = any(:projectIds)) and
-                                               (coalesce(:projectSlugs) is null or p.slug = any(:projectSlugs))) contributor_labels ON true
+                                               (coalesce(:projectSlugs) is null or p.slug = any(:projectSlugs))) contributor_labels ON cast(:projectIds as uuid[]) is not null or cast(:projectSlugs as text[]) is not null
             
             WHERE (coalesce(:totalRewardedUsdAmountMin) is null or d.total_rewarded_usd_amount >= :totalRewardedUsdAmountMin)
               and (coalesce(:totalRewardedUsdAmountEq) is null or d.total_rewarded_usd_amount = :totalRewardedUsdAmountEq)
@@ -96,7 +98,8 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
             """,
             countQuery = """
                     SELECT count(d.contributor_id)
-                    FROM bi.select_contributors(:fromDate, :toDate, :dataSourceIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis) d
+                    FROM bi.select_contributors(:fromDate, :toDate, :dataSourceIds, :contributorIds, ROW(:contributedToContribGithubId, cast(:contributedToContribType as indexer_exp.contribution_type)),
+                                                :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis) d
                     WHERE (coalesce(:totalRewardedUsdAmountMin) is null or d.total_rewarded_usd_amount >= :totalRewardedUsdAmountMin)
                       and (coalesce(:totalRewardedUsdAmountEq) is null or d.total_rewarded_usd_amount = :totalRewardedUsdAmountEq)
                       and (coalesce(:totalRewardedUsdAmountMax) is null or d.total_rewarded_usd_amount <= :totalRewardedUsdAmountMax)
@@ -128,6 +131,8 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                             @NonNull Boolean showFilteredKpis,
                                             String search,
                                             Long[] contributorIds,
+                                            Long contributedToContribGithubId,
+                                            String contributedToContribType,
                                             UUID[] projectIds,
                                             String[] projectSlugs,
                                             UUID[] categoryIds,
@@ -148,9 +153,10 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                             Pageable pageable);
 
     default Page<ContributorKpisReadEntity> findAll(BiContributorsQueryParams q) {
-        final var sanitizedFromDate = sanitizedDate(q.getFromDate(), DEFAULT_FROM_DATE).truncatedTo(ChronoUnit.DAYS);
-        final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now()).truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        final var fromDateOfPreviousPeriod = sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
+        final var sanitizedFromDate = q.getFromDate() == null ? null : parseZonedNullable(q.getFromDate()).truncatedTo(ChronoUnit.DAYS);
+        final var sanitizedToDate = q.getToDate() == null ? null : parseZonedNullable(q.getToDate()).truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        final var fromDateOfPreviousPeriod = sanitizedFromDate == null || sanitizedToDate == null ? null :
+                sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
 
         return findAll(
                 sanitizedFromDate,
@@ -161,6 +167,8 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                 q.getShowFilteredKpis(),
                 q.getSearch(),
                 q.getContributorIds() == null ? null : q.getContributorIds().toArray(Long[]::new),
+                q.getContributedTo() == null ? null : q.getContributedTo().getGithubId(),
+                q.getContributedTo() == null ? null : q.getContributedTo().getType().name(),
                 q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
                 q.getProjectSlugs() == null ? null : q.getProjectSlugs().toArray(String[]::new),
                 q.getCategoryIds() == null ? null : q.getCategoryIds().toArray(UUID[]::new),
@@ -193,6 +201,8 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                 q.getShowFilteredKpis(),
                 q.getSearch(),
                 q.getContributorIds() == null ? null : q.getContributorIds().toArray(Long[]::new),
+                null,
+                null,
                 q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
                 q.getProjectSlugs() == null ? null : q.getProjectSlugs().toArray(String[]::new),
                 q.getCategoryIds() == null ? null : q.getCategoryIds().toArray(UUID[]::new),

@@ -180,6 +180,28 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/bi/contributors/{contributorId}:
+    get:
+      tags:
+        - ReadBi
+      summary: Get contributor BI
+      operationId: getBIContributor
+      parameters:
+        - name: contributorId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/GithubUserId'
+      responses:
+        "200":
+          description: 'Contributor'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiContributorsPageItemResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 
   /api/v1/contributions:
     get:
@@ -212,7 +234,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/contributions/{contributionId}:
+  /api/v1/contributions/{contributionGithubId}:
     get:
       security:
         - bearerAuth: [ ]
@@ -223,11 +245,11 @@ paths:
       description: |
         Get contribution.
       parameters:
-        - name: contributionId
+        - name: contributionGithubId
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/ContributionId'
+            $ref: '#/components/schemas/IssueId'
       responses:
         "200":
           description: 'Contribution'
@@ -248,16 +270,16 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Contributions
-      summary: Change contribution assignees and/or linkedIssues
+      summary: Change contribution assignees and/or linkedIssues and/or archive status
       operationId: patchContribution
       description: |
         Change contribution assignees and/or linkedIssues
       parameters:
-        - name: contributionId
+        - name: contributionGithubId
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/ContributionId'
+            $ref: '#/components/schemas/IssueId'
       requestBody:
         description: 'Contribution patch'
         content:
@@ -7988,15 +8010,6 @@ components:
         - COMPLETED
         - CANCELLED
 
-    GithubCodeReviewState:
-      type: string
-      enum:
-        - PENDING
-        - COMMENTED
-        - APPROVED
-        - CHANGES_REQUESTED
-        - DISMISSED
-
     ContributionStatus:
       type: string
       enum:
@@ -8170,6 +8183,39 @@ components:
               type: boolean
               description: True if the contribution is made by the same user
 
+    # TODO: rename to ContributionLinkResponse
+    ContributionShortLinkResponse:
+      type: object
+      required:
+        - type
+        - githubStatus
+        - githubId
+        - githubNumber
+        - githubTitle
+        - githubHtmlUrl
+      properties:
+        type:
+          $ref: '#/components/schemas/ContributionType'
+        githubId:
+          type: integer
+          format: int64
+          description: Github item id
+          example: 6
+        githubNumber:
+          type: integer
+          format: int64
+          description: Github item number
+          example: 6
+        githubStatus:
+          $ref: '#/components/schemas/GithubStatus'
+        githubTitle:
+          type: string
+          description: Github item title
+        githubHtmlUrl:
+          type: string
+          format: url
+          description: The public Github URL of the contribution.
+
     ContributionResponse:
       type: object
       required:
@@ -8210,8 +8256,6 @@ components:
         githubBody:
           type: string
           description: The body of the contribution.
-        githubCodeReviewOutcome:
-          $ref: '#/components/schemas/GithubCodeReviewState'
         githubLabels:
           type: array
           items:
@@ -8521,6 +8565,10 @@ components:
           properties:
             applicationId:
               $ref: '#/components/schemas/ProjectApplicationId'
+            appliedAt:
+              type: string
+              format: date-time
+              description: When the application was created
 
     ScorePercentage:
       type: integer
@@ -11652,6 +11700,17 @@ components:
             type: string
             format: uuid
 
+    ContributionIdentity:
+      type: object
+      required:
+        - githubId
+        - type
+      properties:
+        githubId:
+          $ref: '#/components/schemas/IssueId'
+        type:
+          $ref: '#/components/schemas/ContributionType'
+
     ContributorsQueryParams:
       type: object
       properties:
@@ -11666,6 +11725,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GithubUserId'
+        contributedTo:
+          $ref: '#/components/schemas/ContributionIdentity'
         projectIds:
           type: array
           items:
@@ -11760,7 +11821,7 @@ components:
         - contributionCount
       properties:
         contributor:
-          $ref: '#/components/schemas/ContributorResponse'
+          $ref: '#/components/schemas/ContributorOverviewResponse'
         projects:
           type: array
           items:
@@ -11801,42 +11862,8 @@ components:
         - $ref: '#/components/schemas/RankedContributorResponse'
       type: object
       required:
-        - languages
-        - ecosystems
-        - countryCode
-        - totalRewardedUsdAmount
-        - rewardCount
-        - issueCount
-        - prCount
-        - codeReviewCount
-        - contributionCount
+        - signedUpOnGithubAt
       properties:
-        languages:
-          type: array
-          items:
-            $ref: '#/components/schemas/LanguageResponse'
-        ecosystems:
-          type: array
-          items:
-            $ref: '#/components/schemas/EcosystemLinkResponse'
-        projectContributorLabels:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectContributorLabelResponse'
-        countryCode:
-          $ref: '#/components/schemas/CountryCode'
-        totalRewardedUsdAmount:
-          type: number
-        rewardCount:
-          type: integer
-        issueCount:
-          type: integer
-        prCount:
-          type: integer
-        codeReviewCount:
-          type: integer
-        contributionCount:
-          type: integer
         bio:
           type: string
           description: User bio as in Github profile
@@ -11849,10 +11876,6 @@ components:
           type: string
           format: date-time
           description: When the user signed up on OnlyDust
-        lastSeenAt:
-          type: string
-          format: date-time
-          description: The last time the user signed in on OnlyDust
         contacts:
           type: array
           items:
@@ -11953,13 +11976,12 @@ components:
           $ref: '#/components/schemas/ContributionsSortEnum'
         sortDirection:
           $ref: '#/components/schemas/SortDirection'
-        dataSourceIds:
-          type: array
-          items:
-            type: string
-            format: uuid
         search:
           type: string
+        ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/IssueId'
         types:
           type: array
           items:
@@ -12010,14 +12032,11 @@ components:
         - $ref: '#/components/schemas/ContributionResponse'
         - type: object
           required:
-            - id
+            - githubId
             - createdAt
             - lastUpdatedAt
             - activityStatus
           properties:
-            id:
-              type: string
-              description: The contribution ID is determined from its content's ID (ie PR / issue / code review ID)
             createdAt:
               type: string
               format: date-time
@@ -12037,16 +12056,11 @@ components:
             contributors:
               type: array
               items:
-                $ref: '#/components/schemas/ContributorOverviewResponse'
+                $ref: '#/components/schemas/GithubUserResponse'
             applicants:
               type: array
               items:
-                $ref: '#/components/schemas/ContributorOverviewResponse'
-            assignees:
-              type: array
-              description: The list of assignees for this issue
-              items:
-                $ref: '#/components/schemas/ContributorOverviewResponse'
+                $ref: '#/components/schemas/GithubUserResponse'
             languages:
               type: array
               items:
@@ -12055,9 +12069,9 @@ components:
               type: array
               description: linked issues to current contribution
               items:
-                $ref: '#/components/schemas/ContributionResponse'
-            totalRewardedAmount:
-              $ref: '#/components/schemas/RewardTotalAmountsResponse'
+                $ref: '#/components/schemas/ContributionShortLinkResponse'
+            totalRewardedUsdAmount:
+              type: number
 
     ContributionEventListResponse:
       type: object
