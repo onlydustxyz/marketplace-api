@@ -72,7 +72,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                             join projects p on p.id = pcl.project_id
                                          where cpcl.github_user_id = d.contributor_id and
                                                (coalesce(:projectIds) is null or p.id = any(:projectIds)) and
-                                               (coalesce(:projectSlugs) is null or p.slug = any(:projectSlugs))) contributor_labels ON true
+                                               (coalesce(:projectSlugs) is null or p.slug = any(:projectSlugs))) contributor_labels ON cast(:projectIds as uuid[]) is not null or cast(:projectSlugs as text[]) is not null
             
             WHERE (coalesce(:totalRewardedUsdAmountMin) is null or d.total_rewarded_usd_amount >= :totalRewardedUsdAmountMin)
               and (coalesce(:totalRewardedUsdAmountEq) is null or d.total_rewarded_usd_amount = :totalRewardedUsdAmountEq)

@@ -211,6 +211,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String BI_STATS_FINANCIALS = "/api/v1/bi/stats/financials";
     protected static final String BI_PROJECTS = "/api/v1/bi/projects";
     protected static final String BI_CONTRIBUTORS = "/api/v1/bi/contributors";
+    protected static final String BI_CONTRIBUTORS_BY_ID = "/api/v1/bi/contributors/%s";
     protected static final String PROJECT_CONTRIBUTOR_LABELS = "/api/v1/projects/%s/contributor-labels";
     protected static final String CONTRIBUTOR_LABEL_BY_ID = "/api/v1/contributor-labels/%s";
 

@@ -649,5 +649,80 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> assertThat(response.getContributors()).isSortedAccordingTo(comparing(c -> c.getPrCount().getValue())), true
             );
         }
+
+        @Test
+        public void should_get_contributor_by_id() {
+            // When
+            client.get()
+                    .uri(getApiURI(BI_CONTRIBUTORS_BY_ID.formatted(antho.githubUserId().toString())))
+                    .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(hayden).jwt())
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .json("""
+                            {
+                              "contributor": {
+                                "bio": null,
+                                "signedUpOnGithubAt": null,
+                                "contacts": null,
+                                "login": "antho",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/antho",
+                                "isRegistered": true,
+                                "globalRank": null,
+                                "globalRankPercentile": null,
+                                "globalRankCategory": "F"
+                              },
+                              "categories": [
+                                {
+                                  "slug": "defi",
+                                  "name": "DeFi"
+                                }
+                              ],
+                              "languages": [
+                                {
+                                  "slug": "java",
+                                  "name": "Java"
+                                },
+                                {
+                                  "slug": "rust",
+                                  "name": "Rust"
+                                }
+                              ],
+                              "ecosystems": [
+                                {
+                                  "name": "Universe ecosystem"
+                                }
+                              ],
+                              "projectContributorLabels": null,
+                              "countryCode": "FR",
+                              "totalRewardedUsdAmount": {
+                                "value": 1.5,
+                                "trend": "UP"
+                              },
+                              "rewardCount": {
+                                "value": 2,
+                                "trend": "UP"
+                              },
+                              "issueCount": {
+                                "value": 0,
+                                "trend": "STABLE"
+                              },
+                              "prCount": {
+                                "value": 3,
+                                "trend": "UP"
+                              },
+                              "codeReviewCount": {
+                                "value": 0,
+                                "trend": "STABLE"
+                              },
+                              "contributionCount": {
+                                "value": 3,
+                                "trend": "UP"
+                              }
+                            }
+                            """);
+        }
     }
 }
