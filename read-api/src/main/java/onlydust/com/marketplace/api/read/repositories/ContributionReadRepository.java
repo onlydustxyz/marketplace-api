@@ -99,16 +99,22 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                            c.github_author_id,
                            c.project_id,
                            rd.contribution_id) c
+            where
+                (coalesce(:types) is null or c.contribution_type = any (cast(:types as indexer_exp.contribution_type[])))
             """, countQuery = """
             select count(distinct c.github_id)
             from bi.p_contribution_data c
                      left join bi.p_contribution_reward_data rd on rd.contribution_id = c.contribution_id
+            where
+                (coalesce(:types) is null or c.contribution_type = any (cast(:types as indexer_exp.contribution_type[])))
             """, nativeQuery = true)
-    Page<ContributionReadEntity> findAll(Pageable pageable);
+    Page<ContributionReadEntity> findAll(String[] types,
+                                         Pageable pageable);
 
     default Page<ContributionReadEntity> findAll(ContributionsQueryParams q) {
-        return findAll(PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC :
-                Sort.Direction.ASC, getSortProperty(q.getSort()))));
+        return findAll(q.getTypes() == null ? null : q.getTypes().stream().map(Enum::name).toArray(String[]::new),
+                PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC :
+                        Sort.Direction.ASC, getSortProperty(q.getSort()))));
     }
 
     static String getSortProperty(ContributionsSortEnum sort) {

@@ -2,13 +2,14 @@ package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.api.contract.model.ContributionActivityPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ContributionActivityPageResponse;
+import onlydust.com.marketplace.api.contract.model.ContributionType;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -98,16 +99,26 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         });
     }
 
-    private WebTestClient.BodySpec<ContributionActivityPageResponse, ?> assertContributions(Map<String, String> params,
-                                                                                            Consumer<ContributionActivityPageResponse> asserter) {
-        return client.get()
-                .uri(getApiURI(CONTRIBUTIONS, params))
+    @Test
+    void should_filter_contributions() {
+        assertContributions(Map.of("types", "PULL_REQUEST"),
+                r -> assertThat(r.getContributions()).allMatch(c -> c.getType().equals(ContributionType.PULL_REQUEST)));
+    }
+
+    private void assertContributions(Map<String, String> params,
+                                     Consumer<ContributionActivityPageResponse> asserter) {
+        final var q = new HashMap<String, String>();
+        q.put("pageSize", "100");
+        q.putAll(params);
+
+        client.get()
+                .uri(getApiURI(CONTRIBUTIONS, q))
                 // Then
                 .exchange()
                 .expectStatus()
                 .isOk()
                 .expectBody(ContributionActivityPageResponse.class)
                 .consumeWith(r -> asserter.accept(r.getResponseBody()))
-                ;
+        ;
     }
 }
