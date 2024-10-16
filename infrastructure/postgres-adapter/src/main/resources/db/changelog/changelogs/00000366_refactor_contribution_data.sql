@@ -121,7 +121,7 @@ FROM (SELECT c.*,
                            LEFT JOIN language_file_extensions lfe ON lfe.extension = gufe.file_extension
                   GROUP BY ga.id) c) c) v;
 
-
+call refresh_pseudo_projection('bi', 'contributor_global_data', 'contributor_id');
 
 call drop_pseudo_projection('bi', 'project_contributions_data');
 call drop_pseudo_projection('bi', 'contribution_data');
@@ -305,7 +305,6 @@ create unique index on bi.p_contribution_reward_data (contribution_id, total_rew
 create unique index on bi.p_contribution_reward_data (repo_id, contribution_id);
 create unique index on bi.p_contribution_reward_data (project_id, contribution_id);
 create index on bi.p_contribution_reward_data using gin (reward_ids);
-
 
 
 
