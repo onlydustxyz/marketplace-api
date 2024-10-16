@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.it.api;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.api.contract.model.ContributorOverviewResponse;
 import onlydust.com.marketplace.api.contract.model.IssueApplicantsPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.IssueApplicantsPageResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationPatchRequest;
-import onlydust.com.marketplace.api.contract.model.RankedContributorResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
@@ -1442,7 +1442,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
             assertThat(response.getApplicants())
                     .isNotEmpty()
                     .extracting(IssueApplicantsPageItemResponse::getContributor)
-                    .extracting(RankedContributorResponse::getGithubUserId)
+                    .extracting(ContributorOverviewResponse::getGithubUserId)
                     .allMatch(id -> id.equals(gregoire.githubUserId().value()));
         });
 
@@ -1452,7 +1452,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
             assertThat(response.getApplicants())
                     .isNotEmpty()
                     .extracting(IssueApplicantsPageItemResponse::getContributor)
-                    .extracting(RankedContributorResponse::getGithubUserId)
+                    .extracting(ContributorOverviewResponse::getGithubUserId)
                     .allMatch(id -> !id.equals(gregoire.githubUserId().value()));
         });
     }

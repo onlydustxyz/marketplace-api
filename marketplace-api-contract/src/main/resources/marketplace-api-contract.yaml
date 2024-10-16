@@ -180,6 +180,28 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/bi/contributors/{contributorId}:
+    get:
+      tags:
+        - ReadBi
+      summary: Get contributor BI
+      operationId: getBIContributor
+      parameters:
+        - name: contributorId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/GithubUserId'
+      responses:
+        "200":
+          description: 'Contributor'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiContributorsPageItemResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 
   /api/v1/contributions:
     get:
@@ -11692,6 +11714,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/GithubUserId'
+        contributionGithubIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/IssueId'
         projectIds:
           type: array
           items:
@@ -11786,7 +11812,7 @@ components:
         - contributionCount
       properties:
         contributor:
-          $ref: '#/components/schemas/RankedContributorResponse'
+          $ref: '#/components/schemas/ContributorOverviewResponse'
         projects:
           type: array
           items:
@@ -11827,42 +11853,8 @@ components:
         - $ref: '#/components/schemas/RankedContributorResponse'
       type: object
       required:
-        - languages
-        - ecosystems
-        - countryCode
-        - totalRewardedUsdAmount
-        - rewardCount
-        - issueCount
-        - prCount
-        - codeReviewCount
-        - contributionCount
+        - signedUpOnGithubAt
       properties:
-        languages:
-          type: array
-          items:
-            $ref: '#/components/schemas/LanguageResponse'
-        ecosystems:
-          type: array
-          items:
-            $ref: '#/components/schemas/EcosystemLinkResponse'
-        projectContributorLabels:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectContributorLabelResponse'
-        countryCode:
-          $ref: '#/components/schemas/CountryCode'
-        totalRewardedUsdAmount:
-          type: number
-        rewardCount:
-          type: integer
-        issueCount:
-          type: integer
-        prCount:
-          type: integer
-        codeReviewCount:
-          type: integer
-        contributionCount:
-          type: integer
         bio:
           type: string
           description: User bio as in Github profile
@@ -11875,10 +11867,6 @@ components:
           type: string
           format: date-time
           description: When the user signed up on OnlyDust
-        lastSeenAt:
-          type: string
-          format: date-time
-          description: The last time the user signed in on OnlyDust
         contacts:
           type: array
           items:

@@ -1,3 +1,18 @@
+create or replace view iam.all_users as
+select u.id                                                         as user_id,
+       coalesce(ga.id, u.github_user_id)                            as github_user_id,
+       coalesce(ga.login, u.github_login)                           as login,
+       coalesce(upi.avatar_url, ga.avatar_url, u.github_avatar_url) as avatar_url,
+       u.email                                                      as email,
+       coalesce(upi.bio, ga.bio)                                    as bio,
+       u.created_at::timestamptz                                    as signed_up_at,
+       ga.created_at::timestamptz                                   as signed_up_on_github_at
+from iam.users u
+         full outer join indexer_exp.github_accounts ga on ga.id = u.github_user_id
+         left join user_profile_info upi on u.id = upi.id;
+
+
+
 CREATE OR REPLACE VIEW bi.v_contributor_global_data AS
 SELECT v.*, md5(v::text) as hash
 FROM (SELECT c.*,
@@ -16,6 +31,9 @@ FROM (SELECT c.*,
                                               'avatarUrl', u.avatar_url,
                                               'isRegistered', u.user_id is not null,
                                               'id', u.user_id,
+                                              'bio', u.bio,
+                                              'signedUpAt', u.signed_up_at,
+                                              'signedUpOnGithubAt', u.signed_up_on_github_at,
                                               'globalRank', gur.rank,
                                               'globalRankPercentile', gur.rank_percentile,
                                               'globalRankCategory', case
@@ -25,7 +43,12 @@ FROM (SELECT c.*,
                                                                         when gur.rank_percentile <= 0.08 then 'D'
                                                                         when gur.rank_percentile <= 0.10 then 'E'
                                                                         else 'F'
-                                                  end)
+                                                  end,
+                                              'contacts', (select jsonb_agg(jsonb_build_object('channel', ci.channel,
+                                                                                               'contact', ci.contact))
+                                                           from contact_informations ci
+                                                           where ci.user_id = u.user_id)) as json
+
                     from iam.all_users u
                              left join global_users_ranks gur on gur.github_user_id = u.github_user_id
                     where u.github_user_id = c.contributor_id)  as contributor,

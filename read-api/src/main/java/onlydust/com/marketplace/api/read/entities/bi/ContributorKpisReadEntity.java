@@ -35,7 +35,7 @@ public class ContributorKpisReadEntity {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @NonNull
-    RankedContributorResponse contributor;
+    ContributorOverviewResponse contributor;
     @JdbcTypeCode(SqlTypes.JSON)
     List<ProjectLinkResponse> projects;
     @JdbcTypeCode(SqlTypes.JSON)
