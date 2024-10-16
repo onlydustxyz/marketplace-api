@@ -17,7 +17,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.sanitizedDate;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseZonedNullable;
 
 public interface ContributorKpisReadRepository extends Repository<ContributorKpisReadEntity, Long> {
     ZonedDateTime DEFAULT_FROM_DATE = ZonedDateTime.parse("2007-10-20T05:24:19Z");
@@ -132,7 +132,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                             String search,
                                             Long[] contributorIds,
                                             Long contributedToContribGithubId,
-                                            ContributionType contributedToContribType,
+                                            String contributedToContribType,
                                             UUID[] projectIds,
                                             String[] projectSlugs,
                                             UUID[] categoryIds,
@@ -153,9 +153,10 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                             Pageable pageable);
 
     default Page<ContributorKpisReadEntity> findAll(BiContributorsQueryParams q) {
-        final var sanitizedFromDate = sanitizedDate(q.getFromDate(), DEFAULT_FROM_DATE).truncatedTo(ChronoUnit.DAYS);
-        final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now()).truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        final var fromDateOfPreviousPeriod = sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
+        final var sanitizedFromDate = q.getFromDate() == null ? null : parseZonedNullable(q.getFromDate()).truncatedTo(ChronoUnit.DAYS);
+        final var sanitizedToDate = q.getToDate() == null ? null : parseZonedNullable(q.getToDate()).truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        final var fromDateOfPreviousPeriod = sanitizedFromDate == null || sanitizedToDate == null ? null :
+                sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
 
         return findAll(
                 sanitizedFromDate,
@@ -167,7 +168,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                 q.getSearch(),
                 q.getContributorIds() == null ? null : q.getContributorIds().toArray(Long[]::new),
                 q.getContributedTo() == null ? null : q.getContributedTo().getGithubId(),
-                q.getContributedTo() == null ? null : q.getContributedTo().getType(),
+                q.getContributedTo() == null ? null : q.getContributedTo().getType().name(),
                 q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
                 q.getProjectSlugs() == null ? null : q.getProjectSlugs().toArray(String[]::new),
                 q.getCategoryIds() == null ? null : q.getCategoryIds().toArray(UUID[]::new),
