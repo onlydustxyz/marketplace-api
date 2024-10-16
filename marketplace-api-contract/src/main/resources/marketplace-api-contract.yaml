@@ -11978,6 +11978,10 @@ components:
           $ref: '#/components/schemas/SortDirection'
         search:
           type: string
+        ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/IssueId'
         types:
           type: array
           items:

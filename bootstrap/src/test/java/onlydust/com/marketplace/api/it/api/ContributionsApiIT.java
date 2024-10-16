@@ -80,7 +80,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
             "TYPE,ASC",
             "TYPE,DESC"
     })
-    void should_get_contributions_with_sorting(String sort, String direction) {
+    void should_sort_contributions(String sort, String direction) {
         // When
         assertContributions(Map.of("sort", sort, "sortDirection", direction), r -> {
             // Then
@@ -103,6 +103,9 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     void should_filter_contributions() {
         assertContributions(Map.of("types", "PULL_REQUEST"),
                 r -> assertThat(r.getContributions()).allMatch(c -> c.getType().equals(ContributionType.PULL_REQUEST)));
+
+        assertContributions(Map.of("ids", "43506983"),
+                r -> assertThat(r.getContributions()).allMatch(c -> c.getGithubId().equals(43506983L)));
     }
 
     private void assertContributions(Map<String, String> params,
