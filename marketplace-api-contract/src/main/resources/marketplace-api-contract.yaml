@@ -11976,11 +11976,6 @@ components:
           $ref: '#/components/schemas/ContributionsSortEnum'
         sortDirection:
           $ref: '#/components/schemas/SortDirection'
-        dataSourceIds:
-          type: array
-          items:
-            type: string
-            format: uuid
         search:
           type: string
         types:
