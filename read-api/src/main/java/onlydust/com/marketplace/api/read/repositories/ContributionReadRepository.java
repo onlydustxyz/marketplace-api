@@ -104,23 +104,23 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                            c.project_slug,
                            rd.contribution_id) c
             where
-                (coalesce(:ids) is null or c.github_id = any (cast(:ids as bigint[]))) and
+                (coalesce(:ids) is null or c.github_id = any (:ids)) and
                 (coalesce(:types) is null or c.contribution_type = any (cast(:types as indexer_exp.contribution_type[]))) and
-                (coalesce(:projectIds) is null or c.project_id = any (cast(:projectIds as uuid[]))) and
-                (coalesce(:projectSlugs) is null or c.project_slug = any (cast(:projectSlugs as text[]))) and
-                (coalesce(:statuses) is null or c.activity_status = any (cast(:statuses as text[]))) and
-                (coalesce(:repoIds) is null or c.repo_id = any (cast(:repoIds as bigint[])))
+                (coalesce(:projectIds) is null or c.project_id = any (:projectIds)) and
+                (coalesce(:projectSlugs) is null or c.project_slug = any (:projectSlugs)) and
+                (coalesce(:statuses) is null or c.activity_status = any (:statuses)) and
+                (coalesce(:repoIds) is null or c.repo_id = any (:repoIds))
             """, countQuery = """
             select count(distinct c.github_id)
             from bi.p_contribution_data c
                      left join bi.p_contribution_reward_data rd on rd.contribution_id = c.contribution_id
             where
-                (coalesce(:ids) is null or c.github_id = any (cast(:ids as bigint[]))) and
+                (coalesce(:ids) is null or c.github_id = any (:ids)) and
                 (coalesce(:types) is null or c.contribution_type = any (cast(:types as indexer_exp.contribution_type[]))) and
-                (coalesce(:projectIds) is null or c.project_id = any (cast(:projectIds as uuid[]))) and
-                (coalesce(:projectSlugs) is null or c.project_slug = any (cast(:projectSlugs as text[]))) and
-                (coalesce(:statuses) is null or c.activity_status = any (cast(:statuses as text[]))) and
-                (coalesce(:repoIds) is null or c.repo_id = any (cast(:repoIds as bigint[])))
+                (coalesce(:projectIds) is null or c.project_id = any (:projectIds)) and
+                (coalesce(:projectSlugs) is null or c.project_slug = any (:projectSlugs)) and
+                (coalesce(:statuses) is null or c.activity_status = any (:statuses)) and
+                (coalesce(:repoIds) is null or c.repo_id = any (:repoIds))
             """, nativeQuery = true)
     Page<ContributionReadEntity> findAll(Long[] ids,
                                          String[] types,
