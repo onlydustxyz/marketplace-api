@@ -4,40 +4,28 @@ call drop_pseudo_projection('bi', 'contribution_data');
 
 
 call create_pseudo_projection('bi', 'contribution_data', $$
-with ranked_project_github_repos_relationship AS (SELECT *, row_number() OVER (PARTITION BY github_repo_id ORDER BY project_id) as row_number
-                                                  FROM project_github_repos),
-     first_contributions AS MATERIALIZED (select c.contributor_id, min(c.created_at) as first_contribution_date
-                                          from indexer_exp.contributions c
-                                          group by c.contributor_id)
-select c.id                                                                                             as contribution_id,
-       c.repo_id                                                                                        as repo_id,
-       p.id                                                                                             as project_id,
-       p.slug                                                                                           as project_slug,
-       c.contributor_id                                                                                 as contributor_id,
-       u.id                                                                                             as contributor_user_id,
-       (array_agg(kyc.country) filter (where kyc.country is not null))[1]                               as contributor_country,
-       c.created_at                                                                                     as timestamp,
-       c.status                                                                                         as contribution_status,
-       c.type                                                                                           as contribution_type,
-       c.github_author_id                                                                               as github_author_id,
-       coalesce(c.pull_request_id, c.issue_id, cr.pull_request_id)                                      as github_id,
-       c.github_number                                                                                  as github_number,
-       c.github_status                                                                                  as github_status,
-       c.github_title                                                                                   as github_title,
-       c.github_html_url                                                                                as github_html_url,
-       c.github_body                                                                                    as github_body,
-       c.created_at                                                                                     as created_at,
-       c.updated_at                                                                                     as updated_at,
-       c.completed_at                                                                                   as completed_at,
-       date_trunc('day', c.created_at)                                                                  as day_timestamp,
-       date_trunc('week', c.created_at)                                                                 as week_timestamp,
-       date_trunc('month', c.created_at)                                                                as month_timestamp,
-       date_trunc('quarter', c.created_at)                                                              as quarter_timestamp,
-       date_trunc('year', c.created_at)                                                                 as year_timestamp,
-       c.created_at = fc.first_contribution_date                                                        as is_first_contribution_on_onlydust,
-       (c.type = 'ISSUE')::int                                                                          as is_issue,
-       (c.type = 'PULL_REQUEST')::int                                                                   as is_pr,
-       (c.type = 'CODE_REVIEW')::int                                                                    as is_code_review,
+with ranked_project_github_repos_relationship AS (SELECT *,
+                                                         row_number() OVER (PARTITION BY github_repo_id ORDER BY project_id) as row_number
+                                                  FROM project_github_repos)
+select c.contribution_uuid                                                                    as contribution_id,
+       c.repo_id                                                                              as repo_id,
+       p.id                                                                                   as project_id,
+       p.slug                                                                                 as project_slug,
+       c.created_at                                                                           as timestamp,
+       c.status                                                                               as contribution_status,
+       c.type                                                                                 as contribution_type,
+       c.github_author_id                                                                     as github_author_id,
+       c.github_number                                                                        as github_number,
+       c.github_status                                                                        as github_status,
+       c.github_title                                                                         as github_title,
+       c.github_html_url                                                                      as github_html_url,
+       c.github_body                                                                          as github_body,
+       c.created_at                                                                           as created_at,
+       c.updated_at                                                                           as updated_at,
+       c.completed_at                                                                         as completed_at,
+       (c.type = 'ISSUE')::int                                                                as is_issue,
+       (c.type = 'PULL_REQUEST')::int                                                         as is_pr,
+       (c.type = 'CODE_REVIEW')::int                                                          as is_code_review,
        case
            when c.type = 'ISSUE' then
                case
@@ -56,18 +44,21 @@ select c.id                                                                     
                    when c.pr_review_state in ('PENDING_REVIEWER', 'UNDER_REVIEW') then 'IN_PROGRESS'
                    else 'DONE'
                    end
-           end                                                                                          as activity_status,
-       array_agg(distinct lfe.language_id) filter ( where lfe.language_id is not null )                 as language_ids,
-       array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null )                 as ecosystem_ids,
-       array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )                     as program_ids,
-       array_agg(distinct ppc.project_category_id) filter ( where ppc.project_category_id is not null ) as project_category_ids,
-       string_agg(distinct lfe.name, ' ')                                                               as languages,
-       bool_or(gl.name ~~* '%good%first%issue%')                                                        as is_good_first_issue,
-       array_agg(distinct gia.user_id) filter ( where gia.user_id is not null )                         as assignee_ids,
-       array_agg(distinct gil.label_id) filter ( where gil.label_id is not null )                       as github_label_ids,
-       array_agg(distinct ci.issue_id) filter ( where ci.issue_id is not null )                         as closing_issue_ids,
-       array_agg(distinct a.applicant_id) filter ( where a.applicant_id is not null )                   as applicant_ids
-from indexer_exp.contributions c
+           end                                                                                as activity_status,
+       array_agg(distinct gcc.contributor_id) filter ( where gcc.contributor_id is not null ) as contributor_ids,
+       array_agg(distinct lfe.language_id) filter ( where lfe.language_id is not null )       as language_ids,
+       array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null )       as ecosystem_ids,
+       array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )           as program_ids,
+       array_agg(distinct ppc.project_category_id)
+       filter ( where ppc.project_category_id is not null )                                   as project_category_ids,
+       string_agg(distinct lfe.name, ' ')                                                     as languages,
+       bool_or(gl.name ~~* '%good%first%issue%')                                              as is_good_first_issue,
+       array_agg(distinct gia.user_id) filter ( where gia.user_id is not null )               as assignee_ids,
+       array_agg(distinct gil.label_id) filter ( where gil.label_id is not null )             as github_label_ids,
+       array_agg(distinct ci.issue_id) filter ( where ci.issue_id is not null )               as closing_issue_ids,
+       array_agg(distinct a.applicant_id) filter ( where a.applicant_id is not null )         as applicant_ids
+from indexer_exp.grouped_contributions c
+         left join indexer_exp.grouped_contribution_contributors gcc on gcc.contribution_uuid = c.contribution_uuid
          left join ranked_project_github_repos_relationship pgr on pgr.github_repo_id = c.repo_id and pgr.row_number = 1
          left join projects p on p.id = pgr.project_id
          left join lateral ( select distinct lfe_1.language_id, l.name
@@ -77,21 +68,16 @@ from indexer_exp.contributions c
          left join projects_ecosystems pe on pe.project_id = p.id
          left join v_programs_projects pp on pp.project_id = p.id
          left join projects_project_categories ppc on ppc.project_id = p.id
-         left join iam.users u on u.github_user_id = c.contributor_id
-         left join accounting.billing_profiles_users bpu on bpu.user_id = u.id
-         left join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id
-         left join first_contributions fc on fc.contributor_id = c.contributor_id
          left join indexer_exp.github_issues_labels gil ON gil.issue_id = c.issue_id
          left join indexer_exp.github_labels gl ON gil.label_id = gl.id
          left join indexer_exp.github_issues_assignees gia ON gia.issue_id = c.issue_id
          left join indexer_exp.github_code_reviews cr on cr.id = c.code_review_id
          left join indexer_exp.github_pull_requests_closing_issues ci on ci.pull_request_id = c.pull_request_id
          left join applications a on a.issue_id = c.issue_id
-group by c.id,
+group by c.contribution_uuid,
          c.repo_id,
          p.id,
          p.slug,
-         c.contributor_id,
          c.created_at,
          c.type,
          c.status,
@@ -106,45 +92,135 @@ group by c.id,
          c.created_at,
          c.updated_at,
          c.completed_at,
-         cr.pull_request_id,
-         u.id,
-         fc.first_contribution_date
+         cr.pull_request_id
 $$, 'contribution_id');
 
-create index on bi.p_contribution_data (github_id);
+
 create index on bi.p_contribution_data (project_id);
 create index on bi.p_contribution_data (project_slug);
-create unique index on bi.p_contribution_data (contributor_id, github_id, contribution_type);
-create unique index on bi.p_contribution_data (contributor_user_id, github_id, contribution_type);
+create index on bi.p_contribution_data (repo_id);
+create index on bi.p_contribution_data (project_id, timestamp);
+create index on bi.p_contribution_data (timestamp, project_id);
 
-create index bi_contribution_data_repo_id_idx on bi.p_contribution_data (repo_id);
 
-create index bi_contribution_data_project_id_timestamp_idx on bi.p_contribution_data (project_id, timestamp);
-create index bi_contribution_data_project_id_day_timestamp_idx on bi.p_contribution_data (project_id, day_timestamp);
-create index bi_contribution_data_project_id_week_timestamp_idx on bi.p_contribution_data (project_id, week_timestamp);
-create index bi_contribution_data_project_id_month_timestamp_idx on bi.p_contribution_data (project_id, month_timestamp);
-create index bi_contribution_data_project_id_quarter_timestamp_idx on bi.p_contribution_data (project_id, quarter_timestamp);
-create index bi_contribution_data_project_id_year_timestamp_idx on bi.p_contribution_data (project_id, year_timestamp);
-create index bi_contribution_data_project_id_timestamp_idx_inv on bi.p_contribution_data (timestamp, project_id);
-create index bi_contribution_data_project_id_day_timestamp_idx_inv on bi.p_contribution_data (day_timestamp, project_id);
-create index bi_contribution_data_project_id_week_timestamp_idx_inv on bi.p_contribution_data (week_timestamp, project_id);
-create index bi_contribution_data_project_id_month_timestamp_idx_inv on bi.p_contribution_data (month_timestamp, project_id);
-create index bi_contribution_data_project_id_quarter_timestamp_idx_inv on bi.p_contribution_data (quarter_timestamp, project_id);
+call create_pseudo_projection('bi', 'per_contributor_contribution_data', $$
+with first_contributions AS MATERIALIZED (select c.contributor_id, min(c.created_at) as first_contribution_date
+                                          from indexer_exp.contributions c
+                                          group by c.contributor_id)
+select c.contribution_id                                                  as contribution_id,
+       c.repo_id                                                          as repo_id,
+       c.project_id                                                       as project_id,
+       c.project_slug                                                     as project_slug,
+       cd.contributor_id                                                  as contributor_id,
+       u.id                                                               as contributor_user_id,
+       (array_agg(kyc.country) filter (where kyc.country is not null))[1] as contributor_country,
+       c.created_at                                                       as timestamp,
+       c.contribution_status                                              as contribution_status,
+       c.contribution_type                                                as contribution_type,
+       c.github_author_id                                                 as github_author_id,
+       c.github_number                                                    as github_number,
+       c.github_status                                                    as github_status,
+       c.github_title                                                     as github_title,
+       c.github_html_url                                                  as github_html_url,
+       c.github_body                                                      as github_body,
+       c.created_at                                                       as created_at,
+       c.updated_at                                                       as updated_at,
+       c.completed_at                                                     as completed_at,
+       date_trunc('day', c.created_at)                                    as day_timestamp,
+       date_trunc('week', c.created_at)                                   as week_timestamp,
+       date_trunc('month', c.created_at)                                  as month_timestamp,
+       date_trunc('quarter', c.created_at)                                as quarter_timestamp,
+       date_trunc('year', c.created_at)                                   as year_timestamp,
+       c.created_at = fc.first_contribution_date                          as is_first_contribution_on_onlydust,
+       c.is_issue                                                         as is_issue,
+       c.is_pr                                                            as is_pr,
+       c.is_code_review                                                   as is_code_review,
+       c.activity_status                                                  as activity_status,
+       c.language_ids                                                     as language_ids,
+       c.ecosystem_ids                                                    as ecosystem_ids,
+       c.program_ids                                                      as program_ids,
+       c.project_category_ids                                             as project_category_ids,
+       c.languages                                                        as languages,
+       c.is_good_first_issue                                              as is_good_first_issue,
+       c.assignee_ids                                                     as assignee_ids,
+       c.github_label_ids                                                 as github_label_ids,
+       c.closing_issue_ids                                                as closing_issue_ids,
+       c.applicant_ids                                                    as applicant_ids
+from bi.p_contribution_data c
+         join unnest(c.contributor_ids) as cd(contributor_id) on true
+         left join iam.users u on u.github_user_id = cd.contributor_id
+         left join accounting.billing_profiles_users bpu on bpu.user_id = u.id
+         left join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id
+         left join first_contributions fc on fc.contributor_id = cd.contributor_id
+group by c.contribution_id,
+         c.repo_id,
+         c.project_id,
+         c.project_slug,
+         cd.contributor_id,
+         u.id,
+         c.created_at,
+         c.contribution_status,
+         c.contribution_type,
+         c.github_author_id,
+         c.github_number,
+         c.github_status,
+         c.github_title,
+         c.github_html_url,
+         c.github_body,
+         c.created_at,
+         c.updated_at,
+         c.completed_at,
+         fc.first_contribution_date,
+         c.is_issue,
+         c.is_pr,
+         c.is_code_review,
+         c.activity_status,
+         c.language_ids,
+         c.ecosystem_ids,
+         c.program_ids,
+         c.project_category_ids,
+         c.languages,
+         c.is_good_first_issue,
+         c.assignee_ids,
+         c.github_label_ids,
+         c.closing_issue_ids,
+         c.applicant_ids
+$$, 'contribution_id');
 
-create index bi_contribution_data_project_id_year_timestamp_idx_inv on bi.p_contribution_data (year_timestamp, project_id);
-create index bi_contribution_data_contributor_id_timestamp_idx on bi.p_contribution_data (contributor_id, timestamp);
-create index bi_contribution_data_contributor_id_day_timestamp_idx on bi.p_contribution_data (contributor_id, day_timestamp);
-create index bi_contribution_data_contributor_id_week_timestamp_idx on bi.p_contribution_data (contributor_id, week_timestamp);
-create index bi_contribution_data_contributor_id_month_timestamp_idx on bi.p_contribution_data (contributor_id, month_timestamp);
-create index bi_contribution_data_contributor_id_quarter_timestamp_idx on bi.p_contribution_data (contributor_id, quarter_timestamp);
-create index bi_contribution_data_contributor_id_year_timestamp_idx on bi.p_contribution_data (contributor_id, year_timestamp);
-create index bi_contribution_data_contributor_id_timestamp_idx_inv on bi.p_contribution_data (timestamp, contributor_id);
-create index bi_contribution_data_contributor_id_day_timestamp_idx_inv on bi.p_contribution_data (day_timestamp, contributor_id);
-create index bi_contribution_data_contributor_id_week_timestamp_idx_inv on bi.p_contribution_data (week_timestamp, contributor_id);
-create index bi_contribution_data_contributor_id_month_timestamp_idx_inv on bi.p_contribution_data (month_timestamp, contributor_id);
-create index bi_contribution_data_contributor_id_quarter_timestamp_idx_inv on bi.p_contribution_data (quarter_timestamp, contributor_id);
+create index on bi.p_per_contributor_contribution_data (github_id);
+create index on bi.p_per_contributor_contribution_data (project_id);
+create index on bi.p_per_contributor_contribution_data (project_slug);
+create unique index on bi.p_per_contributor_contribution_data (contributor_id, github_id, contribution_type);
+create unique index on bi.p_per_contributor_contribution_data (contributor_user_id, github_id, contribution_type);
 
-create index bi_contribution_data_contributor_id_year_timestamp_idx_inv on bi.p_contribution_data (year_timestamp, contributor_id);
+create index bi_contribution_data_repo_id_idx on bi.p_per_contributor_contribution_data (repo_id);
+
+create index bi_contribution_data_project_id_timestamp_idx on bi.p_per_contributor_contribution_data (project_id, timestamp);
+create index bi_contribution_data_project_id_day_timestamp_idx on bi.p_per_contributor_contribution_data (project_id, day_timestamp);
+create index bi_contribution_data_project_id_week_timestamp_idx on bi.p_per_contributor_contribution_data (project_id, week_timestamp);
+create index bi_contribution_data_project_id_month_timestamp_idx on bi.p_per_contributor_contribution_data (project_id, month_timestamp);
+create index bi_contribution_data_project_id_quarter_timestamp_idx on bi.p_per_contributor_contribution_data (project_id, quarter_timestamp);
+create index bi_contribution_data_project_id_year_timestamp_idx on bi.p_per_contributor_contribution_data (project_id, year_timestamp);
+create index bi_contribution_data_project_id_timestamp_idx_inv on bi.p_per_contributor_contribution_data (timestamp, project_id);
+create index bi_contribution_data_project_id_day_timestamp_idx_inv on bi.p_per_contributor_contribution_data (day_timestamp, project_id);
+create index bi_contribution_data_project_id_week_timestamp_idx_inv on bi.p_per_contributor_contribution_data (week_timestamp, project_id);
+create index bi_contribution_data_project_id_month_timestamp_idx_inv on bi.p_per_contributor_contribution_data (month_timestamp, project_id);
+create index bi_contribution_data_project_id_quarter_timestamp_idx_inv on bi.p_per_contributor_contribution_data (quarter_timestamp, project_id);
+
+create index bi_contribution_data_project_id_year_timestamp_idx_inv on bi.p_per_contributor_contribution_data (year_timestamp, project_id);
+create index bi_contribution_data_contributor_id_timestamp_idx on bi.p_per_contributor_contribution_data (contributor_id, timestamp);
+create index bi_contribution_data_contributor_id_day_timestamp_idx on bi.p_per_contributor_contribution_data (contributor_id, day_timestamp);
+create index bi_contribution_data_contributor_id_week_timestamp_idx on bi.p_per_contributor_contribution_data (contributor_id, week_timestamp);
+create index bi_contribution_data_contributor_id_month_timestamp_idx on bi.p_per_contributor_contribution_data (contributor_id, month_timestamp);
+create index bi_contribution_data_contributor_id_quarter_timestamp_idx on bi.p_per_contributor_contribution_data (contributor_id, quarter_timestamp);
+create index bi_contribution_data_contributor_id_year_timestamp_idx on bi.p_per_contributor_contribution_data (contributor_id, year_timestamp);
+create index bi_contribution_data_contributor_id_timestamp_idx_inv on bi.p_per_contributor_contribution_data (timestamp, contributor_id);
+create index bi_contribution_data_contributor_id_day_timestamp_idx_inv on bi.p_per_contributor_contribution_data (day_timestamp, contributor_id);
+create index bi_contribution_data_contributor_id_week_timestamp_idx_inv on bi.p_per_contributor_contribution_data (week_timestamp, contributor_id);
+create index bi_contribution_data_contributor_id_month_timestamp_idx_inv on bi.p_per_contributor_contribution_data (month_timestamp, contributor_id);
+create index bi_contribution_data_contributor_id_quarter_timestamp_idx_inv on bi.p_per_contributor_contribution_data (quarter_timestamp, contributor_id);
+
+create index bi_contribution_data_contributor_id_year_timestamp_idx_inv on bi.p_per_contributor_contribution_data (year_timestamp, contributor_id);
 
 call create_pseudo_projection('bi', 'project_contributions_data', $$
 SELECT p.id                                                                            as project_id,
@@ -155,7 +231,7 @@ SELECT p.id                                                                     
                                                 cd.contribution_status != 'COMPLETED' and
                                                 cd.contribution_status != 'CANCELLED') as good_first_issue_count
 FROM projects p
-         LEFT JOIN bi.p_contribution_data cd ON cd.project_id = p.id
+         LEFT JOIN bi.p_per_contributor_contribution_data cd ON cd.project_id = p.id
 GROUP BY p.id
 $$, 'project_id');
 
@@ -255,7 +331,7 @@ FROM bi.p_contributor_global_data c
                            coalesce(sum(cd.is_issue), 0)       as issue_count,
                            coalesce(sum(cd.is_pr), 0)          as pr_count,
                            coalesce(sum(cd.is_code_review), 0) as code_review_count
-                    from bi.p_contribution_data cd
+                    from bi.p_per_contributor_contribution_data cd
                     where (fromDate is null or cd.timestamp >= fromDate)
                       and (toDate is null or cd.timestamp < toDate)
                       and (dataSourceIds is null or cd.project_id = any (dataSourceIds) or cd.program_ids && dataSourceIds or cd.ecosystem_ids && dataSourceIds)
@@ -291,7 +367,7 @@ WHERE (dataSourceIds is null or c.project_ids && dataSourceIds or c.program_ids 
   and (countryCodes is null or c.contributor_country = any (countryCodes))
   and (searchQuery is null or c.search ilike '%' || searchQuery || '%')
   and (contributedTo is null or exists(select 1
-                                       from bi.p_contribution_data cd
+                                       from bi.p_per_contributor_contribution_data cd
                                        where cd.contributor_id = c.contributor_id
                                          and cd.github_id = contributedTo.github_id
                                          and cd.contribution_type = contributedTo.type))
