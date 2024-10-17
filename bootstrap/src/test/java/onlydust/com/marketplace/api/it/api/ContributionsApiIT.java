@@ -81,7 +81,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "linkedIssues": null,
-                          "totalRewardedUsdAmount": null
+                          "totalRewardedUsdAmount": 0
                         }
                         """);
     }
@@ -133,7 +133,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                               "applicants": null,
                               "languages": null,
                               "linkedIssues": null,
-                              "totalRewardedUsdAmount": null
+                              "totalRewardedUsdAmount": 0
                             }
                           ]
                         }
