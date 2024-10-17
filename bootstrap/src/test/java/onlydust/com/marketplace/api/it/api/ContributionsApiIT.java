@@ -4,16 +4,16 @@ import onlydust.com.marketplace.api.contract.model.ContributionActivityPageItemR
 import onlydust.com.marketplace.api.contract.model.ContributionActivityPageResponse;
 import onlydust.com.marketplace.api.contract.model.ContributionType;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import org.assertj.core.api.AbstractListAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
-import static java.util.Collections.reverse;
+import static java.util.Comparator.comparing;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -22,14 +22,9 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_contribution() {
         // When
-        client.get()
-                .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("43506983"), Map.of("pageSize", "1")))
+        client.get().uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("43506983"), Map.of("pageSize", "1")))
                 // Then
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .json("""
+                .exchange().expectStatus().isOk().expectBody().json("""
                         {
                           "type": "PULL_REQUEST",
                           "repo": {
@@ -87,14 +82,9 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_contributions() {
         // When
-        client.get()
-                .uri(getApiURI(CONTRIBUTIONS, Map.of("pageSize", "1")))
+        client.get().uri(getApiURI(CONTRIBUTIONS, Map.of("pageSize", "1")))
                 // Then
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .json("""
+                .exchange().expectStatus().isOk().expectBody().json("""
                         {
                           "totalPageNumber": 45508,
                           "totalItemNumber": 45508,
@@ -139,72 +129,48 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "CREATED_AT,ASC",
-            "CREATED_AT,DESC",
-            "TYPE,ASC",
-            "TYPE,DESC"
-    })
+    @CsvSource({"CREATED_AT,ASC", "CREATED_AT,DESC", "TYPE,ASC", "TYPE,DESC"})
     void should_sort_contributions(String sort, String direction) {
-        // When
-        assertContributions(Map.of("sort", sort, "sortDirection", direction), r -> {
-            // Then
-            final var contributions = r.getContributions();
-            if (direction.equals("DESC"))
-                reverse(contributions);
+        var comparator = switch (sort) {
+            case "CREATED_AT" -> comparing(ContributionActivityPageItemResponse::getCreatedAt);
+            case "TYPE" -> comparing(ContributionActivityPageItemResponse::getType);
+            default -> throw new IllegalArgumentException("Invalid sort field: " + sort);
+        };
 
-            switch (sort) {
-                case "CREATED_AT":
-                    assertThat(contributions).isSortedAccordingTo(Comparator.comparing(ContributionActivityPageItemResponse::getCreatedAt));
-                    break;
-                case "TYPE":
-                    assertThat(contributions).isSortedAccordingTo(Comparator.comparing(ContributionActivityPageItemResponse::getType));
-                    break;
-            }
-        });
+        comparator = direction.equals("DESC") ? comparator.reversed() : comparator;
+
+        assertContributions(Map.of("sort", sort, "sortDirection", direction))
+                .isSortedAccordingTo(comparator);
     }
 
     @Test
     void should_filter_contributions() {
-        assertContributions(Map.of("types", "PULL_REQUEST"),
-                r -> assertThat(r.getContributions())
-                        .isNotEmpty()
-                        .extracting(ContributionActivityPageItemResponse::getType)
-                        .containsOnly(ContributionType.PULL_REQUEST));
+        assertContributions(Map.of("types", "PULL_REQUEST"))
+                .extracting(ContributionActivityPageItemResponse::getType)
+                .containsOnly(ContributionType.PULL_REQUEST);
 
-        assertContributions(Map.of("ids", "43506983"),
-                r -> assertThat(r.getContributions())
-                        .isNotEmpty()
-                        .extracting(ContributionActivityPageItemResponse::getGithubId)
-                        .containsOnly(43506983L));
+        assertContributions(Map.of("ids", "43506983"))
+                .extracting(ContributionActivityPageItemResponse::getGithubId)
+                .containsOnly(43506983L);
 
-        assertContributions(Map.of("projectIds", "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e"),
-                r -> assertThat(r.getContributions())
-                        .isNotEmpty()
-                        .extracting(c -> c.getProject().getName())
-                        .containsOnly("Cal.com"));
+        assertContributions(Map.of("projectIds", "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e"))
+                .extracting(c -> c.getProject().getName())
+                .containsOnly("Cal.com");
 
-        assertContributions(Map.of("projectSlugs", "calcom"),
-                r -> assertThat(r.getContributions())
-                        .isNotEmpty()
-                        .extracting(c -> c.getProject().getName())
-                        .containsOnly("Cal.com"));
+        assertContributions(Map.of("projectSlugs", "calcom"))
+                .extracting(c -> c.getProject().getName())
+                .containsOnly("Cal.com");
     }
 
-    private void assertContributions(Map<String, String> params,
-                                     Consumer<ContributionActivityPageResponse> asserter) {
+    private AbstractListAssert<?, ? extends List<? extends ContributionActivityPageItemResponse>, ContributionActivityPageItemResponse> assertContributions(Map<String, String> params) {
         final var q = new HashMap<String, String>();
         q.put("pageSize", "100");
         q.putAll(params);
 
-        client.get()
-                .uri(getApiURI(CONTRIBUTIONS, q))
+        final var contributions = client.get().uri(getApiURI(CONTRIBUTIONS, q))
                 // Then
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(ContributionActivityPageResponse.class)
-                .consumeWith(r -> asserter.accept(r.getResponseBody()))
-        ;
+                .exchange().expectStatus().isOk().expectBody(ContributionActivityPageResponse.class).returnResult().getResponseBody().getContributions();
+
+        return assertThat(contributions).isNotEmpty();
     }
 }
