@@ -22,7 +22,7 @@ call create_pseudo_projection('bi', 'contribution_data', $$
 with ranked_project_github_repos_relationship AS (SELECT *,
                                                          row_number() OVER (PARTITION BY github_repo_id ORDER BY project_id) as row_number
                                                   FROM project_github_repos)
-select c.contribution_uuid                                                                    as contribution_id,
+select c.contribution_uuid                                                                    as contribution_uuid,
        c.repo_id                                                                              as repo_id,
        p.id                                                                                   as project_id,
        p.slug                                                                                 as project_slug,
@@ -108,7 +108,7 @@ group by c.contribution_uuid,
          c.updated_at,
          c.completed_at,
          cr.pull_request_id
-$$, 'contribution_id');
+$$, 'contribution_uuid');
 
 
 create index on bi.p_contribution_data (project_id);
@@ -122,7 +122,8 @@ call create_pseudo_projection('bi', 'per_contributor_contribution_data', $$
 with first_contributions AS MATERIALIZED (select c.contributor_id, min(c.created_at) as first_contribution_date
                                           from indexer_exp.contributions c
                                           group by c.contributor_id)
-select c.contribution_id                                                  as contribution_id,
+select md5(row(c.contribution_uuid, cd.contributor_id)::text)::uuid       as technical_id,
+       c.contribution_uuid                                                as contribution_uuid,
        c.repo_id                                                          as repo_id,
        c.project_id                                                       as project_id,
        c.project_slug                                                     as project_slug,
@@ -167,7 +168,7 @@ from bi.p_contribution_data c
          left join accounting.billing_profiles_users bpu on bpu.user_id = u.id
          left join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id
          left join first_contributions fc on fc.contributor_id = cd.contributor_id
-group by c.contribution_id,
+group by c.contribution_uuid,
          c.repo_id,
          c.project_id,
          c.project_slug,
@@ -200,13 +201,13 @@ group by c.contribution_id,
          c.github_label_ids,
          c.closing_issue_ids,
          c.applicant_ids
-$$, 'contribution_id');
+$$, 'technical_id');
 
-create index on bi.p_per_contributor_contribution_data (github_id);
+create index on bi.p_per_contributor_contribution_data (contribution_uuid);
 create index on bi.p_per_contributor_contribution_data (project_id);
 create index on bi.p_per_contributor_contribution_data (project_slug);
-create unique index on bi.p_per_contributor_contribution_data (contributor_id, github_id, contribution_type);
-create unique index on bi.p_per_contributor_contribution_data (contributor_user_id, github_id, contribution_type);
+create unique index on bi.p_per_contributor_contribution_data (contributor_id, contribution_uuid);
+create unique index on bi.p_per_contributor_contribution_data (contributor_user_id, contribution_uuid);
 
 create index bi_contribution_data_repo_id_idx on bi.p_per_contributor_contribution_data (repo_id);
 
@@ -241,7 +242,7 @@ call create_pseudo_projection('bi', 'project_contributions_data', $$
 SELECT p.id                                                                            as project_id,
        array_agg(distinct cd.repo_id)                                                  as repo_ids,
        count(distinct cd.contributor_id)                                               as contributor_count,
-       count(cd.contribution_id) filter ( where cd.is_good_first_issue and
+       count(distinct cd.contribution_uuid) filter ( where cd.is_good_first_issue and
                                                 coalesce(array_length(cd.assignee_ids, 1), 0) = 0 and
                                                 cd.contribution_status != 'COMPLETED' and
                                                 cd.contribution_status != 'CANCELLED') as good_first_issue_count
@@ -278,6 +279,7 @@ DROP FUNCTION bi.select_contributors(fromDate timestamptz,
                                      toDate timestamptz,
                                      dataSourceIds uuid[],
                                      contributorIds bigint[],
+                                     contributedTo contribution_identity,
                                      projectIds uuid[],
                                      projectSlugs text[],
                                      categoryIds uuid[],
@@ -288,11 +290,13 @@ DROP FUNCTION bi.select_contributors(fromDate timestamptz,
                                      searchQuery text,
                                      filteredKpis boolean);
 
+drop type contribution_identity;
+
 CREATE OR REPLACE FUNCTION bi.select_contributors(fromDate timestamptz,
                                                   toDate timestamptz,
                                                   dataSourceIds uuid[],
                                                   contributorIds bigint[],
-                                                  contributedTo contribution_identity,
+                                                  contributedTo uuid[],
                                                   projectIds uuid[],
                                                   projectSlugs text[],
                                                   categoryIds uuid[],
@@ -342,14 +346,15 @@ SELECT c.contributor_id                  as contributor_id,
 FROM bi.p_contributor_global_data c
 
          LEFT JOIN (select cd.contributor_id,
-                           count(cd.contribution_id)           as contribution_count,
+                           count(cd.contribution_uuid)         as contribution_count,
                            coalesce(sum(cd.is_issue), 0)       as issue_count,
                            coalesce(sum(cd.is_pr), 0)          as pr_count,
                            coalesce(sum(cd.is_code_review), 0) as code_review_count
                     from bi.p_per_contributor_contribution_data cd
                     where (fromDate is null or cd.timestamp >= fromDate)
                       and (toDate is null or cd.timestamp < toDate)
-                      and (dataSourceIds is null or cd.project_id = any (dataSourceIds) or cd.program_ids && dataSourceIds or cd.ecosystem_ids && dataSourceIds)
+                      and (dataSourceIds is null or cd.project_id = any (dataSourceIds) or
+                           cd.program_ids && dataSourceIds or cd.ecosystem_ids && dataSourceIds)
                       and (contributionStatuses is null or cd.contribution_status = any (contributionStatuses))
                       and (not filteredKpis or projectIds is null or cd.project_id = any (projectIds))
                       and (not filteredKpis or projectSlugs is null or cd.project_slug = any (projectSlugs))
@@ -364,7 +369,8 @@ FROM bi.p_contributor_global_data c
                     from bi.p_reward_data rd
                     where (fromDate is null or rd.timestamp >= fromDate)
                       and (toDate is null or rd.timestamp < toDate)
-                      and (dataSourceIds is null or rd.project_id = any (dataSourceIds) or rd.program_ids && dataSourceIds or rd.ecosystem_ids && dataSourceIds)
+                      and (dataSourceIds is null or rd.project_id = any (dataSourceIds) or
+                           rd.program_ids && dataSourceIds or rd.ecosystem_ids && dataSourceIds)
                       and (not filteredKpis or projectIds is null or rd.project_id = any (projectIds))
                       and (not filteredKpis or projectSlugs is null or rd.project_slug = any (projectSlugs))
                       and (not filteredKpis or ecosystemIds is null or rd.ecosystem_ids && ecosystemIds)
@@ -372,7 +378,8 @@ FROM bi.p_contributor_global_data c
                       and (not filteredKpis or languageIds is null or rd.language_ids && languageIds)
                     group by rd.contributor_id) rd on rd.contributor_id = c.contributor_id
 
-WHERE (dataSourceIds is null or c.project_ids && dataSourceIds or c.program_ids && dataSourceIds or c.ecosystem_ids && dataSourceIds)
+WHERE (dataSourceIds is null or c.project_ids && dataSourceIds or c.program_ids && dataSourceIds or
+       c.ecosystem_ids && dataSourceIds)
   and (contributorIds is null or c.contributor_id = any (contributorIds))
   and (projectIds is null or c.project_ids && projectIds)
   and (projectSlugs is null or c.project_slugs && projectSlugs)
@@ -384,8 +391,7 @@ WHERE (dataSourceIds is null or c.project_ids && dataSourceIds or c.program_ids 
   and (contributedTo is null or exists(select 1
                                        from bi.p_per_contributor_contribution_data cd
                                        where cd.contributor_id = c.contributor_id
-                                         and cd.github_id = contributedTo.github_id
-                                         and cd.contribution_type = contributedTo.type))
+                                         and cd.contribution_uuid = any (contributedTo)))
   and (cd.contributor_id is not null or rd.contributor_id is not null)
 GROUP BY c.contributor_id, c.contributor_login, c.contributor, c.first_project_name,
          c.projects, c.ecosystems,
