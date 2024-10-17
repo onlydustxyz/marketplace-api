@@ -119,8 +119,9 @@ public class GithubHelper {
         parameters.put("mainFileExtensions", mainFileExtensions == null ? new String[]{} : mainFileExtensions.toArray(String[]::new));
 
         databaseHelper.executeQuery("""
-                insert into indexer_exp.github_pull_requests(id, repo_id, number, title, status, created_at, updated_at, closed_at, merged_at, author_id, html_url, body, comments_count, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url, review_state, commit_count, main_file_extensions)
+                insert into indexer_exp.github_pull_requests(id, contribution_uuid, repo_id, number, title, status, created_at, updated_at, closed_at, merged_at, author_id, html_url, body, comments_count, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url, review_state, commit_count, main_file_extensions)
                 select :prId,
+                       indexer.uuid_of(cast(:prId as text)),
                        gr.id,
                        :githubNumber,
                        :githubTitle,
@@ -182,8 +183,9 @@ public class GithubHelper {
 
         databaseHelper.executeQuery(
                 """
-                        INSERT INTO indexer_exp.github_issues (id, repo_id, number, title, status, created_at, updated_at, closed_at, author_id, html_url, body, comments_count, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url)
+                        INSERT INTO indexer_exp.github_issues (id, contribution_uuid, repo_id, number, title, status, created_at, updated_at, closed_at, author_id, html_url, body, comments_count, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url)
                         SELECT  :issueId,
+                                indexer.uuid_of(cast(:issueId as text)),
                                 gr.id,
                                 :number,
                                 :title,
@@ -258,9 +260,11 @@ public class GithubHelper {
     }
 
     private void createContributionFromPullRequest(Long prId, Long contributorId) {
+        final var contributionId = faker.random().hex();
         databaseHelper.executeQuery("""
-                insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, pull_request_id, created_at, updated_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
+                insert into indexer_exp.contributions(id, contribution_uuid, repo_id, contributor_id, type, status, pull_request_id, created_at, updated_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
                 select  :contributionId,
+                        gpr.contribution_uuid,
                         gpr.repo_id,
                         ga.id,
                         'PULL_REQUEST',
@@ -291,18 +295,21 @@ public class GithubHelper {
                 join indexer_exp.github_accounts ga on ga.id = :contributorId
                 where gpr.id = :prId
                 on conflict do nothing;
-                """, Map.of("contributionId", faker.random().hex(),
+                """, Map.of("contributionId", contributionId,
                 "prId", prId,
                 "contributorId", contributorId));
 
+        addGroupedContributionFromContribution(contributionId, contributorId);
         addRepoContributorFromPullRequest(prId, contributorId);
         addUserMainFileExtensionsFromPullRequest(prId, contributorId);
     }
 
     private void createContributionFromIssue(Long issueId, Long contributorId) {
+        final var contributionId = faker.random().hex();
         databaseHelper.executeQuery("""
-                      insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, issue_id, created_at, updated_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
+                      insert into indexer_exp.contributions(id, contribution_uuid, repo_id, contributor_id, type, status, issue_id, created_at, updated_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
                         select  :contributionId,
+                                gi.contribution_uuid,
                                 gi.repo_id,
                                 ga.id,
                                 'ISSUE',
@@ -333,10 +340,11 @@ public class GithubHelper {
                         join indexer_exp.github_accounts ga on ga.id = :contributorId
                         where gi.id = :issueId
                         on conflict do nothing;
-                """, Map.of("contributionId", faker.random().hex(),
+                """, Map.of("contributionId", contributionId,
                 "issueId", issueId,
                 "contributorId", contributorId));
 
+        addGroupedContributionFromContribution(contributionId, contributorId);
         addRepoContributorFromIssue(issueId, contributorId);
     }
 
@@ -420,13 +428,76 @@ public class GithubHelper {
                 values(:contributorId, :contributorLogin, 'USER', :contributorHtmlUrl, :contributorAvatarUrl, null, null, null, null, null, null, null)
                 on conflict do nothing;
                 
-                insert into indexer_exp.github_code_reviews(id, pull_request_id, author_id, state, requested_at, submitted_at, number, title, html_url, body, comments_count, repo_owner_login, repo_name, repo_id, repo_html_url, author_login, author_html_url, author_avatar_url)
-                values (:codeReviewId, :prId, :contributorId, 'APPROVED', :createdAt, :completedAt, :githubNumber, :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoId, :repoHtmlUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl);
+                insert into indexer_exp.github_code_reviews(id, contribution_uuid, pull_request_id, author_id, state, requested_at, submitted_at, number, title, html_url, body, comments_count, repo_owner_login, repo_name, repo_id, repo_html_url, author_login, author_html_url, author_avatar_url)
+                values (:codeReviewId, indexer.uuid_of(cast(:codeReviewId as text)), :prId, :contributorId, 'APPROVED', :createdAt, :completedAt, :githubNumber, :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoId, :repoHtmlUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl);
                 
-                insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, code_review_id, created_at, updated_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
-                values (:id, :repoId, :contributorId, 'CODE_REVIEW', 'COMPLETED', :codeReviewId, :createdAt, :createdAt, :completedAt, :githubNumber, 'APPROVED', :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :contributorId, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, 'APPROVED', null);
+                insert into indexer_exp.contributions(id, contribution_uuid, repo_id, contributor_id, type, status, code_review_id, created_at, updated_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
+                values (:id, indexer.uuid_of(cast(:codeReviewId as text)), :repoId, :contributorId, 'CODE_REVIEW', 'COMPLETED', :codeReviewId, :createdAt, :createdAt, :completedAt, :githubNumber, 'APPROVED', :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :contributorId, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, 'APPROVED', null);
                 """, parameters);
 
+        addGroupedContributionFromContribution(id, contributor.user().getGithubUserId());
         addRepoContributorFromCodeReview(id, contributor.user().getGithubUserId());
+    }
+
+    private void addGroupedContributionFromContribution(String contributionId, Long contributorId) {
+        databaseHelper.executeQuery("""
+                INSERT INTO indexer_exp.grouped_contributions (contribution_uuid,
+                                                               repo_id,
+                                                               type,
+                                                               status,
+                                                               pull_request_id,
+                                                               issue_id,
+                                                               code_review_id,
+                                                               created_at,
+                                                               updated_at,
+                                                               completed_at,
+                                                               github_number,
+                                                               github_status,
+                                                               github_title,
+                                                               github_html_url,
+                                                               github_body,
+                                                               github_comments_count,
+                                                               repo_owner_login,
+                                                               repo_name,
+                                                               repo_html_url,
+                                                               github_author_id,
+                                                               github_author_login,
+                                                               github_author_html_url,
+                                                               github_author_avatar_url,
+                                                               pr_review_state,
+                                                               main_file_extensions)
+                SELECT DISTINCT ON (c.contribution_uuid) c.contribution_uuid,
+                                                         c.repo_id,
+                                                         c.type,
+                                                         c.status,
+                                                         c.pull_request_id,
+                                                         c.issue_id,
+                                                         c.code_review_id,
+                                                         c.created_at,
+                                                         c.updated_at,
+                                                         c.completed_at,
+                                                         c.github_number,
+                                                         c.github_status,
+                                                         c.github_title,
+                                                         c.github_html_url,
+                                                         c.github_body,
+                                                         c.github_comments_count,
+                                                         c.repo_owner_login,
+                                                         c.repo_name,
+                                                         c.repo_html_url,
+                                                         c.github_author_id,
+                                                         c.github_author_login,
+                                                         c.github_author_html_url,
+                                                         c.github_author_avatar_url,
+                                                         c.pr_review_state,
+                                                         c.main_file_extensions
+                FROM indexer_exp.contributions c
+                WHERE c.id = :contributionId
+                ON CONFLICT DO NOTHING;
+                
+                INSERT INTO indexer_exp.grouped_contribution_contributors (contribution_uuid, contributor_id)
+                VALUES ((select c.contribution_uuid from indexer_exp.contributions c where c.id = :contributionId), :contributorId)
+                ON CONFLICT DO NOTHING;
+                """, Map.of("contributionId", contributionId, "contributorId", contributorId));
     }
 }

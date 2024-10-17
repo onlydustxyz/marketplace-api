@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 REFRESH MATERIALIZED VIEW contributions_stats_per_user;
 REFRESH MATERIALIZED VIEW contributions_stats_per_user_per_week;
 REFRESH MATERIALIZED VIEW contributions_stats_per_ecosystem_per_user;

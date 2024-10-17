@@ -62,6 +62,8 @@ jobs:
     needs: [ build ]
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
