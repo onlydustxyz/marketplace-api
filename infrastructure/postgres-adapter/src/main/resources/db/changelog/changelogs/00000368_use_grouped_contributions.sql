@@ -1,3 +1,18 @@
+CREATE VIEW iam.all_indexed_users AS
+SELECT u.id                                                         AS user_id,
+       ga.id                                                        AS github_user_id,
+       ga.login                                                     AS login,
+       COALESCE(upi.avatar_url, ga.avatar_url, u.github_avatar_url) AS avatar_url,
+       u.email,
+       COALESCE(upi.bio, ga.bio)                                    AS bio,
+       u.created_at::timestamp with time zone                       AS signed_up_at,
+       ga.created_at::timestamp with time zone                      AS signed_up_on_github_at
+FROM indexer_exp.github_accounts ga
+         LEFT JOIN iam.users u ON u.github_user_id = ga.id
+         LEFT JOIN user_profile_info upi ON u.id = upi.id;
+
+
+
 call drop_pseudo_projection('bi', 'project_contributions_data');
 call drop_pseudo_projection('bi', 'contribution_reward_data');
 call drop_pseudo_projection('bi', 'contribution_data');
@@ -240,7 +255,7 @@ create index on bi.p_project_contributions_data using gin (repo_ids);
 
 
 call create_pseudo_projection('bi', 'contribution_reward_data', $$
-select cd.contribution_id                                                         as contribution_id,
+select cd.contribution_uuid                                                       as contribution_uuid,
        cd.project_id                                                              as project_id,
        cd.repo_id                                                                 as repo_id,
        array_agg(distinct rd.reward_id) filter ( where rd.reward_id is not null ) as reward_ids,
@@ -250,12 +265,12 @@ from bi.p_contribution_data cd
                                       ri.repo_id = cd.repo_id and
                                       ri.number = cd.github_number
          left join bi.p_reward_data rd on rd.reward_id = ri.reward_id
-group by cd.contribution_id, cd.project_id, cd.repo_id
-$$, 'contribution_id');
+group by cd.contribution_uuid, cd.project_id, cd.repo_id
+$$, 'contribution_uuid');
 
-create unique index on bi.p_contribution_reward_data (contribution_id, total_rewarded_usd_amount);
-create unique index on bi.p_contribution_reward_data (repo_id, contribution_id);
-create unique index on bi.p_contribution_reward_data (project_id, contribution_id);
+create unique index on bi.p_contribution_reward_data (contribution_uuid, total_rewarded_usd_amount);
+create unique index on bi.p_contribution_reward_data (repo_id, contribution_uuid);
+create unique index on bi.p_contribution_reward_data (project_id, contribution_uuid);
 create index on bi.p_contribution_reward_data using gin (reward_ids);
 
 
