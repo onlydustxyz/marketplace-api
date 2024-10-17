@@ -2,18 +2,20 @@ package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.api.contract.model.ContributionActivityPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ContributionActivityPageResponse;
+import onlydust.com.marketplace.api.contract.model.ContributionActivityStatus;
 import onlydust.com.marketplace.api.contract.model.ContributionType;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import org.assertj.core.api.AbstractListAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.util.Comparator;
+import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
-import static java.util.Collections.reverse;
+import static java.util.Comparator.comparing;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -139,54 +141,74 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "CREATED_AT,ASC",
-            "CREATED_AT,DESC",
-            "TYPE,ASC",
-            "TYPE,DESC"
-    })
+    @CsvSource({"CREATED_AT,ASC", "CREATED_AT,DESC", "TYPE,ASC", "TYPE,DESC"})
     void should_sort_contributions(String sort, String direction) {
-        // When
-        assertContributions(Map.of("sort", sort, "sortDirection", direction), r -> {
-            // Then
-            final var contributions = r.getContributions();
-            if (direction.equals("DESC"))
-                reverse(contributions);
+        var comparator = switch (sort) {
+            case "CREATED_AT" -> comparing(ContributionActivityPageItemResponse::getCreatedAt);
+            case "TYPE" -> comparing(ContributionActivityPageItemResponse::getType);
+            default -> throw new IllegalArgumentException("Invalid sort field: " + sort);
+        };
 
-            switch (sort) {
-                case "CREATED_AT":
-                    assertThat(contributions).isSortedAccordingTo(Comparator.comparing(ContributionActivityPageItemResponse::getCreatedAt));
-                    break;
-                case "TYPE":
-                    assertThat(contributions).isSortedAccordingTo(Comparator.comparing(ContributionActivityPageItemResponse::getType));
-                    break;
-            }
-        });
+        comparator = direction.equals("DESC") ? comparator.reversed() : comparator;
+
+        assertContributions(Map.of("sort", sort, "sortDirection", direction))
+                .isSortedAccordingTo(comparator);
     }
 
     @Test
     void should_filter_contributions() {
-        assertContributions(Map.of("types", "PULL_REQUEST"),
-                r -> assertThat(r.getContributions()).allMatch(c -> c.getType().equals(ContributionType.PULL_REQUEST)));
+        assertContributions(Map.of("types", "PULL_REQUEST"))
+                .extracting(ContributionActivityPageItemResponse::getType)
+                .containsOnly(ContributionType.PULL_REQUEST);
 
-        assertContributions(Map.of("ids", "43506983"),
-                r -> assertThat(r.getContributions()).allMatch(c -> c.getGithubId().equals(43506983L)));
+        assertContributions(Map.of("ids", "43506983"))
+                .extracting(ContributionActivityPageItemResponse::getGithubId)
+                .containsOnly(43506983L);
+
+        assertContributions(Map.of("projectIds", "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e"))
+                .extracting(c -> c.getProject().getName())
+                .containsOnly("Cal.com");
+
+        assertContributions(Map.of("projectSlugs", "calcom"))
+                .extracting(c -> c.getProject().getName())
+                .containsOnly("Cal.com");
+
+        assertContributions(Map.of("statuses", "IN_PROGRESS"))
+                .extracting(ContributionActivityPageItemResponse::getActivityStatus)
+                .containsOnly(ContributionActivityStatus.IN_PROGRESS);
+
+        assertContributions(Map.of("repoIds", "493591124"))
+                .extracting(c -> c.getRepo().getName())
+                .containsOnly("kaaper");
+
+        assertContributions(Map.of("contributorIds", "43467246"))
+                .extracting(ContributionActivityPageItemResponse::getContributors)
+                .allMatch(contributors -> contributors.stream().anyMatch(c -> c.getLogin().equals("AnthonyBuisset")));
+
+        assertContributions(Map.of("hasBeenRewarded", "true"))
+                .extracting(ContributionActivityPageItemResponse::getTotalRewardedUsdAmount)
+                .allMatch(a -> a.compareTo(BigDecimal.ZERO) > 0);
+
+        assertContributions(Map.of("hasBeenRewarded", "false"))
+                .extracting(ContributionActivityPageItemResponse::getTotalRewardedUsdAmount)
+                .allMatch(a -> a.compareTo(BigDecimal.ZERO) == 0);
     }
 
-    private void assertContributions(Map<String, String> params,
-                                     Consumer<ContributionActivityPageResponse> asserter) {
+    private AbstractListAssert<?, ? extends List<? extends ContributionActivityPageItemResponse>, ContributionActivityPageItemResponse> assertContributions(Map<String, String> params) {
         final var q = new HashMap<String, String>();
         q.put("pageSize", "100");
         q.putAll(params);
 
-        client.get()
+        final var contributions = client.get()
                 .uri(getApiURI(CONTRIBUTIONS, q))
-                // Then
                 .exchange()
                 .expectStatus()
                 .isOk()
                 .expectBody(ContributionActivityPageResponse.class)
-                .consumeWith(r -> asserter.accept(r.getResponseBody()))
-        ;
+                .returnResult()
+                .getResponseBody()
+                .getContributions();
+
+        return assertThat(contributions).isNotEmpty();
     }
 }
