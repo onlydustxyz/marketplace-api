@@ -24,9 +24,14 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_contribution() {
         // When
-        client.get().uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("43506983"), Map.of("pageSize", "1")))
+        client.get()
+                .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("43506983"), Map.of("pageSize", "1")))
                 // Then
-                .exchange().expectStatus().isOk().expectBody().json("""
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
                         {
                           "type": "PULL_REQUEST",
                           "repo": {
@@ -84,9 +89,14 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_contributions() {
         // When
-        client.get().uri(getApiURI(CONTRIBUTIONS, Map.of("pageSize", "1")))
+        client.get()
+                .uri(getApiURI(CONTRIBUTIONS, Map.of("pageSize", "1")))
                 // Then
-                .exchange().expectStatus().isOk().expectBody().json("""
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
                         {
                           "totalPageNumber": 45508,
                           "totalItemNumber": 45508,
@@ -189,8 +199,8 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         q.put("pageSize", "100");
         q.putAll(params);
 
-        final var contributions = client.get().uri(getApiURI(CONTRIBUTIONS, q))
-                // Then
+        final var contributions = client.get()
+                .uri(getApiURI(CONTRIBUTIONS, q))
                 .exchange()
                 .expectStatus()
                 .isOk()
