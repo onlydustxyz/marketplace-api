@@ -443,4 +443,14 @@ public class ProjectConfiguration {
                                                                                final ProjectContributorLabelStoragePort projectContributorLabelStoragePort) {
         return new ProjectContributorLabelService(permissionService, projectContributorLabelStoragePort);
     }
+
+    @Bean
+    public IssueFacadePort issueFacadePort(final PermissionPort permissionPort, final ContributionStoragePort contributionStoragePort) {
+        return new IssueService(permissionPort, contributionStoragePort);
+    }
+
+    @Bean
+    public PullRequestFacadePort pullRequestFacadePort(final PermissionPort permissionPort, final ContributionStoragePort contributionStoragePort) {
+        return new PullRequestService(permissionPort, contributionStoragePort);
+    }
 }

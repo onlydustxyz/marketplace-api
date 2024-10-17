@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionRewardQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ArchivedGithubContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CustomIgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
@@ -13,6 +14,8 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
+import onlydust.com.marketplace.project.domain.model.GithubPullRequest;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
@@ -44,6 +47,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     private final CustomIgnoredContributionsRepository customIgnoredContributionsRepository;
     private final IgnoredContributionsRepository ignoredContributionsRepository;
     private final ProjectRepository projectRepository;
+    private final ArchivedGithubContributionRepository archivedGithubContributionRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -192,5 +196,28 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     public void refreshIgnoredContributions(List<Long> repoIds) {
         ignoredContributionsRepository.addMissingContributions(repoIds);
         ignoredContributionsRepository.deleteContributionsThatShouldNotBeIgnored(repoIds);
+    }
+
+
+    @Override
+    @Transactional
+    public void archiveIssue(GithubIssue.Id id, Boolean archived) {
+        archiveGithubContribution(id.value(), archived);
+    }
+
+    @Override
+    @Transactional
+    public void archivePullRequest(GithubPullRequest.Id id, Boolean archived) {
+        archiveGithubContribution(id.value(), archived);
+    }
+
+    private void archiveGithubContribution(Long id, Boolean archived) {
+        final Optional<ArchivedGithubContributionEntity> isAlreadyArchived = archivedGithubContributionRepository.findById(id);
+        if (isAlreadyArchived.isPresent() && !archived) {
+            archivedGithubContributionRepository.delete(isAlreadyArchived.get());
+        }
+        if (isAlreadyArchived.isEmpty() && archived) {
+            archivedGithubContributionRepository.save(new ArchivedGithubContributionEntity(id));
+        }
     }
 }

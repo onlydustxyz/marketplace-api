@@ -593,3 +593,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000365_improve_projects_projections.sql
   - include:
       file: db/changelog/changelogs/00000366_fix_deadlocks.sql
+  - include:
+      file: db/changelog/changelogs/00000368_add_archived_github_contributions_table.sql

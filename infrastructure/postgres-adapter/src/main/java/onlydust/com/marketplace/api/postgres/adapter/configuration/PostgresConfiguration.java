@@ -218,11 +218,12 @@ public class PostgresConfiguration {
                                                                    final CustomContributorRepository customContributorRepository,
                                                                    final CustomIgnoredContributionsRepository customIgnoredContributionsRepository,
                                                                    final IgnoredContributionsRepository ignoredContributionsRepository,
-                                                                   final ProjectRepository projectRepository) {
+                                                                   final ProjectRepository projectRepository,
+                                                                   final ArchivedGithubContributionRepository archivedGithubContributionRepository) {
         return new PostgresContributionAdapter(contributionViewEntityRepository, shortProjectViewEntityRepository,
                 githubRepoViewEntityRepository, contributionDetailsViewEntityRepository,
                 contributionRewardViewEntityRepository, customContributorRepository,
-                customIgnoredContributionsRepository, ignoredContributionsRepository, projectRepository);
+                customIgnoredContributionsRepository, ignoredContributionsRepository, projectRepository, archivedGithubContributionRepository);
     }
 
     @Bean

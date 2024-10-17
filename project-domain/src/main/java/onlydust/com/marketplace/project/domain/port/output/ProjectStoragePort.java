@@ -84,4 +84,8 @@ public interface ProjectStoragePort {
     void refreshRecommendations();
 
     void refreshStats();
+
+    List<ProjectId> getProjectIdsLinkedToIssueId(GithubIssue.Id githubIssueId);
+
+    List<ProjectId> getProjectIdsLinkedToPullRequestId(GithubPullRequest.Id githubPullRequestId);
 }

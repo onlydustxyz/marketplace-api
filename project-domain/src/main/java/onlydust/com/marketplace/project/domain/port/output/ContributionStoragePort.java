@@ -3,6 +3,8 @@ package onlydust.com.marketplace.project.domain.port.output;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
+import onlydust.com.marketplace.project.domain.model.GithubPullRequest;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.view.ContributionDetailsView;
@@ -34,4 +36,8 @@ public interface ContributionStoragePort {
     void refreshIgnoredContributions(ProjectId projectId);
 
     void refreshIgnoredContributions(List<Long> repoIds);
+
+    void archiveIssue(GithubIssue.Id id, Boolean archived);
+
+    void archivePullRequest(GithubPullRequest.Id id, Boolean archived);
 }
