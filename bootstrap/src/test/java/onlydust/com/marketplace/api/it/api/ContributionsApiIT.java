@@ -165,6 +165,10 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         assertContributions(Map.of("statuses", "IN_PROGRESS"))
                 .extracting(ContributionActivityPageItemResponse::getActivityStatus)
                 .containsOnly(ContributionActivityStatus.IN_PROGRESS);
+
+        assertContributions(Map.of("repoIds", "493591124"))
+                .extracting(c -> c.getRepo().getName())
+                .containsOnly("kaaper");
     }
 
     private AbstractListAssert<?, ? extends List<? extends ContributionActivityPageItemResponse>, ContributionActivityPageItemResponse> assertContributions(Map<String, String> params) {
