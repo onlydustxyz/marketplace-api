@@ -11,6 +11,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
+import java.util.UUID;
+
 public interface ContributionReadRepository extends Repository<ContributionReadEntity, Long> {
 
     @Query(value = """
@@ -101,23 +103,27 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                            rd.contribution_id) c
             where
                 (coalesce(:ids) is null or c.github_id = any (cast(:ids as bigint[]))) and
-                (coalesce(:types) is null or c.contribution_type = any (cast(:types as indexer_exp.contribution_type[])))
+                (coalesce(:types) is null or c.contribution_type = any (cast(:types as indexer_exp.contribution_type[]))) and
+                (coalesce(:projectIds) is null or c.project_id = any (cast(:projectIds as uuid[])))
             """, countQuery = """
             select count(distinct c.github_id)
             from bi.p_contribution_data c
                      left join bi.p_contribution_reward_data rd on rd.contribution_id = c.contribution_id
             where
                 (coalesce(:ids) is null or c.github_id = any (cast(:ids as bigint[]))) and
-                (coalesce(:types) is null or c.contribution_type = any (cast(:types as indexer_exp.contribution_type[])))
+                (coalesce(:types) is null or c.contribution_type = any (cast(:types as indexer_exp.contribution_type[]))) and
+                (coalesce(:projectIds) is null or c.project_id = any (cast(:projectIds as uuid[])))
             """, nativeQuery = true)
     Page<ContributionReadEntity> findAll(Long[] ids,
                                          String[] types,
+                                         UUID[] projectIds,
                                          Pageable pageable);
 
     default Page<ContributionReadEntity> findAll(ContributionsQueryParams q) {
         return findAll(
                 q.getIds() == null ? null : q.getIds().toArray(Long[]::new),
                 q.getTypes() == null ? null : q.getTypes().stream().map(Enum::name).toArray(String[]::new),
+                q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC :
                         Sort.Direction.ASC, getSortProperty(q.getSort()))));
     }

@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.it.api;
 import onlydust.com.marketplace.api.contract.model.ContributionActivityPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ContributionActivityPageResponse;
 import onlydust.com.marketplace.api.contract.model.ContributionType;
+import onlydust.com.marketplace.api.contract.model.ProjectLinkResponse;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -167,10 +168,23 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_filter_contributions() {
         assertContributions(Map.of("types", "PULL_REQUEST"),
-                r -> assertThat(r.getContributions()).allMatch(c -> c.getType().equals(ContributionType.PULL_REQUEST)));
+                r -> assertThat(r.getContributions())
+                        .isNotEmpty()
+                        .extracting(ContributionActivityPageItemResponse::getType)
+                        .allMatch(ContributionType.PULL_REQUEST::equals));
 
         assertContributions(Map.of("ids", "43506983"),
-                r -> assertThat(r.getContributions()).allMatch(c -> c.getGithubId().equals(43506983L)));
+                r -> assertThat(r.getContributions())
+                        .isNotEmpty()
+                        .extracting(ContributionActivityPageItemResponse::getGithubId)
+                        .allMatch(((Long) 43506983L)::equals));
+
+        assertContributions(Map.of("projectIds", "8156fc5f-cec5-4f70-a0de-c368772edcd4"),
+                r -> assertThat(r.getContributions())
+                        .isNotEmpty()
+                        .extracting(ContributionActivityPageItemResponse::getProject)
+                        .extracting(ProjectLinkResponse::getName)
+                        .allMatch("Cairo foundry"::equals));
     }
 
     private void assertContributions(Map<String, String> params,
