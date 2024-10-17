@@ -265,36 +265,6 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-    patch:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Contributions
-      summary: Change contribution assignees and/or linkedIssues and/or archive status
-      operationId: patchContribution
-      description: |
-        Change contribution assignees and/or linkedIssues
-      parameters:
-        - name: contributionGithubId
-          in: path
-          required: true
-          schema:
-            $ref: '#/components/schemas/IssueId'
-      requestBody:
-        description: 'Contribution patch'
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ContributionPatchRequest'
-      responses:
-        "204":
-          description: 'Contribution patched'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "404":
-          $ref: '#/components/responses/NotFoundError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
 
 
   /api/v1/contributions/{contributionId}/events:
@@ -2708,6 +2678,34 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+    patch:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Issues
+      summary: update issue
+      operationId: updateIssue
+      description: Update issue. Caller must be lead on linked project.
+      parameters:
+        - in: path
+          name: issueId
+          required: true
+          schema:
+            $ref: '#/components/schemas/IssueId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssuePatchRequest'
+      responses:
+        "204":
+          description: 'Issue updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /api/v1/projects/{projectId}/rewards:
     get:
@@ -3561,7 +3559,6 @@ paths:
 
   /api/v1/applications/{applicationId}/accept:
     post:
-      deprecated: true
       security:
         - bearerAuth: [ ]
       tags:
@@ -5453,6 +5450,37 @@ paths:
                 $ref: '#/components/schemas/SupportedCurrencyListResponse'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/pull-requests/{pullRequestId}:
+    patch:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - PullRequests
+      summary: update pull request
+      operationId: updatePullRequest
+      description: Update pull request. Caller must be lead on linked project.
+      parameters:
+        - in: path
+          name: pullRequestId
+          required: true
+          schema:
+            $ref: '#/components/schemas/PullRequestId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PullRequestPatchRequest'
+      responses:
+        "204":
+          description: 'Pull request updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 
 components:
   securitySchemes:
@@ -12141,16 +12169,19 @@ components:
             issue:
               $ref: '#/components/schemas/GithubIssueLinkResponse'
 
-    ContributionPatchRequest:
+    IssuePatchRequest:
       type: object
       properties:
-        assignees:
-          type: array
-          items:
-            $ref: '#/components/schemas/GithubUserId'
+        archived:
+          type: boolean
+
+    PullRequestPatchRequest:
+      type: object
+      properties:
         linkedIssues:
           type: array
           items:
             $ref: '#/components/schemas/IssueId'
         archived:
           type: boolean
+

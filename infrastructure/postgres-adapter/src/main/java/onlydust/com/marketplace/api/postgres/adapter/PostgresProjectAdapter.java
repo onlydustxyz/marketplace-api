@@ -488,4 +488,18 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         biContributorGlobalDataRepository.refresh();
         biContributionRewardDataRepository.refresh();
     }
+
+    @Override
+    public List<ProjectId> getProjectIdsLinkedToIssueId(GithubIssue.Id githubIssueId) {
+        return projectRepository.findProjectIdsLinkedToIssueId(githubIssueId.value()).stream()
+                .map(ProjectId::of)
+                .toList();
+    }
+
+    @Override
+    public List<ProjectId> getProjectIdsLinkedToPullRequestId(GithubPullRequest.Id githubPullRequestId) {
+        return projectRepository.findProjectIdsLinkedToPullRequestId(githubPullRequestId.value()).stream()
+                .map(ProjectId::of)
+                .toList();
+    }
 }

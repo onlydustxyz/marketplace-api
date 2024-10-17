@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.port.input;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.view.ContributionDetailsView;
 
 import java.util.List;

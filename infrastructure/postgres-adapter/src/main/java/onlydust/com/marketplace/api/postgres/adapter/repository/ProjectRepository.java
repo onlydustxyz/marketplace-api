@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ProjectRepository extends JpaRepository<ProjectEntity, UUID>, JpaSpecificationExecutor<ProjectEntity> {
@@ -41,4 +42,20 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, UUID>, J
             REFRESH MATERIALIZED VIEW CONCURRENTLY bi.project_reward_stats;
             """)
     void refreshStats();
+
+    @Query(nativeQuery = true, value = """
+            select pgr.project_id
+            from indexer_exp.github_issues gi
+            join project_github_repos pgr on pgr.github_repo_id = gi.repo_id
+            where gi.id = :githubIssueId
+            """)
+    List<UUID> findProjectIdsLinkedToIssueId(Long githubIssueId);
+
+    @Query(nativeQuery = true, value = """
+            select pgr.project_id
+            from indexer_exp.github_pull_requests gpr
+            join project_github_repos pgr on pgr.github_repo_id = gpr.repo_id
+            where gpr.id = :githubPullRequestId
+            """)
+    List<UUID> findProjectIdsLinkedToPullRequestId(Long githubPullRequestId);
 }
