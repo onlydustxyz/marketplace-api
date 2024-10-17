@@ -37,7 +37,7 @@ public interface IgnoredContributionsRepository extends JpaRepository<IgnoredCon
                     or (p.reward_ignore_code_reviews_by_default = true and c.type = 'CODE_REVIEW')
                    )
                on conflict do nothing
-               """, nativeQuery = true)
+            """, nativeQuery = true)
     void addMissingContributions(List<Long> reposIds);
 
 
@@ -78,6 +78,6 @@ public interface IgnoredContributionsRepository extends JpaRepository<IgnoredCon
                 join project_github_repos pgr on pgr.project_id = ?1 and pgr.github_repo_id = gr.id
                 where gr.visibility = 'PUBLIC'
             )
-             """, nativeQuery = true)
+            """, nativeQuery = true)
     void deleteContributionsThatAreNotPartOfTheProjectAnymore(UUID projectId);
 }

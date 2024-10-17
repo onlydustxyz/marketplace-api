@@ -93,7 +93,6 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                           "githubTitle": "Anthony buisset feature/starknet",
                           "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/62",
                           "githubBody": null,
-                          "githubCodeReviewOutcome": null,
                           "id": "b66cd16a35e0043d86f1850eb9ba6519d20ff833394f7516b0842fa2f18a5abf",
                           "createdAt": "2022-07-08T13:07:29Z",
                           "completedAt": "2022-07-08T13:17:51Z",
@@ -400,7 +399,6 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                           "githubTitle": "Feat/view",
                           "githubHtmlUrl": "https://github.com/onlydustxyz/kaaper/pull/17",
                           "githubBody": null,
-                          "githubCodeReviewOutcome": null,
                           "id": "9e374e732c9017c3fee800d686e02962dd21b69d9a11c4c21517d76fec56b1a1",
                           "createdAt": "2022-07-12T09:26:34Z",
                           "completedAt": "2022-07-12T15:32:58Z",
@@ -434,14 +432,13 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
                               "githubTitle": "Feat/view",
                               "githubHtmlUrl": "https://github.com/onlydustxyz/kaaper/pull/17",
                               "githubBody": null,
-                              "githubCodeReviewOutcome": null,
                               "is_mine": false
                             }
                           ],
                           "githubPullRequestReviewState": null,
                           "rewards": []
                         }
-                                                
+                        
                         """)
         ;
     }

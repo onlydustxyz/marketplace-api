@@ -93,6 +93,7 @@ create table indexer_exp.github_issues
     title             text                            not null,
     status            indexer_exp.github_issue_status not null,
     created_at        timestamp                       not null,
+    updated_at        timestamp with time zone        not null,
     closed_at         timestamp,
     author_id         bigint                          not null
         references indexer_exp.github_accounts,
@@ -168,6 +169,7 @@ create table indexer_exp.github_pull_requests
     title                text                                         not null,
     status               indexer_exp.github_pull_request_status       not null,
     created_at           timestamp                                    not null,
+    updated_at           timestamp with time zone                     not null,
     closed_at            timestamp,
     merged_at            timestamp,
     author_id            bigint                                       not null
@@ -258,6 +260,7 @@ create table indexer_exp.contributions
     code_review_id           text
         references indexer_exp.github_code_reviews,
     created_at               timestamp                       not null,
+    updated_at               timestamp with time zone        not null,
     completed_at             timestamp,
     tech_created_at          timestamp default now()         not null,
     tech_updated_at          timestamp default now()         not null,
@@ -356,3 +359,14 @@ CREATE TABLE indexer_exp.github_repos_stats
     last_indexed_at TIMESTAMP
 );
 
+create table indexer_exp.github_user_file_extensions
+(
+    user_id            bigint                   not null,
+    file_extension     text                     not null,
+    commit_count       int                      not null,
+    file_count         int                      not null,
+    modification_count int                      not null,
+    tech_created_at    timestamp with time zone not null default now(),
+    tech_updated_at    timestamp with time zone not null default now(),
+    primary key (user_id, file_extension)
+);

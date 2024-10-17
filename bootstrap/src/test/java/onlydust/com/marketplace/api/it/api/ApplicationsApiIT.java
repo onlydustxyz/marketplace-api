@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.it.api;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.api.contract.model.ContributorResponse;
+import onlydust.com.marketplace.api.contract.model.ContributorOverviewResponse;
 import onlydust.com.marketplace.api.contract.model.IssueApplicantsPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.IssueApplicantsPageResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationPatchRequest;
@@ -781,6 +781,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.applicants[?(!@.applicationId)]").isEmpty()
+                .jsonPath("$.applicants[?(!@.appliedAt)]").isEmpty()
                 .json("""
                         {
                           "totalPageNumber": 1,
@@ -790,11 +791,32 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                           "applicants": [
                             {
                               "contributor": {
+                                "bio": "FullStack engineerr",
+                                "contacts": [
+                                  {
+                                    "channel": "TELEGRAM",
+                                    "contact": "https://t.me/abuisset",
+                                    "visibility": null
+                                  },
+                                  {
+                                    "channel": "TWITTER",
+                                    "contact": "https://twitter.com/abuisset",
+                                    "visibility": null
+                                  },
+                                  {
+                                    "channel": "DISCORD",
+                                    "contact": "antho",
+                                    "visibility": null
+                                  }
+                                ],
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": true,
-                                "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4"
+                                "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                                "globalRank": 1,
+                                "globalRankPercentile": 0.000041734485205125,
+                                "globalRankCategory": "A"
                               },
                               "projects": [
                                 {
@@ -982,29 +1004,34 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "trend": "UP"
                               },
                               "issueCount": {
-                                "value": 15,
+                                "value": 46,
                                 "trend": "UP"
                               },
                               "prCount": {
-                                "value": 517,
+                                "value": 817,
                                 "trend": "UP"
                               },
                               "codeReviewCount": {
-                                "value": 406,
+                                "value": 582,
                                 "trend": "UP"
                               },
                               "contributionCount": {
-                                "value": 938,
+                                "value": 1445,
                                 "trend": "UP"
                               }
                             },
                             {
                               "contributor": {
+                                "bio": "Je me lève très tôt et mange à midi pile, n'en déplaise aux grincheux",
+                                "contacts": null,
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true,
-                                "id": "fc92397c-3431-4a84-8054-845376b630a0"
+                                "id": "fc92397c-3431-4a84-8054-845376b630a0",
+                                "globalRank": 5,
+                                "globalRankPercentile": 0.00020867242602562499,
+                                "globalRankCategory": "A"
                               },
                               "projects": [
                                 {
@@ -1054,11 +1081,11 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-java.png"
                                 },
                                 {
-                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
-                                  "slug": "python",
-                                  "name": "Python",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
+                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
+                                  "slug": "javascript",
+                                  "name": "Javascript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                 },
                                 {
                                   "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
@@ -1119,25 +1146,51 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "trend": "STABLE"
                               },
                               "prCount": {
-                                "value": 30,
+                                "value": 263,
                                 "trend": "UP"
                               },
                               "codeReviewCount": {
-                                "value": 118,
+                                "value": 417,
                                 "trend": "UP"
                               },
                               "contributionCount": {
-                                "value": 148,
+                                "value": 680,
                                 "trend": "UP"
                               }
                             },
                             {
                               "contributor": {
+                                "bio": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                                "contacts": [
+                                  {
+                                    "channel": "TELEGRAM",
+                                    "contact": "https://t.me/gregoirecharles",
+                                    "visibility": null
+                                  },
+                                  {
+                                    "channel": "WHATSAPP",
+                                    "contact": "+33683744020",
+                                    "visibility": null
+                                  },
+                                  {
+                                    "channel": "TWITTER",
+                                    "contact": "https://twitter.com/gregcha",
+                                    "visibility": null
+                                  },
+                                  {
+                                    "channel": "LINKEDIN",
+                                    "contact": "https://www.linkedin.com/in/gregoirecharles",
+                                    "visibility": null
+                                  }
+                                ],
                                 "githubUserId": 8642470,
                                 "login": "gregcha",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                                 "isRegistered": true,
-                                "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+                                "id": "45e98bf6-25c2-4edf-94da-e340daba8964",
+                                "globalRank": 6,
+                                "globalRankPercentile": 0.00025040691123075,
+                                "globalRankCategory": "A"
                               },
                               "projects": [
                                 {
@@ -1207,11 +1260,27 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "contributor": {
+                                "bio": "totot",
+                                "contacts": [
+                                  {
+                                    "channel": "TWITTER",
+                                    "contact": "https://twitter.com/fuxeto",
+                                    "visibility": null
+                                  },
+                                  {
+                                    "channel": "TELEGRAM",
+                                    "contact": "https://t.me/ofux",
+                                    "visibility": null
+                                  }
+                                ],
                                 "githubUserId": 595505,
                                 "login": "ofux",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                                 "isRegistered": true,
-                                "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
+                                "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
+                                "globalRank": 4,
+                                "globalRankPercentile": 0.0001669379408205,
+                                "globalRankCategory": "A"
                               },
                               "projects": [
                                 {
@@ -1372,19 +1441,19 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "trend": "UP"
                               },
                               "issueCount": {
-                                "value": 2,
+                                "value": 14,
                                 "trend": "UP"
                               },
                               "prCount": {
-                                "value": 266,
+                                "value": 514,
                                 "trend": "UP"
                               },
                               "codeReviewCount": {
-                                "value": 338,
+                                "value": 469,
                                 "trend": "UP"
                               },
                               "contributionCount": {
-                                "value": 606,
+                                "value": 997,
                                 "trend": "UP"
                               }
                             }
@@ -1429,7 +1498,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
             assertThat(response.getApplicants())
                     .isNotEmpty()
                     .extracting(IssueApplicantsPageItemResponse::getContributor)
-                    .extracting(ContributorResponse::getGithubUserId)
+                    .extracting(ContributorOverviewResponse::getGithubUserId)
                     .allMatch(id -> id.equals(gregoire.githubUserId().value()));
         });
 
@@ -1439,16 +1508,21 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
             assertThat(response.getApplicants())
                     .isNotEmpty()
                     .extracting(IssueApplicantsPageItemResponse::getContributor)
-                    .extracting(ContributorResponse::getGithubUserId)
+                    .extracting(ContributorOverviewResponse::getGithubUserId)
                     .allMatch(id -> !id.equals(gregoire.githubUserId().value()));
         });
     }
 
-
     private void ignore(ApplicationEntity application, UserAuthHelper.AuthenticatedUser projectLead, boolean isIgnored) {
-        client.patch().uri(getApiURI(APPLICATIONS_BY_ID.formatted(application.id()))).header("Authorization", BEARER_PREFIX + projectLead.jwt()).bodyValue(new ProjectApplicationPatchRequest().isIgnored(isIgnored))
+        client.patch()
+                .uri(getApiURI(APPLICATIONS_BY_ID.formatted(application.id())))
+                .header("Authorization", BEARER_PREFIX + projectLead.jwt())
+                .bodyValue(new ProjectApplicationPatchRequest()
+                        .isIgnored(isIgnored))
                 // Then
-                .exchange().expectStatus().isNoContent();
+                .exchange()
+                .expectStatus()
+                .isNoContent();
     }
 
     private void assertApplications(final @NonNull Long issueId,

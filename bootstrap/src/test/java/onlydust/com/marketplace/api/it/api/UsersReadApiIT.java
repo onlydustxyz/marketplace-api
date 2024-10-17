@@ -274,7 +274,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
-                              "rank": 8,
+                              "rank": 9,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
                               "contributionCount": 888,
@@ -348,30 +348,6 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "contributedProjectCount": 1,
                               "contributionCount": 213,
                               "rewardCount": 1,
-                              "totalEarnedUsd": 1010.00,
-                              "projects": [
-                                {
-                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                                  "slug": "mooooooonlight",
-                                  "name": "Mooooooonlight",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                }
-                              ],
-                              "ecosystem": {
-                                "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
-                                "name": "Aztec",
-                                "url": "https://aztec.network/",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg",
-                                "bannerUrl": null,
-                                "slug": "aztec"
-                              }
-                            },
-                            {
-                              "rank": 4,
-                              "contributingStatus": "GREEN",
-                              "contributedProjectCount": 1,
-                              "contributionCount": 213,
-                              "rewardCount": 1,
                               "totalEarnedUsd": 10100.00,
                               "projects": [
                                 {
@@ -387,11 +363,12 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                                 "url": "https://www.availproject.org/",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png",
                                 "bannerUrl": null,
-                                "slug": "avail"
+                                "slug": "avail",
+                                "hidden": true
                               }
                             },
                             {
-                              "rank": 27,
+                              "rank": 28,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
                               "contributionCount": 213,
@@ -411,7 +388,33 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                                 "url": "https://www.starknet.io/en",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
                                 "bannerUrl": null,
-                                "slug": "starknet"
+                                "slug": "starknet",
+                                "hidden": false
+                              }
+                            },
+                            {
+                              "rank": 4,
+                              "contributingStatus": "GREEN",
+                              "contributedProjectCount": 1,
+                              "contributionCount": 213,
+                              "rewardCount": 1,
+                              "totalEarnedUsd": 1010.00,
+                              "projects": [
+                                {
+                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                  "slug": "mooooooonlight",
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                }
+                              ],
+                              "ecosystem": {
+                                "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                                "name": "Aztec",
+                                "url": "https://aztec.network/",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg",
+                                "bannerUrl": null,
+                                "slug": "aztec",
+                                "hidden": false
                               }
                             }
                           ]
@@ -580,7 +583,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                           "location": "Vence, France",
                           "bio": "FullStack engineerr",
                           "website": "https://linktr.ee/abuisset",
-                          "signedUpOnGithubAt": "2018-09-21T00:00:00Z",
+                          "signedUpOnGithubAt": "2018-09-21T08:45:50Z",
                           "signedUpAt": "2022-12-12T09:51:58.48559Z",
                           "lastSeenAt": "2023-10-05T19:06:50.034Z",
                           "contacts": [
@@ -656,7 +659,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                           "location": "Vence, France",
                           "bio": "FullStack engineerr",
                           "website": "https://linktr.ee/abuisset",
-                          "signedUpOnGithubAt": "2018-09-21T00:00:00Z",
+                          "signedUpOnGithubAt": "2018-09-21T08:45:50Z",
                           "signedUpAt": "2022-12-12T09:51:58.48559Z",
                           "lastSeenAt": "2023-10-05T19:06:50.034Z",
                           "contacts": [

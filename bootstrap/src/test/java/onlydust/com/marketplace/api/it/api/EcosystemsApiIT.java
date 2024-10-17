@@ -149,7 +149,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "totalPageNumber": 206,
-                          "totalItemNumber": 1027,
+                          "totalItemNumber": 1028,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "contributors": [
@@ -202,7 +202,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                               "login": "hariombalhara",
                               "avatarUrl": "https://avatars.githubusercontent.com/u/1780212?v=4",
                               "dynamicRank": 5,
-                              "globalRank": 26,
+                              "globalRank": 27,
                               "globalRankCategory": "A",
                               "contributionCount": 1352,
                               "rewardCount": 0,
@@ -227,13 +227,13 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "totalPageNumber": 206,
-                          "totalItemNumber": 1027,
+                          "totalItemNumber": 1028,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "contributors": [
                             {
                               "githubUserId": 45264458,
-                              "login": "abdelhamidbakhta",
+                              "login": "AbdelStark",
                               "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
                               "dynamicRank": 1,
                               "globalRank": 9,
@@ -280,7 +280,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                               "login": "hariombalhara",
                               "avatarUrl": "https://avatars.githubusercontent.com/u/1780212?v=4",
                               "dynamicRank": 3,
-                              "globalRank": 26,
+                              "globalRank": 27,
                               "globalRankCategory": "A",
                               "contributionCount": 1352,
                               "rewardCount": 0,

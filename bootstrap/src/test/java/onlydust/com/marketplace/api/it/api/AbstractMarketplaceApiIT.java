@@ -78,6 +78,8 @@ public class AbstractMarketplaceApiIT {
     protected static final String BILLING_PROFILE_INVOICES = "/api/v1/billing-profiles/%s/invoices";
     protected static final String BILLING_PROFILE_INVOICE = "/api/v1/billing-profiles/%s/invoices/%s";
     protected static final String BILLING_PROFILE_INVOICES_MANDATE = "/api/v1/billing-profiles/%s/invoices/mandate";
+    protected static final String CONTRIBUTIONS = "/api/v1/contributions";
+    protected static final String CONTRIBUTIONS_BY_ID = "/api/v1/contributions/%s";
     protected static final String PROJECTS_GET_CONTRIBUTION_BY_ID = "/api/v1/projects/%s/contributions/%s";
     protected static final String PROJECTS_GET_BY_ID = "/api/v1/projects";
     protected static final String PROJECTS_GET_BY_SLUG = "/api/v1/projects/slug";
@@ -210,6 +212,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String BI_STATS_FINANCIALS = "/api/v1/bi/stats/financials";
     protected static final String BI_PROJECTS = "/api/v1/bi/projects";
     protected static final String BI_CONTRIBUTORS = "/api/v1/bi/contributors";
+    protected static final String BI_CONTRIBUTORS_BY_ID = "/api/v1/bi/contributors/%s";
     protected static final String PROJECT_CONTRIBUTOR_LABELS = "/api/v1/projects/%s/contributor-labels";
     protected static final String CONTRIBUTOR_LABEL_BY_ID = "/api/v1/contributor-labels/%s";
     protected static final String PULL_REQUESTS_BY_ID = "/api/v1/pull-requests/%s";
@@ -283,6 +286,8 @@ public class AbstractMarketplaceApiIT {
     protected HackathonHelper hackathonHelper;
     @Autowired
     protected CurrencyHelper currencyHelper;
+    @Autowired
+    protected DatabaseHelper databaseHelper;
     @Autowired
     OutboxConsumerJob indexerOutboxJob;
     @Autowired
