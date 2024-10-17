@@ -16,80 +16,28 @@ import java.util.UUID;
 public interface ContributionReadRepository extends Repository<ContributionReadEntity, Long> {
 
     @Query(value = """
-            SELECT c.*,
-                   (select jsonb_build_object(
-                                   'id', gr.id,
-                                   'owner', gr.owner_login,
-                                   'name', gr.name,
-                                   'description', gr.description,
-                                   'htmlUrl', gr.html_url)
-                    from indexer_exp.github_repos gr
-                    where gr.id = c.repo_id)                           as github_repo,
-            
-                   (select cd.contributor
-                    from bi.p_contributor_global_data cd
-                    where cd.contributor_id = c.github_author_id)      as github_author,
-            
-                   (select jsonb_build_object(
-                                   'id', p.id,
-                                   'slug', p.slug,
-                                   'name', p.name,
-                                   'logoUrl', p.logo_url)
-                    from projects p
-                    where p.id = c.project_id)                         as project,
-            
-                   (select jsonb_agg(cd.contributor)
-                    from bi.p_contributor_global_data cd
-                    where cd.contributor_id = any (c.contributor_ids)) as contributors,
-            
-                   (select jsonb_agg(cd.contributor)
-                    from bi.p_contributor_global_data cd
-                    where cd.contributor_id = any (c.applicant_ids))   as applicants,
-            
-                   (select jsonb_agg(jsonb_build_object('name', gl.name,
-                                                        'description', gl.description))
-                    from indexer_exp.github_labels gl
-                    where gl.id = any (c.github_label_ids))            as github_labels,
-            
-                   (select jsonb_agg(jsonb_build_object('id', l.id,
-                                                        'slug', l.slug,
-                                                        'name', l.name,
-                                                        'logoUrl', l.logo_url,
-                                                        'bannerUrl', l.banner_url))
-                    from languages l
-                    where l.id = any (c.language_ids))                 as languages,
-            
-                   (select jsonb_agg(jsonb_build_object('type', 'ISSUE',
-                                                        'githubId', i.id,
-                                                        'githubNumber', i.number,
-                                                        'githubStatus', i.status,
-                                                        'githubTitle', i.title,
-                                                        'githubHtmlUrl', i.html_url))
-                    from indexer_exp.github_issues i
-                    where i.id = any (c.closing_issue_ids))            as linked_issues
-            from (select c.contribution_uuid                       as contribution_uuid,
-                         c.contribution_type                       as contribution_type,
-                         c.repo_id                                 as repo_id,
-                         c.github_number                           as github_number,
-                         c.github_status                           as github_status,
-                         c.github_title                            as github_title,
-                         c.github_html_url                         as github_html_url,
-                         c.github_body                             as github_body,
-                         c.activity_status                         as activity_status,
-                         c.github_author_id                        as github_author_id,
-                         c.project_id                              as project_id,
-                         c.project_slug                            as project_slug,
-                         c.updated_at                              as last_updated_at,
-                         c.created_at                              as created_at,
-                         c.completed_at                            as completed_at,
-                         c.contributor_ids                         as contributor_ids,
-                         c.applicant_ids                           as applicant_ids,
-                         c.language_ids                            as language_ids,
-                         c.closing_issue_ids                       as closing_issue_ids,
-                         c.github_label_ids                        as github_label_ids,
-                         coalesce(rd.total_rewarded_usd_amount, 0) as total_rewarded_usd_amount
-                  from bi.p_contribution_data c
-                           left join bi.p_contribution_reward_data rd on rd.contribution_uuid = c.contribution_uuid) c
+            select c.contribution_uuid                       as contribution_uuid,
+                   c.contribution_type                       as contribution_type,
+                   c.github_repo                             as github_repo,
+                   c.github_author                           as github_author,
+                   c.github_number                           as github_number,
+                   c.github_status                           as github_status,
+                   c.github_title                            as github_title,
+                   c.github_html_url                         as github_html_url,
+                   c.github_body                             as github_body,
+                   c.github_labels                           as github_labels,
+                   c.updated_at                              as last_updated_at,
+                   c.created_at                              as created_at,
+                   c.completed_at                            as completed_at,
+                   c.activity_status                         as activity_status,
+                   c.project                                 as project,
+                   c.contributors                            as contributors,
+                   c.applicants                              as applicants,
+                   c.languages                               as languages,
+                   c.linked_issues                           as linked_issues,
+                   coalesce(rd.total_rewarded_usd_amount, 0) as total_rewarded_usd_amount
+            from bi.p_contribution_data c
+                     left join bi.p_contribution_reward_data rd on rd.contribution_uuid = c.contribution_uuid
             where (coalesce(:ids) is null or c.contribution_uuid = any (:ids))
               and (coalesce(:types) is null or c.contribution_type = any (cast(:types as indexer_exp.contribution_type[])))
               and (coalesce(:projectIds) is null or c.project_id = any (:projectIds))
@@ -97,7 +45,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
               and (coalesce(:statuses) is null or c.activity_status = any (:statuses))
               and (coalesce(:repoIds) is null or c.repo_id = any (:repoIds))
               and (coalesce(:contributorIds) is null or c.contributor_ids && :contributorIds)
-              and (coalesce(:hasBeenRewarded) is null or :hasBeenRewarded = (c.total_rewarded_usd_amount > 0))
+              and (coalesce(:hasBeenRewarded) is null or :hasBeenRewarded = (coalesce(rd.total_rewarded_usd_amount, 0) > 0))
             """, countQuery = """
             select count(c.contribution_uuid)
             from bi.p_contribution_data c
@@ -110,7 +58,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                 (coalesce(:statuses) is null or c.activity_status = any (:statuses)) and
                 (coalesce(:repoIds) is null or c.repo_id = any (:repoIds)) and
                 (coalesce(:contributorIds) is null or c.contributor_ids && :contributorIds) and
-                (coalesce(:hasBeenRewarded) is null or :hasBeenRewarded = (rd.total_rewarded_usd_amount > 0))
+                (coalesce(:hasBeenRewarded) is null or :hasBeenRewarded = (coalesce(rd.total_rewarded_usd_amount, 0) > 0))
             """, nativeQuery = true)
     Page<ContributionReadEntity> findAll(UUID[] ids,
                                          String[] types,

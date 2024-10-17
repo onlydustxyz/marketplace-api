@@ -22,25 +22,25 @@ call create_pseudo_projection('bi', 'contribution_data', $$
 with ranked_project_github_repos_relationship AS (SELECT *,
                                                          row_number() OVER (PARTITION BY github_repo_id ORDER BY project_id) as row_number
                                                   FROM project_github_repos)
-select c.contribution_uuid                                                                    as contribution_uuid,
-       c.repo_id                                                                              as repo_id,
-       p.id                                                                                   as project_id,
-       p.slug                                                                                 as project_slug,
-       c.created_at                                                                           as timestamp,
-       c.status                                                                               as contribution_status,
-       c.type                                                                                 as contribution_type,
-       c.github_author_id                                                                     as github_author_id,
-       c.github_number                                                                        as github_number,
-       c.github_status                                                                        as github_status,
-       c.github_title                                                                         as github_title,
-       c.github_html_url                                                                      as github_html_url,
-       c.github_body                                                                          as github_body,
-       c.created_at                                                                           as created_at,
-       c.updated_at                                                                           as updated_at,
-       c.completed_at                                                                         as completed_at,
-       (c.type = 'ISSUE')::int                                                                as is_issue,
-       (c.type = 'PULL_REQUEST')::int                                                         as is_pr,
-       (c.type = 'CODE_REVIEW')::int                                                          as is_code_review,
+select c.contribution_uuid                                                                             as contribution_uuid,
+       c.repo_id                                                                                       as repo_id,
+       p.id                                                                                            as project_id,
+       p.slug                                                                                          as project_slug,
+       c.created_at                                                                                    as timestamp,
+       c.status                                                                                        as contribution_status,
+       c.type                                                                                          as contribution_type,
+       c.github_author_id                                                                              as github_author_id,
+       c.github_number                                                                                 as github_number,
+       c.github_status                                                                                 as github_status,
+       c.github_title                                                                                  as github_title,
+       c.github_html_url                                                                               as github_html_url,
+       c.github_body                                                                                   as github_body,
+       c.created_at                                                                                    as created_at,
+       c.updated_at                                                                                    as updated_at,
+       c.completed_at                                                                                  as completed_at,
+       (c.type = 'ISSUE')::int                                                                         as is_issue,
+       (c.type = 'PULL_REQUEST')::int                                                                  as is_pr,
+       (c.type = 'CODE_REVIEW')::int                                                                   as is_code_review,
        case
            when c.type = 'ISSUE' then
                case
@@ -59,27 +59,67 @@ select c.contribution_uuid                                                      
                    when c.pr_review_state in ('PENDING_REVIEWER', 'UNDER_REVIEW') then 'IN_PROGRESS'
                    else 'DONE'
                    end
-           end                                                                                as activity_status,
-       array_agg(distinct gcc.contributor_id) filter ( where gcc.contributor_id is not null ) as contributor_ids,
-       array_agg(distinct lfe.language_id) filter ( where lfe.language_id is not null )       as language_ids,
-       array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null )       as ecosystem_ids,
-       array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )           as program_ids,
+           end                                                                                         as activity_status,
+       array_agg(distinct gcc.contributor_id)
+       filter ( where gcc.contributor_id is not null )                                                 as contributor_ids,
+       array_agg(distinct l.id) filter ( where l.id is not null )                                      as language_ids,
+       array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null )                as ecosystem_ids,
+       array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )                    as program_ids,
        array_agg(distinct ppc.project_category_id)
-       filter ( where ppc.project_category_id is not null )                                   as project_category_ids,
-       string_agg(distinct lfe.name, ' ')                                                     as languages,
-       bool_or(gl.name ~~* '%good%first%issue%')                                              as is_good_first_issue,
-       array_agg(distinct gia.user_id) filter ( where gia.user_id is not null )               as assignee_ids,
-       array_agg(distinct gil.label_id) filter ( where gil.label_id is not null )             as github_label_ids,
-       array_agg(distinct ci.issue_id) filter ( where ci.issue_id is not null )               as closing_issue_ids,
-       array_agg(distinct a.applicant_id) filter ( where a.applicant_id is not null )         as applicant_ids
+       filter ( where ppc.project_category_id is not null )                                            as project_category_ids,
+       string_agg(distinct l.name, ' ')                                                                as language_names,
+       bool_or(gl.name ~~* '%good%first%issue%')                                                       as is_good_first_issue,
+       array_agg(distinct gia.user_id) filter ( where gia.user_id is not null )                        as assignee_ids,
+       array_agg(distinct gil.label_id)
+       filter ( where gil.label_id is not null )                                                       as github_label_ids,
+       array_agg(distinct ci.issue_id) filter ( where ci.issue_id is not null )                        as closing_issue_ids,
+       array_agg(distinct a.applicant_id) filter ( where a.applicant_id is not null )                  as applicant_ids,
+       jsonb_build_object(
+               'id', gr.id,
+               'owner', gr.owner_login,
+               'name', gr.name,
+               'description', gr.description,
+               'htmlUrl', gr.html_url)                                                                 as github_repo,
+
+       case when ad.contributor_id is not null then ad.contributor end                                 as github_author,
+
+       case
+           when p.id is not null then jsonb_build_object(
+                   'id', p.id,
+                   'slug', p.slug,
+                   'name', p.name,
+                   'logoUrl', p.logo_url) end                                                          as project,
+
+       jsonb_agg(cd.contributor) filter ( where cd.contributor_id is not null )                        as contributors,
+
+       jsonb_agg(apd.contributor) filter ( where apd.contributor_id is not null )                      as applicants,
+
+       jsonb_agg(jsonb_build_object('name', gl.name,
+                                    'description', gl.description)) filter ( where gl.id is not null ) as github_labels,
+
+       jsonb_agg(jsonb_build_object('id', l.id,
+                                    'slug', l.slug,
+                                    'name', l.name,
+                                    'logoUrl', l.logo_url,
+                                    'bannerUrl', l.banner_url)) filter ( where l.id is not null )      as languages,
+
+       jsonb_agg(jsonb_build_object('type', 'ISSUE',
+                                    'githubId', i.id,
+                                    'githubNumber', i.number,
+                                    'githubStatus', i.status,
+                                    'githubTitle', i.title,
+                                    'githubHtmlUrl', i.html_url)) filter ( where i.id is not null )    as linked_issues
 from indexer_exp.grouped_contributions c
          left join indexer_exp.grouped_contribution_contributors gcc on gcc.contribution_uuid = c.contribution_uuid
+         left join indexer_exp.github_repos gr on gr.id = c.repo_id
+         left join bi.p_contributor_global_data cd on cd.contributor_id = gcc.contributor_id
+         left join bi.p_contributor_global_data ad on ad.contributor_id = c.github_author_id
          left join ranked_project_github_repos_relationship pgr on pgr.github_repo_id = c.repo_id and pgr.row_number = 1
          left join projects p on p.id = pgr.project_id
-         left join lateral ( select distinct lfe_1.language_id, l.name
+         left join lateral ( select distinct l.*
                              from language_file_extensions lfe_1
                                       join languages l on l.id = lfe_1.language_id
-                             where lfe_1.extension = any (c.main_file_extensions)) lfe on true
+                             where lfe_1.extension = any (c.main_file_extensions)) l on true
          left join projects_ecosystems pe on pe.project_id = p.id
          left join v_programs_projects pp on pp.project_id = p.id
          left join projects_project_categories ppc on ppc.project_id = p.id
@@ -88,7 +128,9 @@ from indexer_exp.grouped_contributions c
          left join indexer_exp.github_issues_assignees gia ON gia.issue_id = c.issue_id
          left join indexer_exp.github_code_reviews cr on cr.id = c.code_review_id
          left join indexer_exp.github_pull_requests_closing_issues ci on ci.pull_request_id = c.pull_request_id
+         left join indexer_exp.github_issues i on i.id = ci.issue_id
          left join applications a on a.issue_id = c.issue_id
+         left join bi.p_contributor_global_data apd on apd.contributor_id = a.applicant_id
 group by c.contribution_uuid,
          c.repo_id,
          p.id,
@@ -107,7 +149,9 @@ group by c.contribution_uuid,
          c.created_at,
          c.updated_at,
          c.completed_at,
-         cr.pull_request_id
+         cr.pull_request_id,
+         ad.contributor_id,
+         gr.id
 $$, 'contribution_uuid');
 
 
