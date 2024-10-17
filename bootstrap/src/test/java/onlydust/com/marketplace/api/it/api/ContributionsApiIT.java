@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.api.contract.model.ContributionActivityPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ContributionActivityPageResponse;
+import onlydust.com.marketplace.api.contract.model.ContributionActivityStatus;
 import onlydust.com.marketplace.api.contract.model.ContributionType;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import org.assertj.core.api.AbstractListAssert;
@@ -160,6 +161,10 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         assertContributions(Map.of("projectSlugs", "calcom"))
                 .extracting(c -> c.getProject().getName())
                 .containsOnly("Cal.com");
+
+        assertContributions(Map.of("statuses", "IN_PROGRESS"))
+                .extracting(ContributionActivityPageItemResponse::getActivityStatus)
+                .containsOnly(ContributionActivityStatus.IN_PROGRESS);
     }
 
     private AbstractListAssert<?, ? extends List<? extends ContributionActivityPageItemResponse>, ContributionActivityPageItemResponse> assertContributions(Map<String, String> params) {
@@ -169,7 +174,13 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
 
         final var contributions = client.get().uri(getApiURI(CONTRIBUTIONS, q))
                 // Then
-                .exchange().expectStatus().isOk().expectBody(ContributionActivityPageResponse.class).returnResult().getResponseBody().getContributions();
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(ContributionActivityPageResponse.class)
+                .returnResult()
+                .getResponseBody()
+                .getContributions();
 
         return assertThat(contributions).isNotEmpty();
     }

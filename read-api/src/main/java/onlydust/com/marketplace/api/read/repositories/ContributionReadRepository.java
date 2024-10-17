@@ -107,7 +107,8 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                 (coalesce(:ids) is null or c.github_id = any (cast(:ids as bigint[]))) and
                 (coalesce(:types) is null or c.contribution_type = any (cast(:types as indexer_exp.contribution_type[]))) and
                 (coalesce(:projectIds) is null or c.project_id = any (cast(:projectIds as uuid[]))) and
-                (coalesce(:projectSlugs) is null or c.project_slug = any (cast(:projectSlugs as text[])))
+                (coalesce(:projectSlugs) is null or c.project_slug = any (cast(:projectSlugs as text[]))) and
+                (coalesce(:statuses) is null or c.activity_status = any (cast(:statuses as text[])))
             """, countQuery = """
             select count(distinct c.github_id)
             from bi.p_contribution_data c
@@ -116,12 +117,14 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                 (coalesce(:ids) is null or c.github_id = any (cast(:ids as bigint[]))) and
                 (coalesce(:types) is null or c.contribution_type = any (cast(:types as indexer_exp.contribution_type[]))) and
                 (coalesce(:projectIds) is null or c.project_id = any (cast(:projectIds as uuid[]))) and
-                (coalesce(:projectSlugs) is null or c.project_slug = any (cast(:projectSlugs as text[])))
+                (coalesce(:projectSlugs) is null or c.project_slug = any (cast(:projectSlugs as text[]))) and
+                (coalesce(:statuses) is null or c.activity_status = any (cast(:statuses as text[])))
             """, nativeQuery = true)
     Page<ContributionReadEntity> findAll(Long[] ids,
                                          String[] types,
                                          UUID[] projectIds,
                                          String[] projectSlugs,
+                                         String[] statuses,
                                          Pageable pageable);
 
     default Page<ContributionReadEntity> findAll(ContributionsQueryParams q) {
@@ -130,6 +133,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                 q.getTypes() == null ? null : q.getTypes().stream().map(Enum::name).toArray(String[]::new),
                 q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
                 q.getProjectSlugs() == null ? null : q.getProjectSlugs().toArray(String[]::new),
+                q.getStatuses() == null ? null : q.getStatuses().stream().map(Enum::name).toArray(String[]::new),
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC :
                         Sort.Direction.ASC, getSortProperty(q.getSort()))));
     }
