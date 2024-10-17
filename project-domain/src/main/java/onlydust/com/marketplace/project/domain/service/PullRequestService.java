@@ -18,7 +18,7 @@ public class PullRequestService implements PullRequestFacadePort {
     @Override
     public void updatePullRequest(UserId projectLeadId, UpdatePullRequestCommand updatePullRequestCommand) {
         if (!permissionPort.canUserUpdatePullRequest(projectLeadId, updatePullRequestCommand.id().value())) {
-            throw OnlyDustException.badRequest(String.format("User %s must be project lead to update pull request %s linked to its projects", projectLeadId,
+            throw OnlyDustException.unauthorized(String.format("User %s must be project lead to update pull request %s linked to its projects", projectLeadId,
                     updatePullRequestCommand.id().value()));
         }
         if (nonNull(updatePullRequestCommand.archived())) {

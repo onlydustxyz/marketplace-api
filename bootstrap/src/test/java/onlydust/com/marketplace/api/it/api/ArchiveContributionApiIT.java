@@ -1,12 +1,14 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.api.postgres.adapter.repository.ArchivedGithubContributionRepository;
+import onlydust.com.marketplace.api.suites.tags.TagProject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@TagProject
 public class ArchiveContributionApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired

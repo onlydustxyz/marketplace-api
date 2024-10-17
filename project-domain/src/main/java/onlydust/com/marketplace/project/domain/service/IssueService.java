@@ -19,7 +19,7 @@ public class IssueService implements IssueFacadePort {
     @Override
     public void updateIssue(UserId projectLeadId, UpdateIssueCommand updateIssueCommand) {
         if (!permissionPort.canUserUpdateIssue(projectLeadId, updateIssueCommand.id().value())) {
-            throw OnlyDustException.badRequest(String.format("User %s must be project lead to update issue %s linked to its projects", projectLeadId,
+            throw OnlyDustException.unauthorized(String.format("User %s must be project lead to update issue %s linked to its projects", projectLeadId,
                     updateIssueCommand.id().value()));
         }
         if (nonNull(updateIssueCommand.archived())) {
