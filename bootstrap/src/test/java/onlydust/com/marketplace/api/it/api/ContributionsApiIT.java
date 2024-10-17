@@ -169,6 +169,10 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         assertContributions(Map.of("repoIds", "493591124"))
                 .extracting(c -> c.getRepo().getName())
                 .containsOnly("kaaper");
+
+        assertContributions(Map.of("contributorIds", "43467246"))
+                .extracting(ContributionActivityPageItemResponse::getContributors)
+                .allMatch(contributors -> contributors.stream().anyMatch(c -> c.getLogin().equals("AnthonyBuisset")));
     }
 
     private AbstractListAssert<?, ? extends List<? extends ContributionActivityPageItemResponse>, ContributionActivityPageItemResponse> assertContributions(Map<String, String> params) {

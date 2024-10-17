@@ -109,7 +109,8 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                 (coalesce(:projectIds) is null or c.project_id = any (:projectIds)) and
                 (coalesce(:projectSlugs) is null or c.project_slug = any (:projectSlugs)) and
                 (coalesce(:statuses) is null or c.activity_status = any (:statuses)) and
-                (coalesce(:repoIds) is null or c.repo_id = any (:repoIds))
+                (coalesce(:repoIds) is null or c.repo_id = any (:repoIds)) and
+                (coalesce(:contributorIds) is null or c.contributor_ids && :contributorIds)
             """, countQuery = """
             select count(distinct c.github_id)
             from bi.p_contribution_data c
@@ -120,7 +121,8 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                 (coalesce(:projectIds) is null or c.project_id = any (:projectIds)) and
                 (coalesce(:projectSlugs) is null or c.project_slug = any (:projectSlugs)) and
                 (coalesce(:statuses) is null or c.activity_status = any (:statuses)) and
-                (coalesce(:repoIds) is null or c.repo_id = any (:repoIds))
+                (coalesce(:repoIds) is null or c.repo_id = any (:repoIds)) and
+                (coalesce(:contributorIds) is null or c.contributor_id = any (:contributorIds))
             """, nativeQuery = true)
     Page<ContributionReadEntity> findAll(Long[] ids,
                                          String[] types,
@@ -128,6 +130,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                                          String[] projectSlugs,
                                          String[] statuses,
                                          Long[] repoIds,
+                                         Long[] contributorIds,
                                          Pageable pageable);
 
     default Page<ContributionReadEntity> findAll(ContributionsQueryParams q) {
@@ -138,6 +141,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                 q.getProjectSlugs() == null ? null : q.getProjectSlugs().toArray(String[]::new),
                 q.getStatuses() == null ? null : q.getStatuses().stream().map(Enum::name).toArray(String[]::new),
                 q.getRepoIds() == null ? null : q.getRepoIds().toArray(Long[]::new),
+                q.getContributorIds() == null ? null : q.getContributorIds().toArray(Long[]::new),
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC :
                         Sort.Direction.ASC, getSortProperty(q.getSort()))));
     }
