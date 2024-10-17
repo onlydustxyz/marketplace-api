@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.it.api;
 import onlydust.com.marketplace.api.contract.model.ContributionActivityPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ContributionActivityPageResponse;
 import onlydust.com.marketplace.api.contract.model.ContributionType;
-import onlydust.com.marketplace.api.contract.model.ProjectLinkResponse;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -171,20 +170,25 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 r -> assertThat(r.getContributions())
                         .isNotEmpty()
                         .extracting(ContributionActivityPageItemResponse::getType)
-                        .allMatch(ContributionType.PULL_REQUEST::equals));
+                        .containsOnly(ContributionType.PULL_REQUEST));
 
         assertContributions(Map.of("ids", "43506983"),
                 r -> assertThat(r.getContributions())
                         .isNotEmpty()
                         .extracting(ContributionActivityPageItemResponse::getGithubId)
-                        .allMatch(((Long) 43506983L)::equals));
+                        .containsOnly(43506983L));
 
-        assertContributions(Map.of("projectIds", "8156fc5f-cec5-4f70-a0de-c368772edcd4"),
+        assertContributions(Map.of("projectIds", "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e"),
                 r -> assertThat(r.getContributions())
                         .isNotEmpty()
-                        .extracting(ContributionActivityPageItemResponse::getProject)
-                        .extracting(ProjectLinkResponse::getName)
-                        .allMatch("Cairo foundry"::equals));
+                        .extracting(c -> c.getProject().getName())
+                        .containsOnly("Cal.com"));
+
+        assertContributions(Map.of("projectSlugs", "calcom"),
+                r -> assertThat(r.getContributions())
+                        .isNotEmpty()
+                        .extracting(c -> c.getProject().getName())
+                        .containsOnly("Cal.com"));
     }
 
     private void assertContributions(Map<String, String> params,

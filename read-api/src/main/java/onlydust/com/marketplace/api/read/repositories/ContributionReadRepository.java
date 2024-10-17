@@ -78,6 +78,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                          c.activity_status                       as activity_status,
                          c.github_author_id                      as github_author_id,
                          c.project_id                            as project_id,
+                         c.project_slug                          as project_slug,
                          max(c.updated_at)                       as last_updated_at,
                          min(c.created_at)                       as created_at,
                          max(c.completed_at)                     as completed_at,
@@ -100,11 +101,13 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                            c.activity_status,
                            c.github_author_id,
                            c.project_id,
+                           c.project_slug,
                            rd.contribution_id) c
             where
                 (coalesce(:ids) is null or c.github_id = any (cast(:ids as bigint[]))) and
                 (coalesce(:types) is null or c.contribution_type = any (cast(:types as indexer_exp.contribution_type[]))) and
-                (coalesce(:projectIds) is null or c.project_id = any (cast(:projectIds as uuid[])))
+                (coalesce(:projectIds) is null or c.project_id = any (cast(:projectIds as uuid[]))) and
+                (coalesce(:projectSlugs) is null or c.project_slug = any (cast(:projectSlugs as text[])))
             """, countQuery = """
             select count(distinct c.github_id)
             from bi.p_contribution_data c
@@ -112,11 +115,13 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
             where
                 (coalesce(:ids) is null or c.github_id = any (cast(:ids as bigint[]))) and
                 (coalesce(:types) is null or c.contribution_type = any (cast(:types as indexer_exp.contribution_type[]))) and
-                (coalesce(:projectIds) is null or c.project_id = any (cast(:projectIds as uuid[])))
+                (coalesce(:projectIds) is null or c.project_id = any (cast(:projectIds as uuid[]))) and
+                (coalesce(:projectSlugs) is null or c.project_slug = any (cast(:projectSlugs as text[])))
             """, nativeQuery = true)
     Page<ContributionReadEntity> findAll(Long[] ids,
                                          String[] types,
                                          UUID[] projectIds,
+                                         String[] projectSlugs,
                                          Pageable pageable);
 
     default Page<ContributionReadEntity> findAll(ContributionsQueryParams q) {
@@ -124,6 +129,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                 q.getIds() == null ? null : q.getIds().toArray(Long[]::new),
                 q.getTypes() == null ? null : q.getTypes().stream().map(Enum::name).toArray(String[]::new),
                 q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
+                q.getProjectSlugs() == null ? null : q.getProjectSlugs().toArray(String[]::new),
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC :
                         Sort.Direction.ASC, getSortProperty(q.getSort()))));
     }
