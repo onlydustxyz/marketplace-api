@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -173,6 +174,14 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         assertContributions(Map.of("contributorIds", "43467246"))
                 .extracting(ContributionActivityPageItemResponse::getContributors)
                 .allMatch(contributors -> contributors.stream().anyMatch(c -> c.getLogin().equals("AnthonyBuisset")));
+
+        assertContributions(Map.of("hasBeenRewarded", "true"))
+                .extracting(ContributionActivityPageItemResponse::getTotalRewardedUsdAmount)
+                .allMatch(a -> a.compareTo(BigDecimal.ZERO) > 0);
+
+        assertContributions(Map.of("hasBeenRewarded", "false"))
+                .extracting(ContributionActivityPageItemResponse::getTotalRewardedUsdAmount)
+                .allMatch(a -> a.compareTo(BigDecimal.ZERO) == 0);
     }
 
     private AbstractListAssert<?, ? extends List<? extends ContributionActivityPageItemResponse>, ContributionActivityPageItemResponse> assertContributions(Map<String, String> params) {

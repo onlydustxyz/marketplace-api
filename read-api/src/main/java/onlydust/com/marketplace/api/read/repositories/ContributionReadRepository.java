@@ -67,27 +67,27 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                                                         'githubHtmlUrl', i.html_url))
                     from indexer_exp.github_issues i
                     where i.id = any (c.closing_issue_ids))            as linked_issues
-            from (select c.github_id                             as github_id,
-                         c.contribution_type                     as contribution_type,
-                         c.repo_id                               as repo_id,
-                         c.github_number                         as github_number,
-                         c.github_status                         as github_status,
-                         c.github_title                          as github_title,
-                         c.github_html_url                       as github_html_url,
-                         c.github_body                           as github_body,
-                         c.activity_status                       as activity_status,
-                         c.github_author_id                      as github_author_id,
-                         c.project_id                            as project_id,
-                         c.project_slug                          as project_slug,
-                         max(c.updated_at)                       as last_updated_at,
-                         min(c.created_at)                       as created_at,
-                         max(c.completed_at)                     as completed_at,
-                         array_agg(distinct c.contributor_id)    as contributor_ids,
-                         array_uniq_cat_agg(c.applicant_ids)     as applicant_ids,
-                         array_uniq_cat_agg(c.language_ids)      as language_ids,
-                         array_uniq_cat_agg(c.closing_issue_ids) as closing_issue_ids,
-                         array_uniq_cat_agg(c.github_label_ids)  as github_label_ids,
-                         rd.total_rewarded_usd_amount            as total_rewarded_usd_amount
+            from (select c.github_id                               as github_id,
+                         c.contribution_type                       as contribution_type,
+                         c.repo_id                                 as repo_id,
+                         c.github_number                           as github_number,
+                         c.github_status                           as github_status,
+                         c.github_title                            as github_title,
+                         c.github_html_url                         as github_html_url,
+                         c.github_body                             as github_body,
+                         c.activity_status                         as activity_status,
+                         c.github_author_id                        as github_author_id,
+                         c.project_id                              as project_id,
+                         c.project_slug                            as project_slug,
+                         max(c.updated_at)                         as last_updated_at,
+                         min(c.created_at)                         as created_at,
+                         max(c.completed_at)                       as completed_at,
+                         array_agg(distinct c.contributor_id)      as contributor_ids,
+                         array_uniq_cat_agg(c.applicant_ids)       as applicant_ids,
+                         array_uniq_cat_agg(c.language_ids)        as language_ids,
+                         array_uniq_cat_agg(c.closing_issue_ids)   as closing_issue_ids,
+                         array_uniq_cat_agg(c.github_label_ids)    as github_label_ids,
+                         coalesce(rd.total_rewarded_usd_amount, 0) as total_rewarded_usd_amount
                   from bi.p_contribution_data c
                            left join bi.p_contribution_reward_data rd on rd.contribution_id = c.contribution_id
                   group by c.github_id,
@@ -110,7 +110,8 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                 (coalesce(:projectSlugs) is null or c.project_slug = any (:projectSlugs)) and
                 (coalesce(:statuses) is null or c.activity_status = any (:statuses)) and
                 (coalesce(:repoIds) is null or c.repo_id = any (:repoIds)) and
-                (coalesce(:contributorIds) is null or c.contributor_ids && :contributorIds)
+                (coalesce(:contributorIds) is null or c.contributor_ids && :contributorIds) and
+                (coalesce(:hasBeenRewarded) is null or :hasBeenRewarded = (c.total_rewarded_usd_amount > 0))
             """, countQuery = """
             select count(distinct c.github_id)
             from bi.p_contribution_data c
@@ -122,7 +123,8 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                 (coalesce(:projectSlugs) is null or c.project_slug = any (:projectSlugs)) and
                 (coalesce(:statuses) is null or c.activity_status = any (:statuses)) and
                 (coalesce(:repoIds) is null or c.repo_id = any (:repoIds)) and
-                (coalesce(:contributorIds) is null or c.contributor_id = any (:contributorIds))
+                (coalesce(:contributorIds) is null or c.contributor_id = any (:contributorIds)) and
+                (coalesce(:hasBeenRewarded) is null or :hasBeenRewarded = (rd.total_rewarded_usd_amount > 0))
             """, nativeQuery = true)
     Page<ContributionReadEntity> findAll(Long[] ids,
                                          String[] types,
@@ -131,6 +133,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                                          String[] statuses,
                                          Long[] repoIds,
                                          Long[] contributorIds,
+                                         Boolean hasBeenRewarded,
                                          Pageable pageable);
 
     default Page<ContributionReadEntity> findAll(ContributionsQueryParams q) {
@@ -142,6 +145,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                 q.getStatuses() == null ? null : q.getStatuses().stream().map(Enum::name).toArray(String[]::new),
                 q.getRepoIds() == null ? null : q.getRepoIds().toArray(Long[]::new),
                 q.getContributorIds() == null ? null : q.getContributorIds().toArray(Long[]::new),
+                q.getHasBeenRewarded(),
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC :
                         Sort.Direction.ASC, getSortProperty(q.getSort()))));
     }
