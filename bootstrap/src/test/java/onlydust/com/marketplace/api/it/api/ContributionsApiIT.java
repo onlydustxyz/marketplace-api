@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static java.util.Comparator.comparing;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +26,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     void should_get_contribution() {
         // When
         client.get()
-                .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("43506983"), Map.of("pageSize", "1")))
+                .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("f4db1d9b-4e1d-300c-9277-8d05824c804e"), Map.of("pageSize", "1")))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -33,6 +34,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
+                          "uuid": "f4db1d9b-4e1d-300c-9277-8d05824c804e",
                           "type": "PULL_REQUEST",
                           "repo": {
                             "id": 40652912,
@@ -46,7 +48,6 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                             "login": "krzkaczor",
                             "avatarUrl": "https://avatars.githubusercontent.com/u/1814312?v=4"
                           },
-                          "githubId": 43506983,
                           "githubNumber": 8,
                           "githubStatus": "CLOSED",
                           "githubTitle": "Support for promises",
@@ -98,12 +99,13 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 45508,
-                          "totalItemNumber": 45508,
+                          "totalPageNumber": 78889,
+                          "totalItemNumber": 78889,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "contributions": [
                             {
+                              "uuid": "fb8a66f0-b4fc-353a-92ef-14d1a93b02b1",
                               "type": "ISSUE",
                               "repo": {
                                 "id": 21339768,
@@ -117,7 +119,6 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "simonwhitaker",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/116432?v=4"
                               },
-                              "githubId": 39536039,
                               "githubNumber": 1,
                               "githubStatus": "COMPLETED",
                               "githubTitle": "Tutorial uses POST with SimpleHTTPServer",
@@ -161,9 +162,9 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .extracting(ContributionActivityPageItemResponse::getType)
                 .containsOnly(ContributionType.PULL_REQUEST);
 
-        assertContributions(Map.of("ids", "43506983"))
-                .extracting(ContributionActivityPageItemResponse::getGithubId)
-                .containsOnly(43506983L);
+        assertContributions(Map.of("ids", "0000154b-44e2-3134-a60a-474acb3c0f0e"))
+                .extracting(ContributionActivityPageItemResponse::getUuid)
+                .containsOnly(UUID.fromString("0000154b-44e2-3134-a60a-474acb3c0f0e"));
 
         assertContributions(Map.of("projectIds", "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e"))
                 .extracting(c -> c.getProject().getName())

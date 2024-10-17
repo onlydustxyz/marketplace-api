@@ -234,7 +234,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/contributions/{contributionGithubId}:
+  /api/v1/contributions/{contributionUuid}:
     get:
       security:
         - bearerAuth: [ ]
@@ -245,11 +245,12 @@ paths:
       description: |
         Get contribution.
       parameters:
-        - name: contributionGithubId
+        - name: contributionUuid
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/IssueId'
+            $ref: '#/components/schemas/ContributionUuid'
+
       responses:
         "200":
           description: 'Contribution'
@@ -5679,6 +5680,11 @@ components:
       format: uuid
       description: OnlyDust user ID
 
+    ContributionUuid:
+      type: string
+      format: uuid
+      description: OnlyDust contribution ID
+
     GithubUserId:
       type: integer
       format: int64
@@ -8247,26 +8253,23 @@ components:
     ContributionResponse:
       type: object
       required:
+        - uuid
         - type
         - repo
         - githubStatus
-        - githubId
         - githubNumber
         - githubAuthor
         - githubTitle
         - githubHtmlUrl
       properties:
+        uuid:
+          $ref: '#/components/schemas/ContributionUuid'
         type:
           $ref: '#/components/schemas/ContributionType'
         repo:
           $ref: '#/components/schemas/ShortGithubRepoResponse'
         githubAuthor:
           $ref: '#/components/schemas/GithubUserResponse'
-        githubId:
-          type: integer
-          format: int64
-          description: Github item id
-          example: 6
         githubNumber:
           type: integer
           format: int64
@@ -12009,7 +12012,7 @@ components:
         ids:
           type: array
           items:
-            $ref: '#/components/schemas/IssueId'
+            $ref: '#/components/schemas/ContributionUuid'
         types:
           type: array
           items:
