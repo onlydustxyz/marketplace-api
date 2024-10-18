@@ -21,6 +21,7 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -148,27 +149,31 @@ public class GithubIssueReadEntity {
             final var installationStatus = map(repo.owner().installation().map(GithubAppInstallationViewEntity::getStatus).orElse(null));
             response.setGithubAppInstallationStatus(installationStatus);
             if (installationStatus == GithubOrganizationInstallationStatus.MISSING_PERMISSIONS) {
-                final var isAPersonalOrganization = switch (repo.owner().type()) {
-                    case "USER":
-                        yield true;
-                    case "ORGANIZATION":
-                        yield false;
-                    default:
-                        throw OnlyDustException.internalServerError("Invalid github organization type %s".formatted(repo.owner().type()));
-                };
-                if (isAPersonalOrganization) {
-                    response.setGithubAppInstallationPermissionsUpdateUrl(
-                            URI.create("https://github.com/settings/installations/%s"
-                                    .formatted(repo.owner().installation().map(GithubAppInstallationViewEntity::getId).orElse(null))));
-                } else {
-                    response.setGithubAppInstallationPermissionsUpdateUrl(
-                            URI.create("https://github.com/organizations/%s/settings/installations/%d/permissions/update"
-                                    .formatted(repoOwnerLogin, repo.owner().installation().map(GithubAppInstallationViewEntity::getId).orElse(null))));
-                }
+                response.setGithubAppInstallationPermissionsUpdateUrl(getGithubAppInstallationPermissionsUpdateUrl(repo.ownerLogin(),
+                        repo.parent().owner().type(), repo.parent().owner().installation()));
             }
         }
 
         return response;
+    }
+
+    public static URI getGithubAppInstallationPermissionsUpdateUrl(final String organizationLogin, final String organizationType,
+                                                                   final Optional<GithubAppInstallationViewEntity> installation) {
+        final var isAPersonalOrganization = switch (organizationType) {
+            case "USER":
+                yield true;
+            case "ORGANIZATION":
+                yield false;
+            default:
+                throw OnlyDustException.internalServerError("Invalid github organization type %s".formatted(organizationType));
+        };
+        if (isAPersonalOrganization) {
+            return URI.create("https://github.com/settings/installations/%s"
+                    .formatted(installation.map(GithubAppInstallationViewEntity::getId).orElse(null)));
+        } else {
+            return URI.create("https://github.com/organizations/%s/settings/installations/%d/permissions/update"
+                    .formatted(organizationLogin, installation.map(GithubAppInstallationViewEntity::getId).orElse(null)));
+        }
     }
 
     private GithubOrganizationInstallationStatus map(GithubAppInstallationViewEntity.Status status) {

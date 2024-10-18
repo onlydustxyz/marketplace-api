@@ -7593,6 +7593,9 @@ components:
               format: int64
             installationStatus:
               $ref: '#/components/schemas/GithubOrganizationInstallationStatus'
+            githubAppInstallationPermissionsUpdateUrl:
+              type: string
+              format: uri
 
     GithubOrganizationInstallationStatus:
       type: string

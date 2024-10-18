@@ -33,6 +33,8 @@ import static java.math.BigDecimal.ZERO;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
+import static onlydust.com.marketplace.api.read.entities.github.GithubIssueReadEntity.getGithubAppInstallationPermissionsUpdateUrl;
 import static onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper.map;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 import static org.hibernate.Hibernate.size;
@@ -198,6 +200,8 @@ public class ProjectReadEntity {
                                     case MISSING_PERMISSIONS -> GithubOrganizationInstallationStatus.MISSING_PERMISSIONS;
                                     case COMPLETE -> GithubOrganizationInstallationStatus.COMPLETE;
                                 })
+                        .githubAppInstallationPermissionsUpdateUrl(getGithubAppInstallationPermissionsUpdateUrl(entity.login(), entity.type(),
+                                ofNullable(entity.installation())))
                         .repos(entity.repos().stream()
                                 .filter(GithubRepoViewEntity::isPublic)
                                 .filter(repo -> includeAllAvailableRepos || repoIdsIncludedInProject.contains(repo.getId()))
