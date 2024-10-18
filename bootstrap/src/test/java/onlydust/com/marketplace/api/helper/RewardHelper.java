@@ -24,23 +24,24 @@ public class RewardHelper {
     private RewardStoragePort rewardStoragePort;
 
     public RewardId create(ProjectId projectId, UserAuthHelper.AuthenticatedUser lead, GithubUserId recipientId, long amount, Currency.Id currencyId) {
+        return create(projectId, lead, recipientId, amount, currencyId, List.of(RequestRewardCommand.Item.builder()
+                .id("1974448961")
+                .number(77L)
+                .repoId(86943508L)
+                .type(RequestRewardCommand.Item.Type.issue)
+                .build()));
+    }
+
+    public RewardId create(ProjectId projectId, UserAuthHelper.AuthenticatedUser lead, GithubUserId recipientId, long amount, Currency.Id currencyId,
+                           List<RequestRewardCommand.Item> rewardItems) {
         return rewardFacadePort.createReward(UserId.of(lead.user().getId()),
                 RequestRewardCommand.builder()
                         .amount(BigDecimal.valueOf(amount))
                         .currencyId(CurrencyView.Id.of(currencyId.value()))
                         .recipientId(recipientId.value())
-                        .items(List.of(createRequestRewardCommandItem()))
+                        .items(rewardItems)
                         .projectId(projectId)
                         .build());
-    }
-
-    private RequestRewardCommand.Item createRequestRewardCommandItem() {
-        return RequestRewardCommand.Item.builder()
-                .id("1974448961")
-                .number(77L)
-                .repoId(86943508L)
-                .type(RequestRewardCommand.Item.Type.issue)
-                .build();
     }
 
     public void cancel(ProjectId projectId, UserAuthHelper.AuthenticatedUser lead, RewardId rewardId) {

@@ -346,7 +346,7 @@ public class AbstractMarketplaceApiIT {
     @BeforeEach
     void setupUserHelper() {
         userAuthHelper = new UserAuthHelper(userRepository, backofficeUserRepository, jwtVerifier, githubAuthenticationPort, auth0WireMockServer,
-                githubWireMockServer, appUserFacadePort, faker);
+                githubWireMockServer, appUserFacadePort, faker, githubHelper);
 
         userAuthHelper.mockAuth0UserInfo(134486697L, "axelbconseil");
         userAuthHelper.mockAuth0UserInfo(43467246L, "AnthonyBuisset", "abuisset@gmail.com");

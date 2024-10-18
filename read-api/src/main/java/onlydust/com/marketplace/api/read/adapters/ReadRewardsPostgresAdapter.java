@@ -34,6 +34,7 @@ public class ReadRewardsPostgresAdapter implements ReadRewardsApi {
         final var page = rewardReadV2Repository.findAll(
                 authenticatedUser.projectsLed() == null ? null : authenticatedUser.projectsLed().toArray(UUID[]::new),
                 authenticatedUser.githubUserId(),
+                q.getStatuses() == null ? null : q.getStatuses().stream().map(Enum::name).toArray(String[]::new),
                 q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
                 q.getContributionUUIDs() == null ? null : q.getContributionUUIDs().toArray(UUID[]::new),
                 q.getRecipientIds() == null ? null : q.getRecipientIds().toArray(Long[]::new),

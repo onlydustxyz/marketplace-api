@@ -72,7 +72,8 @@ public class RewardV2ReadEntity {
                 .to(recipient)
                 .requestedAt(requestedAt)
                 .processedAt(processedAt)
-                .unlockDate(unlockDate);
+                .unlockDate(unlockDate)
+                .projectId(projectId);
     }
 
     private Money amount() {

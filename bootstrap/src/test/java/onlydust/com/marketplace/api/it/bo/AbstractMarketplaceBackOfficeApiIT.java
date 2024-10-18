@@ -118,11 +118,13 @@ public class AbstractMarketplaceBackOfficeApiIT {
     CurrencyFacadePort currencyFacadePort;
     @Autowired
     AppUserFacadePort appUserFacadePort;
+    @Autowired
+    private GithubHelper githubHelper;
 
     @BeforeEach
     void setupUserAuthHelper() {
         userAuthHelper = new UserAuthHelper(userRepository, backofficeUserRepository, jwtVerifier, githubAuthenticationPort, auth0WireMockServer,
-                githubWireMockServer, appUserFacadePort, faker);
+                githubWireMockServer, appUserFacadePort, faker, githubHelper);
 
         userAuthHelper.mockAuth0UserInfo(134486697L, "axelbconseil");
         userAuthHelper.mockAuth0UserInfo(43467246L, "AnthonyBuisset", "abuisset@gmail.com");

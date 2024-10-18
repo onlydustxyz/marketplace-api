@@ -12229,6 +12229,10 @@ components:
     RewardsQueryParams:
       type: object
       properties:
+        statuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewardStatusContract'
         contributionUUIDs:
           type: array
           items:
@@ -12282,3 +12286,5 @@ components:
         unlockDate:
           type: string
           format: date-time
+        projectId:
+          $ref: '#/components/schemas/ProjectId'

@@ -43,10 +43,16 @@ public interface RewardReadV2Repository extends JpaRepository<RewardV2ReadEntity
                      join iam.all_indexed_users recipient on r.recipient_id = recipient.github_user_id
             
             where (cast(:dataSourceIds as uuid[]) is not null and r.project_id = any (cast(:dataSourceIds as uuid[])) or r.recipient_id = :dataSourceRecipientId)
+              and (cast(:statuses as accounting.reward_status[]) is null or r.status = any (cast(:statuses as accounting.reward_status[])))
               and (cast(:projectIds as uuid[]) is null or r.project_id = any (cast(:projectIds as uuid[])))
               and (cast(:recipientIds as bigint[]) is null or r.recipient_id = any (cast(:recipientIds as bigint[])))
               and (cast(:contributionUUIDs as uuid[]) is null or r.reward_id = any (get_reward_ids_of_contributions(cast(:contributionUUIDs as uuid[]))))
             """, nativeQuery = true)
-    Page<RewardV2ReadEntity> findAll(UUID[] dataSourceIds, Long dataSourceRecipientId, UUID[] projectIds, UUID[] contributionUUIDs,
-                                     Long[] recipientIds, Pageable pageable);
+    Page<RewardV2ReadEntity> findAll(UUID[] dataSourceIds,
+                                     Long dataSourceRecipientId,
+                                     String[] statuses,
+                                     UUID[] projectIds,
+                                     UUID[] contributionUUIDs,
+                                     Long[] recipientIds,
+                                     Pageable pageable);
 }
