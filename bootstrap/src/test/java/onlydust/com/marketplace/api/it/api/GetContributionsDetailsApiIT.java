@@ -44,7 +44,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
                         "90fb751a-1137-4815-b3c4-54927a5db059",
-                        "97735d1fae1597c261d55e07ac10c947ae99ed2d0daf2826938e2f2de9b69ac8")))
+                        "855329b37e8fd40528640329d8dc93ef35baa2801481f2c5f96592d1c9db9e0b")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -473,7 +473,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
                         "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
-                        "2eba1ee6dd0e0a3acb2f0d411eea52500eb572b1eec6f2ccf45bc53e8cd77bd6")))
+                        "8fb115e69ac7598e6b9a8eefeb52817b00bafa382a6fb0804d4285b53ee94730")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -490,7 +490,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTION_BY_ID,
                         "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
-                        "2eba1ee6dd0e0a3acb2f0d411eea52500eb572b1eec6f2ccf45bc53e8cd77bd6")))
+                        "8fb115e69ac7598e6b9a8eefeb52817b00bafa382a6fb0804d4285b53ee94730")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()

@@ -35,7 +35,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                            "totalPageNumber": 1,
-                           "totalItemNumber": 5,
+                           "totalItemNumber": 4,
                            "hasMore": false,
                            "nextPageIndex": 0,
                            "languages": [
@@ -252,7 +252,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "rank": 1,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
-                              "contributionCount": 888,
+                              "contributionCount": 112,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0,
                               "projects": [
@@ -274,10 +274,10 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
-                              "rank": 9,
+                              "rank": 1,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
-                              "contributionCount": 888,
+                              "contributionCount": 112,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0,
                               "projects": [
@@ -302,7 +302,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "rank": 1,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
-                              "contributionCount": 888,
+                              "contributionCount": 112,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0,
                               "projects": [
@@ -470,7 +470,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                           "githubUserId": 777,
                           "login": "AnGeL",
                           "avatarUrl": "https://angel.com/avatar.jpg",
-                          "htmlUrl": null,
+                          "htmlUrl": "https://github.com/AnGeL",
                           "location": null,
                           "bio": null,
                           "website": null,
@@ -609,7 +609,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             "rankCategory": "A",
                             "contributedProjectCount": 7,
                             "leadedProjectCount": 2,
-                            "contributionCount": 938,
+                            "contributionCount": 137,
                             "rewardCount": 21
                           },
                           "ecosystems": [
@@ -739,47 +739,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "week": 15,
                               "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 4,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 16,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 0,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 17,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 6,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 18,
-                              "codeReviewCount": 1,
-                              "issueCount": 0,
-                              "pullRequestCount": 0,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 19,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 0,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 20,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 0,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
@@ -792,18 +752,10 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "year": 2022,
-                              "week": 24,
-                              "codeReviewCount": 0,
-                              "issueCount": 0,
-                              "pullRequestCount": 2,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
                               "week": 25,
-                              "codeReviewCount": 1,
+                              "codeReviewCount": 0,
                               "issueCount": 3,
-                              "pullRequestCount": 3,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
@@ -811,52 +763,28 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "week": 26,
                               "codeReviewCount": 4,
                               "issueCount": 0,
-                              "pullRequestCount": 3,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 27,
-                              "codeReviewCount": 8,
+                              "codeReviewCount": 0,
                               "issueCount": 3,
-                              "pullRequestCount": 10,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 28,
-                              "codeReviewCount": 8,
+                              "codeReviewCount": 5,
                               "issueCount": 5,
-                              "pullRequestCount": 8,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 29,
-                              "codeReviewCount": 8,
-                              "issueCount": 0,
-                              "pullRequestCount": 1,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 30,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 1,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 31,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 15,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 32,
                               "codeReviewCount": 1,
                               "issueCount": 0,
                               "pullRequestCount": 0,
@@ -864,336 +792,128 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "year": 2022,
-                              "week": 33,
-                              "codeReviewCount": 2,
+                              "week": 30,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 2,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
-                              "week": 34,
-                              "codeReviewCount": 3,
+                              "week": 31,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 35,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 11,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 36,
-                              "codeReviewCount": 8,
-                              "issueCount": 0,
-                              "pullRequestCount": 13,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 37,
-                              "codeReviewCount": 5,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 38,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 39,
-                              "codeReviewCount": 3,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 40,
-                              "codeReviewCount": 8,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 41,
-                              "codeReviewCount": 3,
-                              "issueCount": 0,
-                              "pullRequestCount": 2,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 42,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 43,
-                              "codeReviewCount": 5,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 2,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 44,
-                              "codeReviewCount": 0,
-                              "issueCount": 0,
-                              "pullRequestCount": 3,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 45,
-                              "codeReviewCount": 4,
-                              "issueCount": 0,
-                              "pullRequestCount": 4,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 46,
-                              "codeReviewCount": 14,
+                              "codeReviewCount": 3,
                               "issueCount": 0,
-                              "pullRequestCount": 8,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 47,
-                              "codeReviewCount": 10,
-                              "issueCount": 0,
-                              "pullRequestCount": 10,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 48,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 6,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 49,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 10,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 50,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 4,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 51,
-                              "codeReviewCount": 8,
-                              "issueCount": 0,
-                              "pullRequestCount": 12,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 52,
-                              "codeReviewCount": 5,
-                              "issueCount": 0,
-                              "pullRequestCount": 8,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 1,
-                              "codeReviewCount": 9,
-                              "issueCount": 0,
-                              "pullRequestCount": 9,
-                              "rewardCount": 1
-                            },
-                            {
-                              "year": 2023,
-                              "week": 2,
-                              "codeReviewCount": 10,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 3,
-                              "codeReviewCount": 13,
-                              "issueCount": 0,
-                              "pullRequestCount": 8,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 4,
-                              "codeReviewCount": 18,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 11,
+                              "pullRequestCount": 0,
                               "rewardCount": 2
                             },
                             {
                               "year": 2023,
                               "week": 5,
-                              "codeReviewCount": 19,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 19,
+                              "pullRequestCount": 4,
                               "rewardCount": 1
                             },
                             {
                               "year": 2023,
                               "week": 6,
-                              "codeReviewCount": 9,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 9,
+                              "pullRequestCount": 3,
                               "rewardCount": 1
                             },
                             {
                               "year": 2023,
                               "week": 8,
-                              "codeReviewCount": 10,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 7,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 9,
-                              "codeReviewCount": 13,
-                              "issueCount": 0,
-                              "pullRequestCount": 14,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 10,
-                              "codeReviewCount": 11,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 20,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 11,
-                              "codeReviewCount": 10,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 9,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 12,
-                              "codeReviewCount": 6,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 16,
+                              "pullRequestCount": 2,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 13,
-                              "codeReviewCount": 5,
-                              "issueCount": 4,
-                              "pullRequestCount": 7,
+                              "codeReviewCount": 0,
+                              "issueCount": 2,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 14,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 15,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 16,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 10,
-                              "rewardCount": 1
                             },
                             {
                               "year": 2023,
                               "week": 17,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 18,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 18,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 17,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 19,
-                              "codeReviewCount": 10,
-                              "issueCount": 0,
-                              "pullRequestCount": 9,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 20,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 14,
-                              "rewardCount": 1
-                            },
-                            {
-                              "year": 2023,
-                              "week": 21,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 14,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 22,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 8,
+                              "pullRequestCount": 2,
                               "rewardCount": 2
                             },
                             {
                               "year": 2023,
                               "week": 23,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 9,
                               "rewardCount": 0
@@ -1201,7 +921,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 24,
-                              "codeReviewCount": 4,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 5,
                               "rewardCount": 0
@@ -1209,7 +929,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 25,
-                              "codeReviewCount": 3,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 8,
                               "rewardCount": 2
@@ -1217,7 +937,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 26,
-                              "codeReviewCount": 6,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 13,
                               "rewardCount": 0
@@ -1225,7 +945,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 27,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
@@ -1233,7 +953,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 28,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 15,
                               "rewardCount": 0
@@ -1241,7 +961,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 29,
-                              "codeReviewCount": 3,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 4,
                               "rewardCount": 0
@@ -1249,7 +969,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 30,
-                              "codeReviewCount": 5,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
@@ -1257,7 +977,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 31,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 4,
                               "rewardCount": 0
@@ -1265,7 +985,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 32,
-                              "codeReviewCount": 4,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 12,
                               "rewardCount": 0
@@ -1273,70 +993,54 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 35,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 3,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 36,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 37,
-                              "codeReviewCount": 1,
-                              "issueCount": 0,
-                              "pullRequestCount": 3,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 38,
-                              "codeReviewCount": 4,
-                              "issueCount": 0,
-                              "pullRequestCount": 10,
-                              "rewardCount": 10
-                            },
-                            {
-                              "year": 2023,
-                              "week": 39,
-                              "codeReviewCount": 1,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
-                              "week": 40,
-                              "codeReviewCount": 1,
+                              "week": 36,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 0,
+                              "pullRequestCount": 2,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
-                              "week": 41,
-                              "codeReviewCount": 1,
+                              "week": 37,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 0,
+                              "pullRequestCount": 2,
                               "rewardCount": 0
+                            },
+                            {
+                              "year": 2023,
+                              "week": 38,
+                              "codeReviewCount": 0,
+                              "issueCount": 0,
+                              "pullRequestCount": 4,
+                              "rewardCount": 10
                             }
                           ],
                           "earnings": {
                             "totalEarnedUsd": 2692632.50,
                             "perProject": [
                               {
+                                "projectName": "kaaper 3",
+                                "totalEarnedUsd": 2525.00
+                              },
+                              {
+                                "projectName": "oscar's awesome project",
+                                "totalEarnedUsd": 1010.00
+                              },
+                              {
                                 "projectName": "kaaper",
                                 "totalEarnedUsd": 1792080.00
                               },
                               {
-                                "projectName": "kaaper 3",
-                                "totalEarnedUsd": 2525.00
+                                "projectName": "Aldébaran du Taureau",
+                                "totalEarnedUsd": 1767.50
                               },
                               {
                                 "projectName": "Pizzeria Yoshi !",
@@ -1345,21 +1049,13 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               {
                                 "projectName": "Marketplace 2",
                                 "totalEarnedUsd": 890990.00
-                              },
-                              {
-                                "projectName": "Aldébaran du Taureau",
-                                "totalEarnedUsd": 1767.50
-                              },
-                              {
-                                "projectName": "oscar's awesome project",
-                                "totalEarnedUsd": 1010.00
                               }
                             ]
                           },
                           "workDistribution": {
-                            "codeReviewCount": 406,
-                            "issueCount": 15,
-                            "pullRequestCount": 517
+                            "codeReviewCount": 22,
+                            "issueCount": 13,
+                            "pullRequestCount": 102
                           }
                         }
                         """);
@@ -1385,408 +1081,96 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                           "activity": [
                             {
                               "year": 2022,
-                              "week": 24,
-                              "codeReviewCount": 0,
-                              "issueCount": 0,
-                              "pullRequestCount": 2,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
                               "week": 25,
-                              "codeReviewCount": 1,
-                              "issueCount": 3,
-                              "pullRequestCount": 3,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 26,
                               "codeReviewCount": 0,
-                              "issueCount": 0,
-                              "pullRequestCount": 3,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 27,
-                              "codeReviewCount": 8,
                               "issueCount": 3,
-                              "pullRequestCount": 10,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 28,
-                              "codeReviewCount": 3,
-                              "issueCount": 5,
-                              "pullRequestCount": 8,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 29,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 1,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 30,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 1,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 31,
-                              "codeReviewCount": 5,
-                              "issueCount": 0,
-                              "pullRequestCount": 15,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 32,
-                              "codeReviewCount": 1,
-                              "issueCount": 0,
                               "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
-                              "week": 33,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 2,
+                              "week": 27,
+                              "codeReviewCount": 0,
+                              "issueCount": 3,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
-                              "week": 34,
-                              "codeReviewCount": 3,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 35,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 11,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 36,
-                              "codeReviewCount": 8,
-                              "issueCount": 0,
-                              "pullRequestCount": 13,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 37,
-                              "codeReviewCount": 5,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 38,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 39,
-                              "codeReviewCount": 3,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 40,
-                              "codeReviewCount": 8,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 41,
-                              "codeReviewCount": 3,
-                              "issueCount": 0,
-                              "pullRequestCount": 2,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 42,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
+                              "week": 28,
+                              "codeReviewCount": 0,
+                              "issueCount": 5,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 43,
-                              "codeReviewCount": 4,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 2,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
-                              "year": 2022,
-                              "week": 44,
+                              "year": 2023,
+                              "week": 5,
+                              "codeReviewCount": 0,
+                              "issueCount": 0,
+                              "pullRequestCount": 4,
+                              "rewardCount": 0
+                            },
+                            {
+                              "year": 2023,
+                              "week": 6,
                               "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 3,
                               "rewardCount": 0
                             },
                             {
-                              "year": 2022,
-                              "week": 45,
-                              "codeReviewCount": 4,
-                              "issueCount": 0,
-                              "pullRequestCount": 4,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 46,
-                              "codeReviewCount": 11,
-                              "issueCount": 0,
-                              "pullRequestCount": 8,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 47,
-                              "codeReviewCount": 10,
-                              "issueCount": 0,
-                              "pullRequestCount": 10,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 48,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 6,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 49,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 10,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 50,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 4,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 51,
-                              "codeReviewCount": 8,
-                              "issueCount": 0,
-                              "pullRequestCount": 12,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 52,
-                              "codeReviewCount": 5,
-                              "issueCount": 0,
-                              "pullRequestCount": 8,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 1,
-                              "codeReviewCount": 9,
-                              "issueCount": 0,
-                              "pullRequestCount": 9,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 2,
-                              "codeReviewCount": 10,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 3,
-                              "codeReviewCount": 13,
-                              "issueCount": 0,
-                              "pullRequestCount": 8,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 4,
-                              "codeReviewCount": 17,
-                              "issueCount": 0,
-                              "pullRequestCount": 11,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 5,
-                              "codeReviewCount": 18,
-                              "issueCount": 0,
-                              "pullRequestCount": 19,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 6,
-                              "codeReviewCount": 9,
-                              "issueCount": 0,
-                              "pullRequestCount": 9,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 8,
-                              "codeReviewCount": 9,
-                              "issueCount": 0,
-                              "pullRequestCount": 6,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 9,
-                              "codeReviewCount": 13,
-                              "issueCount": 0,
-                              "pullRequestCount": 14,
-                              "rewardCount": 0
-                            },
-                            {
                               "year": 2023,
                               "week": 10,
-                              "codeReviewCount": 11,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 20,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 11,
-                              "codeReviewCount": 10,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 9,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 12,
-                              "codeReviewCount": 6,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 16,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 13,
-                              "codeReviewCount": 5,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 14,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 15,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 16,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 10,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 17,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 17,
+                              "pullRequestCount": 2,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 18,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 17,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 19,
-                              "codeReviewCount": 10,
-                              "issueCount": 0,
-                              "pullRequestCount": 9,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 20,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 14,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 21,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 14,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 22,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 8,
+                              "pullRequestCount": 2,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 23,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 9,
                               "rewardCount": 0
@@ -1794,7 +1178,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 24,
-                              "codeReviewCount": 4,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 5,
                               "rewardCount": 0
@@ -1802,7 +1186,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 25,
-                              "codeReviewCount": 3,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 8,
                               "rewardCount": 0
@@ -1810,7 +1194,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 26,
-                              "codeReviewCount": 6,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 13,
                               "rewardCount": 0
@@ -1818,7 +1202,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 27,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
@@ -1826,7 +1210,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 28,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 15,
                               "rewardCount": 0
@@ -1834,7 +1218,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 29,
-                              "codeReviewCount": 3,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 4,
                               "rewardCount": 0
@@ -1842,7 +1226,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 30,
-                              "codeReviewCount": 5,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
@@ -1850,7 +1234,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 31,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 4,
                               "rewardCount": 0
@@ -1858,7 +1242,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 32,
-                              "codeReviewCount": 4,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 12,
                               "rewardCount": 0
@@ -1866,57 +1250,33 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 35,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 3,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 36,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 37,
-                              "codeReviewCount": 1,
-                              "issueCount": 0,
-                              "pullRequestCount": 3,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 38,
-                              "codeReviewCount": 4,
-                              "issueCount": 0,
-                              "pullRequestCount": 10,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 39,
-                              "codeReviewCount": 1,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
-                              "week": 40,
-                              "codeReviewCount": 1,
+                              "week": 36,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 0,
+                              "pullRequestCount": 2,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
-                              "week": 41,
-                              "codeReviewCount": 1,
+                              "week": 37,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 0,
+                              "pullRequestCount": 2,
+                              "rewardCount": 0
+                            },
+                            {
+                              "year": 2023,
+                              "week": 38,
+                              "codeReviewCount": 0,
+                              "issueCount": 0,
+                              "pullRequestCount": 4,
                               "rewardCount": 0
                             }
                           ],
@@ -1925,9 +1285,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             "perProject": []
                           },
                           "workDistribution": {
-                            "codeReviewCount": 372,
+                            "codeReviewCount": 2,
                             "issueCount": 11,
-                            "pullRequestCount": 505
+                            "pullRequestCount": 99
                           }
                         }
                         """);

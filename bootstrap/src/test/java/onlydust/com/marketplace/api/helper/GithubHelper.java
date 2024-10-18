@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.helper;
 import com.github.javafaker.Faker;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.GithubAccount;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
@@ -99,14 +100,16 @@ public class GithubHelper {
         createPullRequest(repo, contributor, null);
     }
 
-    public long createPullRequest(GithubRepo repo, UserAuthHelper.AuthenticatedUser contributor, List<String> mainFileExtensions) {
+    public ContributionUUID createPullRequest(GithubRepo repo, UserAuthHelper.AuthenticatedUser contributor, List<String> mainFileExtensions) {
         final var prId = faker.random().nextLong();
+        final var contributionUuid = ContributionUUID.of(prId);
         final var prNumber = faker.random().nextInt(1000);
 
         createAccount(contributor);
 
         final var parameters = new HashMap<String, Object>();
         parameters.put("prId", prId);
+        parameters.put("contributionUuid", contributionUuid.value());
         parameters.put("repoId", repo.getId());
         parameters.put("contributorId", contributor.user().getGithubUserId());
         parameters.put("createdAt", CurrentDateProvider.now());
@@ -121,7 +124,7 @@ public class GithubHelper {
         databaseHelper.executeQuery("""
                 insert into indexer_exp.github_pull_requests(id, contribution_uuid, repo_id, number, title, status, created_at, updated_at, closed_at, merged_at, author_id, html_url, body, comments_count, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url, review_state, commit_count, main_file_extensions)
                 select :prId,
-                       indexer.uuid_of(cast(:prId as text)),
+                       :contributionUuid,
                        gr.id,
                        :githubNumber,
                        :githubTitle,
@@ -150,7 +153,7 @@ public class GithubHelper {
 
         createContributionFromPullRequest(prId, contributor.user().getGithubUserId());
 
-        return prId;
+        return contributionUuid;
     }
 
     public Long createIssue(GithubRepo repo, UserAuthHelper.AuthenticatedUser contributor) {
@@ -399,7 +402,7 @@ public class GithubHelper {
                 "contributorId", contributorId));
     }
 
-    public void createCodeReview(GithubRepo repo, Long prId, UserAuthHelper.AuthenticatedUser contributor) {
+    public void createCodeReview(GithubRepo repo, ContributionUUID prId, UserAuthHelper.AuthenticatedUser contributor) {
         final var id = faker.random().hex();
         final var prNumber = faker.random().nextInt(1000);
         final var parameters = new HashMap<String, Object>();
@@ -410,7 +413,7 @@ public class GithubHelper {
         parameters.put("repoName", repo.getName());
         parameters.put("repoHtmlUrl", repo.getHtmlUrl());
         parameters.put("codeReviewId", faker.random().nextLong());
-        parameters.put("prId", prId);
+        parameters.put("prId", prId.value());
         parameters.put("createdAt", CurrentDateProvider.now());
         parameters.put("completedAt", CurrentDateProvider.now().plusDays(1));
         parameters.put("githubNumber", prNumber);
@@ -429,7 +432,9 @@ public class GithubHelper {
                 on conflict do nothing;
                 
                 insert into indexer_exp.github_code_reviews(id, contribution_uuid, pull_request_id, author_id, state, requested_at, submitted_at, number, title, html_url, body, comments_count, repo_owner_login, repo_name, repo_id, repo_html_url, author_login, author_html_url, author_avatar_url)
-                values (:codeReviewId, indexer.uuid_of(cast(:codeReviewId as text)), :prId, :contributorId, 'APPROVED', :createdAt, :completedAt, :githubNumber, :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoId, :repoHtmlUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl);
+                select :codeReviewId, indexer.uuid_of(cast(:codeReviewId as text)), pr.id, :contributorId, 'APPROVED', :createdAt, :completedAt, :githubNumber, :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoId, :repoHtmlUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl
+                from indexer_exp.github_pull_requests pr
+                where pr.contribution_uuid = :prId ;
                 
                 insert into indexer_exp.contributions(id, contribution_uuid, repo_id, contributor_id, type, status, code_review_id, created_at, updated_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
                 values (:id, indexer.uuid_of(cast(:codeReviewId as text)), :repoId, :contributorId, 'CODE_REVIEW', 'COMPLETED', :codeReviewId, :createdAt, :createdAt, :completedAt, :githubNumber, 'APPROVED', :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :contributorId, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, 'APPROVED', null);

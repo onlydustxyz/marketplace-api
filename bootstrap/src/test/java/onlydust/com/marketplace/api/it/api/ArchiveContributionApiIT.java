@@ -58,7 +58,7 @@ public class ArchiveContributionApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_archive_unarchive_pull_request() {
         // Given
-        final var prId = ContributionUUID.of(953656792L);
+        final var prId = ContributionUUID.of(1623877895L);
 
         // When
         client.patch()

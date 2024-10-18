@@ -708,7 +708,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
-                .jsonPath("$.contributions[0].links.length()").isEqualTo(3)
+                .jsonPath("$.contributions[0].links.length()").isEqualTo(1)
         ;
     }
 

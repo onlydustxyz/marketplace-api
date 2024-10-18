@@ -37,15 +37,14 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 5,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
                           "contributions": [
                             {
-                              "id": "662217b394e92161dac7470d717508a9287bb253e9fc8d9206f750ee4b1a9f35",
-                              "contributor": {
-                                "githubUserId": 143011364,
-                                "login": "pixelfact",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
-                                "isRegistered": false
-                              },
+                              "uuid": null,
+                              "type": "PULL_REQUEST",
                               "repo": {
                                 "id": 498695724,
                                 "owner": "onlydustxyz",
@@ -53,47 +52,91 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                                 "description": null,
                                 "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
                               },
-                              "type": "PULL_REQUEST",
-                              "status": "IN_PROGRESS",
+                              "githubAuthor": {
+                                "githubUserId": 143011364,
+                                "login": "pixelfact",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4"
+                              },
                               "githubNumber": 1514,
-                              "githubTitle": "Migrate Profile mutation",
                               "githubStatus": "DRAFT",
+                              "githubTitle": "Migrate Profile mutation",
                               "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1514",
                               "githubBody": null,
-                              "createdAt": "2023-12-01T16:53:55Z"
+                              "githubLabels": null,
+                              "lastUpdatedAt": "2023-12-01T16:53:55Z",
+                              "id": "662217b394e92161dac7470d717508a9287bb253e9fc8d9206f750ee4b1a9f35",
+                              "createdAt": "2023-12-01T16:53:55Z",
+                              "completedAt": null,
+                              "status": "IN_PROGRESS",
+                              "githubPullRequestReviewState": "PENDING_REVIEWER",
+                              "rewardIds": [],
+                              "project": {
+                                "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                "slug": "kaaper",
+                                "name": "kaaper",
+                                "logoUrl": null,
+                                "shortDescription": "Documentation generator for Cairo projects.",
+                                "visibility": "PUBLIC",
+                                "languages": []
+                              },
+                              "contributor": {
+                                "githubUserId": 143011364,
+                                "login": "pixelfact",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
+                                "isRegistered": false,
+                                "id": null
+                              },
+                              "links": []
                             },
                             {
+                              "uuid": null,
+                              "type": "PULL_REQUEST",
+                              "repo": {
+                                "id": 498695724,
+                                "owner": "onlydustxyz",
+                                "name": "marketplace-frontend",
+                                "description": null,
+                                "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
+                              },
+                              "githubAuthor": {
+                                "githubUserId": 5160414,
+                                "login": "haydencleary",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4"
+                              },
+                              "githubNumber": 1503,
+                              "githubStatus": "DRAFT",
+                              "githubTitle": "B 1178 build new contributions tab",
+                              "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1503",
+                              "githubBody": null,
+                              "githubLabels": null,
+                              "lastUpdatedAt": "2023-11-30T16:32:31Z",
                               "id": "440ada773bbb1c112e039324edac9bd2e2dd612d2c7b99d9cc73aaa4ad483c11",
+                              "createdAt": "2023-11-30T16:32:31Z",
+                              "completedAt": null,
+                              "status": "IN_PROGRESS",
+                              "githubPullRequestReviewState": "PENDING_REVIEWER",
+                              "rewardIds": [],
+                              "project": {
+                                "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                "slug": "kaaper",
+                                "name": "kaaper",
+                                "logoUrl": null,
+                                "shortDescription": "Documentation generator for Cairo projects.",
+                                "visibility": "PUBLIC",
+                                "languages": []
+                              },
                               "contributor": {
                                 "githubUserId": 5160414,
                                 "login": "haydencleary",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
-                                "isRegistered": true
+                                "isRegistered": true,
+                                "id": null
                               },
-                              "repo": {
-                                "id": 498695724,
-                                "owner": "onlydustxyz",
-                                "name": "marketplace-frontend",
-                                "description": null,
-                                "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
-                              },
-                              "type": "PULL_REQUEST",
-                              "status": "IN_PROGRESS",
-                              "githubNumber": 1503,
-                              "githubTitle": "B 1178 build new contributions tab",
-                              "githubStatus": "DRAFT",
-                              "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1503",
-                              "githubBody": null,
-                              "createdAt": "2023-11-30T16:32:31Z"
+                              "links": []
                             },
                             {
-                              "id": "7361846a37de9b41029875d07c49299e3e816d65759bfb69c844055169df7ff8",
-                              "contributor": {
-                                "githubUserId": 143011364,
-                                "login": "pixelfact",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
-                                "isRegistered": false
-                              },
+                              "uuid": null,
+                              "type": "PULL_REQUEST",
                               "repo": {
                                 "id": 498695724,
                                 "owner": "onlydustxyz",
@@ -101,23 +144,45 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                                 "description": null,
                                 "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
                               },
-                              "type": "CODE_REVIEW",
-                              "status": "IN_PROGRESS",
+                              "githubAuthor": {
+                                "githubUserId": 17259618,
+                                "login": "alexbeno",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4"
+                              },
                               "githubNumber": 1464,
+                              "githubStatus": "DRAFT",
                               "githubTitle": "E 616 enhance panels stacking",
-                              "githubStatus": "COMMENTED",
                               "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1464",
                               "githubBody": "`src/App/Stacks/Stacks.tsx` and `src/App/Stacks` will be deleted before merging\\r\\n\\r\\nI keep some commented code but it will be deleted before merging\\r\\n\\r\\n\\r\\nImplemented panel : \\r\\n- ContributorProfile\\r\\n- ProjectReward\\r\\n- MyReward\\r\\n- Contribution\\r\\n",
-                              "createdAt": "2023-11-27T09:03:28Z"
-                            },
-                            {
+                              "githubLabels": null,
+                              "lastUpdatedAt": "2023-11-27T09:03:28Z",
                               "id": "d2924007831f961fa48d393013230781b0c6febeb9d83cf2f4dec2b13161e948",
+                              "createdAt": "2023-11-27T09:03:28Z",
+                              "completedAt": null,
+                              "status": "IN_PROGRESS",
+                              "githubPullRequestReviewState": "UNDER_REVIEW",
+                              "rewardIds": [],
+                              "project": {
+                                "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                "slug": "kaaper",
+                                "name": "kaaper",
+                                "logoUrl": null,
+                                "shortDescription": "Documentation generator for Cairo projects.",
+                                "visibility": "PUBLIC",
+                                "languages": []
+                              },
                               "contributor": {
                                 "githubUserId": 17259618,
                                 "login": "alexbeno",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
-                                "isRegistered": false
+                                "isRegistered": false,
+                                "id": null
                               },
+                              "links": []
+                            },
+                            {
+                              "uuid": null,
+                              "type": "CODE_REVIEW",
                               "repo": {
                                 "id": 498695724,
                                 "owner": "onlydustxyz",
@@ -125,23 +190,70 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                                 "description": null,
                                 "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
                               },
-                              "type": "PULL_REQUEST",
-                              "status": "IN_PROGRESS",
+                              "githubAuthor": {
+                                "githubUserId": 5160414,
+                                "login": "haydencleary",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4"
+                              },
                               "githubNumber": 1464,
+                              "githubStatus": "COMMENTED",
                               "githubTitle": "E 616 enhance panels stacking",
-                              "githubStatus": "DRAFT",
                               "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1464",
                               "githubBody": "`src/App/Stacks/Stacks.tsx` and `src/App/Stacks` will be deleted before merging\\r\\n\\r\\nI keep some commented code but it will be deleted before merging\\r\\n\\r\\n\\r\\nImplemented panel : \\r\\n- ContributorProfile\\r\\n- ProjectReward\\r\\n- MyReward\\r\\n- Contribution\\r\\n",
-                              "createdAt": "2023-11-27T09:03:28Z"
-                            },
-                            {
+                              "githubLabels": null,
+                              "lastUpdatedAt": "2023-11-27T09:03:28Z",
                               "id": "ec767f4a956861cc87245120dfa39b4167ff07383087541487617a8de306f945",
+                              "createdAt": "2023-11-27T09:03:28Z",
+                              "completedAt": null,
+                              "status": "IN_PROGRESS",
+                              "githubPullRequestReviewState": null,
+                              "rewardIds": [],
+                              "project": {
+                                "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                "slug": "kaaper",
+                                "name": "kaaper",
+                                "logoUrl": null,
+                                "shortDescription": "Documentation generator for Cairo projects.",
+                                "visibility": "PUBLIC",
+                                "languages": []
+                              },
                               "contributor": {
                                 "githubUserId": 5160414,
                                 "login": "haydencleary",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
-                                "isRegistered": true
+                                "isRegistered": true,
+                                "id": null
                               },
+                              "links": [
+                                {
+                                  "uuid": null,
+                                  "type": "PULL_REQUEST",
+                                  "repo": {
+                                    "id": 498695724,
+                                    "owner": "onlydustxyz",
+                                    "name": "marketplace-frontend",
+                                    "description": null,
+                                    "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
+                                  },
+                                  "githubAuthor": {
+                                    "githubUserId": 17259618,
+                                    "login": "alexbeno",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4"
+                                  },
+                                  "githubNumber": 1464,
+                                  "githubStatus": "DRAFT",
+                                  "githubTitle": "E 616 enhance panels stacking",
+                                  "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1464",
+                                  "githubBody": "`src/App/Stacks/Stacks.tsx` and `src/App/Stacks` will be deleted before merging\\r\\n\\r\\nI keep some commented code but it will be deleted before merging\\r\\n\\r\\n\\r\\nImplemented panel : \\r\\n- ContributorProfile\\r\\n- ProjectReward\\r\\n- MyReward\\r\\n- Contribution\\r\\n",
+                                  "githubLabels": null,
+                                  "lastUpdatedAt": null,
+                                  "is_mine": false
+                                }
+                              ]
+                            },
+                            {
+                              "uuid": null,
+                              "type": "CODE_REVIEW",
                               "repo": {
                                 "id": 498695724,
                                 "owner": "onlydustxyz",
@@ -149,20 +261,68 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                                 "description": null,
                                 "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
                               },
-                              "type": "CODE_REVIEW",
-                              "status": "IN_PROGRESS",
+                              "githubAuthor": {
+                                "githubUserId": 143011364,
+                                "login": "pixelfact",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4"
+                              },
                               "githubNumber": 1464,
-                              "githubTitle": "E 616 enhance panels stacking",
                               "githubStatus": "COMMENTED",
+                              "githubTitle": "E 616 enhance panels stacking",
                               "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1464",
                               "githubBody": "`src/App/Stacks/Stacks.tsx` and `src/App/Stacks` will be deleted before merging\\r\\n\\r\\nI keep some commented code but it will be deleted before merging\\r\\n\\r\\n\\r\\nImplemented panel : \\r\\n- ContributorProfile\\r\\n- ProjectReward\\r\\n- MyReward\\r\\n- Contribution\\r\\n",
-                              "createdAt": "2023-11-27T09:03:28Z"
+                              "githubLabels": null,
+                              "lastUpdatedAt": "2023-11-27T09:03:28Z",
+                              "id": "7361846a37de9b41029875d07c49299e3e816d65759bfb69c844055169df7ff8",
+                              "createdAt": "2023-11-27T09:03:28Z",
+                              "completedAt": null,
+                              "status": "IN_PROGRESS",
+                              "githubPullRequestReviewState": null,
+                              "rewardIds": [],
+                              "project": {
+                                "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                "slug": "kaaper",
+                                "name": "kaaper",
+                                "logoUrl": null,
+                                "shortDescription": "Documentation generator for Cairo projects.",
+                                "visibility": "PUBLIC",
+                                "languages": []
+                              },
+                              "contributor": {
+                                "githubUserId": 143011364,
+                                "login": "pixelfact",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
+                                "isRegistered": false,
+                                "id": null
+                              },
+                              "links": [
+                                {
+                                  "uuid": null,
+                                  "type": "PULL_REQUEST",
+                                  "repo": {
+                                    "id": 498695724,
+                                    "owner": "onlydustxyz",
+                                    "name": "marketplace-frontend",
+                                    "description": null,
+                                    "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
+                                  },
+                                  "githubAuthor": {
+                                    "githubUserId": 17259618,
+                                    "login": "alexbeno",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4"
+                                  },
+                                  "githubNumber": 1464,
+                                  "githubStatus": "DRAFT",
+                                  "githubTitle": "E 616 enhance panels stacking",
+                                  "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1464",
+                                  "githubBody": "`src/App/Stacks/Stacks.tsx` and `src/App/Stacks` will be deleted before merging\\r\\n\\r\\nI keep some commented code but it will be deleted before merging\\r\\n\\r\\n\\r\\nImplemented panel : \\r\\n- ContributorProfile\\r\\n- ProjectReward\\r\\n- MyReward\\r\\n- Contribution\\r\\n",
+                                  "githubLabels": null,
+                                  "lastUpdatedAt": null,
+                                  "is_mine": false
+                                }
+                              ]
                             }
-                          ],
-                          "hasMore": true,
-                          "totalPageNumber": 2,
-                          "totalItemNumber": 7,
-                          "nextPageIndex": 1
+                          ]
                         }
                         """);
     }
@@ -183,48 +343,17 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
+                          "totalPageNumber": 4,
+                          "totalItemNumber": 5,
+                          "hasMore": true,
+                          "nextPageIndex": 1,
                           "contributors": [
-                            {
-                              "githubUserId": 31901905,
-                              "login": "kaelsky",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
-                              "isRegistered": true,
-                              "cover": "CYAN",
-                              "lastContribution": {
-                                "id": "48c6f61a076454ba2ce5d8c52fd21deccd50aeb7953dd22b174eb2384fdea479",
-                                "completedAt": "2023-12-04T14:12:52Z",
-                                "repo": {
-                                  "id": 498695724,
-                                  "owner": "onlydustxyz",
-                                  "name": "marketplace-frontend",
-                                  "description": "Contributions marketplace backend services",
-                                  "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
-                                }
-                              }
-                            },
-                            {
-                              "githubUserId": 143011364,
-                              "login": "pixelfact",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
-                              "isRegistered": false,
-                              "cover": "MAGENTA",
-                              "lastContribution": {
-                                "id": "bb134dc807abcdc8125104ea79a76b3e4a99a04eb9e734fb2f17dc26f9ac65f8",
-                                "completedAt": "2023-12-04T14:12:52Z",
-                                "repo": {
-                                  "id": 498695724,
-                                  "owner": "onlydustxyz",
-                                  "name": "marketplace-frontend",
-                                  "description": "Contributions marketplace backend services",
-                                  "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
-                                }
-                              }
-                            },
                             {
                               "githubUserId": 5160414,
                               "login": "haydencleary",
                               "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
                               "isRegistered": true,
+                              "id": null,
                               "cover": "BLUE",
                               "lastContribution": {
                                 "id": "1e65192b16f1b8550d9f11314f25c4610b62252c40336e1d74c5792002f110af",
@@ -243,6 +372,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "login": "alexbeno",
                               "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
                               "isRegistered": false,
+                              "id": null,
                               "cover": "BLUE",
                               "lastContribution": {
                                 "id": "2971ac0b29502637dd945ce2b330c52440959ecbf95fca43a8eabf40e6d72860",
@@ -257,14 +387,53 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
-                              "githubUserId": 21149076,
-                              "login": "oscarwroche",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
+                              "githubUserId": 31901905,
+                              "login": "kaelsky",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
                               "isRegistered": true,
+                              "id": null,
+                              "cover": "CYAN",
+                              "lastContribution": {
+                                "id": "a3c85bd5e85f505766c62b67802fd2ddc450e2532924bef082af17e43a388c88",
+                                "completedAt": "2023-12-04T13:44:50Z",
+                                "repo": {
+                                  "id": 498695724,
+                                  "owner": "onlydustxyz",
+                                  "name": "marketplace-frontend",
+                                  "description": "Contributions marketplace backend services",
+                                  "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
+                                }
+                              }
+                            },
+                            {
+                              "githubUserId": 143011364,
+                              "login": "pixelfact",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
+                              "isRegistered": false,
+                              "id": null,
                               "cover": "MAGENTA",
                               "lastContribution": {
-                                "id": "39f0ee86f57fc94477f7525ca035800e54f79c7c20c8bc2774b916bcc514d921",
-                                "completedAt": "2023-07-13T16:38:18Z",
+                                "id": "9c4b19c7131b83e7c6aa7d7382d55a929715fcab67a56f19100e90427450db32",
+                                "completedAt": "2023-12-04T10:33:39Z",
+                                "repo": {
+                                  "id": 498695724,
+                                  "owner": "onlydustxyz",
+                                  "name": "marketplace-frontend",
+                                  "description": "Contributions marketplace backend services",
+                                  "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
+                                }
+                              }
+                            },
+                            {
+                              "githubUserId": 10922658,
+                              "login": "alexbensimon",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/10922658?v=4",
+                              "isRegistered": true,
+                              "id": null,
+                              "cover": "BLUE",
+                              "lastContribution": {
+                                "id": "61e77bb3d391ed1d9e93e586ed8cbb569352678a0c6eac0a8e43a007a960f149",
+                                "completedAt": "2023-10-19T09:27:18Z",
                                 "repo": {
                                   "id": 498695724,
                                   "owner": "onlydustxyz",
@@ -274,11 +443,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                                 }
                               }
                             }
-                          ],
-                          "hasMore": true,
-                          "totalPageNumber": 5,
-                          "totalItemNumber": 5,
-                          "nextPageIndex": 1
+                          ]
                         }
                         """);
     }
@@ -305,24 +470,21 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                     .expectBody()
                     .json("""
                             {
+                              "totalPageNumber": 1,
+                              "totalItemNumber": 1,
+                              "hasMore": false,
+                              "nextPageIndex": 0,
                               "contributors": [
                                 {
                                   "githubUserId": 143011364,
                                   "login": "pixelfact",
                                   "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4",
                                   "isRegistered": false,
+                                  "id": null,
                                   "cover": "MAGENTA",
                                   "location": null,
-                                  "bio": "Frontend Developer, API Enthusiast"
-                                },
-                                {
-                                  "githubUserId": 45264458,
-                                  "login": "abdelhamidbakhta",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
-                                  "isRegistered": false,
-                                  "cover": "BLUE",
-                                  "location": "Genesis",
-                                  "bio": "Building Starknet.\\r\\n#Bitcoin minimalist\\r\\nnpub1hr6v96g0phtxwys4x0tm3khawuuykz6s28uzwtj5j0zc7lunu99snw2e29"
+                                  "bio": "Frontend Developer, API Enthusiast",
+                                  "firstContributedAt": "2024-10-17T14:05:46.811962Z"
                                 }
                               ]
                             }

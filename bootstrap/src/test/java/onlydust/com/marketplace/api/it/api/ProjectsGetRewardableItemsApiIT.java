@@ -317,8 +317,8 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "hasMore": true,
-                          "totalPageNumber": 15,
-                          "totalItemNumber": 146,
+                          "totalPageNumber": 2,
+                          "totalItemNumber": 11,
                           "nextPageIndex": 1
                         }
                         """);
@@ -327,7 +327,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_REWARDABLE_ITEMS, projectId), Map.of("githubUserId",
                         pierre.user().getGithubUserId().toString(),
-                        "pageIndex", "13", "pageSize", "10")))
+                        "pageIndex", "1", "pageSize", "10")))
                 .header("Authorization", BEARER_PREFIX + pierre.jwt())
                 // Then
                 .exchange()
@@ -338,375 +338,31 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                         {
                           "rewardableItems": [
                             {
-                              "number": 1153,
-                              "id": "e1376e0f7e5ebd666772199dc030a9db779f330d309760a7a773a2ee61f1403a",
-                              "contributionId": "978eb90a010e91661d4c8df1cffbb6498c4aeadbd6f4f6c841ee3f4903bbd6ed",
-                              "title": "Prevent auto-zoom when focus input on mobile",
-                              "createdAt": "2023-08-01T19:27:28Z",
-                              "completedAt": "2023-08-02T09:47:22Z",
+                              "number": 1492,
+                              "id": "a6e01e21965a9b41d5ec755f96c180173ff4623d6086438ecf1add062cec8c78",
+                              "contributionId": "4eadc1396781268cfbbba7d317f5d6a8408691426ecefb22954edf887096345a",
+                              "title": "e-829-qa",
+                              "createdAt": "2023-11-29T15:50:12Z",
+                              "completedAt": "2023-11-29T16:05:37Z",
+                              "githubBody": null,
+                              "author": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                              },
                               "repoName": "marketplace-frontend",
                               "repoId": 498695724,
                               "type": "CODE_REVIEW",
                               "commitsCount": null,
                               "userCommitsCount": null,
-                              "commentsCount": 2,
+                              "commentsCount": 1,
                               "status": "APPROVED",
                               "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1153"
-                            },
-                            {
-                              "number": 1152,
-                              "id": "c716bf6091234a7a3a377bed4adca0041df290dd18e6904af9166e7ac03401b9",
-                              "contributionId": "1106e2603a0cf7db2030358e3475b87ed8527db2ac2b6415fb3f69b44ee2857c",
-                              "title": "[E-642] Index extra fields in github pull requests",
-                              "createdAt": "2023-08-01T14:26:33Z",
-                              "completedAt": "2023-08-07T07:47:51Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 3,
-                              "status": "APPROVED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1152"
-                            },
-                            {
-                              "number": 1151,
-                              "id": "9926e35c5e760c1274aa767bbfc45acb7a2f734c3f9e384b8d86f2c15b0990ab",
-                              "contributionId": "60e82c5c7278724beaa8ba44a339e774d62c3e5d20fdb461960c640458c0c4ed",
-                              "title": "[E-641] Index extra fields for github issues",
-                              "createdAt": "2023-08-01T11:24:24Z",
-                              "completedAt": "2023-08-01T11:35:20Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "APPROVED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1151"
-                            },
-                            {
-                              "number": 1150,
-                              "id": "3bfcdc6c8f353bc4a4ce283a73b1a39160ecf06f8848a7a059ca779cdbc0e72a",
-                              "contributionId": "eca160b2f28ac4bf342d7166d8916e159beba3f9498d6bd73baba8ed7a0b3743",
-                              "title": "Use proper DTO for github graphql API",
-                              "createdAt": "2023-08-01T09:38:44Z",
-                              "completedAt": "2023-08-01T09:47:46Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "APPROVED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1150"
-                            },
-                            {
-                              "number": 1149,
-                              "id": "3190d0dff1d68d17b35c236a9a0cd36fa43eaf906e9c1e692ba30cd0e504e8dd",
-                              "contributionId": "f2b15245858299ad20cda8e9579773c034ff599a3271099e041014ee1b08b50a",
-                              "title": "Isolate the story book files from the production code",
-                              "createdAt": "2023-07-31T20:20:52Z",
-                              "completedAt": "2023-08-01T10:52:03Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "APPROVED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1149"
-                            },
-                            {
-                              "number": 1147,
-                              "id": "1bed345d3c6ef22a6eb0e9df879294e4711ea5df39e50b65ad7fcfe3ef679247",
-                              "contributionId": "2eac27fd9c2c8f32d0ceea8f62571af439f524c030b8d5a894bd1af4da0333ee",
-                              "title": "Scrollbars are broken on public profile page",
-                              "createdAt": "2023-07-31T18:01:54Z",
-                              "completedAt": "2023-07-31T18:16:02Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "APPROVED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1147"
-                            },
-                            {
-                              "number": 1148,
-                              "id": "813a336e99ecb10778d5b2dedac0c3c1dd484e076a7043fa35e672bb8d2cbe0b",
-                              "contributionId": "ffd826c697abd544df6dac59c24c8d5903daf72013970e2af70616ebdf518253",
-                              "title": "[E-640] Split github issues and pull requests",
-                              "createdAt": "2023-07-31T16:47:24Z",
-                              "completedAt": "2023-08-01T06:41:27Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "APPROVED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1148"
-                            },
-                            {
-                              "number": 1146,
-                              "id": "abf154057a6ff3c8b21ed750337b8be31080577c7dc00685504a0f853b2978c0",
-                              "contributionId": "c7c486f40055a7bbcdfb4234a0a013a2f1e6c12e78f3dea7ecedb893e33342cc",
-                              "title": "Hide tooltips on mobile",
-                              "createdAt": "2023-07-31T11:23:37Z",
-                              "completedAt": "2023-07-31T16:16:14Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "APPROVED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1146"
-                            },
-                            {
-                              "number": 1143,
-                              "id": "b33abb84069b1dbabdc474344165cc4370205cd3ef5ef2d71f512ca7e6bb61a2",
-                              "contributionId": "28d1af9960485f93b491f62551c2c1a69128f445c59ae0983a9028c72e740624",
-                              "title": "[E-614] Invite users to share their contact upon showing their interest to project",
-                              "createdAt": "2023-07-27T10:23:34Z",
-                              "completedAt": "2023-07-28T10:03:48Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 8,
-                              "status": "APPROVED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1143"
-                            },
-                            {
-                              "number": 1140,
-                              "id": "f373239267368ed631303e5d6122676ac10b9a493b6df5c02e726de4defbc614",
-                              "contributionId": "7baff771ad7b4fdbb82f501318e9450a0a6ea9c0c0b96285e2d22864811aa4dd",
-                              "title": "Broken PR - DO NOT MERGE",
-                              "createdAt": "2023-07-26T12:30:16Z",
-                              "completedAt": "2023-07-27T15:43:21Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "PENDING",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1140"
+                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1492"
                             }
-                          ],
-                          "hasMore": true,
-                          "totalPageNumber": 15,
-                          "totalItemNumber": 146,
-                          "nextPageIndex": 14
+                          ]
                         }
                         """);
-
-        // When
-        client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_REWARDABLE_ITEMS, projectId), Map.of("githubUserId",
-                        pierre.user().getGithubUserId().toString(),
-                        "pageIndex", "13", "pageSize", "10")))
-                .header("Authorization", BEARER_PREFIX + pierre.jwt())
-                // Then
-                .exchange()
-                .expectStatus()
-                .isEqualTo(206)
-                .expectBody()
-                .json("""
-                        {
-                          "rewardableItems": [
-                            {
-                              "number": 1153,
-                              "id": "e1376e0f7e5ebd666772199dc030a9db779f330d309760a7a773a2ee61f1403a",
-                              "contributionId": "978eb90a010e91661d4c8df1cffbb6498c4aeadbd6f4f6c841ee3f4903bbd6ed",
-                              "title": "Prevent auto-zoom when focus input on mobile",
-                              "createdAt": "2023-08-01T19:27:28Z",
-                              "completedAt": "2023-08-02T09:47:22Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "APPROVED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1153"
-                            },
-                            {
-                              "number": 1152,
-                              "id": "c716bf6091234a7a3a377bed4adca0041df290dd18e6904af9166e7ac03401b9",
-                              "contributionId": "1106e2603a0cf7db2030358e3475b87ed8527db2ac2b6415fb3f69b44ee2857c",
-                              "title": "[E-642] Index extra fields in github pull requests",
-                              "createdAt": "2023-08-01T14:26:33Z",
-                              "completedAt": "2023-08-07T07:47:51Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 3,
-                              "status": "APPROVED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1152"
-                            },
-                            {
-                              "number": 1151,
-                              "id": "9926e35c5e760c1274aa767bbfc45acb7a2f734c3f9e384b8d86f2c15b0990ab",
-                              "contributionId": "60e82c5c7278724beaa8ba44a339e774d62c3e5d20fdb461960c640458c0c4ed",
-                              "title": "[E-641] Index extra fields for github issues",
-                              "createdAt": "2023-08-01T11:24:24Z",
-                              "completedAt": "2023-08-01T11:35:20Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "APPROVED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1151"
-                            },
-                            {
-                              "number": 1150,
-                              "id": "3bfcdc6c8f353bc4a4ce283a73b1a39160ecf06f8848a7a059ca779cdbc0e72a",
-                              "contributionId": "eca160b2f28ac4bf342d7166d8916e159beba3f9498d6bd73baba8ed7a0b3743",
-                              "title": "Use proper DTO for github graphql API",
-                              "createdAt": "2023-08-01T09:38:44Z",
-                              "completedAt": "2023-08-01T09:47:46Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "APPROVED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1150"
-                            },
-                            {
-                              "number": 1149,
-                              "id": "3190d0dff1d68d17b35c236a9a0cd36fa43eaf906e9c1e692ba30cd0e504e8dd",
-                              "contributionId": "f2b15245858299ad20cda8e9579773c034ff599a3271099e041014ee1b08b50a",
-                              "title": "Isolate the story book files from the production code",
-                              "createdAt": "2023-07-31T20:20:52Z",
-                              "completedAt": "2023-08-01T10:52:03Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "APPROVED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1149"
-                            },
-                            {
-                              "number": 1147,
-                              "id": "1bed345d3c6ef22a6eb0e9df879294e4711ea5df39e50b65ad7fcfe3ef679247",
-                              "contributionId": "2eac27fd9c2c8f32d0ceea8f62571af439f524c030b8d5a894bd1af4da0333ee",
-                              "title": "Scrollbars are broken on public profile page",
-                              "createdAt": "2023-07-31T18:01:54Z",
-                              "completedAt": "2023-07-31T18:16:02Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "APPROVED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1147"
-                            },
-                            {
-                              "number": 1148,
-                              "id": "813a336e99ecb10778d5b2dedac0c3c1dd484e076a7043fa35e672bb8d2cbe0b",
-                              "contributionId": "ffd826c697abd544df6dac59c24c8d5903daf72013970e2af70616ebdf518253",
-                              "title": "[E-640] Split github issues and pull requests",
-                              "createdAt": "2023-07-31T16:47:24Z",
-                              "completedAt": "2023-08-01T06:41:27Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "APPROVED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1148"
-                            },
-                            {
-                              "number": 1146,
-                              "id": "abf154057a6ff3c8b21ed750337b8be31080577c7dc00685504a0f853b2978c0",
-                              "contributionId": "c7c486f40055a7bbcdfb4234a0a013a2f1e6c12e78f3dea7ecedb893e33342cc",
-                              "title": "Hide tooltips on mobile",
-                              "createdAt": "2023-07-31T11:23:37Z",
-                              "completedAt": "2023-07-31T16:16:14Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "APPROVED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1146"
-                            },
-                            {
-                              "number": 1143,
-                              "id": "b33abb84069b1dbabdc474344165cc4370205cd3ef5ef2d71f512ca7e6bb61a2",
-                              "contributionId": "28d1af9960485f93b491f62551c2c1a69128f445c59ae0983a9028c72e740624",
-                              "title": "[E-614] Invite users to share their contact upon showing their interest to project",
-                              "createdAt": "2023-07-27T10:23:34Z",
-                              "completedAt": "2023-07-28T10:03:48Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 8,
-                              "status": "APPROVED",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1143"
-                            },
-                            {
-                              "number": 1140,
-                              "id": "f373239267368ed631303e5d6122676ac10b9a493b6df5c02e726de4defbc614",
-                              "contributionId": "7baff771ad7b4fdbb82f501318e9450a0a6ea9c0c0b96285e2d22864811aa4dd",
-                              "title": "Broken PR - DO NOT MERGE",
-                              "createdAt": "2023-07-26T12:30:16Z",
-                              "completedAt": "2023-07-27T15:43:21Z",
-                              "repoName": "marketplace-frontend",
-                              "repoId": 498695724,
-                              "type": "CODE_REVIEW",
-                              "commitsCount": null,
-                              "userCommitsCount": null,
-                              "commentsCount": 2,
-                              "status": "PENDING",
-                              "ignored": false,
-                              "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/1140"
-                            }
-                          ],
-                          "hasMore": true,
-                          "totalPageNumber": 15,
-                          "totalItemNumber": 146,
-                          "nextPageIndex": 14
-                        }
-                        """);
-
 
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_REWARDABLE_ITEMS, projectId), Map.of("githubUserId",
@@ -1550,8 +1206,8 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "hasMore": true,
-                          "totalPageNumber": 28,
-                          "totalItemNumber": 140,
+                          "totalPageNumber": 3,
+                          "totalItemNumber": 11,
                           "nextPageIndex": 1
                         }
                         """);
@@ -1568,7 +1224,6 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                 .isEqualTo(206)
                 .expectBody()
                 .json("""
-                        
                         {
                            "rewardableItems": [
                              {
@@ -1743,8 +1398,8 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                              }
                            ],
                            "hasMore": true,
-                           "totalPageNumber": 15,
-                           "totalItemNumber": 146,
+                           "totalPageNumber": 2,
+                           "totalItemNumber": 11,
                            "nextPageIndex": 1
                         }
                         """);
@@ -1797,10 +1452,11 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .consumeWith(System.out::println)
                 .jsonPath("$.rewardableIssues.length()").isEqualTo(0)
-                .jsonPath("$.rewardablePullRequests.length()").isEqualTo(5)
+                .jsonPath("$.rewardablePullRequests.length()").isEqualTo(1)
                 .jsonPath("$.rewardablePullRequests[?(@.status != 'MERGED')]").doesNotExist()
-                .jsonPath("$.rewardableCodeReviews.length()").isEqualTo(112)
+                .jsonPath("$.rewardableCodeReviews.length()").isEqualTo(10)
                 .jsonPath("$.rewardableCodeReviews[?(@.status nin ['APPROVED', 'CHANGES_REQUESTED'])]").doesNotExist()
                 .jsonPath("$..[?(@.contributionId=='279c2e7794a6f798c0de46c6fe23cbffcc2feb485072a25fdefc726eaf90e34d')]").doesNotExist()
                 .jsonPath("$..[?(@.contributionId=='803254a420051b6b04c8cb2030922f3a93cfe2bfbac34c61b56dde93184dbd70')]").doesNotExist()
@@ -1808,10 +1464,6 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$..[?(@.contributionId=='c6ffc682726fc0ffd3a41a9bee04d62d288761501b5906968577bcd132e36cbf')]").doesNotExist()
                 .jsonPath("$..[?(@.contributionId=='4b44061840a2f8185f80f2fa381c2aa1bd228e56bde84ab8e9a243ca6da7b073')]").doesNotExist()
                 .jsonPath("$..[?(@.contributionId=='abc741ada4822926f7f92fb99441868664ae850006629864d6562726f7a53f59')]").doesNotExist()
-                .jsonPath("$..[?(@.contributionId=='72e253a8ea9fef3e9fee718f0b5c901efdbebb0fff8304cbf09f18066edd3e2f')].githubBody").isEqualTo( "IT test structure\nDocker container support\nFirst API integration test: create project")
-                .jsonPath("$..[?(@.contributionId=='72e253a8ea9fef3e9fee718f0b5c901efdbebb0fff8304cbf09f18066edd3e2f')].author.githubUserId").isEqualTo(16590657)
-                .jsonPath("$..[?(@.contributionId=='72e253a8ea9fef3e9fee718f0b5c901efdbebb0fff8304cbf09f18066edd3e2f')].author.login").isEqualTo("PierreOucif")
-                .jsonPath("$..[?(@.contributionId=='72e253a8ea9fef3e9fee718f0b5c901efdbebb0fff8304cbf09f18066edd3e2f')].author.avatarUrl").isEqualTo("https://avatars.githubusercontent.com/u/16590657?v=4")
         ;
         // @formatter:on
     }

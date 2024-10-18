@@ -70,9 +70,9 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
     @Test
     void should_search_users_with_criteria() {
         final var rustAndCairoCount = searchUsers("((language1.name==Rust);(language2.name==Cairo))").getTotalItemNumber();
-        assertThat(rustAndCairoCount).isEqualTo(16);
+        assertThat(rustAndCairoCount).isEqualTo(5);
         final var rustOrCairoCount = searchUsers("((language1.name==Rust),(language2.name==Cairo))").getTotalItemNumber();
-        assertThat(rustOrCairoCount).isEqualTo(214);
+        assertThat(rustOrCairoCount).isEqualTo(55);
 
         var users = searchUsers("login==ofux").getUsers();
         assertThat(users).hasSize(1);
