@@ -20,6 +20,7 @@ import java.util.Set;
 public class PostgresBiProjectorAdapter implements AccountingObserverPort, ContributionObserverPort, ProjectObserverPort, UserObserverPort {
     private final BiRewardDataRepository biRewardDataRepository;
     private final BiContributionDataRepository biContributionDataRepository;
+    private final BiPerContributorContributionDataRepository biPerContributorContributionDataRepository;
     private final BiProjectGrantsDataRepository biProjectGrantsDataRepository;
     private final BiProjectGlobalDataRepository biProjectGlobalDataRepository;
     private final BiProjectBudgetDataRepository biProjectBudgetDataRepository;
@@ -99,6 +100,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     @Transactional
     public void onContributionsChanged(Long repoId) {
         biContributionDataRepository.refreshByRepo(repoId);
+        biPerContributorContributionDataRepository.refreshByRepo(repoId);
         biProjectContributionsDataRepository.refresh(repoId);
         biContributionRewardDataRepository.refresh(repoId);
     }
@@ -108,6 +110,8 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     public void onLinkedReposChanged(ProjectId projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds) {
         linkedRepoIds.forEach(biContributionDataRepository::refreshByRepo);
         unlinkedRepoIds.forEach(biContributionDataRepository::refreshByRepo);
+        linkedRepoIds.forEach(biPerContributorContributionDataRepository::refreshByRepo);
+        unlinkedRepoIds.forEach(biPerContributorContributionDataRepository::refreshByRepo);
         biProjectGlobalDataRepository.refresh(projectId);
         biProjectContributionsDataRepository.refresh(projectId);
         linkedRepoIds.forEach(biContributionRewardDataRepository::refresh);
@@ -124,8 +128,6 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     public void onProjectCreated(ProjectId projectId, UserId projectLeadId) {
         biProjectGlobalDataRepository.refresh(projectId);
         biProjectBudgetDataRepository.refresh(projectId);
-        biProjectContributionsDataRepository.refresh(projectId);
-        biContributionRewardDataRepository.refresh(projectId);
     }
 
     @Override

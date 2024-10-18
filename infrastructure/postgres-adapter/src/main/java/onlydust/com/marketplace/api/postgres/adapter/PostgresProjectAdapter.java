@@ -66,6 +66,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final BiContributorGlobalDataRepository biContributorGlobalDataRepository;
     private final BiContributionRewardDataRepository biContributionRewardDataRepository;
     private final UserProjectRecommendationsRepository userProjectRecommendationsRepository;
+    private final BiPerContributorContributionDataRepository biPerContributorContributionDataRepository;
 
     @Override
     public Optional<ProjectId> getProjectIdBySlug(String slug) {
@@ -482,6 +483,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         projectRepository.refreshStats();
         biRewardDataRepository.refresh();
         biContributionDataRepository.refresh();
+        biPerContributorContributionDataRepository.refresh();
         biProjectGrantsDataRepository.refresh();
         biProjectGlobalDataRepository.refresh();
         biProjectBudgetDataRepository.refresh();

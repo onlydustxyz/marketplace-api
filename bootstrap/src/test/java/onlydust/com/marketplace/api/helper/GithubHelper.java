@@ -259,7 +259,7 @@ public class GithubHelper {
         createContributionFromIssue(issueId, contributorId);
     }
 
-    private void createContributionFromPullRequest(Long prId, Long contributorId) {
+    public void createContributionFromPullRequest(Long prId, Long contributorId) {
         final var contributionId = faker.random().hex();
         databaseHelper.executeQuery("""
                 insert into indexer_exp.contributions(id, contribution_uuid, repo_id, contributor_id, type, status, pull_request_id, created_at, updated_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)

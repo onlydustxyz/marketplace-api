@@ -19,6 +19,7 @@ import onlydust.com.marketplace.accounting.domain.service.*;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.AccountingHelper;
 import onlydust.com.marketplace.api.helper.CurrencyHelper;
+import onlydust.com.marketplace.api.helper.GithubHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
@@ -98,6 +99,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     KycRepository kycRepository;
     @Autowired
     KybRepository kybRepository;
+    @Autowired
+    GithubHelper githubHelper;
 
     final AuthenticatedBackofficeUserService authenticatedBackofficeUserService = mock(AuthenticatedBackofficeUserService.class);
 
@@ -274,13 +277,16 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         INSERT INTO indexer_exp.github_accounts (id, login, type, html_url, avatar_url, name, tech_created_at, tech_updated_at, bio, location, website, twitter, linkedin, telegram) VALUES (6, 'ind_test', 'USER', 'https://github.com/ind_test', 'https://avatars.githubusercontent.com/u/51669?v=4', 'Ind Ian', '2023-11-09 22:11:21.150640', '2023-11-22 17:13:06.290191', null, 'Mumbai', 'https://ind_test.github.io/', 'https://twitter.com/ind', null, null);
                         INSERT INTO indexer_exp.github_repos (id, owner_id, name, html_url, updated_at, description, stars_count, forks_count, has_issues, parent_id, tech_created_at, tech_updated_at, owner_login, visibility) VALUES (11223344, 98735558, 'account-obstr-2', 'https://github.com/onlydustxyz/account-obstr', '2022-11-01 18:27:14.000000', null, 0, 0, true, null, '2023-11-22 14:19:27.975872', '2023-12-04 14:24:00.541641', 'onlydustxyz', 'PUBLIC');
                         INSERT INTO indexer_exp.github_repos (id, owner_id, name, html_url, updated_at, description, stars_count, forks_count, has_issues, parent_id, tech_created_at, tech_updated_at, owner_login, visibility) VALUES (55223344, 98735558, 'marketplace-provisionning-2', 'https://github.com/onlydustxyz/marketplace-provisionning', '2023-07-31 08:56:57.000000', null, 0, 0, true, null, '2023-11-22 14:19:27.975893', '2023-12-04 14:24:01.809884', 'onlydustxyz', 'PUBLIC');
-                        INSERT INTO indexer_exp.github_pull_requests (id, contribution_uuid, repo_id, number, title, status, created_at, closed_at, merged_at, updated_at, author_id, html_url, body, comments_count, tech_created_at, tech_updated_at, draft, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url, review_state, commit_count) VALUES (0011051356, indexer.uuid_of('0011051356'), 55223344, 1, 'fix issue link query', 'MERGED', '2023-11-21 14:13:35.000000', '2023-11-21 14:27:21.000000', '2023-11-21 14:27:21.000000', '2023-11-21 14:27:21.000000', 1, 'https://github.com/onlydustxyz/marketplace-api/pull/128', null, 0, '2023-11-21 15:17:17.139895', '2023-11-22 17:49:23.008254', false, 'onlydustxyz', 'marketplace-api', 'https://github.com/onlydustxyz/marketplace-api', 'AnthonyBuisset', 'https://github.com/AnthonyBuisset', 'https://avatars.githubusercontent.com/u/43467246?v=4', 'PENDING_REVIEWER', 1);
-                        INSERT INTO indexer_exp.github_pull_requests (id, contribution_uuid, repo_id, number, title, status, created_at, closed_at, merged_at, updated_at, author_id, html_url, body, comments_count, tech_created_at, tech_updated_at, draft, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url, review_state, commit_count) VALUES (0001051356, indexer.uuid_of('0001051356'), 11223344, 1, 'fix issue link query', 'MERGED', '2023-11-21 14:13:35.000000', '2023-11-21 14:27:21.000000', '2023-11-21 14:27:21.000000', '2023-11-21 14:27:21.000000', 1, 'https://github.com/onlydustxyz/marketplace-api/pull/128', null, 0, '2023-11-21 15:17:17.139895', '2023-11-22 17:49:23.008254', false, 'onlydustxyz', 'marketplace-api', 'https://github.com/onlydustxyz/marketplace-api', 'AnthonyBuisset', 'https://github.com/AnthonyBuisset', 'https://avatars.githubusercontent.com/u/43467246?v=4', 'PENDING_REVIEWER', 1);
+                        INSERT INTO indexer_exp.github_pull_requests (id, contribution_uuid, repo_id, number, title, status, created_at, closed_at, merged_at, updated_at, author_id, html_url, body, comments_count, tech_created_at, tech_updated_at, draft, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url, review_state, commit_count) VALUES (11051356, indexer.uuid_of('11051356'), 55223344, 1, 'fix issue link query', 'MERGED', '2023-11-21 14:13:35.000000', '2023-11-21 14:27:21.000000', '2023-11-21 14:27:21.000000', '2023-11-21 14:27:21.000000', 1, 'https://github.com/onlydustxyz/marketplace-api/pull/128', null, 0, '2023-11-21 15:17:17.139895', '2023-11-22 17:49:23.008254', false, 'onlydustxyz', 'marketplace-api', 'https://github.com/onlydustxyz/marketplace-api', 'AnthonyBuisset', 'https://github.com/AnthonyBuisset', 'https://avatars.githubusercontent.com/u/43467246?v=4', 'PENDING_REVIEWER', 1);
+                        INSERT INTO indexer_exp.github_pull_requests (id, contribution_uuid, repo_id, number, title, status, created_at, closed_at, merged_at, updated_at, author_id, html_url, body, comments_count, tech_created_at, tech_updated_at, draft, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url, review_state, commit_count) VALUES (1051356, indexer.uuid_of('1051356'), 11223344, 1, 'fix issue link query', 'MERGED', '2023-11-21 14:13:35.000000', '2023-11-21 14:27:21.000000', '2023-11-21 14:27:21.000000', '2023-11-21 14:27:21.000000', 1, 'https://github.com/onlydustxyz/marketplace-api/pull/128', null, 0, '2023-11-21 15:17:17.139895', '2023-11-22 17:49:23.008254', false, 'onlydustxyz', 'marketplace-api', 'https://github.com/onlydustxyz/marketplace-api', 'AnthonyBuisset', 'https://github.com/AnthonyBuisset', 'https://avatars.githubusercontent.com/u/43467246?v=4', 'PENDING_REVIEWER', 1);
                         """)
                 .executeUpdate();
         em.flush();
         em.getTransaction().commit();
         em.close();
+
+        githubHelper.createContributionFromPullRequest(11051356L, 1L);
+        githubHelper.createContributionFromPullRequest(1051356L, 1L);
 
         quoteStorage.save(List.of(
                 new Quote(Currency.Id.of(accountingHelper.strk().id()), Currency.Id.of(accountingHelper.usd().id()), BigDecimal.valueOf(strkToUsd1),
@@ -411,11 +417,11 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .currencyId(currencyId)
                 .recipientId(recipientId)
                 .items(List.of(
-                        new RewardItemRequest().id("0011051356")
+                        new RewardItemRequest().id("11051356")
                                 .type(RewardType.PULL_REQUEST)
                                 .number(1L)
                                 .repoId(55223344L),
-                        new RewardItemRequest().id("0001051356")
+                        new RewardItemRequest().id("1051356")
                                 .type(RewardType.PULL_REQUEST)
                                 .number(1L)
                                 .repoId(11223344L)

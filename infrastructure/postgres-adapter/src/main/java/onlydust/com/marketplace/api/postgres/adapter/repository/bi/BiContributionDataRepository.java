@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class BiContributionDataRepository extends PseudoProjectionRepository {
     public BiContributionDataRepository(final @NonNull EntityManager entityManager) {
-        super(entityManager, "bi", "contribution_data", "contribution_id");
+        super(entityManager, "bi", "contribution_data", "contribution_uuid");
     }
 
     @Trace(operationName = "pseudo_projection.global_refresh", resourceName = "global_refresh:bi.contribution_data")
