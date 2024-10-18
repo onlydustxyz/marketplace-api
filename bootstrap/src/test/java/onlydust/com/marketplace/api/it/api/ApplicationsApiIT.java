@@ -224,12 +224,51 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 }
                               },
                               "applicant": {
+                                "githubUserId": 8642470,
+                                "login": "gregcha",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                                "isRegistered": true,
+                                "id": "45e98bf6-25c2-4edf-94da-e340daba8964",
+                                "globalRank": 4,
+                                "globalRankPercentile": null,
+                                "globalRankCategory": "A"
+                              }
+                            },
+                            {
+                              "project": {
+                                "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
+                                "slug": "taco-tuesday",
+                                "name": "Taco Tuesday",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg"
+                              },
+                              "issue": {
+                                "id": 1736474921,
+                                "number": 1111,
+                                "title": "Documentation by AnthonyBuisset",
+                                "status": "OPEN",
+                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111",
+                                "repo": {
+                                  "id": 602953640,
+                                  "owner": "od-mocks",
+                                  "name": "cool.repo.B",
+                                  "description": null,
+                                  "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
+                                },
+                                "author": {
+                                  "githubUserId": 112474158,
+                                  "login": "onlydust-contributor",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
+                                  "isRegistered": true,
+                                  "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d"
+                                }
+                              },
+                              "applicant": {
                                 "githubUserId": 595505,
                                 "login": "ofux",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                                 "isRegistered": true,
                                 "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
-                                "globalRank": 4,
+                                "globalRank": 5,
                                 "globalRankPercentile": null,
                                 "globalRankCategory": "A"
                               }
@@ -268,45 +307,6 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true,
                                 "id": "fc92397c-3431-4a84-8054-845376b630a0",
-                                "globalRank": 5,
-                                "globalRankPercentile": null,
-                                "globalRankCategory": "A"
-                              }
-                            },
-                            {
-                              "project": {
-                                "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
-                                "slug": "taco-tuesday",
-                                "name": "Taco Tuesday",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg"
-                              },
-                              "issue": {
-                                "id": 1736474921,
-                                "number": 1111,
-                                "title": "Documentation by AnthonyBuisset",
-                                "status": "OPEN",
-                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111",
-                                "repo": {
-                                  "id": 602953640,
-                                  "owner": "od-mocks",
-                                  "name": "cool.repo.B",
-                                  "description": null,
-                                  "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
-                                },
-                                "author": {
-                                  "githubUserId": 112474158,
-                                  "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                                  "isRegistered": true,
-                                  "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d"
-                                }
-                              },
-                              "applicant": {
-                                "githubUserId": 8642470,
-                                "login": "gregcha",
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
-                                "isRegistered": true,
-                                "id": "45e98bf6-25c2-4edf-94da-e340daba8964",
                                 "globalRank": 6,
                                 "globalRankPercentile": null,
                                 "globalRankCategory": "A"
@@ -356,6 +356,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1112",
                                 "repo": {
                                   "id": 602953640,
+                                  "owner": "od-mocks",
                                   "name": "cool.repo.B",
                                   "description": null,
                                   "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
@@ -364,7 +365,8 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                   "githubUserId": 112474158,
                                   "login": "onlydust-contributor",
                                   "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                                  "isRegistered": true
+                                  "isRegistered": true,
+                                  "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d"
                                 }
                               },
                               "applicant": {
@@ -372,7 +374,9 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": true,
+                                "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
                                 "globalRank": 1,
+                                "globalRankPercentile": null,
                                 "globalRankCategory": "A"
                               }
                             },
@@ -391,6 +395,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1112",
                                 "repo": {
                                   "id": 602953640,
+                                  "owner": "od-mocks",
                                   "name": "cool.repo.B",
                                   "description": null,
                                   "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
@@ -399,7 +404,8 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                   "githubUserId": 112474158,
                                   "login": "onlydust-contributor",
                                   "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                                  "isRegistered": true
+                                  "isRegistered": true,
+                                  "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d"
                                 }
                               },
                               "applicant": {
@@ -407,7 +413,9 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true,
-                                "globalRank": 5,
+                                "id": "fc92397c-3431-4a84-8054-845376b630a0",
+                                "globalRank": 6,
+                                "globalRankPercentile": null,
                                 "globalRankCategory": "A"
                               }
                             }
@@ -539,7 +547,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true,
-                                "globalRank": 5,
+                                "globalRank": 6,
                                 "globalRankCategory": "A"
                               }
                             }
@@ -586,13 +594,14 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
                               },
                               "issue": {
-                                "id": 1736504583,
-                                "number": 1112,
-                                "title": "Monthly contracting subscription",
+                                "id": 1736474921,
+                                "number": 1111,
+                                "title": "Documentation by AnthonyBuisset",
                                 "status": "OPEN",
-                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1112",
+                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111",
                                 "repo": {
                                   "id": 602953640,
+                                  "owner": "od-mocks",
                                   "name": "cool.repo.B",
                                   "description": null,
                                   "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
@@ -601,7 +610,8 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                   "githubUserId": 112474158,
                                   "login": "onlydust-contributor",
                                   "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                                  "isRegistered": true
+                                  "isRegistered": true,
+                                  "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d"
                                 }
                               },
                               "applicant": {
@@ -609,7 +619,9 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true,
-                                "globalRank": 5,
+                                "id": "fc92397c-3431-4a84-8054-845376b630a0",
+                                "globalRank": 6,
+                                "globalRankPercentile": null,
                                 "globalRankCategory": "A"
                               }
                             },
@@ -621,13 +633,14 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
                               },
                               "issue": {
-                                "id": 1736474921,
-                                "number": 1111,
-                                "title": "Documentation by AnthonyBuisset",
+                                "id": 1736504583,
+                                "number": 1112,
+                                "title": "Monthly contracting subscription",
                                 "status": "OPEN",
-                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111",
+                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1112",
                                 "repo": {
                                   "id": 602953640,
+                                  "owner": "od-mocks",
                                   "name": "cool.repo.B",
                                   "description": null,
                                   "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
@@ -636,7 +649,8 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                   "githubUserId": 112474158,
                                   "login": "onlydust-contributor",
                                   "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                                  "isRegistered": true
+                                  "isRegistered": true,
+                                  "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d"
                                 }
                               },
                               "applicant": {
@@ -644,7 +658,9 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true,
-                                "globalRank": 5,
+                                "id": "fc92397c-3431-4a84-8054-845376b630a0",
+                                "globalRank": 6,
+                                "globalRankPercentile": null,
                                 "globalRankCategory": "A"
                               }
                             },
@@ -663,6 +679,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111",
                                 "repo": {
                                   "id": 602953640,
+                                  "owner": "od-mocks",
                                   "name": "cool.repo.B",
                                   "description": null,
                                   "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
@@ -671,7 +688,8 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                   "githubUserId": 112474158,
                                   "login": "onlydust-contributor",
                                   "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                                  "isRegistered": true
+                                  "isRegistered": true,
+                                  "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d"
                                 }
                               },
                               "applicant": {
@@ -679,7 +697,9 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true,
-                                "globalRank": 5,
+                                "id": "fc92397c-3431-4a84-8054-845376b630a0",
+                                "globalRank": 6,
+                                "globalRankPercentile": null,
                                 "globalRankCategory": "A"
                               }
                             }
@@ -1004,19 +1024,19 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "trend": "UP"
                               },
                               "issueCount": {
-                                "value": 46,
+                                "value": 44,
                                 "trend": "UP"
                               },
                               "prCount": {
-                                "value": 817,
+                                "value": 265,
                                 "trend": "UP"
                               },
                               "codeReviewCount": {
-                                "value": 582,
+                                "value": 135,
                                 "trend": "UP"
                               },
                               "contributionCount": {
-                                "value": 1445,
+                                "value": 444,
                                 "trend": "UP"
                               }
                             },
@@ -1146,15 +1166,15 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "trend": "STABLE"
                               },
                               "prCount": {
-                                "value": 263,
+                                "value": 102,
                                 "trend": "UP"
                               },
                               "codeReviewCount": {
-                                "value": 417,
+                                "value": 215,
                                 "trend": "UP"
                               },
                               "contributionCount": {
-                                "value": 680,
+                                "value": 317,
                                 "trend": "UP"
                               }
                             },
@@ -1445,15 +1465,15 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "trend": "UP"
                               },
                               "prCount": {
-                                "value": 514,
+                                "value": 198,
                                 "trend": "UP"
                               },
                               "codeReviewCount": {
-                                "value": 469,
+                                "value": 72,
                                 "trend": "UP"
                               },
                               "contributionCount": {
-                                "value": 997,
+                                "value": 284,
                                 "trend": "UP"
                               }
                             }

@@ -47,12 +47,9 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
             "420bbdd396b23d24fbe94bf6a874736b1430ecb93cc59a42642ecb4a50e79e45", // CODE_REVIEW      2023-04-24 10:36:03
             "25dfb3c26e29787d606fcccffa8fe50f6246c45623147445e1d8a44db7716162", // CODE_REVIEW      2023-04-24 10:36:03
             "0c84f988abd52d1fe7d7889860d2e049072c6bb7879758d0ebc73188f2f93da4", // ISSUE            2023-03-28 14:41:22
-            "4b7b03cff784c0939ed0530e76902bb6bac54ff98c8c9212ccbb6b06d0967980", // ISSUE            2023-03-27 14:56:04
-            "105fa664f0702b603446f5e5d8d4793fedf57add7690487782bb42c299b6345e", // ISSUE            2023-03-27 14:56:51
             "468fdb4de0a8acd91b836a2226ba4db931708f74bd372e9d60f5464c3e2f6b57", // ISSUE            2023-03-28 14:40:35
             "d6703a6b1f0b1d5a91cff05e12e8b0f088adce4f156bc73a04eb03a38786810f", // PULL_REQUEST     2023-02-21 17:07:22
             "f1f013dae1071e7b04c2edd8624a34e85a40bc70afacd1c6f62b469d4a6d97e7", // PULL_REQUEST     2023-02-21 16:43:47
-            "e009fd961fd9cdbc30c3081e38cd1275a44787706b414e1302f9b378bf0da9f6", // PULL_REQUEST     2023-02-21 17:08:12
             "472577e241d9c6dcbf92a512eb673ad3bba5c83bb105dd2a2fa9c64b27b83b82", // PULL_REQUEST     2023-02-21 16:47:09
             "9702804b7be03d3b0460fc145c750b36d5296298de772b5f5c89d821abf9f1dc", // PULL_REQUEST     2023-02-21 16:22:45
             "c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
@@ -124,12 +121,9 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
                 //"420bbdd396b23d24fbe94bf6a874736b1430ecb93cc59a42642ecb4a50e79e45", // CODE_REVIEW      2023-04-24 10:36:03
                 //"25dfb3c26e29787d606fcccffa8fe50f6246c45623147445e1d8a44db7716162", // CODE_REVIEW      2023-04-24 10:36:03
                 //"0c84f988abd52d1fe7d7889860d2e049072c6bb7879758d0ebc73188f2f93da4", // ISSUE            2023-03-28 14:41:22
-                "4b7b03cff784c0939ed0530e76902bb6bac54ff98c8c9212ccbb6b06d0967980", // ISSUE            2023-03-27 14:56:04
-                "105fa664f0702b603446f5e5d8d4793fedf57add7690487782bb42c299b6345e", // ISSUE            2023-03-27 14:56:51
                 "468fdb4de0a8acd91b836a2226ba4db931708f74bd372e9d60f5464c3e2f6b57" // ISSUE            2023-03-28 14:40:35
                 //"d6703a6b1f0b1d5a91cff05e12e8b0f088adce4f156bc73a04eb03a38786810f", // PULL_REQUEST     2023-02-21 17:07:22
                 //"f1f013dae1071e7b04c2edd8624a34e85a40bc70afacd1c6f62b469d4a6d97e7", // PULL_REQUEST     2023-02-21 16:43:47
-                //"e009fd961fd9cdbc30c3081e38cd1275a44787706b414e1302f9b378bf0da9f6", // PULL_REQUEST     2023-02-21 17:08:12
                 //"472577e241d9c6dcbf92a512eb673ad3bba5c83bb105dd2a2fa9c64b27b83b82", // PULL_REQUEST     2023-02-21 16:47:09
                 //"9702804b7be03d3b0460fc145c750b36d5296298de772b5f5c89d821abf9f1dc", // PULL_REQUEST     2023-02-21 16:22:45
                 //"c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
@@ -142,12 +136,10 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
         // Given
         final var projectId = createProject();
 
-        customUnignoreContribution(projectId, repo1ContributionIds.get(0));
+        customUnignoreContribution(projectId, repo1ContributionIds.get(0)); // should not affect result
         customUnignoreContribution(projectId, repo1ContributionIds.get(2));
         customUnignoreContribution(projectId, repo2ContributionIds.get(4));
-        customUnignoreContribution(projectId, repo2ContributionIds.get(12));
-        customUnignoreContribution(projectId, repo2ContributionIds.get(13));
-        customIgnoreContribution(projectId, repo1ContributionIds.get(1)); // should not affect result
+        customIgnoreContribution(projectId, repo1ContributionIds.get(1));
 
         // When
         updateRewardSettings(projectId, """
@@ -173,15 +165,12 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
                 //"420bbdd396b23d24fbe94bf6a874736b1430ecb93cc59a42642ecb4a50e79e45", // CODE_REVIEW      2023-04-24 10:36:03
                 //"25dfb3c26e29787d606fcccffa8fe50f6246c45623147445e1d8a44db7716162", // CODE_REVIEW      2023-04-24 10:36:03
                 //"0c84f988abd52d1fe7d7889860d2e049072c6bb7879758d0ebc73188f2f93da4", // ISSUE            2023-03-28 14:41:22
-                //"4b7b03cff784c0939ed0530e76902bb6bac54ff98c8c9212ccbb6b06d0967980", // ISSUE            2023-03-27 14:56:04
-                //"105fa664f0702b603446f5e5d8d4793fedf57add7690487782bb42c299b6345e", // ISSUE            2023-03-27 14:56:51
                 //"468fdb4de0a8acd91b836a2226ba4db931708f74bd372e9d60f5464c3e2f6b57" // ISSUE            2023-03-28 14:40:35
                 "d6703a6b1f0b1d5a91cff05e12e8b0f088adce4f156bc73a04eb03a38786810f", // PULL_REQUEST     2023-02-21 17:07:22
                 "f1f013dae1071e7b04c2edd8624a34e85a40bc70afacd1c6f62b469d4a6d97e7", // PULL_REQUEST     2023-02-21 16:43:47
-                "e009fd961fd9cdbc30c3081e38cd1275a44787706b414e1302f9b378bf0da9f6", // PULL_REQUEST     2023-02-21 17:08:12
-                "472577e241d9c6dcbf92a512eb673ad3bba5c83bb105dd2a2fa9c64b27b83b82" // PULL_REQUEST     2023-02-21 16:47:09
-                //"9702804b7be03d3b0460fc145c750b36d5296298de772b5f5c89d821abf9f1dc", // PULL_REQUEST     2023-02-21 16:22:45
-                //"c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
+                "472577e241d9c6dcbf92a512eb673ad3bba5c83bb105dd2a2fa9c64b27b83b82", // PULL_REQUEST     2023-02-21 16:47:09
+                "9702804b7be03d3b0460fc145c750b36d5296298de772b5f5c89d821abf9f1dc", // PULL_REQUEST     2023-02-21 16:22:45
+                "c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
         );
         // @formatter:on
     }
@@ -215,12 +204,9 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
                 "420bbdd396b23d24fbe94bf6a874736b1430ecb93cc59a42642ecb4a50e79e45", // CODE_REVIEW      2023-04-24 10:36:03
                 "25dfb3c26e29787d606fcccffa8fe50f6246c45623147445e1d8a44db7716162" // CODE_REVIEW      2023-04-24 10:36:03
                 //"0c84f988abd52d1fe7d7889860d2e049072c6bb7879758d0ebc73188f2f93da4", // ISSUE            2023-03-28 14:41:22
-                //"4b7b03cff784c0939ed0530e76902bb6bac54ff98c8c9212ccbb6b06d0967980", // ISSUE            2023-03-27 14:56:04
-                //"105fa664f0702b603446f5e5d8d4793fedf57add7690487782bb42c299b6345e", // ISSUE            2023-03-27 14:56:51
                 //"468fdb4de0a8acd91b836a2226ba4db931708f74bd372e9d60f5464c3e2f6b57" // ISSUE            2023-03-28 14:40:35
                 //"d6703a6b1f0b1d5a91cff05e12e8b0f088adce4f156bc73a04eb03a38786810f", // PULL_REQUEST     2023-02-21 17:07:22
                 //"f1f013dae1071e7b04c2edd8624a34e85a40bc70afacd1c6f62b469d4a6d97e7", // PULL_REQUEST     2023-02-21 16:43:47
-                //"e009fd961fd9cdbc30c3081e38cd1275a44787706b414e1302f9b378bf0da9f6", // PULL_REQUEST     2023-02-21 17:08:12
                 //"472577e241d9c6dcbf92a512eb673ad3bba5c83bb105dd2a2fa9c64b27b83b82" // PULL_REQUEST     2023-02-21 16:47:09
                 //"9702804b7be03d3b0460fc145c750b36d5296298de772b5f5c89d821abf9f1dc", // PULL_REQUEST     2023-02-21 16:22:45
                 //"c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
@@ -259,12 +245,8 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
                 //"420bbdd396b23d24fbe94bf6a874736b1430ecb93cc59a42642ecb4a50e79e45", // CODE_REVIEW      2023-04-24 10:36:03
                 //"25dfb3c26e29787d606fcccffa8fe50f6246c45623147445e1d8a44db7716162", // CODE_REVIEW      2023-04-24 10:36:03
                 //"0c84f988abd52d1fe7d7889860d2e049072c6bb7879758d0ebc73188f2f93da4", // ISSUE            2023-03-28 14:41:22
-                "4b7b03cff784c0939ed0530e76902bb6bac54ff98c8c9212ccbb6b06d0967980", // ISSUE            2023-03-27 14:56:04
-                "105fa664f0702b603446f5e5d8d4793fedf57add7690487782bb42c299b6345e", // ISSUE            2023-03-27 14:56:51
-                //"468fdb4de0a8acd91b836a2226ba4db931708f74bd372e9d60f5464c3e2f6b57" // ISSUE            2023-03-28 14:40:35
                 "d6703a6b1f0b1d5a91cff05e12e8b0f088adce4f156bc73a04eb03a38786810f", // PULL_REQUEST     2023-02-21 17:07:22
                 "f1f013dae1071e7b04c2edd8624a34e85a40bc70afacd1c6f62b469d4a6d97e7", // PULL_REQUEST     2023-02-21 16:43:47
-                "e009fd961fd9cdbc30c3081e38cd1275a44787706b414e1302f9b378bf0da9f6", // PULL_REQUEST     2023-02-21 17:08:12
                 "472577e241d9c6dcbf92a512eb673ad3bba5c83bb105dd2a2fa9c64b27b83b82", // PULL_REQUEST     2023-02-21 16:47:09
                 "9702804b7be03d3b0460fc145c750b36d5296298de772b5f5c89d821abf9f1dc" // PULL_REQUEST     2023-02-21 16:22:45
                 //"c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
@@ -304,12 +286,9 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
                 //"420bbdd396b23d24fbe94bf6a874736b1430ecb93cc59a42642ecb4a50e79e45", // CODE_REVIEW      2023-04-24 10:36:03
                 //"25dfb3c26e29787d606fcccffa8fe50f6246c45623147445e1d8a44db7716162", // CODE_REVIEW      2023-04-24 10:36:03
                 "0c84f988abd52d1fe7d7889860d2e049072c6bb7879758d0ebc73188f2f93da4", // ISSUE            2023-03-28 14:41:22
-                "4b7b03cff784c0939ed0530e76902bb6bac54ff98c8c9212ccbb6b06d0967980", // ISSUE            2023-03-27 14:56:04
-                "105fa664f0702b603446f5e5d8d4793fedf57add7690487782bb42c299b6345e", // ISSUE            2023-03-27 14:56:51
                 "468fdb4de0a8acd91b836a2226ba4db931708f74bd372e9d60f5464c3e2f6b57", // ISSUE            2023-03-28 14:40:35
                 "d6703a6b1f0b1d5a91cff05e12e8b0f088adce4f156bc73a04eb03a38786810f", // PULL_REQUEST     2023-02-21 17:07:22
                 "f1f013dae1071e7b04c2edd8624a34e85a40bc70afacd1c6f62b469d4a6d97e7", // PULL_REQUEST     2023-02-21 16:43:47
-                "e009fd961fd9cdbc30c3081e38cd1275a44787706b414e1302f9b378bf0da9f6", // PULL_REQUEST     2023-02-21 17:08:12
                 "472577e241d9c6dcbf92a512eb673ad3bba5c83bb105dd2a2fa9c64b27b83b82", // PULL_REQUEST     2023-02-21 16:47:09
                 "9702804b7be03d3b0460fc145c750b36d5296298de772b5f5c89d821abf9f1dc" // PULL_REQUEST     2023-02-21 16:22:45
                 //"c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
@@ -348,12 +327,9 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
                 "420bbdd396b23d24fbe94bf6a874736b1430ecb93cc59a42642ecb4a50e79e45", // CODE_REVIEW      2023-04-24 10:36:03
                 "25dfb3c26e29787d606fcccffa8fe50f6246c45623147445e1d8a44db7716162", // CODE_REVIEW      2023-04-24 10:36:03
                 //"0c84f988abd52d1fe7d7889860d2e049072c6bb7879758d0ebc73188f2f93da4", // ISSUE            2023-03-28 14:41:22
-                "4b7b03cff784c0939ed0530e76902bb6bac54ff98c8c9212ccbb6b06d0967980", // ISSUE            2023-03-27 14:56:04
-                "105fa664f0702b603446f5e5d8d4793fedf57add7690487782bb42c299b6345e", // ISSUE            2023-03-27 14:56:51
                 "468fdb4de0a8acd91b836a2226ba4db931708f74bd372e9d60f5464c3e2f6b57" // ISSUE            2023-03-28 14:40:35
                 //"d6703a6b1f0b1d5a91cff05e12e8b0f088adce4f156bc73a04eb03a38786810f", // PULL_REQUEST     2023-02-21 17:07:22
                 //"f1f013dae1071e7b04c2edd8624a34e85a40bc70afacd1c6f62b469d4a6d97e7", // PULL_REQUEST     2023-02-21 16:43:47
-                //"e009fd961fd9cdbc30c3081e38cd1275a44787706b414e1302f9b378bf0da9f6", // PULL_REQUEST     2023-02-21 17:08:12
                 //"472577e241d9c6dcbf92a512eb673ad3bba5c83bb105dd2a2fa9c64b27b83b82" // PULL_REQUEST     2023-02-21 16:47:09
                 //"9702804b7be03d3b0460fc145c750b36d5296298de772b5f5c89d821abf9f1dc", // PULL_REQUEST     2023-02-21 16:22:45
                 //"c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
@@ -393,12 +369,9 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
                 "420bbdd396b23d24fbe94bf6a874736b1430ecb93cc59a42642ecb4a50e79e45", // CODE_REVIEW      2023-04-24 10:36:03
                 "25dfb3c26e29787d606fcccffa8fe50f6246c45623147445e1d8a44db7716162", // CODE_REVIEW      2023-04-24 10:36:03
                 //"0c84f988abd52d1fe7d7889860d2e049072c6bb7879758d0ebc73188f2f93da4", // ISSUE            2023-03-28 14:41:22
-                //"4b7b03cff784c0939ed0530e76902bb6bac54ff98c8c9212ccbb6b06d0967980", // ISSUE            2023-03-27 14:56:04
-                //"105fa664f0702b603446f5e5d8d4793fedf57add7690487782bb42c299b6345e", // ISSUE            2023-03-27 14:56:51
                 //"468fdb4de0a8acd91b836a2226ba4db931708f74bd372e9d60f5464c3e2f6b57" // ISSUE            2023-03-28 14:40:35
                 "d6703a6b1f0b1d5a91cff05e12e8b0f088adce4f156bc73a04eb03a38786810f", // PULL_REQUEST     2023-02-21 17:07:22
                 "f1f013dae1071e7b04c2edd8624a34e85a40bc70afacd1c6f62b469d4a6d97e7", // PULL_REQUEST     2023-02-21 16:43:47
-                "e009fd961fd9cdbc30c3081e38cd1275a44787706b414e1302f9b378bf0da9f6", // PULL_REQUEST     2023-02-21 17:08:12
                 "472577e241d9c6dcbf92a512eb673ad3bba5c83bb105dd2a2fa9c64b27b83b82", // PULL_REQUEST     2023-02-21 16:47:09
                 "9702804b7be03d3b0460fc145c750b36d5296298de772b5f5c89d821abf9f1dc", // PULL_REQUEST     2023-02-21 16:22:45
                 "c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
@@ -429,12 +402,9 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
                 //"420bbdd396b23d24fbe94bf6a874736b1430ecb93cc59a42642ecb4a50e79e45", // CODE_REVIEW      2023-04-24 10:36:03
                 //"25dfb3c26e29787d606fcccffa8fe50f6246c45623147445e1d8a44db7716162", // CODE_REVIEW      2023-04-24 10:36:03
                 //"0c84f988abd52d1fe7d7889860d2e049072c6bb7879758d0ebc73188f2f93da4", // ISSUE            2023-03-28 14:41:22
-                //"4b7b03cff784c0939ed0530e76902bb6bac54ff98c8c9212ccbb6b06d0967980", // ISSUE            2023-03-27 14:56:04
-                //"105fa664f0702b603446f5e5d8d4793fedf57add7690487782bb42c299b6345e", // ISSUE            2023-03-27 14:56:51
                 //"468fdb4de0a8acd91b836a2226ba4db931708f74bd372e9d60f5464c3e2f6b57" // ISSUE            2023-03-28 14:40:35
                 "d6703a6b1f0b1d5a91cff05e12e8b0f088adce4f156bc73a04eb03a38786810f", // PULL_REQUEST     2023-02-21 17:07:22
                 "f1f013dae1071e7b04c2edd8624a34e85a40bc70afacd1c6f62b469d4a6d97e7", // PULL_REQUEST     2023-02-21 16:43:47
-                "e009fd961fd9cdbc30c3081e38cd1275a44787706b414e1302f9b378bf0da9f6", // PULL_REQUEST     2023-02-21 17:08:12
                 "472577e241d9c6dcbf92a512eb673ad3bba5c83bb105dd2a2fa9c64b27b83b82", // PULL_REQUEST     2023-02-21 16:47:09
                 "9702804b7be03d3b0460fc145c750b36d5296298de772b5f5c89d821abf9f1dc", // PULL_REQUEST     2023-02-21 16:22:45
                 "c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
@@ -470,12 +440,9 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
                 "420bbdd396b23d24fbe94bf6a874736b1430ecb93cc59a42642ecb4a50e79e45", // CODE_REVIEW      2023-04-24 10:36:03
                 "25dfb3c26e29787d606fcccffa8fe50f6246c45623147445e1d8a44db7716162", // CODE_REVIEW      2023-04-24 10:36:03
                 //"0c84f988abd52d1fe7d7889860d2e049072c6bb7879758d0ebc73188f2f93da4", // ISSUE            2023-03-28 14:41:22
-                //"4b7b03cff784c0939ed0530e76902bb6bac54ff98c8c9212ccbb6b06d0967980", // ISSUE            2023-03-27 14:56:04
-                //"105fa664f0702b603446f5e5d8d4793fedf57add7690487782bb42c299b6345e", // ISSUE            2023-03-27 14:56:51
                 //"468fdb4de0a8acd91b836a2226ba4db931708f74bd372e9d60f5464c3e2f6b57" // ISSUE            2023-03-28 14:40:35
                 "d6703a6b1f0b1d5a91cff05e12e8b0f088adce4f156bc73a04eb03a38786810f", // PULL_REQUEST     2023-02-21 17:07:22
                 "f1f013dae1071e7b04c2edd8624a34e85a40bc70afacd1c6f62b469d4a6d97e7", // PULL_REQUEST     2023-02-21 16:43:47
-                "e009fd961fd9cdbc30c3081e38cd1275a44787706b414e1302f9b378bf0da9f6", // PULL_REQUEST     2023-02-21 17:08:12
                 "472577e241d9c6dcbf92a512eb673ad3bba5c83bb105dd2a2fa9c64b27b83b82", // PULL_REQUEST     2023-02-21 16:47:09
                 "9702804b7be03d3b0460fc145c750b36d5296298de772b5f5c89d821abf9f1dc", // PULL_REQUEST     2023-02-21 16:22:45
                 "c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
@@ -516,12 +483,9 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
                 "420bbdd396b23d24fbe94bf6a874736b1430ecb93cc59a42642ecb4a50e79e45", // CODE_REVIEW      2023-04-24 10:36:03
                 "25dfb3c26e29787d606fcccffa8fe50f6246c45623147445e1d8a44db7716162", // CODE_REVIEW      2023-04-24 10:36:03
                 //"0c84f988abd52d1fe7d7889860d2e049072c6bb7879758d0ebc73188f2f93da4", // ISSUE            2023-03-28 14:41:22
-                //"4b7b03cff784c0939ed0530e76902bb6bac54ff98c8c9212ccbb6b06d0967980", // ISSUE            2023-03-27 14:56:04
-                //"105fa664f0702b603446f5e5d8d4793fedf57add7690487782bb42c299b6345e", // ISSUE            2023-03-27 14:56:51
                 //"468fdb4de0a8acd91b836a2226ba4db931708f74bd372e9d60f5464c3e2f6b57" // ISSUE            2023-03-28 14:40:35
                 "d6703a6b1f0b1d5a91cff05e12e8b0f088adce4f156bc73a04eb03a38786810f", // PULL_REQUEST     2023-02-21 17:07:22
                 "f1f013dae1071e7b04c2edd8624a34e85a40bc70afacd1c6f62b469d4a6d97e7", // PULL_REQUEST     2023-02-21 16:43:47
-                "e009fd961fd9cdbc30c3081e38cd1275a44787706b414e1302f9b378bf0da9f6", // PULL_REQUEST     2023-02-21 17:08:12
                 "472577e241d9c6dcbf92a512eb673ad3bba5c83bb105dd2a2fa9c64b27b83b82", // PULL_REQUEST     2023-02-21 16:47:09
                 "9702804b7be03d3b0460fc145c750b36d5296298de772b5f5c89d821abf9f1dc", // PULL_REQUEST     2023-02-21 16:22:45
                 "c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
@@ -545,12 +509,8 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
                 "420bbdd396b23d24fbe94bf6a874736b1430ecb93cc59a42642ecb4a50e79e45", // CODE_REVIEW      2023-04-24 10:36:03
                 "25dfb3c26e29787d606fcccffa8fe50f6246c45623147445e1d8a44db7716162", // CODE_REVIEW      2023-04-24 10:36:03
                 //"0c84f988abd52d1fe7d7889860d2e049072c6bb7879758d0ebc73188f2f93da4", // ISSUE            2023-03-28 14:41:22
-                //"4b7b03cff784c0939ed0530e76902bb6bac54ff98c8c9212ccbb6b06d0967980", // ISSUE            2023-03-27 14:56:04
-                //"105fa664f0702b603446f5e5d8d4793fedf57add7690487782bb42c299b6345e", // ISSUE            2023-03-27 14:56:51
-                //"468fdb4de0a8acd91b836a2226ba4db931708f74bd372e9d60f5464c3e2f6b57" // ISSUE            2023-03-28 14:40:35
                 "d6703a6b1f0b1d5a91cff05e12e8b0f088adce4f156bc73a04eb03a38786810f", // PULL_REQUEST     2023-02-21 17:07:22
                 "f1f013dae1071e7b04c2edd8624a34e85a40bc70afacd1c6f62b469d4a6d97e7", // PULL_REQUEST     2023-02-21 16:43:47
-                "e009fd961fd9cdbc30c3081e38cd1275a44787706b414e1302f9b378bf0da9f6", // PULL_REQUEST     2023-02-21 17:08:12
                 "472577e241d9c6dcbf92a512eb673ad3bba5c83bb105dd2a2fa9c64b27b83b82", // PULL_REQUEST     2023-02-21 16:47:09
                 "9702804b7be03d3b0460fc145c750b36d5296298de772b5f5c89d821abf9f1dc", // PULL_REQUEST     2023-02-21 16:22:45
                 "c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03

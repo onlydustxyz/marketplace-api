@@ -236,6 +236,7 @@ create index on bi.p_contribution_data (activity_status, contribution_type, crea
 call create_pseudo_projection('bi', 'contribution_contributors_data', $$
 
 select c.contribution_uuid                                                                    as contribution_uuid,
+       c.repo_id                                                                              as repo_id,
        c.github_author_id                                                                     as github_author_id,
        array_agg(distinct gcc.contributor_id) filter ( where gcc.contributor_id is not null ) as contributor_ids,
        array_agg(distinct gia.user_id) filter ( where gia.user_id is not null )               as assignee_ids,
@@ -263,6 +264,7 @@ from indexer_exp.grouped_contributions c
 group by c.contribution_uuid, ad.contributor_id
 $$, 'contribution_uuid');
 
+create index on bi.p_contribution_contributors_data (repo_id);
 create index on bi.p_contribution_contributors_data using gin (contributor_ids);
 
 
@@ -401,13 +403,15 @@ create index on bi.p_contribution_reward_data using gin (reward_ids);
 CREATE OR REPLACE VIEW bi.v_contributor_global_data AS
 SELECT v.*, md5(v::text) as hash
 FROM (SELECT c.*,
-             bi.search_of(c.contributor_login, c.projects, c.categories, c.languages, c.ecosystems, c.currencies, c.programs) as search
+             bi.search_of(c.contributor_login, c.projects, c.categories, c.languages, c.ecosystems, c.currencies,
+                          c.programs) as search
 
       FROM (SELECT c.*,
                    (select kyc.country
                     from iam.users u
                              join accounting.billing_profiles_users bpu on bpu.user_id = u.id
-                             join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id and kyc.country is not null
+                             join accounting.kyc
+                                  on kyc.billing_profile_id = bpu.billing_profile_id and kyc.country is not null
                     where u.github_user_id = c.contributor_id
                     limit 1)                                    as contributor_country,
 
@@ -481,18 +485,23 @@ FROM (SELECT c.*,
                     from currencies cu
                     where cu.id = any (c.currency_ids))         as currencies
 
-            FROM (SELECT ga.id                                                                                            as contributor_id,
-                         ga.login                                                                                         as contributor_login,
+            FROM (SELECT ga.id                                                                            as contributor_id,
+                         ga.login                                                                         as contributor_login,
 
-                         min(p.name)                                                                                      as first_project_name,
+                         min(p.name)                                                                      as first_project_name,
 
-                         array_agg(distinct p.id) filter ( where p.id is not null )                                       as project_ids,
-                         array_agg(distinct p.slug) filter ( where p.slug is not null )                                   as project_slugs,
-                         array_agg(distinct ppc.project_category_id) filter ( where ppc.project_category_id is not null ) as project_category_ids,
-                         array_agg(distinct lfe.language_id) filter ( where lfe.language_id is not null )                 as language_ids,
-                         array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null )                 as ecosystem_ids,
-                         array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )                     as program_ids,
-                         array_agg(distinct currencies.id) filter ( where currencies.id is not null )                     as currency_ids
+                         array_agg(distinct p.id) filter ( where p.id is not null )                       as project_ids,
+                         array_agg(distinct p.slug) filter ( where p.slug is not null )                   as project_slugs,
+                         array_agg(distinct ppc.project_category_id)
+                         filter ( where ppc.project_category_id is not null )                             as project_category_ids,
+                         array_agg(distinct lfe.language_id)
+                         filter ( where lfe.language_id is not null )                                     as language_ids,
+                         array_agg(distinct pe.ecosystem_id)
+                         filter ( where pe.ecosystem_id is not null )                                     as ecosystem_ids,
+                         array_agg(distinct pp.program_id)
+                         filter ( where pp.program_id is not null )                                       as program_ids,
+                         array_agg(distinct currencies.id)
+                         filter ( where currencies.id is not null )                                       as currency_ids
                   FROM indexer_exp.github_accounts ga
                            LEFT JOIN indexer_exp.repos_contributors rc ON rc.contributor_id = ga.id
                            LEFT JOIN project_github_repos pgr ON pgr.github_repo_id = rc.repo_id
@@ -526,10 +535,14 @@ FROM (select r.id                                                               
              rsd.amount_usd_equivalent                                                                        as usd_amount,
              r.amount                                                                                         as amount,
              r.currency_id                                                                                    as currency_id,
-             array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null )                 as ecosystem_ids,
-             array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )                     as program_ids,
-             array_agg(distinct lfe.language_id) filter ( where lfe.language_id is not null )                 as language_ids,
-             array_agg(distinct ppc.project_category_id) filter ( where ppc.project_category_id is not null ) as project_category_ids,
+             array_agg(distinct pe.ecosystem_id)
+             filter ( where pe.ecosystem_id is not null )                                                     as ecosystem_ids,
+             array_agg(distinct pp.program_id)
+             filter ( where pp.program_id is not null )                                                       as program_ids,
+             array_agg(distinct lfe.language_id)
+             filter ( where lfe.language_id is not null )                                                     as language_ids,
+             array_agg(distinct ppc.project_category_id)
+             filter ( where ppc.project_category_id is not null )                                             as project_category_ids,
              string_agg(currencies.name || ' ' || currencies.code, ' ')                                       as search
       from rewards r
                join accounting.reward_status_data rsd ON rsd.reward_id = r.id
@@ -752,7 +765,8 @@ FROM bi.p_project_global_data p
                            coalesce(sum(cd.is_pr), 0)                                                              as pr_count,
                            coalesce(sum(cd.is_code_review), 0)                                                     as code_review_count,
                            count(distinct cd.contributor_id)                                                       as active_contributor_count,
-                           count(distinct cd.contributor_id) filter ( where cd.is_first_contribution_on_onlydust ) as onboarded_contributor_count
+                           count(distinct cd.contributor_id)
+                           filter ( where cd.is_first_contribution_on_onlydust )                                   as onboarded_contributor_count
                     from bi.p_per_contributor_contribution_data cd
                     where cd.timestamp >= fromDate
                       and cd.timestamp < toDate

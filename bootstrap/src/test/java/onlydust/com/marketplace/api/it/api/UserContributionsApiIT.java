@@ -36,52 +36,9 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
-                .consumeWith(System.out::println)
                 .json("""
                         {
                           "contributions": [
-                            {
-                              "type": "PULL_REQUEST",
-                              "repo": {
-                                "id": 480776993,
-                                "owner": "onlydustxyz",
-                                "name": "starklings",
-                                "description": null,
-                                "htmlUrl": "https://github.com/onlydustxyz/starklings"
-                              },
-                              "githubAuthor": {
-                                "githubUserId": 43467246,
-                                "login": "AnthonyBuisset",
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
-                              },
-                              "githubNumber": 2,
-                              "githubStatus": "MERGED",
-                              "githubTitle": "DUST token creation",
-                              "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/2",
-                              "githubBody": "ERC721 based\\r\\ncan be minted and burned\\r\\non-chain metadata:\\r\\n* Space size\\r\\n* position (x, y)\\r\\n* direction (x, y)\\r\\n\\r\\nCan move and will bounce in case it hurts one of the border/corner of the space\\r\\n\\r\\nSome nice features added:\\r\\n* batch minting (with user defined position/direction)\\r\\n* random minting (on the edge of the board game)\\r\\n* random batch minting\\r\\n* optimization of storage",
-                              "id": "6d3bac610f1f9e983b179478916eefcd39583dd7ca869ec15529c66539ff9045",
-                              "createdAt": "2022-04-12T16:56:44Z",
-                              "completedAt": "2022-04-13T09:00:48Z",
-                              "lastUpdatedAt": "2022-04-13T09:00:48Z",
-                              "status": "COMPLETED",
-                              "githubPullRequestReviewState": "PENDING_REVIEWER",
-                              "rewardIds": [],
-                              "project": {
-                                "id": "00490be6-2c03-4720-993b-aea3e07edd81",
-                                "slug": "zama",
-                                "name": "Zama",
-                                "shortDescription": "A super description for Zama",
-                                "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
-                                "visibility": "PUBLIC"
-                              },
-                              "contributor": {
-                                "githubUserId": 43467246,
-                                "login": "AnthonyBuisset",
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                                "isRegistered": true
-                              },
-                              "links": []
-                            },
                             {
                               "type": "PULL_REQUEST",
                               "repo": {
@@ -101,10 +58,11 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                               "githubTitle": "feat: add common model",
                               "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/1",
                               "githubBody": "Note: if we use ERC20 instead of ERC721 to keep track of dust balance, then `token_id` must be removed from `Dust` struct.",
+                              "githubLabels": null,
+                              "lastUpdatedAt": "2022-04-13T09:00:49Z",
                               "id": "7b076143d6844660494a112d2182017a367914577b14ed562250ef1751de6547",
                               "createdAt": "2022-04-12T11:59:17Z",
                               "completedAt": "2022-04-13T09:00:49Z",
-                              "lastUpdatedAt": "2022-04-13T09:00:49Z",
                               "status": "COMPLETED",
                               "githubPullRequestReviewState": "PENDING_REVIEWER",
                               "rewardIds": [],
@@ -112,20 +70,22 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                                 "id": "00490be6-2c03-4720-993b-aea3e07edd81",
                                 "slug": "zama",
                                 "name": "Zama",
-                                "shortDescription": "A super description for Zama",
                                 "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
-                                "visibility": "PUBLIC"
+                                "shortDescription": "A super description for Zama",
+                                "visibility": "PUBLIC",
+                                "languages": []
                               },
                               "contributor": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                                "isRegistered": true
+                                "isRegistered": true,
+                                "id": null
                               },
                               "links": []
                             },
                             {
-                              "type": "PULL_REQUEST",
+                              "type": "CODE_REVIEW",
                               "repo": {
                                 "id": 480776993,
                                 "owner": "onlydustxyz",
@@ -134,43 +94,135 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                                 "htmlUrl": "https://github.com/onlydustxyz/starklings"
                               },
                               "githubAuthor": {
-                                "githubUserId": 595505,
-                                "login": "ofux",
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
                               },
-                              "githubNumber": 3,
-                              "githubStatus": "MERGED",
-                              "githubTitle": "Feature/space",
-                              "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/3",
-                              "githubBody": "Add a space contract that is in charge of processing game turns.\\r\\n\\r\\nAt each turn:\\r\\n- one dust is spawned\\r\\n- dust is moved on the grid\\r\\n- dust collisions are handled. When a collision occurs, one of the dust is burnt\\r\\n\\r\\nThe random generator is now in its own contract so we can mock it.\\r\\n\\r\\nThe TODOs can be found here: https://www.notion.so/onlydust/Workshop-TODO-9a67a936a5ca4180a3a23d7d94fecd61\\r\\n\\r\\n> Note: I just realised that we have different formatting between @AnthonyBuisset and me. I don't know why. This is quite annoying for tracking changes, so I apologise in advance.",
-                              "id": "5befa137a9ef4264834de24e223c7ee0b6fada1bb24ca3dc713496a96fba805b",
-                              "createdAt": "2022-04-13T15:42:14Z",
-                              "completedAt": "2022-04-13T16:01:10Z",
-                              "lastUpdatedAt": "2022-04-13T16:01:10Z",
+                              "githubNumber": 169,
+                              "githubStatus": "APPROVED",
+                              "githubTitle": "Educational content: follow-up exercise on hints.",
+                              "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/169",
+                              "githubBody": "A second exercise on hints",
+                              "githubLabels": null,
+                              "lastUpdatedAt": "2022-06-01T10:34:49Z",
+                              "id": "1e80b860c62c6d43bb1b0e383e57fa2a645a20ed33d900a2f8a9810ccbdfbbc4",
+                              "createdAt": "2022-06-01T10:24:19Z",
+                              "completedAt": "2022-06-01T10:34:49Z",
                               "status": "COMPLETED",
-                              "githubPullRequestReviewState": "APPROVED",
+                              "githubPullRequestReviewState": null,
                               "rewardIds": [],
                               "project": {
                                 "id": "00490be6-2c03-4720-993b-aea3e07edd81",
                                 "slug": "zama",
                                 "name": "Zama",
-                                "shortDescription": "A super description for Zama",
                                 "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
-                                "visibility": "PUBLIC"
+                                "shortDescription": "A super description for Zama",
+                                "visibility": "PUBLIC",
+                                "languages": []
                               },
                               "contributor": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                                "isRegistered": true
+                                "isRegistered": true,
+                                "id": null
                               },
-                              "links": []
+                              "links": [
+                                {
+                                  "type": "PULL_REQUEST",
+                                  "repo": {
+                                    "id": 480776993,
+                                    "owner": "onlydustxyz",
+                                    "name": "starklings",
+                                    "description": null,
+                                    "htmlUrl": "https://github.com/onlydustxyz/starklings"
+                                  },
+                                  "githubAuthor": {
+                                    "githubUserId": 98529704,
+                                    "login": "tekkac",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/98529704?v=4"
+                                  },
+                                  "githubNumber": 169,
+                                  "githubStatus": "MERGED",
+                                  "githubTitle": "Educational content: follow-up exercise on hints.",
+                                  "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/169",
+                                  "githubBody": "A second exercise on hints",
+                                  "githubLabels": null,
+                                  "lastUpdatedAt": null,
+                                  "is_mine": false
+                                }
+                              ]
+                            },
+                            {
+                              "type": "ISSUE",
+                              "repo": {
+                                "id": 498695724,
+                                "owner": "onlydustxyz",
+                                "name": "marketplace-frontend",
+                                "description": null,
+                                "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
+                              },
+                              "githubAuthor": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                              },
+                              "githubNumber": 15,
+                              "githubStatus": "COMPLETED",
+                              "githubTitle": "push contributions pr to github smart contract",
+                              "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/issues/15",
+                              "githubBody": "When a new PR is merged for a registered user, we should be able to push the data on-chain.",
+                              "githubLabels": null,
+                              "lastUpdatedAt": "2022-06-21T15:49:26Z",
+                              "id": "7c06e9b36cd92c6214a1b4af4a11b0c16d0be722105bfc0a75afd1e34f9c500e",
+                              "createdAt": "2022-06-21T08:16:18Z",
+                              "completedAt": "2022-06-21T15:49:26Z",
+                              "status": "COMPLETED",
+                              "githubPullRequestReviewState": null,
+                              "rewardIds": [],
+                              "project": {
+                                "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                "slug": "mooooooonlight",
+                                "name": "Mooooooonlight",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
+                                "shortDescription": "hello la team",
+                                "visibility": "PUBLIC",
+                                "languages": []
+                              },
+                              "contributor": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                "isRegistered": true,
+                                "id": null
+                              },
+                              "links": [
+                                {
+                                  "type": "PULL_REQUEST",
+                                  "repo": {
+                                    "id": 498695724,
+                                    "owner": "onlydustxyz",
+                                    "name": "marketplace-frontend",
+                                    "description": null,
+                                    "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
+                                  },
+                                  "githubAuthor": {
+                                    "githubUserId": 43467246,
+                                    "login": "AnthonyBuisset",
+                                    "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                                  },
+                                  "githubNumber": 18,
+                                  "githubStatus": "MERGED",
+                                  "githubTitle": "starknet interfacing",
+                                  "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/18",
+                                  "githubBody": "closes #15\\n\\ndatabase:\\n- repo id is now the same as teh one provided by github API (like pullrequest id)\\n- foreign key added from pullrequest table to project table\\n- can log an indexing status (last time the indexer ran)\\n- can fetch pull requests\\n- can log a contract update status (last time the uploader ran)\\n\\nbinaries:\\n- refactor to smaller binaries:\\n  - add a single repo in database\\n  - index all repos (fetch PR from github and log in DB)\\n  - upload all pr (fetch PR from database and log in smart contract)\\n\\nstarknet:\\n- can log pullrequest in smart contract\\n\\nNext steps:\\n- user iterator trait for fetcher output\\n- use references when possible to avoid cloning strings everywhere\\n- consolidate errors instead of crashing at the first occurence\\n- end to end testing\\n- deployment\\n",
+                                  "githubLabels": null,
+                                  "lastUpdatedAt": null,
+                                  "is_mine": true
+                                }
+                              ]
                             }
-                          ],
-                          "hasMore": true,
-                          "totalPageNumber": 1413,
-                          "totalItemNumber": 4238,
-                          "nextPageIndex": 1
+                          ]
                         }
                         """);
     }
@@ -189,52 +241,9 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
-                .consumeWith(System.out::println)
                 .json("""
                         {
                           "contributions": [
-                            {
-                              "type": "PULL_REQUEST",
-                              "repo": {
-                                "id": 480776993,
-                                "owner": "onlydustxyz",
-                                "name": "starklings",
-                                "description": null,
-                                "htmlUrl": "https://github.com/onlydustxyz/starklings"
-                              },
-                              "githubAuthor": {
-                                "githubUserId": 43467246,
-                                "login": "AnthonyBuisset",
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
-                              },
-                              "githubNumber": 2,
-                              "githubStatus": "MERGED",
-                              "githubTitle": "DUST token creation",
-                              "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/2",
-                              "githubBody": "ERC721 based\\r\\ncan be minted and burned\\r\\non-chain metadata:\\r\\n* Space size\\r\\n* position (x, y)\\r\\n* direction (x, y)\\r\\n\\r\\nCan move and will bounce in case it hurts one of the border/corner of the space\\r\\n\\r\\nSome nice features added:\\r\\n* batch minting (with user defined position/direction)\\r\\n* random minting (on the edge of the board game)\\r\\n* random batch minting\\r\\n* optimization of storage",
-                              "id": "6d3bac610f1f9e983b179478916eefcd39583dd7ca869ec15529c66539ff9045",
-                              "createdAt": "2022-04-12T16:56:44Z",
-                              "completedAt": "2022-04-13T09:00:48Z",
-                              "lastUpdatedAt": "2022-04-13T09:00:48Z",
-                              "status": "COMPLETED",
-                              "githubPullRequestReviewState": "PENDING_REVIEWER",
-                              "rewardIds": [],
-                              "project": {
-                                "id": "00490be6-2c03-4720-993b-aea3e07edd81",
-                                "slug": "zama",
-                                "name": "Zama",
-                                "shortDescription": "A super description for Zama",
-                                "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
-                                "visibility": "PUBLIC"
-                              },
-                              "contributor": {
-                                "githubUserId": 43467246,
-                                "login": "AnthonyBuisset",
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                                "isRegistered": true
-                              },
-                              "links": []
-                            },
                             {
                               "type": "PULL_REQUEST",
                               "repo": {
@@ -254,10 +263,11 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                               "githubTitle": "feat: add common model",
                               "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/1",
                               "githubBody": "Note: if we use ERC20 instead of ERC721 to keep track of dust balance, then `token_id` must be removed from `Dust` struct.",
+                              "githubLabels": null,
+                              "lastUpdatedAt": "2022-04-13T09:00:49Z",
                               "id": "7b076143d6844660494a112d2182017a367914577b14ed562250ef1751de6547",
                               "createdAt": "2022-04-12T11:59:17Z",
                               "completedAt": "2022-04-13T09:00:49Z",
-                              "lastUpdatedAt": "2022-04-13T09:00:49Z",
                               "status": "COMPLETED",
                               "githubPullRequestReviewState": "PENDING_REVIEWER",
                               "rewardIds": [],
@@ -265,20 +275,22 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                                 "id": "00490be6-2c03-4720-993b-aea3e07edd81",
                                 "slug": "zama",
                                 "name": "Zama",
-                                "shortDescription": "A super description for Zama",
                                 "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
-                                "visibility": "PUBLIC"
+                                "shortDescription": "A super description for Zama",
+                                "visibility": "PUBLIC",
+                                "languages": []
                               },
                               "contributor": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                                "isRegistered": true
+                                "isRegistered": true,
+                                "id": null
                               },
                               "links": []
                             },
                             {
-                              "type": "PULL_REQUEST",
+                              "type": "CODE_REVIEW",
                               "repo": {
                                 "id": 480776993,
                                 "owner": "onlydustxyz",
@@ -287,43 +299,135 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                                 "htmlUrl": "https://github.com/onlydustxyz/starklings"
                               },
                               "githubAuthor": {
-                                "githubUserId": 595505,
-                                "login": "ofux",
-                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
                               },
-                              "githubNumber": 3,
-                              "githubStatus": "MERGED",
-                              "githubTitle": "Feature/space",
-                              "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/3",
-                              "githubBody": "Add a space contract that is in charge of processing game turns.\\r\\n\\r\\nAt each turn:\\r\\n- one dust is spawned\\r\\n- dust is moved on the grid\\r\\n- dust collisions are handled. When a collision occurs, one of the dust is burnt\\r\\n\\r\\nThe random generator is now in its own contract so we can mock it.\\r\\n\\r\\nThe TODOs can be found here: https://www.notion.so/onlydust/Workshop-TODO-9a67a936a5ca4180a3a23d7d94fecd61\\r\\n\\r\\n> Note: I just realised that we have different formatting between @AnthonyBuisset and me. I don't know why. This is quite annoying for tracking changes, so I apologise in advance.",
-                              "id": "5befa137a9ef4264834de24e223c7ee0b6fada1bb24ca3dc713496a96fba805b",
-                              "createdAt": "2022-04-13T15:42:14Z",
-                              "completedAt": "2022-04-13T16:01:10Z",
-                              "lastUpdatedAt": "2022-04-13T16:01:10Z",
+                              "githubNumber": 169,
+                              "githubStatus": "APPROVED",
+                              "githubTitle": "Educational content: follow-up exercise on hints.",
+                              "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/169",
+                              "githubBody": "A second exercise on hints",
+                              "githubLabels": null,
+                              "lastUpdatedAt": "2022-06-01T10:34:49Z",
+                              "id": "1e80b860c62c6d43bb1b0e383e57fa2a645a20ed33d900a2f8a9810ccbdfbbc4",
+                              "createdAt": "2022-06-01T10:24:19Z",
+                              "completedAt": "2022-06-01T10:34:49Z",
                               "status": "COMPLETED",
-                              "githubPullRequestReviewState": "APPROVED",
+                              "githubPullRequestReviewState": null,
                               "rewardIds": [],
                               "project": {
                                 "id": "00490be6-2c03-4720-993b-aea3e07edd81",
                                 "slug": "zama",
                                 "name": "Zama",
-                                "shortDescription": "A super description for Zama",
                                 "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
-                                "visibility": "PUBLIC"
+                                "shortDescription": "A super description for Zama",
+                                "visibility": "PUBLIC",
+                                "languages": []
                               },
                               "contributor": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                                "isRegistered": true
+                                "isRegistered": true,
+                                "id": null
                               },
-                              "links": []
+                              "links": [
+                                {
+                                  "type": "PULL_REQUEST",
+                                  "repo": {
+                                    "id": 480776993,
+                                    "owner": "onlydustxyz",
+                                    "name": "starklings",
+                                    "description": null,
+                                    "htmlUrl": "https://github.com/onlydustxyz/starklings"
+                                  },
+                                  "githubAuthor": {
+                                    "githubUserId": 98529704,
+                                    "login": "tekkac",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/98529704?v=4"
+                                  },
+                                  "githubNumber": 169,
+                                  "githubStatus": "MERGED",
+                                  "githubTitle": "Educational content: follow-up exercise on hints.",
+                                  "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/169",
+                                  "githubBody": "A second exercise on hints",
+                                  "githubLabels": null,
+                                  "lastUpdatedAt": null,
+                                  "is_mine": false
+                                }
+                              ]
+                            },
+                            {
+                              "type": "ISSUE",
+                              "repo": {
+                                "id": 498695724,
+                                "owner": "onlydustxyz",
+                                "name": "marketplace-frontend",
+                                "description": null,
+                                "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
+                              },
+                              "githubAuthor": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                              },
+                              "githubNumber": 15,
+                              "githubStatus": "COMPLETED",
+                              "githubTitle": "push contributions pr to github smart contract",
+                              "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/issues/15",
+                              "githubBody": "When a new PR is merged for a registered user, we should be able to push the data on-chain.",
+                              "githubLabels": null,
+                              "lastUpdatedAt": "2022-06-21T15:49:26Z",
+                              "id": "7c06e9b36cd92c6214a1b4af4a11b0c16d0be722105bfc0a75afd1e34f9c500e",
+                              "createdAt": "2022-06-21T08:16:18Z",
+                              "completedAt": "2022-06-21T15:49:26Z",
+                              "status": "COMPLETED",
+                              "githubPullRequestReviewState": null,
+                              "rewardIds": [],
+                              "project": {
+                                "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                "slug": "mooooooonlight",
+                                "name": "Mooooooonlight",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
+                                "shortDescription": "hello la team",
+                                "visibility": "PUBLIC",
+                                "languages": []
+                              },
+                              "contributor": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                "isRegistered": true,
+                                "id": null
+                              },
+                              "links": [
+                                {
+                                  "type": "PULL_REQUEST",
+                                  "repo": {
+                                    "id": 498695724,
+                                    "owner": "onlydustxyz",
+                                    "name": "marketplace-frontend",
+                                    "description": null,
+                                    "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
+                                  },
+                                  "githubAuthor": {
+                                    "githubUserId": 43467246,
+                                    "login": "AnthonyBuisset",
+                                    "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                                  },
+                                  "githubNumber": 18,
+                                  "githubStatus": "MERGED",
+                                  "githubTitle": "starknet interfacing",
+                                  "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/18",
+                                  "githubBody": "closes #15\\n\\ndatabase:\\n- repo id is now the same as teh one provided by github API (like pullrequest id)\\n- foreign key added from pullrequest table to project table\\n- can log an indexing status (last time the indexer ran)\\n- can fetch pull requests\\n- can log a contract update status (last time the uploader ran)\\n\\nbinaries:\\n- refactor to smaller binaries:\\n  - add a single repo in database\\n  - index all repos (fetch PR from github and log in DB)\\n  - upload all pr (fetch PR from database and log in smart contract)\\n\\nstarknet:\\n- can log pullrequest in smart contract\\n\\nNext steps:\\n- user iterator trait for fetcher output\\n- use references when possible to avoid cloning strings everywhere\\n- consolidate errors instead of crashing at the first occurence\\n- end to end testing\\n- deployment\\n",
+                                  "githubLabels": null,
+                                  "lastUpdatedAt": null,
+                                  "is_mine": true
+                                }
+                              ]
                             }
-                          ],
-                          "hasMore": true,
-                          "totalPageNumber": 1410,
-                          "totalItemNumber": 4230,
-                          "nextPageIndex": 1
+                          ]
                         }
                         """);
     }
@@ -346,8 +450,8 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.contributions.length()").isEqualTo(50)
                 .jsonPath("$.hasMore").isEqualTo(true)
-                .jsonPath("$.totalPageNumber").isEqualTo(42)
-                .jsonPath("$.totalItemNumber").isEqualTo(2087)
+                .jsonPath("$.totalPageNumber").isEqualTo(5)
+                .jsonPath("$.totalItemNumber").isEqualTo(225)
                 .jsonPath("$.nextPageIndex").isEqualTo(1)
         ;
     }
@@ -371,8 +475,8 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.contributions.length()").isEqualTo(50)
                 .jsonPath("$.hasMore").isEqualTo(true)
-                .jsonPath("$.totalPageNumber").isEqualTo(22)
-                .jsonPath("$.totalItemNumber").isEqualTo(1054)
+                .jsonPath("$.totalPageNumber").isEqualTo(3)
+                .jsonPath("$.totalItemNumber").isEqualTo(121)
                 .jsonPath("$.nextPageIndex").isEqualTo(1)
         ;
     }
@@ -416,8 +520,8 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.contributions.length()").isEqualTo(50)
                 .jsonPath("$.hasMore").isEqualTo(true)
-                .jsonPath("$.totalPageNumber").isEqualTo(17)
-                .jsonPath("$.totalItemNumber").isEqualTo(828)
+                .jsonPath("$.totalPageNumber").isEqualTo(3)
+                .jsonPath("$.totalItemNumber").isEqualTo(120)
         ;
     }
 
@@ -461,12 +565,12 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.contributions.length()").isEqualTo(50)
+                .jsonPath("$.contributions.length()").isEqualTo(48)
                 .jsonPath("$.contributions[0].type").isEqualTo("ISSUE")
-                .jsonPath("$.hasMore").isEqualTo(true)
-                .jsonPath("$.totalPageNumber").isEqualTo(2)
-                .jsonPath("$.totalItemNumber").isEqualTo(52)
-                .jsonPath("$.nextPageIndex").isEqualTo(1)
+                .jsonPath("$.hasMore").isEqualTo(false)
+                .jsonPath("$.totalPageNumber").isEqualTo(1)
+                .jsonPath("$.totalItemNumber").isEqualTo(48)
+                .jsonPath("$.nextPageIndex").isEqualTo(0)
         ;
     }
 
@@ -547,11 +651,8 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                               "rewardIds": [
                                 "6587511b-3791-47c6-8430-8f793606c63a",
                                 "0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf",
-                                "335e45a5-7f59-4519-8a12-1addc530214c",
                                 "e9ebbe59-fb74-4a6c-9a51-6d9050412977",
                                 "e33ea956-d2f5-496b-acf9-e2350faddb16",
-                                "dd7d445f-6915-4955-9bae-078173627b05",
-                                "d22f75ab-d9f5-4dc6-9a85-60dcd7452028",
                                 "95e079c9-609c-4531-8c5c-13217306b299"
                               ]
                             }
@@ -618,7 +719,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
-                .jsonPath("$.contributions[0].lastUpdatedAt").isEqualTo("2022-04-13T09:00:48Z")
+                .jsonPath("$.contributions[0].lastUpdatedAt").isEqualTo("2022-04-13T09:00:49Z")
         ;
 
         // When
@@ -672,8 +773,8 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
-                .jsonPath("$.contributions[0].githubNumber").isEqualTo("1477")
-                .jsonPath("$.contributions[0].githubTitle").isEqualTo("Contribution type upper case")
+                .jsonPath("$.contributions[0].githubNumber").isEqualTo("1247")
+                .jsonPath("$.contributions[0].githubTitle").isEqualTo("[E-723] Fetch token prices")
         ;
     }
 
@@ -708,7 +809,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                 .expectBody()
-                .jsonPath("$.contributions[0].links.length()").isEqualTo(3)
+                .jsonPath("$.contributions[0].links.length()").isEqualTo(1)
         ;
     }
 

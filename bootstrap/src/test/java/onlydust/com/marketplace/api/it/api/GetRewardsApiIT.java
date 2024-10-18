@@ -112,10 +112,10 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .build());
 
         at("2024-06-01T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, antho.githubUserId(), 1, STRK, List.of(
-                // contributionUUID = 014a5c12-8973-3dd8-a530-98ad40be1dec
+                // contributionUUID = f9360345-3145-33f0-a9b0-cbaa3ba78a4e
                 RequestRewardCommand.Item.builder()
-                        .id("1693393852")
-                        .number(8634L)
+                        .id("1981399962")
+                        .number(12264L)
                         .repoId(350360184L)
                         .type(RequestRewardCommand.Item.Type.issue)
                         .build()
@@ -293,7 +293,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                 response -> response.getRewards().forEach(reward -> assertThat(reward.getStatus()).isEqualTo(RewardStatusContract.INDIVIDUAL_LIMIT_REACHED)),
                 true
         );
-        test_get_rewards(Map.of("contributionUUIDs", "014a5c12-8973-3dd8-a530-98ad40be1dec"),
+        test_get_rewards(Map.of("contributionUUIDs", "f9360345-3145-33f0-a9b0-cbaa3ba78a4e"),
                 response -> response.getRewards().forEach(reward -> {
                     assertThat(reward.getFrom().getId()).isEqualTo(pierre.userId().value());
                     assertThat(reward.getTo().getGithubUserId()).isEqualTo(antho.githubUserId().value());

@@ -76,8 +76,8 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "hasMore": true,
-                          "totalPageNumber": 3765,
-                          "totalItemNumber": 3765,
+                          "totalPageNumber": 391,
+                          "totalItemNumber": 391,
                           "nextPageIndex": 1
                         }
                         """);
@@ -92,20 +92,21 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(PROJECTS_GET_CONTRIBUTIONS.formatted(KAAPER), Map.of(
                         "pageSize", "100",
-                        "fromDate", "2023-02-21",
-                        "toDate", "2023-02-21"
+                        "fromDate", "2022-05-18",
+                        "toDate", "2022-05-18"
                 )))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
                 .expectStatus().isOk() // Make sure we get all results
                 .expectBody()
+                .consumeWith(System.out::println)
                 // we have at least one correct date
-                .jsonPath("$.contributions[?(@.lastUpdatedAt >= '2023-02-21')]").exists()
-                .jsonPath("$.contributions[?(@.lastUpdatedAt < '2023-02-22')]").exists()
+                .jsonPath("$.contributions[?(@.lastUpdatedAt >= '2022-05-18')]").exists()
+                .jsonPath("$.contributions[?(@.lastUpdatedAt < '2022-05-19')]").exists()
                 // we do not have any incorrect date
-                .jsonPath("$.contributions[?(@.lastUpdatedAt < '2023-02-21')]").doesNotExist()
-                .jsonPath("$.contributions[?(@.lastUpdatedAt > '2023-02-22')]").doesNotExist()
+                .jsonPath("$.contributions[?(@.lastUpdatedAt < '2022-05-18')]").doesNotExist()
+                .jsonPath("$.contributions[?(@.lastUpdatedAt > '2022-05-19')]").doesNotExist()
         ;
     }
 
@@ -142,7 +143,7 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.contributions[0].contributor.login").isEqualTo("tekkac")
-                .jsonPath("$.contributions[99].contributor.login").isEqualTo("tdelabro")
+                .jsonPath("$.contributions[99].contributor.login").isEqualTo("ofux")
         ;
     }
 

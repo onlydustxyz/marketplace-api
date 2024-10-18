@@ -94,9 +94,9 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                 .recipientId(11111L)
                 .items(List.of(
                         new RewardItemRequest()
-                                .id("1019589587")
+                                .id("1217699807")
                                 .type(RewardType.PULL_REQUEST)
-                                .number(138L)
+                                .number(580L)
                                 .repoId(498695724L)
                 ));
 
@@ -191,17 +191,17 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                 .currencyId(CurrencyHelper.ETH.value())
                 .recipientId(pierre.user().getGithubUserId())
                 .items(List.of(
-                        new RewardItemRequest().id("1329385358")
+                        new RewardItemRequest().id("1518472203")
                                 .type(RewardType.PULL_REQUEST)
-                                .number(1L)
+                                .number(1237L)
                                 .repoId(498695724L),
-                        new RewardItemRequest().id("2005686072")
+                        new RewardItemRequest().id("1261585100")
                                 .type(RewardType.ISSUE)
-                                .number(1425L)
+                                .number(5L)
                                 .repoId(498695724L),
-                        new RewardItemRequest().id("baad3d143b4728bcea785b0e6df440a08c710fa580c3780e936ff8f04c45fc3b")
+                        new RewardItemRequest().id("12f189eeb0e533949616badf0c03906aef273aedcb0cedd0aa1260f58051fed7")
                                 .type(RewardType.CODE_REVIEW)
-                                .number(1040L)
+                                .number(1484L)
                                 .repoId(498695724L)
                 ));
 
@@ -255,10 +255,10 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                         .currencyId(CurrencyHelper.ETH.value())
                         .recipientId(pierre.user().getGithubUserId())
                         .items(List.of(
-                                new RewardItemRequest().id("issue1")
+                                new RewardItemRequest().id("1261585100")
                                         .type(RewardType.ISSUE)
                                         .number(5L)
-                                        .repoId(6L)
+                                        .repoId(498695724L)
                         ))
                 ,
                 new RewardRequest()
@@ -266,10 +266,10 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                         .currencyId(CurrencyHelper.ETH.value())
                         .recipientId(pierre.user().getGithubUserId())
                         .items(List.of(
-                                new RewardItemRequest().id("pr1")
+                                new RewardItemRequest().id("1624000021")
                                         .type(RewardType.PULL_REQUEST)
-                                        .number(7L)
-                                        .repoId(8L)
+                                        .number(1502L)
+                                        .repoId(498695724L)
                         ))
         );
 

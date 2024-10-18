@@ -590,9 +590,9 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .currencyId(CurrencyHelper.USDC.value())
                 .recipientId(recipientId)
                 .items(List.of(
-                        new RewardItemRequest().id("1551881651")
+                        new RewardItemRequest().id("1217699807")
                                 .type(RewardType.PULL_REQUEST)
-                                .number(1296L)
+                                .number(580L)
                                 .repoId(498695724L)
                 ));
 

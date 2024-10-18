@@ -123,8 +123,8 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 78889,
-                          "totalItemNumber": 78889,
+                          "totalPageNumber": 5113,
+                          "totalItemNumber": 5113,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "contributions": [
@@ -186,9 +186,9 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .extracting(ContributionActivityPageItemResponse::getType)
                 .containsOnly(ContributionType.PULL_REQUEST);
 
-        assertContributions(Map.of("ids", "0000154b-44e2-3134-a60a-474acb3c0f0e"))
+        assertContributions(Map.of("ids", "00c1f2f1-1123-305b-95da-11da17765e39"))
                 .extracting(ContributionActivityPageItemResponse::getUuid)
-                .containsOnly(UUID.fromString("0000154b-44e2-3134-a60a-474acb3c0f0e"));
+                .containsOnly(UUID.fromString("00c1f2f1-1123-305b-95da-11da17765e39"));
 
         assertContributions(Map.of("projectIds", "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e"))
                 .extracting(c -> c.getProject().getName())

@@ -76,7 +76,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                 "rankCategory": "A",
                 "contributedProjectCount": 7,
                 "leadedProjectCount": 2,
-                "contributionCount": 938,
+                "contributionCount": 137,
                 "rewardCount": 21
               },
               "ecosystems": [
