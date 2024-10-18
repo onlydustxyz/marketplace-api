@@ -441,8 +441,9 @@ public class ProjectConfiguration {
 
     @Bean
     public ProjectContributorLabelFacadePort projectContributorLabelFacadePort(final PermissionService permissionService,
-                                                                               final ProjectContributorLabelStoragePort projectContributorLabelStoragePort) {
-        return new ProjectContributorLabelService(permissionService, projectContributorLabelStoragePort);
+                                                                               final ProjectContributorLabelStoragePort projectContributorLabelStoragePort,
+                                                                               final ProjectObserverPort projectObservers) {
+        return new ProjectContributorLabelService(permissionService, projectContributorLabelStoragePort, projectObservers);
     }
 
     @Bean

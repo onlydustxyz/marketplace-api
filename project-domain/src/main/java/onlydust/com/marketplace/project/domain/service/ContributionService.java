@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
@@ -90,5 +91,9 @@ public class ContributionService implements ContributionFacadePort, Contribution
 
     @Override
     public void onProjectCategorySuggested(String categoryName, UserId userId) {
+    }
+
+    @Override
+    public void onLabelsModified(@NonNull ProjectId projectId, Set<Long> githubUserIds) {
     }
 }

@@ -2,10 +2,12 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.*;
@@ -15,6 +17,8 @@ import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.user.domain.port.input.UserObserverPort;
 
 import java.util.Set;
+
+import static java.util.stream.Collectors.toSet;
 
 @AllArgsConstructor
 public class PostgresBiProjectorAdapter implements AccountingObserverPort, ContributionObserverPort, ProjectObserverPort, UserObserverPort {
@@ -133,6 +137,12 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     @Override
     public void onProjectCategorySuggested(String categoryName, UserId userId) {
 
+    }
+
+    @Override
+    @Transactional
+    public void onLabelsModified(@NonNull ProjectId projectId, Set<Long> githubUserIds) {
+        biContributionDataRepository.refresh(projectId, githubUserIds.stream().map(GithubUserId::of).collect(toSet()));
     }
 
     @Override

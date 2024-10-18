@@ -108,6 +108,8 @@ select c.contribution_uuid                                                      
        filter ( where gil.label_id is not null )                                                       as github_label_ids,
        array_agg(distinct ci.issue_id) filter ( where ci.issue_id is not null )                        as closing_issue_ids,
        array_agg(distinct a.applicant_id) filter ( where a.applicant_id is not null )                  as applicant_ids,
+       array_agg(distinct cpcl.label_id)
+       filter ( where cpcl.label_id is not null )                                                      as project_contributor_label_ids,
        jsonb_build_object(
                'id', gr.id,
                'owner', gr.owner_login,
@@ -166,6 +168,9 @@ from indexer_exp.grouped_contributions c
          left join applications a on a.issue_id = c.issue_id
          left join bi.p_contributor_global_data apd on apd.contributor_id = a.applicant_id
          left join archived_github_contributions agc on agc.contribution_uuid = c.contribution_uuid
+         left join project_contributor_labels pcl on pcl.project_id = p.id
+         left join contributor_project_contributor_labels cpcl
+                   on cpcl.label_id = pcl.id and cpcl.github_user_id = gcc.contributor_id
 group by c.contribution_uuid,
          c.repo_id,
          p.id,

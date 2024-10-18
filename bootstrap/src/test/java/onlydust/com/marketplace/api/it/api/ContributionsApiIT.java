@@ -5,16 +5,22 @@ import onlydust.com.marketplace.api.contract.model.ContributionActivityPageRespo
 import onlydust.com.marketplace.api.contract.model.ContributionActivityStatus;
 import onlydust.com.marketplace.api.contract.model.ContributionType;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.project.domain.model.ProjectContributorLabel;
+import onlydust.com.marketplace.project.domain.port.input.ProjectContributorLabelFacadePort;
 import org.assertj.core.api.AbstractListAssert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.Comparator.comparing;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,6 +28,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @TagProject
 public class ContributionsApiIT extends AbstractMarketplaceApiIT {
+    private static final AtomicBoolean setupDone = new AtomicBoolean();
+    static ProjectContributorLabel ogLabel;
+
+    @Autowired
+    ProjectContributorLabelFacadePort projectContributorLabelFacadePort;
+
+    @BeforeEach
+    void setup() {
+        if (setupDone.compareAndExchange(false, true)) return;
+
+        final var kaaper = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
+        final var olivier = userAuthHelper.authenticateOlivier();
+        final var projectLead = userAuthHelper.authenticateAntho();
+        ogLabel = projectContributorLabelFacadePort.createLabel(projectLead.userId(), kaaper, "OG");
+        projectContributorLabelFacadePort.updateLabelsOfContributors(projectLead.userId(), kaaper,
+                Map.of(olivier.user().getGithubUserId(), List.of(ogLabel.id())));
+    }
+
     @Test
     void should_get_contribution() {
         // When
@@ -193,6 +217,10 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         assertContributions(Map.of("hasBeenRewarded", "false"))
                 .extracting(ContributionActivityPageItemResponse::getTotalRewardedUsdAmount)
                 .allMatch(a -> a.compareTo(BigDecimal.ZERO) == 0);
+
+        assertContributions(Map.of("projectContributorLabelIds", ogLabel.id().value().toString()))
+                .extracting(ContributionActivityPageItemResponse::getContributors)
+                .allMatch(contributors -> contributors.stream().anyMatch(c -> c.getLogin().equals("ofux")));
     }
 
     private AbstractListAssert<?, ? extends List<? extends ContributionActivityPageItemResponse>, ContributionActivityPageItemResponse> assertContributions(Map<String, String> params) {
