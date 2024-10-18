@@ -12,6 +12,7 @@ FROM indexer_exp.github_accounts ga
          LEFT JOIN user_profile_info upi ON u.id = upi.id;
 
 
+
 delete
 from archived_github_contributions;
 
@@ -20,6 +21,30 @@ alter table archived_github_contributions
 
 alter table archived_github_contributions
     alter column contribution_uuid type uuid using contribution_uuid::text::uuid;
+
+
+
+create index on indexer_exp.grouped_contributions (coalesce(issue_id::text, pull_request_id::text, code_review_id));
+
+alter table reward_items
+    add column if not exists contribution_uuid uuid;
+
+update reward_items
+set contribution_uuid = (select c.contribution_uuid
+                         from indexer_exp.grouped_contributions c
+                         where coalesce(c.issue_id::text, c.pull_request_id::text, c.code_review_id) = reward_items.id);
+
+update reward_items
+set contribution_uuid = indexer.uuid_of(reward_items.id::text)
+where contribution_uuid is null;
+
+alter table reward_items
+    alter column contribution_uuid set not null;
+
+create unique index if not exists reward_items_contribution_uuid_index on reward_items (contribution_uuid, reward_id);
+create unique index if not exists reward_items_contribution_uuid_index_inv on reward_items (reward_id, contribution_uuid);
+
+
 
 call drop_pseudo_projection('bi', 'project_contributions_data');
 call drop_pseudo_projection('bi', 'contribution_reward_data');
@@ -317,10 +342,8 @@ select cd.contribution_uuid                                                     
        array_agg(distinct rd.reward_id) filter ( where rd.reward_id is not null ) as reward_ids,
        sum(round(rd.usd_amount, 2))                                               as total_rewarded_usd_amount
 from bi.p_contribution_data cd
-         left join reward_items ri on ri.type = cast(cast(cd.contribution_type as text) as contribution_type) and
-                                      ri.repo_id = cd.repo_id and
-                                      ri.number = cd.github_number
-         left join bi.p_reward_data rd on rd.reward_id = ri.reward_id
+         join reward_items ri on ri.contribution_uuid = cd.contribution_uuid
+         join bi.p_reward_data rd on rd.reward_id = ri.reward_id
 group by cd.contribution_uuid, cd.project_id, cd.repo_id
 $$, 'contribution_uuid');
 

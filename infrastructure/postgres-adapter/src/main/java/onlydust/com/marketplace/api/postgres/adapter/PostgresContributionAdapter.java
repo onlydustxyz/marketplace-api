@@ -208,4 +208,9 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
         if (!isAlreadyArchived && archived)
             archivedGithubContributionRepository.save(new ArchivedGithubContributionEntity(id.value()));
     }
+
+    @Override
+    public Optional<UUID> getContributionUUID(String issuePRCodeReviewId) {
+        return Optional.ofNullable(contributionViewEntityRepository.getContributionUUID(issuePRCodeReviewId));
+    }
 }

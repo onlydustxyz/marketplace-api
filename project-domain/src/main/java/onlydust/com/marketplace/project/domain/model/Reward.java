@@ -13,6 +13,7 @@ import onlydust.com.marketplace.kernel.model.UserId;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Value
 @Accessors(fluent = true)
@@ -38,6 +39,7 @@ public class Reward {
     @Data
     @Accessors(fluent = true)
     public static class Item {
+        UUID contributionUUID;
         String id;
         Long number;
         Long repoId;

@@ -168,10 +168,11 @@ public class ProjectConfiguration {
 
     @Bean
     public RewardFacadePort rewardFacadePort(final PostgresRewardAdapter postgresRewardAdapter,
+                                             final PostgresContributionAdapter postgresContributionAdapter,
                                              final PermissionService permissionService,
                                              final IndexerPort indexerPort,
                                              final AccountingServicePort accountingServicePort) {
-        return new RewardService(postgresRewardAdapter, permissionService, indexerPort, accountingServicePort);
+        return new RewardService(postgresRewardAdapter, postgresContributionAdapter, permissionService, indexerPort, accountingServicePort);
     }
 
     @Bean

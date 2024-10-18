@@ -11,6 +11,7 @@ import onlydust.com.marketplace.project.domain.view.ContributionView;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface ContributionStoragePort {
     Page<ContributionView> findContributions(Optional<Long> callerGithubUserId,
@@ -37,4 +38,6 @@ public interface ContributionStoragePort {
     void refreshIgnoredContributions(List<Long> repoIds);
 
     void archiveContribution(ContributionUUID id, Boolean archived);
+
+    Optional<UUID> getContributionUUID(String issuePRCodeReviewId);
 }

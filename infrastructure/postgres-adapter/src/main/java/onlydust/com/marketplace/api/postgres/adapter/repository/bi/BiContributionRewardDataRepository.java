@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.repository.bi;
 import datadog.trace.api.Trace;
 import jakarta.persistence.EntityManager;
 import lombok.NonNull;
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.RewardId;
 
@@ -10,7 +11,7 @@ import java.util.Map;
 
 public class BiContributionRewardDataRepository extends PseudoProjectionRepository {
     public BiContributionRewardDataRepository(final @NonNull EntityManager entityManager) {
-        super(entityManager, "bi", "contribution_reward_data", "contribution_id");
+        super(entityManager, "bi", "contribution_reward_data", "contribution_uuid");
     }
 
     @Trace(operationName = "pseudo_projection.global_refresh", resourceName = "global_refresh:bi.contribution_reward_data")
@@ -20,8 +21,8 @@ public class BiContributionRewardDataRepository extends PseudoProjectionReposito
     }
 
     @Trace(operationName = "pseudo_projection.refresh", resourceName = "refresh:bi.contribution_reward_data")
-    public int refresh(final String contributionId) {
-        return refresh(Map.of("contribution_id", contributionId));
+    public int refresh(final ContributionUUID contributionUUID) {
+        return refresh(Map.of("contribution_uuid", contributionUUID));
     }
 
     @Trace(operationName = "pseudo_projection.refresh", resourceName = "refresh:bi.contribution_reward_data")

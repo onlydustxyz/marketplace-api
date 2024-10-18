@@ -10,6 +10,7 @@ import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.AccountingServicePort;
+import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 @AllArgsConstructor
 public class RewardService implements RewardFacadePort {
     private final RewardStoragePort rewardStoragePort;
+    private final ContributionStoragePort contributionStoragePort;
     private final PermissionService permissionService;
     private final IndexerPort indexerPort;
     private final AccountingServicePort accountingServicePort;
@@ -48,6 +50,9 @@ public class RewardService implements RewardFacadePort {
                 command.getCurrencyId(),
                 CurrentDateProvider.now(),
                 command.getItems().stream().map(item -> Reward.Item.builder()
+                        .contributionUUID(contributionStoragePort.getContributionUUID(item.getId())
+                                .orElseThrow(() -> notFound("Contribution (repo %d, number %d, type %s) not found".formatted(
+                                        item.getRepoId(), item.getNumber(), item.getType()))))
                         .id(item.getId())
                         .number(item.getNumber())
                         .repoId(item.getRepoId())

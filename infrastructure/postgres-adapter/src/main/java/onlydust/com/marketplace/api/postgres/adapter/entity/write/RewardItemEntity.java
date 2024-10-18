@@ -8,8 +8,9 @@ import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -31,6 +32,8 @@ public class RewardItemEntity {
     @Id
     @NonNull
     Long repoId;
+
+    UUID contributionUuid;
 
     @NonNull
     String id;
@@ -58,8 +61,9 @@ public class RewardItemEntity {
         Long repoId;
     }
 
-    public static List<RewardItemEntity> of(Reward reward) {
+    public static Set<RewardItemEntity> of(Reward reward) {
         return reward.rewardItems().stream().map(item -> RewardItemEntity.builder()
+                .contributionUuid(item.contributionUUID())
                 .rewardId(reward.id().value())
                 .number(item.number())
                 .repoId(item.repoId())
@@ -71,7 +75,7 @@ public class RewardItemEntity {
                 })
                 .projectId(reward.projectId().value())
                 .recipientId(reward.recipientId())
-                .build()).toList();
+                .build()).collect(Collectors.toSet());
     }
 
     public Reward.Item toRewardItem() {
