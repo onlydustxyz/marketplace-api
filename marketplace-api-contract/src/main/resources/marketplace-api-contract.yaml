@@ -300,6 +300,37 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/rewards:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadRewards
+      summary: Get rewards
+      operationId: getRewards
+      description: |
+        Get rewards
+      parameters:
+        - name: queryParams
+          in: query
+          schema:
+            $ref: '#/components/schemas/PageableRewardsQueryParams'
+      responses:
+        "200":
+          description: 'Reward list'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 
   /api/v1/version:
     get:
@@ -5711,6 +5742,11 @@ components:
       description: Github PR ID (databaseId)
       example: 1678794252
 
+    ContributionUUID:
+      type: string
+      format: uuid
+      description: OnlyDust contribution UUID
+
     ProjectId:
       type: string
       format: uuid
@@ -7681,7 +7717,7 @@ components:
             rewards:
               type: array
               items:
-                $ref: '#/components/schemas/RewardPageItemResponse'
+                $ref: '#/components/schemas/RewardsPageItemResponse'
             remainingBudget:
               $ref: '#/components/schemas/DetailedTotalMoney'
             spentAmount:
@@ -7724,7 +7760,7 @@ components:
               type: integer
               description: Number of rewards at pending request status
 
-    RewardPageItemResponse:
+    RewardsPageItemResponse:
       type: object
       required:
         - status
@@ -12194,3 +12230,64 @@ components:
         archived:
           type: boolean
 
+    PageableRewardsQueryParams:
+      allOf:
+        - $ref: '#/components/schemas/PaginationQueryParams'
+        - $ref: '#/components/schemas/RewardsQueryParams'
+
+    RewardsQueryParams:
+      type: object
+      properties:
+        contributionUUIDs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributionUUID'
+        recipientIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/GithubUserId'
+        projectIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectId'
+
+    RewardPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - rewards
+          properties:
+            rewards:
+              type: array
+              items:
+                $ref: '#/components/schemas/RewardPageItemResponse'
+
+    RewardPageItemResponse:
+      type: object
+      required:
+        - id
+        - amount
+        - from
+        - to
+        - createdAt
+      properties:
+        id:
+          $ref: '#/components/schemas/RewardId'
+        amount:
+          $ref: '#/components/schemas/Money'
+        status:
+          $ref: '#/components/schemas/RewardStatusContract'
+        from:
+          $ref: '#/components/schemas/ContributorResponse'
+        to:
+          $ref: '#/components/schemas/ContributorResponse'
+        requestedAt:
+          type: string
+          format: date-time
+        processedAt:
+          type: string
+          format: date-time
+        unlockDate:
+          type: string
+          format: date-time

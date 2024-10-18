@@ -46,6 +46,16 @@ create unique index if not exists reward_items_contribution_uuid_index_inv on re
 
 
 
+CREATE OR REPLACE FUNCTION get_reward_ids_of_contributions(contributionUuids UUID[])
+    RETURNS UUID[] AS
+$$
+select array_agg(distinct ri.reward_id)
+from reward_items ri
+where ri.contribution_uuid = any (contributionUuids)
+$$ LANGUAGE SQL STABLE
+                PARALLEL SAFE;
+
+
 call drop_pseudo_projection('bi', 'project_contributions_data');
 call drop_pseudo_projection('bi', 'contribution_reward_data');
 call drop_pseudo_projection('bi', 'contribution_data');

@@ -61,8 +61,8 @@ public interface RewardsMapper {
         return rewardsPageResponse;
     }
 
-    static RewardPageItemResponse mapProjectRewardToResponse(final RewardDetailsReadEntity reward, AuthenticatedUser authenticatedUser) {
-        final RewardPageItemResponse rewardPageItemResponse = new RewardPageItemResponse();
+    static RewardsPageItemResponse mapProjectRewardToResponse(final RewardDetailsReadEntity reward, AuthenticatedUser authenticatedUser) {
+        final RewardsPageItemResponse rewardPageItemResponse = new RewardsPageItemResponse();
         rewardPageItemResponse.setId(reward.getId());
         rewardPageItemResponse.setNumberOfRewardedContributions(reward.getContributionCount());
         rewardPageItemResponse.setRewardedUser(reward.toContributorResponse());
