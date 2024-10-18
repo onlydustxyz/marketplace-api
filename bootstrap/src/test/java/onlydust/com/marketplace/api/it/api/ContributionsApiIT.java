@@ -221,6 +221,10 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         assertContributions(Map.of("projectContributorLabelIds", ogLabel.id().value().toString()))
                 .extracting(ContributionActivityPageItemResponse::getContributors)
                 .allMatch(contributors -> contributors.stream().anyMatch(c -> c.getLogin().equals("ofux")));
+
+        assertContributions(Map.of("rewardIds", "0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf"))
+                .extracting(ContributionActivityPageItemResponse::getTotalRewardedUsdAmount)
+                .allMatch(a -> a.compareTo(BigDecimal.ZERO) > 0);
     }
 
     private AbstractListAssert<?, ? extends List<? extends ContributionActivityPageItemResponse>, ContributionActivityPageItemResponse> assertContributions(Map<String, String> params) {

@@ -46,6 +46,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
               and (coalesce(:repoIds) is null or c.repo_id = any (:repoIds))
               and (coalesce(:contributorIds) is null or c.contributor_ids && :contributorIds)
               and (coalesce(:projectContributorLabelIds) is null or c.project_contributor_label_ids && :projectContributorLabelIds)
+              and (coalesce(:rewardIds) is null or rd.reward_ids && :rewardIds)
               and (coalesce(:hasBeenRewarded) is null or :hasBeenRewarded = (coalesce(rd.total_rewarded_usd_amount, 0) > 0))
             """, nativeQuery = true)
     Page<ContributionReadEntity> findAll(UUID[] ids,
@@ -56,6 +57,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                                          Long[] repoIds,
                                          Long[] contributorIds,
                                          UUID[] projectContributorLabelIds,
+                                         UUID[] rewardIds,
                                          Boolean hasBeenRewarded,
                                          Pageable pageable);
 
@@ -69,6 +71,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                 q.getRepoIds() == null ? null : q.getRepoIds().toArray(Long[]::new),
                 q.getContributorIds() == null ? null : q.getContributorIds().toArray(Long[]::new),
                 q.getProjectContributorLabelIds() == null ? null : q.getProjectContributorLabelIds().toArray(UUID[]::new),
+                q.getRewardIds() == null ? null : q.getRewardIds().toArray(UUID[]::new),
                 q.getHasBeenRewarded(),
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC :
                         Sort.Direction.ASC, getSortProperty(q.getSort()))));
