@@ -144,7 +144,19 @@ select c.contribution_uuid                                                      
                                     'githubNumber', i.number,
                                     'githubStatus', i.status,
                                     'githubTitle', i.title,
-                                    'githubHtmlUrl', i.html_url)) filter ( where i.id is not null )    as linked_issues
+                                    'githubHtmlUrl', i.html_url)) filter ( where i.id is not null )    as linked_issues,
+       concat(c.github_number, ' ',
+              c.github_title, ' ',
+              gr.owner_login, ' ',
+              gr.name, ' ',
+              ad.contributor_login, ' ',
+              string_agg(cd.contributor_login, ' '), ' ',
+              string_agg(apd.contributor_login, ' '), ' ',
+              string_agg(gl.name, ' '), ' ',
+              string_agg(l.name, ' '), ' ',
+              string_agg(pcl.name, ' '), ' ',
+              string_agg(i.number || ' ' || i.title, ' ')
+       )                                                                                               as search
 from indexer_exp.grouped_contributions c
          left join indexer_exp.grouped_contribution_contributors gcc on gcc.contribution_uuid = c.contribution_uuid
          left join indexer_exp.github_repos gr on gr.id = c.repo_id

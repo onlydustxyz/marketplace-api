@@ -48,6 +48,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
               and (coalesce(:projectContributorLabelIds) is null or c.project_contributor_label_ids && :projectContributorLabelIds)
               and (coalesce(:rewardIds) is null or rd.reward_ids && :rewardIds)
               and (coalesce(:hasBeenRewarded) is null or :hasBeenRewarded = (coalesce(rd.total_rewarded_usd_amount, 0) > 0))
+              and (coalesce(:search) is null or c.search ilike '%' || :search || '%')
             """, nativeQuery = true)
     Page<ContributionReadEntity> findAll(UUID[] ids,
                                          String[] types,
@@ -59,6 +60,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                                          UUID[] projectContributorLabelIds,
                                          UUID[] rewardIds,
                                          Boolean hasBeenRewarded,
+                                         String search,
                                          Pageable pageable);
 
     default Page<ContributionReadEntity> findAll(ContributionsQueryParams q) {
@@ -73,6 +75,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                 q.getProjectContributorLabelIds() == null ? null : q.getProjectContributorLabelIds().toArray(UUID[]::new),
                 q.getRewardIds() == null ? null : q.getRewardIds().toArray(UUID[]::new),
                 q.getHasBeenRewarded(),
+                q.getSearch(),
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC :
                         Sort.Direction.ASC, getSortProperty(q.getSort()))));
     }

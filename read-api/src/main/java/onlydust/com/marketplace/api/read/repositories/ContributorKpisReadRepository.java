@@ -20,8 +20,6 @@ import java.util.UUID;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseZonedNullable;
 
 public interface ContributorKpisReadRepository extends Repository<ContributorKpisReadEntity, Long> {
-    ZonedDateTime DEFAULT_FROM_DATE = ZonedDateTime.parse("2007-10-20T05:24:19Z");
-
     static String getSortProperty(ContributorKpiSortEnum sort) {
         return sort == null ? "contributor_login" : switch (sort) {
             case CONTRIBUTOR_LOGIN -> "contributor_login";
