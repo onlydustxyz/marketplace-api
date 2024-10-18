@@ -31,7 +31,7 @@ import static onlydust.com.marketplace.api.helper.CurrencyHelper.STRK;
 public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     ProjectFacadePort projectFacadePort;
-    
+
     private final static String CAL_DOT_COM = "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e";
 
     private final static ProjectId B_CONSEIL = ProjectId.of("27ca7e18-9e71-468f-8825-c64fe6b79d66");
@@ -601,6 +601,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .isEqualTo(false)
                 .jsonPath("$.me.isInvitedAsProjectLead")
                 .isEqualTo(false)
+                .jsonPath("$.organizations[0].githubAppInstallationPermissionsUpdateUrl").isEqualTo("https://github.com/settings/installations/44637372")
+                .consumeWith(System.out::println)
                 .json(BRETZEL_OVERVIEW_JSON);
     }
 
