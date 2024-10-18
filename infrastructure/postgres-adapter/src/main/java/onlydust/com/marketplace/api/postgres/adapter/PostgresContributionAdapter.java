@@ -11,11 +11,10 @@ import onlydust.com.marketplace.api.postgres.adapter.mapper.GithubRepoMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
-import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.model.GithubPullRequest;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
@@ -201,23 +200,12 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
 
     @Override
     @Transactional
-    public void archiveIssue(GithubIssue.Id id, Boolean archived) {
-        archiveGithubContribution(id.value(), archived);
-    }
+    public void archiveContribution(ContributionUUID id, Boolean archived) {
+        final var isAlreadyArchived = archivedGithubContributionRepository.existsById(id.value());
+        if (isAlreadyArchived && !archived)
+            archivedGithubContributionRepository.deleteById(id.value());
 
-    @Override
-    @Transactional
-    public void archivePullRequest(GithubPullRequest.Id id, Boolean archived) {
-        archiveGithubContribution(id.value(), archived);
-    }
-
-    private void archiveGithubContribution(Long id, Boolean archived) {
-        final Optional<ArchivedGithubContributionEntity> isAlreadyArchived = archivedGithubContributionRepository.findById(id);
-        if (isAlreadyArchived.isPresent() && !archived) {
-            archivedGithubContributionRepository.delete(isAlreadyArchived.get());
-        }
-        if (isAlreadyArchived.isEmpty() && archived) {
-            archivedGithubContributionRepository.save(new ArchivedGithubContributionEntity(id));
-        }
+        if (!isAlreadyArchived && archived)
+            archivedGithubContributionRepository.save(new ArchivedGithubContributionEntity(id.value()));
     }
 }

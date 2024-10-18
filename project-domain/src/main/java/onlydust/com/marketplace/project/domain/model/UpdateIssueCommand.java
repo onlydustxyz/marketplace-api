@@ -1,4 +1,6 @@
 package onlydust.com.marketplace.project.domain.model;
 
-public record UpdateIssueCommand(GithubIssue.Id id, Boolean archived) {
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
+
+public record UpdateIssueCommand(ContributionUUID id, Boolean archived) {
 }

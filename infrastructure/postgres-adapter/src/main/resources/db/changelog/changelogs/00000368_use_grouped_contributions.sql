@@ -12,6 +12,14 @@ FROM indexer_exp.github_accounts ga
          LEFT JOIN user_profile_info upi ON u.id = upi.id;
 
 
+delete
+from archived_github_contributions;
+
+alter table archived_github_contributions
+    rename column id to contribution_uuid;
+
+alter table archived_github_contributions
+    alter column contribution_uuid type uuid using contribution_uuid::text::uuid;
 
 call drop_pseudo_projection('bi', 'project_contributions_data');
 call drop_pseudo_projection('bi', 'contribution_reward_data');
@@ -42,6 +50,7 @@ select c.contribution_uuid                                                      
        (c.type = 'PULL_REQUEST')::int                                                                  as is_pr,
        (c.type = 'CODE_REVIEW')::int                                                                   as is_code_review,
        case
+           when agc.contribution_uuid is not null then 'ARCHIVED'
            when c.type = 'ISSUE' then
                case
                    when c.github_status = 'OPEN' AND array_agg(gia.user_id) is null then 'NOT_ASSIGNED'
@@ -131,6 +140,7 @@ from indexer_exp.grouped_contributions c
          left join indexer_exp.github_issues i on i.id = ci.issue_id
          left join applications a on a.issue_id = c.issue_id
          left join bi.p_contributor_global_data apd on apd.contributor_id = a.applicant_id
+         left join archived_github_contributions agc on agc.contribution_uuid = c.contribution_uuid
 group by c.contribution_uuid,
          c.repo_id,
          p.id,
@@ -151,7 +161,8 @@ group by c.contribution_uuid,
          c.completed_at,
          cr.pull_request_id,
          ad.contributor_id,
-         gr.id
+         gr.id,
+         agc.contribution_uuid
 $$, 'contribution_uuid');
 
 

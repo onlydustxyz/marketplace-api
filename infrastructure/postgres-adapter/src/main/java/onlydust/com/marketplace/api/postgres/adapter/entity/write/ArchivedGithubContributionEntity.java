@@ -6,6 +6,8 @@ import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.UUID;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
@@ -16,5 +18,5 @@ public class ArchivedGithubContributionEntity {
 
     @Id
     @EqualsAndHashCode.Include
-    Long id;
+    UUID contributionUuid;
 }

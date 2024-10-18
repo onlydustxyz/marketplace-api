@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.api.postgres.adapter.repository.ArchivedGithubContributionRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -17,11 +18,11 @@ public class ArchiveContributionApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_archive_unarchive_issue() {
         // Given
-        final Long issueId = 2013944953L;
+        final var issueId = ContributionUUID.of(2013944953L);
 
         // When
         client.patch()
-                .uri(getApiURI(String.format(ISSUES_BY_ID, issueId)))
+                .uri(getApiURI(String.format(V2_ISSUES_BY_ID, issueId)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + userAuthHelper.authenticatePierre().jwt())
                 .bodyValue("""
@@ -34,11 +35,11 @@ public class ArchiveContributionApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isNoContent();
 
-        assertTrue(archivedGithubContributionRepository.findById(issueId).isPresent());
+        assertTrue(archivedGithubContributionRepository.findById(issueId.value()).isPresent());
 
         // When
         client.patch()
-                .uri(getApiURI(String.format(ISSUES_BY_ID, issueId)))
+                .uri(getApiURI(String.format(V2_ISSUES_BY_ID, issueId)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + userAuthHelper.authenticatePierre().jwt())
                 .bodyValue("""
@@ -51,13 +52,13 @@ public class ArchiveContributionApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isNoContent();
 
-        assertTrue(archivedGithubContributionRepository.findById(issueId).isEmpty());
+        assertTrue(archivedGithubContributionRepository.findById(issueId.value()).isEmpty());
     }
 
     @Test
     void should_archive_unarchive_pull_request() {
         // Given
-        final Long prId = 953656792L;
+        final var prId = ContributionUUID.of(953656792L);
 
         // When
         client.patch()
@@ -74,7 +75,7 @@ public class ArchiveContributionApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isNoContent();
 
-        assertTrue(archivedGithubContributionRepository.findById(prId).isPresent());
+        assertTrue(archivedGithubContributionRepository.findById(prId.value()).isPresent());
 
         // When
         client.patch()
@@ -91,7 +92,7 @@ public class ArchiveContributionApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isNoContent();
 
-        assertTrue(archivedGithubContributionRepository.findById(prId).isEmpty());
+        assertTrue(archivedGithubContributionRepository.findById(prId.value()).isEmpty());
     }
 
 

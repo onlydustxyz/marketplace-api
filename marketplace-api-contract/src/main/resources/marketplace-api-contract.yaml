@@ -2679,6 +2679,8 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
+  /api/v2/issues/{contributionUuid}:
     patch:
       security:
         - bearerAuth: [ ]
@@ -2689,10 +2691,10 @@ paths:
       description: Update issue. Caller must be lead on linked project.
       parameters:
         - in: path
-          name: issueId
+          name: contributionUuid
           required: true
           schema:
-            $ref: '#/components/schemas/IssueId'
+            $ref: '#/components/schemas/ContributionUuid'
       requestBody:
         content:
           application/json:
@@ -5452,7 +5454,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/pull-requests/{pullRequestId}:
+  /api/v1/pull-requests/{contributionUuid}:
     patch:
       security:
         - bearerAuth: [ ]
@@ -5463,10 +5465,10 @@ paths:
       description: Update pull request. Caller must be lead on linked project.
       parameters:
         - in: path
-          name: pullRequestId
+          name: contributionUuid
           required: true
           schema:
-            $ref: '#/components/schemas/PullRequestId'
+            $ref: '#/components/schemas/ContributionUuid'
       requestBody:
         content:
           application/json:
