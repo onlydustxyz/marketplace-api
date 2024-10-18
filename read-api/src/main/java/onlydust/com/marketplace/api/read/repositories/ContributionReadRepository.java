@@ -46,19 +46,6 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
               and (coalesce(:repoIds) is null or c.repo_id = any (:repoIds))
               and (coalesce(:contributorIds) is null or c.contributor_ids && :contributorIds)
               and (coalesce(:hasBeenRewarded) is null or :hasBeenRewarded = (coalesce(rd.total_rewarded_usd_amount, 0) > 0))
-            """, countQuery = """
-            select count(c.contribution_uuid)
-            from bi.p_contribution_data c
-                     left join bi.p_contribution_reward_data rd on rd.contribution_uuid = c.contribution_uuid
-            where
-                (coalesce(:ids) is null or c.contribution_uuid = any (:ids)) and
-                (coalesce(:types) is null or c.contribution_type = any (cast(:types as indexer_exp.contribution_type[]))) and
-                (coalesce(:projectIds) is null or c.project_id = any (:projectIds)) and
-                (coalesce(:projectSlugs) is null or c.project_slug = any (:projectSlugs)) and
-                (coalesce(:statuses) is null or c.activity_status = any (:statuses)) and
-                (coalesce(:repoIds) is null or c.repo_id = any (:repoIds)) and
-                (coalesce(:contributorIds) is null or c.contributor_ids && :contributorIds) and
-                (coalesce(:hasBeenRewarded) is null or :hasBeenRewarded = (coalesce(rd.total_rewarded_usd_amount, 0) > 0))
             """, nativeQuery = true)
     Page<ContributionReadEntity> findAll(UUID[] ids,
                                          String[] types,
