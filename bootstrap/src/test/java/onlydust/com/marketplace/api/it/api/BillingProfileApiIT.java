@@ -577,10 +577,10 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                         .currencyId(CurrencyHelper.STRK.value())
                         .recipientId(authenticatedUser.user().getGithubUserId())
                         .items(List.of(
-                                new RewardItemRequest().id("0011051356")
+                                new RewardItemRequest().id("1624000021")
                                         .type(RewardType.PULL_REQUEST)
-                                        .number(1L)
-                                        .repoId(55223344L)
+                                        .number(1502L)
+                                        .repoId(498695724L)
                         ))))
                 // Then
                 .exchange()
