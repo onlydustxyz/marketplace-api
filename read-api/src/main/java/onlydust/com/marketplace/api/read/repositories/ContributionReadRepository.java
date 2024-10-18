@@ -19,7 +19,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
             select c.contribution_uuid                       as contribution_uuid,
                    c.contribution_type                       as contribution_type,
                    c.github_repo                             as github_repo,
-                   c.github_author                           as github_author,
+                   ccd.github_author                         as github_author,
                    c.github_number                           as github_number,
                    c.github_status                           as github_status,
                    c.github_title                            as github_title,
@@ -31,24 +31,31 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                    c.completed_at                            as completed_at,
                    c.activity_status                         as activity_status,
                    c.project                                 as project,
-                   c.contributors                            as contributors,
-                   c.applicants                              as applicants,
+                   ccd.contributors                          as contributors,
+                   ccd.applicants                            as applicants,
                    c.languages                               as languages,
                    c.linked_issues                           as linked_issues,
-                   coalesce(rd.total_rewarded_usd_amount, 0) as total_rewarded_usd_amount
+                   coalesce(rd.total_rewarded_usd_amount, 0) as total_rewarded_usd_amount,
+                   rd.reward_ids                             as reward_ids
             from bi.p_contribution_data c
+                     join bi.p_contribution_contributors_data ccd on c.contribution_uuid = ccd.contribution_uuid
                      left join bi.p_contribution_reward_data rd on rd.contribution_uuid = c.contribution_uuid
+                     left join project_contributor_labels pcl on coalesce(:projectContributorLabelIds) is not null and pcl.project_id = c.project_id
+                     left join contributor_project_contributor_labels cpcl on coalesce(:projectContributorLabelIds) is not null and cpcl.label_id = pcl.id and cpcl.github_user_id = any (ccd.contributor_ids)
             where (coalesce(:ids) is null or c.contribution_uuid = any (:ids))
               and (coalesce(:types) is null or c.contribution_type = any (cast(:types as indexer_exp.contribution_type[])))
               and (coalesce(:projectIds) is null or c.project_id = any (:projectIds))
               and (coalesce(:projectSlugs) is null or c.project_slug = any (:projectSlugs))
-              and (coalesce(:statuses) is null or c.activity_status = any (:statuses))
+              and (coalesce(:statuses) is null or c.activity_status = any (cast(:statuses as activity_status[])))
               and (coalesce(:repoIds) is null or c.repo_id = any (:repoIds))
-              and (coalesce(:contributorIds) is null or c.contributor_ids && :contributorIds)
-              and (coalesce(:projectContributorLabelIds) is null or c.project_contributor_label_ids && :projectContributorLabelIds)
+              and (coalesce(:contributorIds) is null or ccd.contributor_ids && :contributorIds)
+              and (coalesce(:projectContributorLabelIds) is null or cpcl.label_id = any (:projectContributorLabelIds))
               and (coalesce(:rewardIds) is null or rd.reward_ids && :rewardIds)
               and (coalesce(:hasBeenRewarded) is null or :hasBeenRewarded = (coalesce(rd.total_rewarded_usd_amount, 0) > 0))
-              and (coalesce(:search) is null or c.search ilike '%' || :search || '%')
+              and (coalesce(:search) is null or c.search ilike '%' || :search || '%' or ccd.search ilike '%' || :search || '%')
+            group by c.contribution_uuid,
+                     ccd.contribution_uuid,
+                     rd.contribution_uuid
             """, nativeQuery = true)
     Page<ContributionReadEntity> findAll(UUID[] ids,
                                          String[] types,

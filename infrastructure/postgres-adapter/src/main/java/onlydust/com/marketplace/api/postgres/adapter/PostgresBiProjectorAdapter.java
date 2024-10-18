@@ -7,7 +7,6 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.*;
@@ -18,12 +17,11 @@ import onlydust.com.marketplace.user.domain.port.input.UserObserverPort;
 
 import java.util.Set;
 
-import static java.util.stream.Collectors.toSet;
-
 @AllArgsConstructor
 public class PostgresBiProjectorAdapter implements AccountingObserverPort, ContributionObserverPort, ProjectObserverPort, UserObserverPort {
     private final BiRewardDataRepository biRewardDataRepository;
     private final BiContributionDataRepository biContributionDataRepository;
+    private final BiContributionContributorsDataRepository biContributionContributorsDataRepository;
     private final BiPerContributorContributionDataRepository biPerContributorContributionDataRepository;
     private final BiProjectGrantsDataRepository biProjectGrantsDataRepository;
     private final BiProjectGlobalDataRepository biProjectGlobalDataRepository;
@@ -104,6 +102,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     @Transactional
     public void onContributionsChanged(Long repoId) {
         biContributionDataRepository.refreshByRepo(repoId);
+        biContributionContributorsDataRepository.refreshByRepo(repoId);
         biPerContributorContributionDataRepository.refreshByRepo(repoId);
         biProjectContributionsDataRepository.refresh(repoId);
         biContributionRewardDataRepository.refresh(repoId);
@@ -114,6 +113,8 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     public void onLinkedReposChanged(ProjectId projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds) {
         linkedRepoIds.forEach(biContributionDataRepository::refreshByRepo);
         unlinkedRepoIds.forEach(biContributionDataRepository::refreshByRepo);
+        linkedRepoIds.forEach(biContributionContributorsDataRepository::refreshByRepo);
+        unlinkedRepoIds.forEach(biContributionContributorsDataRepository::refreshByRepo);
         linkedRepoIds.forEach(biPerContributorContributionDataRepository::refreshByRepo);
         unlinkedRepoIds.forEach(biPerContributorContributionDataRepository::refreshByRepo);
         biProjectGlobalDataRepository.refresh(projectId);
@@ -142,7 +143,6 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     @Override
     @Transactional
     public void onLabelsModified(@NonNull ProjectId projectId, Set<Long> githubUserIds) {
-        biContributionDataRepository.refresh(projectId, githubUserIds.stream().map(GithubUserId::of).collect(toSet()));
     }
 
     @Override

@@ -66,6 +66,7 @@ public class PostgresConfiguration {
                                                  final ProjectCategorySuggestionRepository projectCategorySuggestionRepository,
                                                  final BiRewardDataRepository biRewardDataRepository,
                                                  final BiContributionDataRepository biContributionDataRepository,
+                                                 final BiContributionContributorsDataRepository biContributionContributorsDataRepository,
                                                  final BiPerContributorContributionDataRepository biPerContributorContributionDataRepository,
                                                  final BiProjectGrantsDataRepository biProjectGrantsDataRepository,
                                                  final BiProjectGlobalDataRepository biProjectGlobalDataRepository,
@@ -92,6 +93,7 @@ public class PostgresConfiguration {
                 projectCategorySuggestionRepository,
                 biRewardDataRepository,
                 biContributionDataRepository,
+                biContributionContributorsDataRepository,
                 biProjectGrantsDataRepository,
                 biProjectGlobalDataRepository,
                 biProjectBudgetDataRepository,
@@ -127,6 +129,7 @@ public class PostgresConfiguration {
                                                            final ProjectCategorySuggestionRepository projectCategorySuggestionRepository,
                                                            final BiRewardDataRepository biRewardDataRepository,
                                                            final BiContributionDataRepository biContributionDataRepository,
+                                                           final BiContributionContributorsDataRepository biContributionContributorsDataRepository,
                                                            final BiPerContributorContributionDataRepository biPerContributorContributionDataRepository,
                                                            final BiProjectGrantsDataRepository biProjectGrantsDataRepository,
                                                            final BiProjectGlobalDataRepository biProjectGlobalDataRepository,
@@ -153,6 +156,7 @@ public class PostgresConfiguration {
                 projectCategorySuggestionRepository,
                 biRewardDataRepository,
                 biContributionDataRepository,
+                biContributionContributorsDataRepository,
                 biProjectGrantsDataRepository,
                 biProjectGlobalDataRepository,
                 biProjectBudgetDataRepository,
@@ -493,6 +497,11 @@ public class PostgresConfiguration {
     }
 
     @Bean
+    public BiContributionContributorsDataRepository biContributionContributorsDataRepository(final EntityManager entityManager) {
+        return new BiContributionContributorsDataRepository(entityManager);
+    }
+
+    @Bean
     public BiPerContributorContributionDataRepository biPerContributorContributionDataRepository(final EntityManager entityManager) {
         return new BiPerContributorContributionDataRepository(entityManager);
     }
@@ -535,6 +544,7 @@ public class PostgresConfiguration {
     @Bean
     PostgresBiProjectorAdapter postgresBiProjectorAdapter(final BiRewardDataRepository biRewardDataRepository,
                                                           final BiContributionDataRepository biContributionDataRepository,
+                                                          final BiContributionContributorsDataRepository biContributionContributorsDataRepository,
                                                           final BiPerContributorContributionDataRepository biPerContributorContributionDataRepository,
                                                           final BiProjectGrantsDataRepository biProjectGrantsDataRepository,
                                                           final BiProjectGlobalDataRepository biProjectGlobalDataRepository,
@@ -545,6 +555,7 @@ public class PostgresConfiguration {
                                                           final UserProjectRecommendationsRepository userProjectRecommendationsRepository) {
         return new PostgresBiProjectorAdapter(biRewardDataRepository,
                 biContributionDataRepository,
+                biContributionContributorsDataRepository,
                 biPerContributorContributionDataRepository,
                 biProjectGrantsDataRepository,
                 biProjectGlobalDataRepository,
