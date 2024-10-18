@@ -11769,17 +11769,6 @@ components:
             type: string
             format: uuid
 
-    ContributionIdentity:
-      type: object
-      required:
-        - githubId
-        - type
-      properties:
-        githubId:
-          $ref: '#/components/schemas/IssueId'
-        type:
-          $ref: '#/components/schemas/ContributionType'
-
     ContributorsQueryParams:
       type: object
       properties:
@@ -11795,7 +11784,9 @@ components:
           items:
             $ref: '#/components/schemas/GithubUserId'
         contributedTo:
-          $ref: '#/components/schemas/ContributionIdentity'
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributionUuid'
         projectIds:
           type: array
           items:

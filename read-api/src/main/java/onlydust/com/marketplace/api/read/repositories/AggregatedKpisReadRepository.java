@@ -31,9 +31,9 @@ public class AggregatedKpisReadRepository {
                              filter (where previous.timestamp < d.#timeGrouping#_timestamp - cast(:timeGroupingInterval as interval)) as reactivated_project_count,
             
                              coalesce(sum(d.is_pr), 0)                                                                    as merged_pr_count
-                      from bi.p_contribution_data d
+                      from bi.p_per_contributor_contribution_data d
                                left join lateral ( select max(previous.#timeGrouping#_timestamp) as timestamp
-                                                   from bi.p_contribution_data previous
+                                                   from bi.p_per_contributor_contribution_data previous
                                                    where previous.project_id = d.project_id
                                                      and previous.#timeGrouping#_timestamp < d.#timeGrouping#_timestamp
                                                      and (coalesce(:dataSourceIds) is null
@@ -112,9 +112,9 @@ public class AggregatedKpisReadRepository {
                              filter (where previous.timestamp < d.#timeGrouping#_timestamp - cast(:timeGroupingInterval as interval)) as reactivated_contributor_count,
             
                              coalesce(sum(d.is_pr), 0)                                                                    as merged_pr_count
-                      from bi.p_contribution_data d
+                      from bi.p_per_contributor_contribution_data d
                                left join lateral ( select max(previous.#timeGrouping#_timestamp) as timestamp
-                                                   from bi.p_contribution_data previous
+                                                   from bi.p_per_contributor_contribution_data previous
                                                    where previous.contributor_id = d.contributor_id
                                                      and previous.#timeGrouping#_timestamp < d.#timeGrouping#_timestamp
                                                      and (coalesce(:dataSourceIds) is null

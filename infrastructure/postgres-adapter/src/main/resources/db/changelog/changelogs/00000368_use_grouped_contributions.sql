@@ -111,7 +111,6 @@ select c.contribution_uuid                                                      
        array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )                    as program_ids,
        array_agg(distinct ppc.project_category_id)
        filter ( where ppc.project_category_id is not null )                                            as project_category_ids,
-       string_agg(distinct l.name, ' ')                                                                as language_names,
        bool_or(gl.name ~~* '%good%first%issue%')                                                       as is_good_first_issue,
        array_agg(distinct gia.user_id) filter ( where gia.user_id is not null )                        as assignee_ids,
        array_agg(distinct gil.label_id)
@@ -501,5 +500,118 @@ WHERE (dataSourceIds is null or c.project_ids && dataSourceIds or c.program_ids 
 GROUP BY c.contributor_id, c.contributor_login, c.contributor, c.first_project_name,
          c.projects, c.ecosystems,
          c.languages, c.categories, c.contributor_country;
+$$
+    LANGUAGE SQL;
+
+
+CREATE OR REPLACE FUNCTION bi.select_projects(fromDate timestamptz,
+                                              toDate timestamptz,
+                                              dataSourceIds uuid[],
+                                              programIds uuid[],
+                                              projectIds uuid[],
+                                              projectSlugs text[],
+                                              projectLeadIds uuid[],
+                                              categoryIds uuid[],
+                                              languageIds uuid[],
+                                              ecosystemIds uuid[],
+                                              searchQuery text,
+                                              showFilteredKpis boolean)
+    RETURNS TABLE
+            (
+                project_id                  uuid,
+                project_name                text,
+                project                     jsonb,
+                leads                       jsonb,
+                categories                  jsonb,
+                languages                   jsonb,
+                ecosystems                  jsonb,
+                programs                    jsonb,
+                budget                      jsonb,
+                available_budget_usd        numeric,
+                percent_spent_budget_usd    numeric,
+                total_granted_usd_amount    numeric,
+                reward_count                bigint,
+                issue_count                 bigint,
+                pr_count                    bigint,
+                code_review_count           bigint,
+                contribution_count          bigint,
+                total_rewarded_usd_amount   numeric,
+                average_reward_usd_amount   numeric,
+                active_contributor_count    bigint,
+                onboarded_contributor_count bigint
+            )
+    STABLE
+    PARALLEL RESTRICTED
+AS
+$$
+SELECT p.project_id                        as project_id,
+       p.project_name                      as project_name,
+       p.project                           as project,
+       p.leads                             as leads,
+       p.categories                        as categories,
+       p.languages                         as languages,
+       p.ecosystems                        as ecosystems,
+       p.programs                          as programs,
+       pb.budget                           as budget,
+       pb.available_budget_usd             as available_budget_usd,
+       pb.percent_spent_budget_usd         as percent_spent_budget_usd,
+       sum(gd.total_granted_usd_amount)    as total_granted_usd_amount,
+       sum(rd.reward_count)                as reward_count,
+       sum(cd.issue_count)                 as issue_count,
+       sum(cd.pr_count)                    as pr_count,
+       sum(cd.code_review_count)           as code_review_count,
+       sum(cd.contribution_count)          as contribution_count,
+       sum(rd.total_rewarded_usd_amount)   as total_rewarded_usd_amount,
+       sum(rd.average_reward_usd_amount)   as average_reward_usd_amount,
+       sum(cd.active_contributor_count)    as active_contributor_count,
+       sum(cd.onboarded_contributor_count) as onboarded_contributor_count
+FROM bi.p_project_global_data p
+         JOIN bi.p_project_budget_data pb on pb.project_id = p.project_id
+
+         LEFT JOIN (select cd.project_id,
+                           count(cd.contribution_uuid)                                                             as contribution_count,
+                           coalesce(sum(cd.is_issue), 0)                                                           as issue_count,
+                           coalesce(sum(cd.is_pr), 0)                                                              as pr_count,
+                           coalesce(sum(cd.is_code_review), 0)                                                     as code_review_count,
+                           count(distinct cd.contributor_id)                                                       as active_contributor_count,
+                           count(distinct cd.contributor_id) filter ( where cd.is_first_contribution_on_onlydust ) as onboarded_contributor_count
+                    from bi.p_per_contributor_contribution_data cd
+                    where cd.timestamp >= fromDate
+                      and cd.timestamp < toDate
+                      and (not showFilteredKpis or languageIds is null or cd.language_ids && languageIds)
+                    group by cd.project_id) cd
+                   on cd.project_id = p.project_id
+
+         LEFT JOIN (select rd.project_id,
+                           count(rd.reward_id)             as reward_count,
+                           coalesce(sum(rd.usd_amount), 0) as total_rewarded_usd_amount,
+                           coalesce(avg(rd.usd_amount), 0) as average_reward_usd_amount
+                    from bi.p_reward_data rd
+                    where rd.timestamp >= fromDate
+                      and rd.timestamp < toDate
+                      and (not showFilteredKpis or projectLeadIds is null or rd.requestor_id = any (projectLeadIds))
+                      and (not showFilteredKpis or languageIds is null or rd.language_ids && languageIds)
+                    group by rd.project_id) rd on rd.project_id = p.project_id
+
+         LEFT JOIN (select gd.project_id,
+                           coalesce(sum(gd.usd_amount), 0) as total_granted_usd_amount
+                    from bi.p_project_grants_data gd
+                    where gd.timestamp >= fromDate
+                      and gd.timestamp < toDate
+                    group by gd.project_id) gd on gd.project_id = p.project_id
+
+WHERE (p.project_id = any (dataSourceIds) or p.program_ids && dataSourceIds or p.ecosystem_ids && dataSourceIds)
+  and (ecosystemIds is null or p.ecosystem_ids && ecosystemIds)
+  and (programIds is null or p.program_ids && programIds)
+  and (projectIds is null or p.project_id = any (projectIds))
+  and (projectSlugs is null or p.project_slug = any (projectSlugs))
+  and (projectLeadIds is null or p.project_lead_ids && projectLeadIds)
+  and (categoryIds is null or p.project_category_ids && categoryIds)
+  and (languageIds is null or p.language_ids && languageIds)
+  and (searchQuery is null or p.search ilike '%' || searchQuery || '%')
+  and (cd.project_id is not null or rd.project_id is not null or gd.project_id is not null)
+
+GROUP BY p.project_id, p.project_name, p.project, p.programs, p.ecosystems, p.languages, p.categories,
+         p.leads, pb.budget, pb.available_budget_usd, pb.percent_spent_budget_usd
 $$
     LANGUAGE SQL;
