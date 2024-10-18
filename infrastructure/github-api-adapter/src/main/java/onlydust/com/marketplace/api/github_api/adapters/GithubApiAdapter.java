@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
-import onlydust.com.marketplace.api.github_api.dto.CommentRequest;
-import onlydust.com.marketplace.api.github_api.dto.CommentResponse;
-import onlydust.com.marketplace.api.github_api.dto.IssueAssigneesRequest;
-import onlydust.com.marketplace.api.github_api.dto.IssueAssigneesResponse;
+import onlydust.com.marketplace.api.github_api.dto.*;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.port.output.GithubApiPort;
@@ -53,5 +50,11 @@ public class GithubApiAdapter implements GithubApiPort {
     @Override
     public void deleteComment(@NonNull String personalAccessToken, @NonNull Long repoId, GithubComment.@NonNull Id id) {
         client.delete("/repositories/%d/issues/comments/%d".formatted(repoId, id.value()), personalAccessToken, Void.class);
+    }
+
+    @Override
+    public void closeIssue(@NonNull String githubAppAccessToken, @NonNull Long repoId, @NonNull Long githubIssueNumber) {
+        client.post("/repositories/%d/issues/%d".formatted(repoId, githubIssueNumber), CloseIssueRequestDTO.builder().build(), githubAppAccessToken,
+                Void.class);
     }
 }
