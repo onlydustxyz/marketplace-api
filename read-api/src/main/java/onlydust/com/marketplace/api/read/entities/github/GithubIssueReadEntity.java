@@ -150,7 +150,7 @@ public class GithubIssueReadEntity {
             response.setGithubAppInstallationStatus(installationStatus);
             if (installationStatus == GithubOrganizationInstallationStatus.MISSING_PERMISSIONS) {
                 response.setGithubAppInstallationPermissionsUpdateUrl(getGithubAppInstallationPermissionsUpdateUrl(repo.ownerLogin(),
-                        repo.parent().owner().type(), repo.parent().owner().installation()));
+                        repo.owner().type(), repo.owner().installation()));
             }
         }
 
