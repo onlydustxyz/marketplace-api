@@ -5736,17 +5736,6 @@ components:
       description: Github issue ID (databaseId)
       example: 1678794252
 
-    PullRequestId:
-      type: integer
-      format: int64
-      description: Github PR ID (databaseId)
-      example: 1678794252
-
-    ContributionUUID:
-      type: string
-      format: uuid
-      description: OnlyDust contribution UUID
-
     ProjectId:
       type: string
       format: uuid
@@ -12236,7 +12225,7 @@ components:
         contributionUUIDs:
           type: array
           items:
-            $ref: '#/components/schemas/ContributionUUID'
+            $ref: '#/components/schemas/ContributionUuid'
         recipientIds:
           type: array
           items:
