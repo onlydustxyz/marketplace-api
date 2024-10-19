@@ -257,9 +257,6 @@ create index on bi.p_contribution_contributors_data using gin (contributor_ids);
 
 
 call create_pseudo_projection('bi', 'per_contributor_contribution_data', $$
-with first_contributions AS MATERIALIZED (select c.contributor_id, min(c.created_at) as first_contribution_date
-                                          from indexer_exp.contributions c
-                                          group by c.contributor_id)
 select md5(row (c.contribution_uuid, cd.contributor_id)::text)::uuid      as technical_id,
        c.contribution_uuid                                                as contribution_uuid,
        c.repo_id                                                          as repo_id,
@@ -285,7 +282,12 @@ select md5(row (c.contribution_uuid, cd.contributor_id)::text)::uuid      as tec
        date_trunc('month', c.created_at)                                  as month_timestamp,
        date_trunc('quarter', c.created_at)                                as quarter_timestamp,
        date_trunc('year', c.created_at)                                   as year_timestamp,
-       c.created_at = fc.first_contribution_date                          as is_first_contribution_on_onlydust,
+       not exists(select 1
+                  from indexer_exp.contributions fc
+                           join indexer_exp.github_repos gr on gr.id = fc.repo_id
+                           join project_github_repos pgr on pgr.github_repo_id = gr.id
+                  where fc.contributor_id = cd.contributor_id
+                    and fc.created_at < c.created_at)                     as is_first_contribution_on_onlydust,
        c.is_issue                                                         as is_issue,
        c.is_pr                                                            as is_pr,
        c.is_code_review                                                   as is_code_review,
@@ -306,12 +308,10 @@ from bi.p_contribution_data c
          left join iam.users u on u.github_user_id = cd.contributor_id
          left join accounting.billing_profiles_users bpu on bpu.user_id = u.id
          left join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id
-         left join first_contributions fc on fc.contributor_id = cd.contributor_id
 group by c.contribution_uuid,
          ccd.contribution_uuid,
          cd.contributor_id,
-         u.id,
-         fc.first_contribution_date
+         u.id
 $$, 'technical_id');
 
 create index on bi.p_per_contributor_contribution_data (contribution_uuid);
