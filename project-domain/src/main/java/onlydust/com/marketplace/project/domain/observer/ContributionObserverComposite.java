@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.observer;
 
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.project.domain.port.input.ContributionObserverPort;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public class ContributionObserverComposite implements ContributionObserverPort {
     }
 
     @Override
-    public void onContributionsChanged(Long repoId) {
-        observers.forEach(observer -> observer.onContributionsChanged(repoId));
+    public void onContributionsChanged(Long repoId, ContributionUUID contributionUUID) {
+        observers.forEach(observer -> observer.onContributionsChanged(repoId, contributionUUID));
     }
 }

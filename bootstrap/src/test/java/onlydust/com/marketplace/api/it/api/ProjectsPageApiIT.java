@@ -3272,7 +3272,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
         final var project = projectRepository.findById(UUID.fromString("6239cb20-eece-466a-80a0-742c1071dd3c")).get();
         project.setCategories(Set.of(new ProjectProjectCategoryEntity(project.getId(), categoryAI.getId())));
         projectRepository.saveAndFlush(project);
-        databaseHelper.executeInTransaction(() -> biProjectGlobalDataRepository.refresh(ProjectId.of(project.getId())));
+        databaseHelper.executeInTransaction(() -> biProjectGlobalDataRepository.refreshByProject(ProjectId.of(project.getId())));
     }
 
     @Test
@@ -3339,7 +3339,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
 
         final ProjectViewEntity bretzel = projectViewRepository.findBySlug("bretzel").orElseThrow();
         projectLeaderInvitationRepository.save(new ProjectLeaderInvitationEntity(UUID.randomUUID(), bretzel.getId(), auth.user().getGithubUserId()));
-        databaseHelper.executeInTransaction(() -> biProjectGlobalDataRepository.refresh(ProjectId.of(bretzel.getId())));
+        databaseHelper.executeInTransaction(() -> biProjectGlobalDataRepository.refreshByProject(ProjectId.of(bretzel.getId())));
 
         // When
         client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "mine", "true")))
@@ -3721,8 +3721,8 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
         );
 
         databaseHelper.executeInTransaction(() -> {
-            biProjectGlobalDataRepository.refresh(ProjectId.of("7d04163c-4187-4313-8066-61504d34fc56"));
-            biProjectGlobalDataRepository.refresh(ProjectId.of("f39b827f-df73-498c-8853-99bc3f562723"));
+            biProjectGlobalDataRepository.refreshByProject(ProjectId.of("7d04163c-4187-4313-8066-61504d34fc56"));
+            biProjectGlobalDataRepository.refreshByProject(ProjectId.of("f39b827f-df73-498c-8853-99bc3f562723"));
         });
 
 

@@ -36,7 +36,7 @@ public class PostgresRefreshIT extends AbstractPostgresIT {
                 Currency.Id.random()));
         assertDoesNotThrow(() -> postgresBiProjectorAdapter.onFundsRefundedByProject(ProjectId.random(), ProgramId.random(), PositiveAmount.of(1000L),
                 Currency.Id.random()));
-        assertDoesNotThrow(() -> postgresBiProjectorAdapter.onContributionsChanged(123L));
+        assertDoesNotThrow(() -> postgresBiProjectorAdapter.onContributionsChanged(123L, ContributionUUID.of(456L)));
         assertDoesNotThrow(() -> postgresBiProjectorAdapter.onLinkedReposChanged(ProjectId.random(), Set.of(123L), Set.of(456L)));
         assertDoesNotThrow(() -> postgresBiProjectorAdapter.onProjectCreated(ProjectId.random(), UserId.random()));
         assertDoesNotThrow(() -> postgresBiProjectorAdapter.onUserSignedUp(AuthenticatedUser.builder().githubUserId(123L).build()));

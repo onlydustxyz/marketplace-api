@@ -18,13 +18,13 @@ public class BiProjectContributionsDataRepository extends PseudoProjectionReposi
         return super.refresh();
     }
 
-    @Trace(operationName = "pseudo_projection.refresh", resourceName = "refresh:bi.project_contributions_data")
-    public int refresh(final ProjectId projectId) {
+    @Trace(operationName = "pseudo_projection.refresh", resourceName = "refresh:bi.project_contributions_data:project_id")
+    public int refreshByProject(final ProjectId projectId) {
         return refresh(Map.of("project_id", projectId.value()));
     }
 
-    @Trace(operationName = "pseudo_projection.refresh", resourceName = "refresh:bi.project_contributions_data")
-    public int refresh(final Long repoId) {
+    @Trace(operationName = "pseudo_projection.refresh", resourceName = "refresh:bi.project_contributions_data:repo_id")
+    public int refreshByRepo(final Long repoId) {
         return refreshUnsafe("%d = any(repo_ids)".formatted(repoId));
     }
 }

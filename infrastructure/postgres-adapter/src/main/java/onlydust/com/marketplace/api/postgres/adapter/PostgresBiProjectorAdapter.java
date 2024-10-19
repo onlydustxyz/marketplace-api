@@ -44,19 +44,19 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     @Override
     public void onRewardCreated(RewardId rewardId, AccountBookFacade accountBookFacade) {
         biRewardDataRepository.refresh(rewardId);
-        biContributionRewardDataRepository.refresh(rewardId);
+        biContributionRewardDataRepository.refreshByReward(rewardId);
     }
 
     @Override
     public void onRewardCancelled(RewardId rewardId) {
         biRewardDataRepository.refresh(rewardId);
-        biContributionRewardDataRepository.refresh(rewardId);
+        biContributionRewardDataRepository.refreshByReward(rewardId);
     }
 
     @Override
     public void onRewardPaid(RewardId rewardId) {
         biRewardDataRepository.refresh(rewardId);
-        biContributionRewardDataRepository.refresh(rewardId);
+        biContributionRewardDataRepository.refreshByReward(rewardId);
     }
 
     @Override
@@ -88,24 +88,24 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     @Transactional
     public void onFundsGrantedToProject(ProgramId from, ProjectId to, PositiveAmount amount, Currency.Id currencyId) {
         biProjectGrantsDataRepository.refresh(from, to);
-        biProjectBudgetDataRepository.refresh(to);
+        biProjectBudgetDataRepository.refreshByProject(to);
     }
 
     @Override
     @Transactional
     public void onFundsRefundedByProject(ProjectId from, ProgramId to, PositiveAmount amount, Currency.Id currencyId) {
         biProjectGrantsDataRepository.refresh(to, from);
-        biProjectBudgetDataRepository.refresh(from);
+        biProjectBudgetDataRepository.refreshByProject(from);
     }
 
     @Override
     @Transactional
-    public void onContributionsChanged(Long repoId) {
-        biContributionDataRepository.refreshByRepo(repoId);
-        biContributionContributorsDataRepository.refreshByRepo(repoId);
-        biPerContributorContributionDataRepository.refreshByRepo(repoId);
-        biProjectContributionsDataRepository.refresh(repoId);
-        biContributionRewardDataRepository.refresh(repoId);
+    public void onContributionsChanged(Long repoId, ContributionUUID contributionUUID) {
+        biContributionDataRepository.refreshByUUID(contributionUUID);
+        biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
+        biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
+        biProjectContributionsDataRepository.refreshByRepo(repoId);
+        biContributionRewardDataRepository.refreshByUUID(contributionUUID);
     }
 
     @Override
@@ -117,10 +117,10 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         unlinkedRepoIds.forEach(biContributionContributorsDataRepository::refreshByRepo);
         linkedRepoIds.forEach(biPerContributorContributionDataRepository::refreshByRepo);
         unlinkedRepoIds.forEach(biPerContributorContributionDataRepository::refreshByRepo);
-        biProjectGlobalDataRepository.refresh(projectId);
-        biProjectContributionsDataRepository.refresh(projectId);
-        linkedRepoIds.forEach(biContributionRewardDataRepository::refresh);
-        unlinkedRepoIds.forEach(biContributionRewardDataRepository::refresh);
+        biProjectGlobalDataRepository.refreshByProject(projectId);
+        biProjectContributionsDataRepository.refreshByProject(projectId);
+        linkedRepoIds.forEach(biContributionRewardDataRepository::refreshByRepo);
+        unlinkedRepoIds.forEach(biContributionRewardDataRepository::refreshByRepo);
     }
 
     @Override
@@ -131,8 +131,8 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     @Override
     @Transactional
     public void onProjectCreated(ProjectId projectId, UserId projectLeadId) {
-        biProjectGlobalDataRepository.refresh(projectId);
-        biProjectBudgetDataRepository.refresh(projectId);
+        biProjectGlobalDataRepository.refreshByProject(projectId);
+        biProjectBudgetDataRepository.refreshByProject(projectId);
     }
 
     @Override
