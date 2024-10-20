@@ -31,6 +31,6 @@ public class BiContributionRewardDataRepository extends PseudoProjectionReposito
 
     @Trace(operationName = "pseudo_projection.refresh", resourceName = "refresh:bi.contribution_reward_data:reward_id")
     public int refreshByReward(final RewardId rewardId) {
-        return refreshUnsafe("'%s' = any(reward_ids)".formatted(rewardId.value()));
+        return refreshUnsafe("contribution_uuid = any (get_contribution_uuids_of_reward('%s'))".formatted(rewardId.value()));
     }
 }

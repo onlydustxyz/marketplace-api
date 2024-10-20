@@ -70,6 +70,17 @@ $$ LANGUAGE SQL STABLE
                 PARALLEL SAFE;
 
 
+
+CREATE OR REPLACE FUNCTION get_contribution_uuids_of_reward(rewardId uuid)
+    RETURNS UUID[] AS
+$$
+select array_agg(distinct ri.contribution_uuid)
+from reward_items ri
+where ri.reward_id = rewardId
+$$ LANGUAGE SQL STABLE
+                PARALLEL SAFE;
+
+
 ------------------------------------------------------------------------------------------------------------------------
 call drop_pseudo_projection('bi', 'project_contributions_data');
 call drop_pseudo_projection('bi', 'contribution_reward_data');
@@ -368,14 +379,14 @@ create index on bi.p_project_contributions_data using gin (repo_ids);
 
 
 call create_pseudo_projection('bi', 'contribution_reward_data', $$
-select cd.contribution_uuid                                                       as contribution_uuid,
-       cd.project_id                                                              as project_id,
-       cd.repo_id                                                                 as repo_id,
-       array_agg(distinct rd.reward_id) filter ( where rd.reward_id is not null ) as reward_ids,
-       sum(round(rd.usd_amount, 2))                                               as total_rewarded_usd_amount
+select cd.contribution_uuid                    as contribution_uuid,
+       cd.project_id                           as project_id,
+       cd.repo_id                              as repo_id,
+       array_agg(ri.reward_id)                 as reward_ids,
+       sum(round(rd.amount_usd_equivalent, 2)) as total_rewarded_usd_amount
 from bi.p_contribution_data cd
          join reward_items ri on ri.contribution_uuid = cd.contribution_uuid
-         join bi.p_reward_data rd on rd.reward_id = ri.reward_id
+         join accounting.reward_status_data rd on rd.reward_id = ri.reward_id
 group by cd.contribution_uuid, cd.project_id, cd.repo_id
 $$, 'contribution_uuid');
 
@@ -494,6 +505,53 @@ FROM (SELECT c.*,
                            LEFT JOIN indexer_exp.github_user_file_extensions gufe ON gufe.user_id = ga.id
                            LEFT JOIN language_file_extensions lfe ON lfe.extension = gufe.file_extension
                   GROUP BY ga.id) c) c) v;
+
+
+
+------------------------------------------------------------------------------------------------------------------------
+-- Use m_programs_projects instead of v_programs_projects
+CREATE OR REPLACE VIEW bi.v_reward_data AS
+SELECT v.*, md5(v::text) as hash
+FROM (select r.id                                                                                             as reward_id,
+             r.requested_at                                                                                   as timestamp,
+             date_trunc('day', r.requested_at)                                                                as day_timestamp,
+             date_trunc('week', r.requested_at)                                                               as week_timestamp,
+             date_trunc('month', r.requested_at)                                                              as month_timestamp,
+             date_trunc('quarter', r.requested_at)                                                            as quarter_timestamp,
+             date_trunc('year', r.requested_at)                                                               as year_timestamp,
+             r.recipient_id                                                                                   as contributor_id,
+             r.requestor_id                                                                                   as requestor_id,
+             r.project_id                                                                                     as project_id,
+             p.slug                                                                                           as project_slug,
+             rsd.amount_usd_equivalent                                                                        as usd_amount,
+             r.amount                                                                                         as amount,
+             r.currency_id                                                                                    as currency_id,
+             array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null )                 as ecosystem_ids,
+             array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )                     as program_ids,
+             array_agg(distinct lfe.language_id) filter ( where lfe.language_id is not null )                 as language_ids,
+             array_agg(distinct ppc.project_category_id) filter ( where ppc.project_category_id is not null ) as project_category_ids,
+             string_agg(currencies.name || ' ' || currencies.code, ' ')                                       as search
+      from rewards r
+               join accounting.reward_status_data rsd ON rsd.reward_id = r.id
+               join projects p on p.id = r.project_id
+               join currencies on currencies.id = r.currency_id
+               left join projects_ecosystems pe on pe.project_id = r.project_id
+               left join m_programs_projects pp on pp.project_id = r.project_id
+               left join projects_project_categories ppc on ppc.project_id = r.project_id
+               left join reward_items ri on r.id = ri.reward_id
+               left join indexer_exp.contributions c on c.contributor_id = ri.recipient_id and
+                                                        c.repo_id = ri.repo_id and
+                                                        c.github_number = ri.number and
+                                                        c.type::text::contribution_type = ri.type
+               left join language_file_extensions lfe on lfe.extension = any (c.main_file_extensions)
+      group by r.id,
+               r.requested_at,
+               r.recipient_id,
+               r.project_id,
+               rsd.amount_usd_equivalent,
+               r.amount,
+               r.currency_id,
+               p.slug) v;
 
 
 ------------------------------------------------------------------------------------------------------------------------
