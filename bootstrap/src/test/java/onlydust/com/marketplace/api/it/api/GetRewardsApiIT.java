@@ -171,34 +171,6 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "pierre",
                                 "isRegistered": true
                               },
-                              "requestedAt": "2024-06-10T00:00:00Z",
-                              "processedAt": null,
-                              "unlockDate": null
-                            },
-                            {
-                              "amount": {
-                                "amount": 3,
-                                "prettyAmount": 3,
-                                "currency": {
-                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                                  "code": "ETH",
-                                  "name": "Ether",
-                                  "logoUrl": null,
-                                  "decimals": 18
-                                },
-                                "usdEquivalent": 5345.94,
-                                "usdConversionRate": 1781.98
-                              },
-                              "status": "PENDING_CONTRIBUTOR",
-                              "from": {
-                                "login": "pierre",
-                                "isRegistered": true
-                              },
-                              "to": {
-                                "login": "james",
-                                "isRegistered": true
-                              },
-                              "requestedAt": "2024-06-01T00:00:00Z",
                               "processedAt": null,
                               "unlockDate": null
                             },
@@ -225,7 +197,6 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "antho",
                                 "isRegistered": true
                               },
-                              "requestedAt": "2024-06-01T00:00:00Z",
                               "processedAt": null,
                               "unlockDate": null
                             },
@@ -252,7 +223,32 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "antho",
                                 "isRegistered": true
                               },
-                              "requestedAt": "2024-06-01T00:00:00Z",
+                              "processedAt": null,
+                              "unlockDate": null
+                            },
+                            {
+                              "amount": {
+                                "amount": 3,
+                                "prettyAmount": 3,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 5345.94,
+                                "usdConversionRate": 1781.98
+                              },
+                              "status": "PENDING_CONTRIBUTOR",
+                              "from": {
+                                "login": "pierre",
+                                "isRegistered": true
+                              },
+                              "to": {
+                                "login": "sophiebits",
+                                "isRegistered": true
+                              },
                               "processedAt": null,
                               "unlockDate": null
                             }

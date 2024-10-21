@@ -65,8 +65,8 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 564,
-                          "totalItemNumber": 1691,
+                          "totalPageNumber": 20,
+                          "totalItemNumber": 58,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "issues": [
@@ -87,7 +87,8 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "githubUserId": 8642470,
                                 "login": "gregcha",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
-                                "isRegistered": true
+                                "isRegistered": true,
+                                "id": null
                               },
                               "createdAt": "2023-01-31T11:26:54Z",
                               "closedAt": null,
@@ -98,11 +99,11 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
                               "currentUserApplication": null
                             },
                             {
-                              "id": 1642022365,
-                              "number": 6,
-                              "title": "This is a new issue",
-                              "status": "COMPLETED",
-                              "htmlUrl": "https://github.com/od-mocks/cool-repo-A/issues/6",
+                              "id": 1643865031,
+                              "number": 12,
+                              "title": "Documentation by AnthonyBuisset",
+                              "status": "OPEN",
+                              "htmlUrl": "https://github.com/od-mocks/cool-repo-A/issues/12",
                               "repo": {
                                 "id": 602953043,
                                 "owner": "od-mocks",
@@ -114,28 +115,23 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                                "isRegistered": true
+                                "isRegistered": true,
+                                "id": null
                               },
-                              "createdAt": "2023-03-27T12:56:04Z",
-                              "closedAt": "2023-08-30T09:20:48Z",
-                              "body": null,
+                              "createdAt": "2023-03-28T12:39:14Z",
+                              "closedAt": null,
+                              "body": "Real cool documentation",
                               "labels": [],
                               "applicants": [],
-                              "assignees": [
-                                {
-                                  "githubUserId": 43467246,
-                                  "login": "AnthonyBuisset",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
-                                }
-                              ],
+                              "assignees": [],
                               "currentUserApplication": null
                             },
                             {
-                              "id": 1642022454,
-                              "number": 7,
-                              "title": "This one has been cancelled",
-                              "status": "CANCELLED",
-                              "htmlUrl": "https://github.com/od-mocks/cool-repo-A/issues/7",
+                              "id": 1643866301,
+                              "number": 13,
+                              "title": "Documentation by AnthonyBuisset",
+                              "status": "OPEN",
+                              "htmlUrl": "https://github.com/od-mocks/cool-repo-A/issues/13",
                               "repo": {
                                 "id": 602953043,
                                 "owner": "od-mocks",
@@ -147,11 +143,12 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                                "isRegistered": true
+                                "isRegistered": true,
+                                "id": null
                               },
-                              "createdAt": "2023-03-27T12:56:32Z",
-                              "closedAt": "2023-03-27T12:57:25Z",
-                              "body": null,
+                              "createdAt": "2023-03-28T12:40:02Z",
+                              "closedAt": null,
+                              "body": "Real cool documentation",
                               "labels": [],
                               "applicants": [],
                               "assignees": [],

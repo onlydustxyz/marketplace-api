@@ -167,7 +167,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     void should_not_be_able_to_apply_twice() {
         // Given
         final var user = userAuthHelper.authenticateAntho();
-        final var issueId = 1736474921L;
+        final var issueId = 1976081596L;
         final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
 
         applicationRepository.save(new ApplicationEntity(

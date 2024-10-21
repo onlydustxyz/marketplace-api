@@ -54,16 +54,16 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
         if (setupDone.compareAndExchange(false, true)) return;
 
         applications = List.of(
-                fakeApplication(projectAppliedTo1, gregoire, 1736474921L, 110L),
+                fakeApplication(projectAppliedTo1, gregoire, 2012380735L, 110L),
 
-                fakeApplication(projectAppliedTo1, pierre, 1736474921L, 112L),
-                fakeApplication(projectAppliedTo2, pierre, 1736474921L, 113L),
-                fakeApplication(projectAppliedTo2, pierre, 1736504583L, 113L),
+                fakeApplication(projectAppliedTo1, pierre, 2012380735L, 112L),
+                fakeApplication(projectAppliedTo2, pierre, 2012380735L, 113L),
+                fakeApplication(projectAppliedTo2, pierre, 2012381551L, 113L),
 
-                fakeApplication(projectAppliedTo1, antho, 1736474921L, 112L),
-                fakeApplication(projectAppliedTo2, antho, 1736504583L, 113L),
+                fakeApplication(projectAppliedTo1, antho, 2012380735L, 112L),
+                fakeApplication(projectAppliedTo2, antho, 2012381551L, 113L),
 
-                fakeApplication(projectAppliedTo1, olivier, 1736474921L, 112L)
+                fakeApplication(projectAppliedTo1, olivier, 2012380735L, 112L)
         );
 
         applicationRepository.saveAll(applications);
@@ -95,7 +95,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(APPLICATIONS, Map.of(
                         "projectId", projectAppliedTo1.toString(),
-                        "issueId", "1736474921",
+                        "issueId", "2012380735",
                         "pageIndex", "0",
                         "pageSize", "10"
                 )))
@@ -115,7 +115,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(APPLICATIONS, Map.of(
                         "projectId", projectAppliedTo1.toString(),
-                        "issueId", "1736504583",
+                        "issueId", "2012381551",
                         "pageIndex", "0",
                         "pageSize", "10"
                 )))
@@ -133,7 +133,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(APPLICATIONS, Map.of(
                         "projectId", projectAppliedTo1.toString(),
-                        "issueId", "1736474921",
+                        "issueId", "2012380735",
                         "pageIndex", "0",
                         "pageSize", "10"
                 )))
@@ -165,24 +165,24 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg"
                               },
                               "issue": {
-                                "id": 1736474921,
-                                "number": 1111,
-                                "title": "Documentation by AnthonyBuisset",
+                                "id": 2012380735,
+                                "number": 582,
+                                "title": "epic: create spec compliant gas accounting",
                                 "status": "OPEN",
-                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111",
+                                "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj/issues/582",
                                 "repo": {
-                                  "id": 602953640,
-                                  "owner": "od-mocks",
-                                  "name": "cool.repo.B",
-                                  "description": null,
-                                  "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
+                                  "id": 599607010,
+                                  "owner": "kkrt-labs",
+                                  "name": "kakarot-ssj",
+                                  "description": "Kakarot zkEVM - rewrite in the latest version of Cairo",
+                                  "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj"
                                 },
                                 "author": {
-                                  "githubUserId": 112474158,
-                                  "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                                  "isRegistered": true,
-                                  "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d"
+                                  "githubUserId": 66871571,
+                                  "login": "Eikix",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/66871571?v=4",
+                                  "isRegistered": false,
+                                  "id": null
                                 }
                               },
                               "applicant": {
@@ -204,24 +204,24 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg"
                               },
                               "issue": {
-                                "id": 1736474921,
-                                "number": 1111,
-                                "title": "Documentation by AnthonyBuisset",
+                                "id": 2012380735,
+                                "number": 582,
+                                "title": "epic: create spec compliant gas accounting",
                                 "status": "OPEN",
-                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111",
+                                "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj/issues/582",
                                 "repo": {
-                                  "id": 602953640,
-                                  "owner": "od-mocks",
-                                  "name": "cool.repo.B",
-                                  "description": null,
-                                  "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
+                                  "id": 599607010,
+                                  "owner": "kkrt-labs",
+                                  "name": "kakarot-ssj",
+                                  "description": "Kakarot zkEVM - rewrite in the latest version of Cairo",
+                                  "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj"
                                 },
                                 "author": {
-                                  "githubUserId": 112474158,
-                                  "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                                  "isRegistered": true,
-                                  "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d"
+                                  "githubUserId": 66871571,
+                                  "login": "Eikix",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/66871571?v=4",
+                                  "isRegistered": false,
+                                  "id": null
                                 }
                               },
                               "applicant": {
@@ -243,24 +243,24 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg"
                               },
                               "issue": {
-                                "id": 1736474921,
-                                "number": 1111,
-                                "title": "Documentation by AnthonyBuisset",
+                                "id": 2012380735,
+                                "number": 582,
+                                "title": "epic: create spec compliant gas accounting",
                                 "status": "OPEN",
-                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111",
+                                "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj/issues/582",
                                 "repo": {
-                                  "id": 602953640,
-                                  "owner": "od-mocks",
-                                  "name": "cool.repo.B",
-                                  "description": null,
-                                  "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
+                                  "id": 599607010,
+                                  "owner": "kkrt-labs",
+                                  "name": "kakarot-ssj",
+                                  "description": "Kakarot zkEVM - rewrite in the latest version of Cairo",
+                                  "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj"
                                 },
                                 "author": {
-                                  "githubUserId": 112474158,
-                                  "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                                  "isRegistered": true,
-                                  "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d"
+                                  "githubUserId": 66871571,
+                                  "login": "Eikix",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/66871571?v=4",
+                                  "isRegistered": false,
+                                  "id": null
                                 }
                               },
                               "applicant": {
@@ -282,24 +282,24 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg"
                               },
                               "issue": {
-                                "id": 1736474921,
-                                "number": 1111,
-                                "title": "Documentation by AnthonyBuisset",
+                                "id": 2012380735,
+                                "number": 582,
+                                "title": "epic: create spec compliant gas accounting",
                                 "status": "OPEN",
-                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111",
+                                "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj/issues/582",
                                 "repo": {
-                                  "id": 602953640,
-                                  "owner": "od-mocks",
-                                  "name": "cool.repo.B",
-                                  "description": null,
-                                  "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
+                                  "id": 599607010,
+                                  "owner": "kkrt-labs",
+                                  "name": "kakarot-ssj",
+                                  "description": "Kakarot zkEVM - rewrite in the latest version of Cairo",
+                                  "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj"
                                 },
                                 "author": {
-                                  "githubUserId": 112474158,
-                                  "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                                  "isRegistered": true,
-                                  "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d"
+                                  "githubUserId": 66871571,
+                                  "login": "Eikix",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/66871571?v=4",
+                                  "isRegistered": false,
+                                  "id": null
                                 }
                               },
                               "applicant": {
@@ -321,7 +321,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(APPLICATIONS, Map.of(
                         "projectId", projectAppliedTo2.toString(),
-                        "issueId", "1736504583",
+                        "issueId", "2012381551",
                         "pageIndex", "0",
                         "pageSize", "10"
                 )))
@@ -350,7 +350,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
                               },
                               "issue": {
-                                "id": 1736504583,
+                                "id": 2012381551,
                                 "number": 1112,
                                 "title": "Monthly contracting subscription",
                                 "status": "OPEN",
@@ -389,7 +389,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
                               },
                               "issue": {
-                                "id": 1736504583,
+                                "id": 2012381551,
                                 "number": 1112,
                                 "title": "Monthly contracting subscription",
                                 "status": "OPEN",
@@ -434,7 +434,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(APPLICATIONS, Map.of(
                         "projectId", projectAppliedTo2.toString(),
-                        "issueId", "1736504583",
+                        "issueId", "2012381551",
                         "isApplicantProjectMember", "true",
                         "pageIndex", "0",
                         "pageSize", "10"
@@ -460,7 +460,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(APPLICATIONS, Map.of(
                         "projectId", projectAppliedTo2.toString(),
-                        "issueId", "1736504583",
+                        "issueId", "2012381551",
                         "isApplicantProjectMember", "false",
                         "pageIndex", "0",
                         "pageSize", "10"
@@ -490,22 +490,24 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
                               },
                               "issue": {
-                                "id": 1736504583,
-                                "number": 1112,
-                                "title": "Monthly contracting subscription",
+                                "id": 2012381551,
+                                "number": 586,
+                                "title": "add access list (warm/cold) address gast costs",
                                 "status": "OPEN",
-                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1112",
+                                "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj/issues/586",
                                 "repo": {
-                                  "id": 602953640,
-                                  "name": "cool.repo.B",
-                                  "description": null,
-                                  "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
+                                  "id": 599607010,
+                                  "owner": "kkrt-labs",
+                                  "name": "kakarot-ssj",
+                                  "description": "Kakarot zkEVM - rewrite in the latest version of Cairo",
+                                  "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj"
                                 },
                                 "author": {
-                                  "githubUserId": 112474158,
-                                  "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                                  "isRegistered": true
+                                  "githubUserId": 66871571,
+                                  "login": "Eikix",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/66871571?v=4",
+                                  "isRegistered": false,
+                                  "id": null
                                 }
                               },
                               "applicant": {
@@ -525,22 +527,24 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
                               },
                               "issue": {
-                                "id": 1736504583,
-                                "number": 1112,
-                                "title": "Monthly contracting subscription",
+                                "id": 2012381551,
+                                "number": 586,
+                                "title": "add access list (warm/cold) address gast costs",
                                 "status": "OPEN",
-                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1112",
+                                "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj/issues/586",
                                 "repo": {
-                                  "id": 602953640,
-                                  "name": "cool.repo.B",
-                                  "description": null,
-                                  "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
+                                  "id": 599607010,
+                                  "owner": "kkrt-labs",
+                                  "name": "kakarot-ssj",
+                                  "description": "Kakarot zkEVM - rewrite in the latest version of Cairo",
+                                  "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj"
                                 },
                                 "author": {
-                                  "githubUserId": 112474158,
-                                  "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                                  "isRegistered": true
+                                  "githubUserId": 66871571,
+                                  "login": "Eikix",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/66871571?v=4",
+                                  "isRegistered": false,
+                                  "id": null
                                 }
                               },
                               "applicant": {
@@ -595,24 +599,24 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
                               },
                               "issue": {
-                                "id": 1736474921,
-                                "number": 1111,
-                                "title": "Documentation by AnthonyBuisset",
+                                "id": 2012380735,
+                                "number": 582,
+                                "title": "epic: create spec compliant gas accounting",
                                 "status": "OPEN",
-                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111",
+                                "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj/issues/582",
                                 "repo": {
-                                  "id": 602953640,
-                                  "owner": "od-mocks",
-                                  "name": "cool.repo.B",
-                                  "description": null,
-                                  "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
+                                  "id": 599607010,
+                                  "owner": "kkrt-labs",
+                                  "name": "kakarot-ssj",
+                                  "description": "Kakarot zkEVM - rewrite in the latest version of Cairo",
+                                  "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj"
                                 },
                                 "author": {
-                                  "githubUserId": 112474158,
-                                  "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                                  "isRegistered": true,
-                                  "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d"
+                                  "githubUserId": 66871571,
+                                  "login": "Eikix",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/66871571?v=4",
+                                  "isRegistered": false,
+                                  "id": null
                                 }
                               },
                               "applicant": {
@@ -634,24 +638,24 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
                               },
                               "issue": {
-                                "id": 1736504583,
-                                "number": 1112,
-                                "title": "Monthly contracting subscription",
+                                "id": 2012381551,
+                                "number": 586,
+                                "title": "add access list (warm/cold) address gast costs",
                                 "status": "OPEN",
-                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1112",
+                                "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj/issues/586",
                                 "repo": {
-                                  "id": 602953640,
-                                  "owner": "od-mocks",
-                                  "name": "cool.repo.B",
-                                  "description": null,
-                                  "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
+                                  "id": 599607010,
+                                  "owner": "kkrt-labs",
+                                  "name": "kakarot-ssj",
+                                  "description": "Kakarot zkEVM - rewrite in the latest version of Cairo",
+                                  "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj"
                                 },
                                 "author": {
-                                  "githubUserId": 112474158,
-                                  "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                                  "isRegistered": true,
-                                  "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d"
+                                  "githubUserId": 66871571,
+                                  "login": "Eikix",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/66871571?v=4",
+                                  "isRegistered": false,
+                                  "id": null
                                 }
                               },
                               "applicant": {
@@ -673,24 +677,24 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg"
                               },
                               "issue": {
-                                "id": 1736474921,
-                                "number": 1111,
-                                "title": "Documentation by AnthonyBuisset",
+                                "id": 2012380735,
+                                "number": 582,
+                                "title": "epic: create spec compliant gas accounting",
                                 "status": "OPEN",
-                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111",
+                                "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj/issues/582",
                                 "repo": {
-                                  "id": 602953640,
-                                  "owner": "od-mocks",
-                                  "name": "cool.repo.B",
-                                  "description": null,
-                                  "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
+                                  "id": 599607010,
+                                  "owner": "kkrt-labs",
+                                  "name": "kakarot-ssj",
+                                  "description": "Kakarot zkEVM - rewrite in the latest version of Cairo",
+                                  "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj"
                                 },
                                 "author": {
-                                  "githubUserId": 112474158,
-                                  "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                                  "isRegistered": true,
-                                  "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d"
+                                  "githubUserId": 66871571,
+                                  "login": "Eikix",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/66871571?v=4",
+                                  "isRegistered": false,
+                                  "id": null
                                 }
                               },
                               "applicant": {
@@ -759,20 +763,35 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                         {
                           "projectId": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
                           "issue": {
-                            "id": 1736474921,
-                            "number": 1111,
-                            "title": "Documentation by AnthonyBuisset",
+                            "id": 2012380735,
+                            "number": 582,
+                            "title": "epic: create spec compliant gas accounting",
                             "status": "OPEN",
-                            "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111"
+                            "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj/issues/582",
+                            "repo": {
+                              "id": 599607010,
+                              "owner": "kkrt-labs",
+                              "name": "kakarot-ssj",
+                              "description": "Kakarot zkEVM - rewrite in the latest version of Cairo",
+                              "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj"
+                            },
+                            "author": {
+                              "githubUserId": 66871571,
+                              "login": "Eikix",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/66871571?v=4",
+                              "isRegistered": false,
+                              "id": null
+                            }
                           },
                           "applicant": {
                             "githubUserId": 595505,
                             "login": "ofux",
                             "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
-                            "isRegistered": true
+                            "isRegistered": true,
+                            "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
                           },
                           "origin": "MARKETPLACE",
-                          "motivation": "ofux motivations on 1736474921/3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
+                          "motivation": "ofux motivations on 2012380735/3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
                           "problemSolvingApproach": null
                         }
                         """);
@@ -796,7 +815,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_list_applications() {
         client.get()
-                .uri(getApiURI(ISSUES_BY_ID_APPLICANTS.formatted("81dca58e-497a-36f4-9917-8c703174718e")))
+                .uri(getApiURI(ISSUES_BY_ID_APPLICANTS.formatted("4b06fec5-1219-3680-bb2e-0bf9c10acdc2")))
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
@@ -1511,7 +1530,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_list_project_members() {
         // Given
-        final var issueId = 1736474921L;
+        final var issueId = 2012380735L;
 
         // When
         assertApplications(issueId, Map.of("isApplicantProjectMember", "true"), response -> {

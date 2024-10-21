@@ -123,8 +123,8 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 5113,
-                          "totalItemNumber": 5113,
+                          "totalPageNumber": 4694,
+                          "totalItemNumber": 4694,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "contributions": [

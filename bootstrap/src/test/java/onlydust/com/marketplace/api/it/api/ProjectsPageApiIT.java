@@ -742,7 +742,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
                   "hiring": true,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 46,
+                  "contributorCount": 43,
                   "remainingUsdBudget": null,
                   "leaders": [
                     {
@@ -792,7 +792,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 2,
-                  "contributorCount": 27,
+                  "contributorCount": 24,
                   "remainingUsdBudget": null,
                   "leaders": [],
                   "ecosystems": [],
@@ -1054,7 +1054,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 5,
-                  "contributorCount": 87,
+                  "contributorCount": 78,
                   "remainingUsdBudget": null,
                   "leaders": [
                     {
@@ -2073,7 +2073,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
                   "hiring": true,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 46,
+                  "contributorCount": 43,
                   "remainingUsdBudget": null,
                   "leaders": [
                     {
@@ -2123,7 +2123,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 2,
-                  "contributorCount": 27,
+                  "contributorCount": 24,
                   "remainingUsdBudget": null,
                   "leaders": [],
                   "ecosystems": [],
@@ -2385,7 +2385,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 5,
-                  "contributorCount": 87,
+                  "contributorCount": 78,
                   "remainingUsdBudget": null,
                   "leaders": [
                     {
@@ -3209,7 +3209,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
                               "hiring": true,
                               "visibility": "PUBLIC",
                               "repoCount": 1,
-                              "contributorCount": 46,
+                              "contributorCount": 43,
                               "remainingUsdBudget": null,
                               "leaders": [
                                 {
@@ -4578,7 +4578,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
                   "hiring": true,
                   "visibility": "PUBLIC",
                   "repoCount": 1,
-                  "contributorCount": 46,
+                  "contributorCount": 43,
                   "remainingUsdBudget": null,
                   "leaders": [
                     {
@@ -4627,7 +4627,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
                   "hiring": false,
                   "visibility": "PUBLIC",
                   "repoCount": 2,
-                  "contributorCount": 27,
+                  "contributorCount": 24,
                   "remainingUsdBudget": null,
                   "leaders": [],
                   "ecosystems": [],

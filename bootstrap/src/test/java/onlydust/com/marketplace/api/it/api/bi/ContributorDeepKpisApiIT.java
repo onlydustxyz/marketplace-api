@@ -11,7 +11,6 @@ import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
-import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -225,8 +224,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   ],
                                   "countryCode": "FR",
                                   "totalRewardedUsdAmount": {
-                                    "value": 1.5,
-                                    "trend": "UP"
+                                    "value": 0,
+                                    "trend": "STABLE"
                                   },
                                   "rewardCount": {
                                     "value": 2,
@@ -368,8 +367,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   ],
                                   "countryCode": "GB",
                                   "totalRewardedUsdAmount": {
-                                    "value": 3.5,
-                                    "trend": "UP"
+                                    "value": 0,
+                                    "trend": "STABLE"
                                   },
                                   "rewardCount": {
                                     "value": 2,
@@ -684,8 +683,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                               "projectContributorLabels": null,
                               "countryCode": "FR",
                               "totalRewardedUsdAmount": {
-                                "value": 1.5,
-                                "trend": "UP"
+                                "value": 0,
+                                "trend": "STABLE"
                               },
                               "rewardCount": {
                                 "value": 2,

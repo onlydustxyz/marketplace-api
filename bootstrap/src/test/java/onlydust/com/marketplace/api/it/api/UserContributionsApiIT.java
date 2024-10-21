@@ -181,11 +181,11 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                               "githubPullRequestReviewState": null,
                               "rewardIds": [],
                               "project": {
-                                "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                                "slug": "mooooooonlight",
-                                "name": "Mooooooonlight",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
-                                "shortDescription": "hello la team",
+                                "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                "slug": "kaaper",
+                                "name": "kaaper",
+                                "logoUrl": null,
+                                "shortDescription": "Documentation generator for Cairo projects.",
                                 "visibility": "PUBLIC",
                                 "languages": []
                               },
@@ -196,31 +196,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": true,
                                 "id": null
                               },
-                              "links": [
-                                {
-                                  "type": "PULL_REQUEST",
-                                  "repo": {
-                                    "id": 498695724,
-                                    "owner": "onlydustxyz",
-                                    "name": "marketplace-frontend",
-                                    "description": null,
-                                    "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
-                                  },
-                                  "githubAuthor": {
-                                    "githubUserId": 43467246,
-                                    "login": "AnthonyBuisset",
-                                    "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
-                                  },
-                                  "githubNumber": 18,
-                                  "githubStatus": "MERGED",
-                                  "githubTitle": "starknet interfacing",
-                                  "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/18",
-                                  "githubBody": "closes #15\\n\\ndatabase:\\n- repo id is now the same as teh one provided by github API (like pullrequest id)\\n- foreign key added from pullrequest table to project table\\n- can log an indexing status (last time the indexer ran)\\n- can fetch pull requests\\n- can log a contract update status (last time the uploader ran)\\n\\nbinaries:\\n- refactor to smaller binaries:\\n  - add a single repo in database\\n  - index all repos (fetch PR from github and log in DB)\\n  - upload all pr (fetch PR from database and log in smart contract)\\n\\nstarknet:\\n- can log pullrequest in smart contract\\n\\nNext steps:\\n- user iterator trait for fetcher output\\n- use references when possible to avoid cloning strings everywhere\\n- consolidate errors instead of crashing at the first occurence\\n- end to end testing\\n- deployment\\n",
-                                  "githubLabels": null,
-                                  "lastUpdatedAt": null,
-                                  "is_mine": true
-                                }
-                              ]
+                              "links": []
                             }
                           ]
                         }
@@ -386,11 +362,11 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                               "githubPullRequestReviewState": null,
                               "rewardIds": [],
                               "project": {
-                                "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                                "slug": "mooooooonlight",
-                                "name": "Mooooooonlight",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
-                                "shortDescription": "hello la team",
+                                "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                "slug": "kaaper",
+                                "name": "kaaper",
+                                "logoUrl": null,
+                                "shortDescription": "Documentation generator for Cairo projects.",
                                 "visibility": "PUBLIC",
                                 "languages": []
                               },
@@ -401,31 +377,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": true,
                                 "id": null
                               },
-                              "links": [
-                                {
-                                  "type": "PULL_REQUEST",
-                                  "repo": {
-                                    "id": 498695724,
-                                    "owner": "onlydustxyz",
-                                    "name": "marketplace-frontend",
-                                    "description": null,
-                                    "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
-                                  },
-                                  "githubAuthor": {
-                                    "githubUserId": 43467246,
-                                    "login": "AnthonyBuisset",
-                                    "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
-                                  },
-                                  "githubNumber": 18,
-                                  "githubStatus": "MERGED",
-                                  "githubTitle": "starknet interfacing",
-                                  "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/pull/18",
-                                  "githubBody": "closes #15\\n\\ndatabase:\\n- repo id is now the same as teh one provided by github API (like pullrequest id)\\n- foreign key added from pullrequest table to project table\\n- can log an indexing status (last time the indexer ran)\\n- can fetch pull requests\\n- can log a contract update status (last time the uploader ran)\\n\\nbinaries:\\n- refactor to smaller binaries:\\n  - add a single repo in database\\n  - index all repos (fetch PR from github and log in DB)\\n  - upload all pr (fetch PR from database and log in smart contract)\\n\\nstarknet:\\n- can log pullrequest in smart contract\\n\\nNext steps:\\n- user iterator trait for fetcher output\\n- use references when possible to avoid cloning strings everywhere\\n- consolidate errors instead of crashing at the first occurence\\n- end to end testing\\n- deployment\\n",
-                                  "githubLabels": null,
-                                  "lastUpdatedAt": null,
-                                  "is_mine": true
-                                }
-                              ]
+                              "links": []
                             }
                           ]
                         }

@@ -149,7 +149,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "totalPageNumber": 9,
-                          "totalItemNumber": 42,
+                          "totalItemNumber": 41,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "contributors": [
@@ -198,13 +198,13 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                               "totalEarnedUsd": 0
                             },
                             {
-                              "githubUserId": 33379285,
-                              "login": "ernestognw",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/33379285?v=4",
+                              "githubUserId": 595505,
+                              "login": "ofux",
+                              "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                               "dynamicRank": 5,
-                              "globalRank": 37,
+                              "globalRank": 5,
                               "globalRankCategory": "A",
-                              "contributionCount": 25,
+                              "contributionCount": 22,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0
                             }
@@ -227,7 +227,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "totalPageNumber": 9,
-                          "totalItemNumber": 42,
+                          "totalItemNumber": 41,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "contributors": [
@@ -265,17 +265,6 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                               "totalEarnedUsd": 0
                             },
                             {
-                              "githubUserId": 33379285,
-                              "login": "ernestognw",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/33379285?v=4",
-                              "dynamicRank": 2,
-                              "globalRank": 37,
-                              "globalRankCategory": "A",
-                              "contributionCount": 25,
-                              "rewardCount": 0,
-                              "totalEarnedUsd": 0
-                            },
-                            {
                               "githubUserId": 595505,
                               "login": "ofux",
                               "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
@@ -283,6 +272,17 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                               "globalRank": 5,
                               "globalRankCategory": "A",
                               "contributionCount": 22,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0
+                            },
+                            {
+                              "githubUserId": 5160414,
+                              "login": "haydencleary",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
+                              "dynamicRank": 2,
+                              "globalRank": 39,
+                              "globalRankCategory": "A",
+                              "contributionCount": 20,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0
                             }
@@ -300,7 +300,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
         em.getTransaction().begin();
         em.createNativeQuery("""
                 -- // Add good first issue to project B Conseil
-                INSERT INTO indexer_exp.github_issues_labels (issue_id, label_id) VALUES (1678706027, 3042230479);
+                INSERT INTO indexer_exp.github_issues_labels (issue_id, label_id) VALUES (1564131775, 3042230479);
                 -- // Add tag to project Bretzel
                 INSERT INTO projects_tags (project_id, tag) VALUES ('7d04163c-4187-4313-8066-61504d34fc56', 'FAST_AND_FURIOUS');
                 INSERT INTO projects_tags (project_id, tag) VALUES ('7d04163c-4187-4313-8066-61504d34fc56', 'WORK_IN_PROGRESS');
@@ -549,47 +549,6 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                   "name": "Typescript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
-                                }
-                              ]
-                            },
-                            {
-                              "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
-                              "slug": "zero-title-11",
-                              "name": "Zero title 11",
-                              "shortDescription": "Missing short description",
-                              "logoUrl": null,
-                              "topContributors": [
-                                {
-                                  "githubUserId": 481465,
-                                  "login": "frangio",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/481465?v=4"
-                                },
-                                {
-                                  "githubUserId": 2432299,
-                                  "login": "Amxx",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/2432299?v=4"
-                                },
-                                {
-                                  "githubUserId": 2530770,
-                                  "login": "nventuro",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/2530770?v=4"
-                                }
-                              ],
-                              "contributorsCount": 453,
-                              "languages": [
-                                {
-                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
-                                  "slug": "javascript",
-                                  "name": "Javascript",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
-                                },
-                                {
-                                  "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
-                                  "slug": "solidity",
-                                  "name": "Solidity",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                                 }
                               ]
                             }

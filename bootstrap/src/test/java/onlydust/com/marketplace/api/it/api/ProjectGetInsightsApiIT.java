@@ -394,7 +394,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
                               "id": null,
                               "cover": "CYAN",
                               "lastContribution": {
-                                "id": "a3c85bd5e85f505766c62b67802fd2ddc450e2532924bef082af17e43a388c88",
+                                "id": "b7ac93427ca348ff94c4479a00a9dc9b29fd186e3d589936964338b1362e7c7e",
                                 "completedAt": "2023-12-04T13:44:50Z",
                                 "repo": {
                                   "id": 498695724,

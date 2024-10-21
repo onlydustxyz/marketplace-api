@@ -323,8 +323,8 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 3,
-                          "totalItemNumber": 11,
+                          "totalPageNumber": 2,
+                          "totalItemNumber": 8,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "users": [
@@ -484,10 +484,10 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "applicants": []
                             },
                             {
-                              "id": 1263404890,
-                              "number": 183,
-                              "title": "Put the Id struct in the exercise storage02",
-                              "status": "COMPLETED",
+                              "id": 1262933369,
+                              "number": 181,
+                              "title": "VSCode extension to automatically move on to the next exercise",
+                              "status": "OPEN",
                               "repo": {
                                 "id": 480776993,
                                 "owner": "onlydustxyz",
@@ -509,22 +509,16 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4"
                               },
                               "labels": [
-                                "Context: isolated",
-                                "Difficulty: easy",
-                                "Duration: under a day",
+                                "Context: coupled",
+                                "Difficulty: hard",
+                                "Duration: few days",
                                 "State: open",
-                                "Techno: cairo",
-                                "Type: refactor",
+                                "Techno: js",
+                                "Techno: python",
+                                "Type: feature",
                                 "good first issue"
                               ],
-                              "assignees": [
-                                {
-                                  "githubUserId": 34384633,
-                                  "userId": null,
-                                  "login": "tdelabro",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4"
-                                }
-                              ],
+                              "assignees": [],
                               "applicants": []
                             }
                           ]

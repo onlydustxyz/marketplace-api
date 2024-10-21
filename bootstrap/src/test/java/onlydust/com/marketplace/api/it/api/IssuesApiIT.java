@@ -13,7 +13,7 @@ public class IssuesApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(String.format(ISSUES_BY_ID, "1736474921")))
+                .uri(getApiURI(String.format(ISSUES_BY_ID, "1952203217")))
                 .header("Authorization", "Bearer " + olivier.jwt())
                 // Then
                 .exchange()
@@ -22,26 +22,28 @@ public class IssuesApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "id": 1736474921,
-                          "number": 1111,
-                          "title": "Documentation by AnthonyBuisset",
-                          "status": "OPEN",
-                          "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111",
+                          "id": 1952203217,
+                          "number": 4,
+                          "title": "Test pierre 2",
+                          "status": "COMPLETED",
+                          "htmlUrl": "https://github.com/gregcha/bretzel-app/issues/4",
                           "repo": {
-                            "id": 602953640,
-                            "name": "cool.repo.B",
+                            "id": 380954304,
+                            "owner": "gregcha",
+                            "name": "bretzel-app",
                             "description": null,
-                            "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
+                            "htmlUrl": "https://github.com/gregcha/bretzel-app"
                           },
                           "author": {
-                            "githubUserId": 112474158,
-                            "login": "onlydust-contributor",
-                            "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                            "isRegistered": true
+                            "githubUserId": 136717950,
+                            "login": "od-staging",
+                            "avatarUrl": "https://avatars.githubusercontent.com/u/136717950?v=4",
+                            "isRegistered": false,
+                            "id": null
                           },
-                          "createdAt": "2023-06-01T14:39:49Z",
-                          "closedAt": null,
-                          "body": "Real cool documentation",
+                          "createdAt": "2023-10-19T12:59:45Z",
+                          "closedAt": "2023-10-19T12:59:46Z",
+                          "body": "aaaa",
                           "commentCount": 0,
                           "labels": [],
                           "applicants": [],

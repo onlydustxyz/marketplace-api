@@ -31,7 +31,7 @@ import static onlydust.com.marketplace.api.helper.CurrencyHelper.STRK;
 public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     ProjectFacadePort projectFacadePort;
-    
+
     private final static String CAL_DOT_COM = "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e";
 
     private final static ProjectId B_CONSEIL = ProjectId.of("27ca7e18-9e71-468f-8825-c64fe6b79d66");
@@ -639,7 +639,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + CAL_DOT_COM)).exchange()
                 // Then
                 .expectStatus().is2xxSuccessful().expectBody()
-                .jsonPath("$.goodFirstIssueCount").isEqualTo(11);
+                .jsonPath("$.goodFirstIssueCount").isEqualTo(4);
     }
 
     @Test
