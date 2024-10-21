@@ -4,8 +4,13 @@ import onlydust.com.marketplace.api.contract.model.GithubIssuePageItemResponse;
 import onlydust.com.marketplace.api.contract.model.GithubIssuePageResponse;
 import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.project.domain.model.Application;
+import onlydust.com.marketplace.project.domain.model.GithubComment;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import org.assertj.core.api.AbstractListAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,10 +33,14 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     private ApplicationRepository applicationRepository;
 
+    @Autowired
+    private PostgresBiProjectorAdapter biProjectorAdapter;
+
     private final static UUID projectAppliedTo1 = UUID.fromString("27ca7e18-9e71-468f-8825-c64fe6b79d66");
     private final static UUID projectAppliedTo2 = UUID.fromString("57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8");
+    private final static AtomicBoolean setupDone = new AtomicBoolean();
+
     private static UserAuthHelper.AuthenticatedUser projectLead;
-    private static AtomicBoolean setupDone = new AtomicBoolean();
 
     @BeforeEach
     void setup() {
@@ -42,17 +51,33 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
         final var pierre = userAuthHelper.authenticatePierre();
         final var antho = userAuthHelper.authenticateAntho();
         final var olivier = userAuthHelper.authenticateOlivier();
-        applicationRepository.saveAll(List.of(
-                // 1652216316L has 2 applicants on project 2
+
+        final var applications = List.of(
+                // 1643865031L has 2 applicants on project 2
                 // 1652216317L has 2 applicants on project 1 and 1 applicant on project 2
-                fakeApplication(projectAppliedTo1, pierre, 1651834617L, 112L),
-                fakeApplication(projectAppliedTo2, pierre, 1652216316L, 113L),
+                fakeApplication(projectAppliedTo1, pierre, 1643866301L, 112L),
+                fakeApplication(projectAppliedTo2, pierre, 1643865031L, 113L),
 
-                fakeApplication(projectAppliedTo2, antho, 1652216316L, 112L),
-                fakeApplication(projectAppliedTo2, antho, 1651834617L, 113L),
+                fakeApplication(projectAppliedTo2, antho, 1643865031L, 112L),
+                fakeApplication(projectAppliedTo2, antho, 1643866301L, 113L),
 
-                fakeApplication(projectAppliedTo1, olivier, 1651834617L, 112L)
-        ));
+                fakeApplication(projectAppliedTo1, olivier, 1643866301L, 112L)
+        );
+
+        databaseHelper.executeInTransaction(() -> {
+            applicationRepository.saveAll(applications);
+            applications.forEach(a -> biProjectorAdapter.onApplicationCreated(new Application(
+                    Application.Id.of(a.id()),
+                    ProjectId.of(a.projectId()),
+                    a.applicantId(),
+                    a.origin(),
+                    a.receivedAt(),
+                    GithubIssue.Id.of(a.issueId()),
+                    GithubComment.Id.of(a.commentId()),
+                    a.motivations(),
+                    a.problemSolvingApproach()
+            )));
+        });
     }
 
     @Test
@@ -96,7 +121,18 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
                               "closedAt": null,
                               "body": "Real cool documentation",
                               "labels": [],
-                              "applicants": [],
+                              "applicants": [
+                                {
+                                  "githubUserId": 43467246,
+                                  "login": "AnthonyBuisset",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                                },
+                                {
+                                  "githubUserId": 16590657,
+                                  "login": "PierreOucif",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                                }
+                              ],
                               "assignees": [],
                               "currentUserApplication": null
                             },
@@ -124,7 +160,23 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
                               "closedAt": null,
                               "body": "Real cool documentation",
                               "labels": [],
-                              "applicants": [],
+                              "applicants": [
+                                {
+                                  "githubUserId": 43467246,
+                                  "login": "AnthonyBuisset",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                                },
+                                {
+                                  "githubUserId": 16590657,
+                                  "login": "PierreOucif",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                                },
+                                {
+                                  "githubUserId": 595505,
+                                  "login": "ofux",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
+                                }
+                              ],
                               "assignees": [],
                               "currentUserApplication": null
                             },
