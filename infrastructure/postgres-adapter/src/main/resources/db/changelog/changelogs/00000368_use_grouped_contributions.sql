@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 ------------------------------------------------------------------------------------------------------------------------
 -- Allows to get all indexed users a lot faster than by using all_users
 CREATE VIEW iam.all_indexed_users AS
