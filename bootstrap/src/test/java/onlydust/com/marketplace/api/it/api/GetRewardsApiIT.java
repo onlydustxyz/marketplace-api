@@ -164,12 +164,10 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               },
                               "status": "INDIVIDUAL_LIMIT_REACHED",
                               "from": {
-                                "login": "hayden",
-                                "isRegistered": true
+                                "login": "hayden"
                               },
                               "to": {
-                                "login": "pierre",
-                                "isRegistered": true
+                                "login": "pierre"
                               },
                               "processedAt": null,
                               "unlockDate": null
@@ -190,12 +188,10 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               },
                               "status": "PENDING_CONTRIBUTOR",
                               "from": {
-                                "login": "pierre",
-                                "isRegistered": true
+                                "login": "pierre"
                               },
                               "to": {
-                                "login": "antho",
-                                "isRegistered": true
+                                "login": "antho"
                               },
                               "processedAt": null,
                               "unlockDate": null
@@ -216,12 +212,10 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               },
                               "status": "PENDING_CONTRIBUTOR",
                               "from": {
-                                "login": "pierre",
-                                "isRegistered": true
+                                "login": "pierre"
                               },
                               "to": {
-                                "login": "antho",
-                                "isRegistered": true
+                                "login": "antho"
                               },
                               "processedAt": null,
                               "unlockDate": null
@@ -242,12 +236,10 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               },
                               "status": "PENDING_CONTRIBUTOR",
                               "from": {
-                                "login": "pierre",
-                                "isRegistered": true
+                                "login": "pierre"
                               },
                               "to": {
-                                "login": "sophiebits",
-                                "isRegistered": true
+                                "login": "james"
                               },
                               "processedAt": null,
                               "unlockDate": null

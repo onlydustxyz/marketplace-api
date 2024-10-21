@@ -162,6 +162,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     }
 
     @Override
+    @Transactional
     public void onApplicationCreated(Application application) {
         entityManager.flush();
         final var contributionUUID = ContributionUUID.of(application.issueId().value());
@@ -170,6 +171,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     }
 
     @Override
+    @Transactional
     public void onApplicationAccepted(Application application, UserId projectLeadId) {
         entityManager.flush();
         final var contributionUUID = ContributionUUID.of(application.issueId().value());
@@ -178,6 +180,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     }
 
     @Override
+    @Transactional
     public void onApplicationRefused(Application application) {
         entityManager.flush();
         final var contributionUUID = ContributionUUID.of(application.issueId().value());

@@ -351,23 +351,23 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                               },
                               "issue": {
                                 "id": 2012381551,
-                                "number": 1112,
-                                "title": "Monthly contracting subscription",
+                                "number": 586,
+                                "title": "add access list (warm/cold) address gast costs",
                                 "status": "OPEN",
-                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1112",
+                                "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj/issues/586",
                                 "repo": {
-                                  "id": 602953640,
-                                  "owner": "od-mocks",
-                                  "name": "cool.repo.B",
-                                  "description": null,
-                                  "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
+                                  "id": 599607010,
+                                  "owner": "kkrt-labs",
+                                  "name": "kakarot-ssj",
+                                  "description": "Kakarot zkEVM - rewrite in the latest version of Cairo",
+                                  "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj"
                                 },
                                 "author": {
-                                  "githubUserId": 112474158,
-                                  "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                                  "isRegistered": true,
-                                  "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d"
+                                  "githubUserId": 66871571,
+                                  "login": "Eikix",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/66871571?v=4",
+                                  "isRegistered": false,
+                                  "id": null
                                 }
                               },
                               "applicant": {
@@ -390,23 +390,23 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                               },
                               "issue": {
                                 "id": 2012381551,
-                                "number": 1112,
-                                "title": "Monthly contracting subscription",
+                                "number": 586,
+                                "title": "add access list (warm/cold) address gast costs",
                                 "status": "OPEN",
-                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1112",
+                                "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj/issues/586",
                                 "repo": {
-                                  "id": 602953640,
-                                  "owner": "od-mocks",
-                                  "name": "cool.repo.B",
-                                  "description": null,
-                                  "htmlUrl": "https://github.com/od-mocks/cool.repo.B"
+                                  "id": 599607010,
+                                  "owner": "kkrt-labs",
+                                  "name": "kakarot-ssj",
+                                  "description": "Kakarot zkEVM - rewrite in the latest version of Cairo",
+                                  "htmlUrl": "https://github.com/kkrt-labs/kakarot-ssj"
                                 },
                                 "author": {
-                                  "githubUserId": 112474158,
-                                  "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
-                                  "isRegistered": true,
-                                  "id": "cde93e0e-99cf-4722-8aaa-2c27b91e270d"
+                                  "githubUserId": 66871571,
+                                  "login": "Eikix",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/66871571?v=4",
+                                  "isRegistered": false,
+                                  "id": null
                                 }
                               },
                               "applicant": {
@@ -1052,11 +1052,11 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "trend": "UP"
                               },
                               "codeReviewCount": {
-                                "value": 135,
+                                "value": 126,
                                 "trend": "UP"
                               },
                               "contributionCount": {
-                                "value": 444,
+                                "value": 435,
                                 "trend": "UP"
                               }
                             },
@@ -1190,11 +1190,11 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "trend": "UP"
                               },
                               "codeReviewCount": {
-                                "value": 215,
+                                "value": 163,
                                 "trend": "UP"
                               },
                               "contributionCount": {
-                                "value": 317,
+                                "value": 265,
                                 "trend": "UP"
                               }
                             },
@@ -1489,11 +1489,11 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "trend": "UP"
                               },
                               "codeReviewCount": {
-                                "value": 72,
+                                "value": 63,
                                 "trend": "UP"
                               },
                               "contributionCount": {
-                                "value": 284,
+                                "value": 275,
                                 "trend": "UP"
                               }
                             }
