@@ -8288,6 +8288,7 @@ components:
         - githubAuthor
         - githubTitle
         - githubHtmlUrl
+        - githubId
       properties:
         uuid:
           $ref: '#/components/schemas/ContributionUuid'
@@ -8295,6 +8296,11 @@ components:
           $ref: '#/components/schemas/ContributionType'
         repo:
           $ref: '#/components/schemas/ShortGithubRepoResponse'
+        githubId:
+          type: integer
+          format: int64
+          description: Github item id
+          example: 6
         githubAuthor:
           $ref: '#/components/schemas/GithubUserResponse'
         githubNumber:
