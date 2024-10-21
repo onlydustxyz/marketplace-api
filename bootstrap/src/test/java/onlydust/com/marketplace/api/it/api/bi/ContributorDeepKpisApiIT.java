@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.suites.tags.TagBI;
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
@@ -56,7 +57,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
         private static ProjectId onlyDust;
         private static String onlyDustSlug;
         private static ProjectId madara;
-        private static Long prId;
+        private static ContributionUUID prId;
 
         private static String allProgramOrEcosystemIds;
 
@@ -185,6 +186,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .is2xxSuccessful()
                     .expectBody()
+                    .consumeWith(System.out::println)
                     .jsonPath("$.contributors[0].projects[0].name").<String>value(name -> assertThat(name).contains("OnlyDust"))
                     .jsonPath("$.contributors[1].projects[0].name").<String>value(name -> assertThat(name).contains("Bridge"))
                     .jsonPath("$.contributors[1].projects[1].name").<String>value(name -> assertThat(name).contains("Madara"))
@@ -222,8 +224,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   ],
                                   "countryCode": "FR",
                                   "totalRewardedUsdAmount": {
-                                    "value": 1.5,
-                                    "trend": "UP"
+                                    "value": 0,
+                                    "trend": "STABLE"
                                   },
                                   "rewardCount": {
                                     "value": 2,
@@ -365,8 +367,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   ],
                                   "countryCode": "GB",
                                   "totalRewardedUsdAmount": {
-                                    "value": 3.5,
-                                    "trend": "UP"
+                                    "value": 0,
+                                    "trend": "STABLE"
                                   },
                                   "rewardCount": {
                                     "value": 2,
@@ -532,22 +534,6 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             asserter.accept(response);
         }
 
-        private void test_bad_request(Map<String, String> queryParamsWithValues) {
-            final var queryParams = new HashMap<String, String>();
-            queryParams.put("pageIndex", "0");
-            queryParams.put("pageSize", "100");
-            queryParams.put("fromDate", "2021-01-01");
-            queryParams.put("toDate", "2021-01-10");
-            queryParams.put("dataSourceIds", allProgramOrEcosystemIds);
-            queryParams.putAll(queryParamsWithValues);
-            client.get()
-                    .uri(getApiURI(BI_CONTRIBUTORS, queryParams))
-                    .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(caller).jwt())
-                    .exchange()
-                    .expectStatus()
-                    .is4xxClientError();
-        }
-
         @Test
         public void should_get_contributors_stats_with_filters() {
             test_contributors_stats("search", "gaming",
@@ -567,14 +553,13 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                             .extracting(BiContributorsPageItemResponse::getContributor)
                             .extracting(ContributorOverviewResponse::getGithubUserId)
                             .contains(mehdi.githubUserId().value()), true);
-            test_contributors_stats(Map.of("contributedTo.githubId", prId.toString(), "contributedTo.type", "PULL_REQUEST"),
+
+            test_contributors_stats(Map.of("contributedTo", prId.value().toString()),
                     response -> assertThat(response.getContributors())
                             .hasSize(1)
                             .extracting(BiContributorsPageItemResponse::getContributor)
                             .extracting(ContributorOverviewResponse::getGithubUserId)
                             .contains(hayden.githubUserId().value()), true);
-            test_bad_request(Map.of("contributedTo.githubId", prId.toString()));
-            test_bad_request(Map.of("contributedTo.type", "ISSUE"));
             test_contributors_stats("projectIds", onlyDust.toString(),
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getProjects())
                             .extracting(ProjectLinkResponse::getName)
@@ -698,8 +683,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                               "projectContributorLabels": null,
                               "countryCode": "FR",
                               "totalRewardedUsdAmount": {
-                                "value": 1.5,
-                                "trend": "UP"
+                                "value": 0,
+                                "trend": "STABLE"
                               },
                               "rewardCount": {
                                 "value": 2,

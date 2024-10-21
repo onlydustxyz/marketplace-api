@@ -10,7 +10,10 @@ import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Reward;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Data
@@ -44,7 +47,7 @@ public class RewardEntity {
                         @NonNull UUID currencyId,
                         @NonNull BigDecimal amount,
                         @NonNull Date requestedAt,
-                        @NonNull List<RewardItemEntity> rewardItems,
+                        @NonNull Set<RewardItemEntity> rewardItems,
                         UUID billingProfileId) {
         this.id = id;
         this.projectId = projectId;
@@ -63,7 +66,8 @@ public class RewardEntity {
 
     @OneToMany(mappedBy = "rewardId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @NonNull
-    List<RewardItemEntity> rewardItems;
+    Set<RewardItemEntity> rewardItems;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "currencyId", insertable = false, updatable = false)
     CurrencyEntity currency;

@@ -234,7 +234,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/contributions/{contributionGithubId}:
+  /api/v1/contributions/{contributionUuid}:
     get:
       security:
         - bearerAuth: [ ]
@@ -245,11 +245,12 @@ paths:
       description: |
         Get contribution.
       parameters:
-        - name: contributionGithubId
+        - name: contributionUuid
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/IssueId'
+            $ref: '#/components/schemas/ContributionUuid'
+
       responses:
         "200":
           description: 'Contribution'
@@ -290,6 +291,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContributionEventListResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/rewards:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadRewards
+      summary: Get rewards
+      operationId: getRewards
+      description: |
+        Get rewards
+      parameters:
+        - name: queryParams
+          in: query
+          schema:
+            $ref: '#/components/schemas/PageableRewardsQueryParams'
+      responses:
+        "200":
+          description: 'Reward list'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -2678,6 +2710,8 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
+  /api/v2/issues/{contributionUuid}:
     patch:
       security:
         - bearerAuth: [ ]
@@ -2688,10 +2722,10 @@ paths:
       description: Update issue. Caller must be lead on linked project.
       parameters:
         - in: path
-          name: issueId
+          name: contributionUuid
           required: true
           schema:
-            $ref: '#/components/schemas/IssueId'
+            $ref: '#/components/schemas/ContributionUuid'
       requestBody:
         content:
           application/json:
@@ -3438,7 +3472,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
 
-  /api/v1/issues/{issueId}/applicants:
+  /api/v1/issues/{contributionUuid}/applicants:
     get:
       tags:
         - ReadIssues
@@ -3448,10 +3482,10 @@ paths:
         Get the list of all users that applied to an issue.
       parameters:
         - in: path
-          name: issueId
+          name: contributionUuid
           required: true
           schema:
-            $ref: '#/components/schemas/IssueId'
+            $ref: '#/components/schemas/ContributionUuid'
         - in: query
           name: params
           schema:
@@ -5451,7 +5485,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/pull-requests/{pullRequestId}:
+  /api/v1/pull-requests/{contributionUuid}:
     patch:
       security:
         - bearerAuth: [ ]
@@ -5462,10 +5496,10 @@ paths:
       description: Update pull request. Caller must be lead on linked project.
       parameters:
         - in: path
-          name: pullRequestId
+          name: contributionUuid
           required: true
           schema:
-            $ref: '#/components/schemas/PullRequestId'
+            $ref: '#/components/schemas/ContributionUuid'
       requestBody:
         content:
           application/json:
@@ -5679,6 +5713,11 @@ components:
       format: uuid
       description: OnlyDust user ID
 
+    ContributionUuid:
+      type: string
+      format: uuid
+      description: OnlyDust contribution ID
+
     GithubUserId:
       type: integer
       format: int64
@@ -5695,12 +5734,6 @@ components:
       type: integer
       format: int64
       description: Github issue ID (databaseId)
-      example: 1678794252
-
-    PullRequestId:
-      type: integer
-      format: int64
-      description: Github PR ID (databaseId)
       example: 1678794252
 
     ProjectId:
@@ -7676,7 +7709,7 @@ components:
             rewards:
               type: array
               items:
-                $ref: '#/components/schemas/RewardPageItemResponse'
+                $ref: '#/components/schemas/RewardsPageItemResponse'
             remainingBudget:
               $ref: '#/components/schemas/DetailedTotalMoney'
             spentAmount:
@@ -7719,7 +7752,7 @@ components:
               type: integer
               description: Number of rewards at pending request status
 
-    RewardPageItemResponse:
+    RewardsPageItemResponse:
       type: object
       required:
         - status
@@ -8220,18 +8253,12 @@ components:
       required:
         - type
         - githubStatus
-        - githubId
         - githubNumber
         - githubTitle
         - githubHtmlUrl
       properties:
         type:
           $ref: '#/components/schemas/ContributionType'
-        githubId:
-          type: integer
-          format: int64
-          description: Github item id
-          example: 6
         githubNumber:
           type: integer
           format: int64
@@ -8250,26 +8277,23 @@ components:
     ContributionResponse:
       type: object
       required:
+        - uuid
         - type
         - repo
         - githubStatus
-        - githubId
         - githubNumber
         - githubAuthor
         - githubTitle
         - githubHtmlUrl
       properties:
+        uuid:
+          $ref: '#/components/schemas/ContributionUuid'
         type:
           $ref: '#/components/schemas/ContributionType'
         repo:
           $ref: '#/components/schemas/ShortGithubRepoResponse'
         githubAuthor:
           $ref: '#/components/schemas/GithubUserResponse'
-        githubId:
-          type: integer
-          format: int64
-          description: Github item id
-          example: 6
         githubNumber:
           type: integer
           format: int64
@@ -11731,17 +11755,6 @@ components:
             type: string
             format: uuid
 
-    ContributionIdentity:
-      type: object
-      required:
-        - githubId
-        - type
-      properties:
-        githubId:
-          $ref: '#/components/schemas/IssueId'
-        type:
-          $ref: '#/components/schemas/ContributionType'
-
     ContributorsQueryParams:
       type: object
       properties:
@@ -11757,7 +11770,9 @@ components:
           items:
             $ref: '#/components/schemas/GithubUserId'
         contributedTo:
-          $ref: '#/components/schemas/ContributionIdentity'
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributionUuid'
         projectIds:
           type: array
           items:
@@ -12012,7 +12027,7 @@ components:
         ids:
           type: array
           items:
-            $ref: '#/components/schemas/IssueId'
+            $ref: '#/components/schemas/ContributionUuid'
         types:
           type: array
           items:
@@ -12041,6 +12056,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectContributorLabelId'
+        rewardIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewardId'
         hasBeenRewarded:
           type: boolean
 
@@ -12068,6 +12087,10 @@ components:
             - lastUpdatedAt
             - activityStatus
           properties:
+            githubId:
+              type: string
+              description: Github item id
+              deprecated: true
             createdAt:
               type: string
               format: date-time
@@ -12188,3 +12211,70 @@ components:
         archived:
           type: boolean
 
+    PageableRewardsQueryParams:
+      allOf:
+        - $ref: '#/components/schemas/PaginationQueryParams'
+        - $ref: '#/components/schemas/RewardsQueryParams'
+
+    RewardsQueryParams:
+      type: object
+      properties:
+        statuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewardStatusContract'
+        contributionUUIDs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributionUuid'
+        recipientIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/GithubUserId'
+        projectIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectId'
+
+    RewardPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - rewards
+          properties:
+            rewards:
+              type: array
+              items:
+                $ref: '#/components/schemas/RewardPageItemResponse'
+
+    RewardPageItemResponse:
+      type: object
+      required:
+        - id
+        - amount
+        - from
+        - to
+        - createdAt
+      properties:
+        id:
+          $ref: '#/components/schemas/RewardId'
+        amount:
+          $ref: '#/components/schemas/Money'
+        status:
+          $ref: '#/components/schemas/RewardStatusContract'
+        from:
+          $ref: '#/components/schemas/ContributorResponse'
+        to:
+          $ref: '#/components/schemas/ContributorResponse'
+        requestedAt:
+          type: string
+          format: date-time
+        processedAt:
+          type: string
+          format: date-time
+        unlockDate:
+          type: string
+          format: date-time
+        projectId:
+          $ref: '#/components/schemas/ProjectId'

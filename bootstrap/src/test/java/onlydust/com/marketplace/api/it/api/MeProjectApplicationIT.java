@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.it.api;
 
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
+import onlydust.com.marketplace.api.contract.model.ContributionsQueryParams;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateRequest;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationUpdateRequest;
@@ -9,13 +10,14 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.Applicatio
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndexingEventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
+import onlydust.com.marketplace.api.read.repositories.ContributionReadRepository;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
 import onlydust.com.marketplace.kernel.model.event.OnGithubIssueDeleted;
 import onlydust.com.marketplace.project.domain.model.Application;
-import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -47,7 +49,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     @Autowired
     CustomerIOProperties customerIOProperties;
     @Autowired
-    HackathonStoragePort hackathonStoragePort;
+    ContributionReadRepository contributionReadRepository;
 
     @BeforeEach
     void setUp() {
@@ -82,6 +84,10 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                                 }
                                 """)));
 
+        final var contributionBefore =
+                contributionReadRepository.findAll(new ContributionsQueryParams().ids(List.of(ContributionUUID.of(issueId).value()))).stream().findFirst().orElseThrow();
+        assertThat(contributionBefore.applicants()).isNull();
+
         // When
         final var applicationId = client.post()
                 .uri(getApiURI(ME_APPLICATIONS))
@@ -103,6 +109,11 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         assertThat(application.commentId()).isEqualTo(123456789L);
         assertThat(application.motivations()).isEqualTo(motivations);
         assertThat(application.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
+
+        final var contributionAfter =
+                contributionReadRepository.findAll(new ContributionsQueryParams().ids(List.of(ContributionUUID.of(issueId).value()))).stream().findFirst().orElseThrow();
+        assertThat(contributionAfter.applicants()).hasSize(1);
+        assertThat(contributionAfter.applicants().get(0).getGithubUserId()).isEqualTo(user.githubUserId().value());
 
         trackingOutboxJob.run();
 
@@ -156,7 +167,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     void should_not_be_able_to_apply_twice() {
         // Given
         final var user = userAuthHelper.authenticateAntho();
-        final var issueId = 1736474921L;
+        final var issueId = 1976081596L;
         final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
 
         applicationRepository.save(new ApplicationEntity(

@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.observer;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
@@ -33,5 +34,10 @@ public class ProjectObserverComposite implements ProjectObserverPort {
     @Override
     public void onProjectCategorySuggested(String categoryName, UserId userId) {
         observers.forEach(observer -> observer.onProjectCategorySuggested(categoryName, userId));
+    }
+
+    @Override
+    public void onLabelsModified(@NonNull ProjectId projectId, Set<Long> githubUserIds) {
+        observers.forEach(observer -> observer.onLabelsModified(projectId, githubUserIds));
     }
 }

@@ -17,12 +17,12 @@ public class PullRequestService implements PullRequestFacadePort {
 
     @Override
     public void updatePullRequest(UserId projectLeadId, UpdatePullRequestCommand updatePullRequestCommand) {
-        if (!permissionPort.canUserUpdatePullRequest(projectLeadId, updatePullRequestCommand.id().value())) {
+        if (!permissionPort.canUserUpdateContribution(projectLeadId, updatePullRequestCommand.id())) {
             throw OnlyDustException.unauthorized(String.format("User %s must be project lead to update pull request %s linked to its projects", projectLeadId,
                     updatePullRequestCommand.id().value()));
         }
         if (nonNull(updatePullRequestCommand.archived())) {
-            contributionStoragePort.archivePullRequest(updatePullRequestCommand.id(), updatePullRequestCommand.archived());
+            contributionStoragePort.archiveContribution(updatePullRequestCommand.id(), updatePullRequestCommand.archived());
         }
     }
 }

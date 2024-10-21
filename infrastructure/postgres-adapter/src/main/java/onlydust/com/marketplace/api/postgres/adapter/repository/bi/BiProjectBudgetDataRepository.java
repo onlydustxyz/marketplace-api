@@ -18,8 +18,8 @@ public class BiProjectBudgetDataRepository extends PseudoProjectionRepository {
         return super.refresh();
     }
 
-    @Trace(operationName = "pseudo_projection.refresh", resourceName = "refresh:bi.project_budget_data")
-    public int refresh(final ProjectId projectId) {
+    @Trace(operationName = "pseudo_projection.refresh", resourceName = "refresh:bi.project_budget_data:project_id")
+    public int refreshByProject(final ProjectId projectId) {
         return refresh(Map.of("project_id", projectId.value()));
     }
 }

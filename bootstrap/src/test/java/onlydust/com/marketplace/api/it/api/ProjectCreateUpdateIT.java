@@ -155,7 +155,6 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .jsonPath("$.id").isEqualTo(response.getProjectId().toString())
                 .jsonPath("$.visibility").isEqualTo("PUBLIC")
                 .jsonPath("$.name").isEqualTo("Super Project")

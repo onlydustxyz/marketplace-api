@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
@@ -32,6 +33,10 @@ public class OutboxProjectService implements ProjectObserverPort, ApplicationObs
 
     @Override
     public void onProjectCategorySuggested(String categoryName, UserId userId) {
+    }
+
+    @Override
+    public void onLabelsModified(@NonNull ProjectId projectId, Set<Long> githubUserIds) {
     }
 
     @Override

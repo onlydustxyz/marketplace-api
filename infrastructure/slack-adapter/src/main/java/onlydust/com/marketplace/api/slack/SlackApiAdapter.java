@@ -96,6 +96,11 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     }
 
     @Override
+    public void onLabelsModified(@NonNull ProjectId projectId, Set<Long> githubUserIds) {
+        
+    }
+
+    @Override
     public void onInvoiceUploaded(BillingProfile.Id billingProfileId, Invoice.Id invoiceId, boolean isExternal) {
     }
 

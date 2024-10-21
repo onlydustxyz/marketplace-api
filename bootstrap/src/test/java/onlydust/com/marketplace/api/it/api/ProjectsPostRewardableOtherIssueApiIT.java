@@ -69,12 +69,12 @@ public class ProjectsPostRewardableOtherIssueApiIT extends AbstractMarketplaceAp
         final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         // When
-        indexerApiWireMockServer.stubFor(put(urlEqualTo("/api/v1/repos/onlydustxyz/starklings/issues/100"))
+        indexerApiWireMockServer.stubFor(put(urlEqualTo("/api/v1/repos/onlydustxyz/starklings/issues/139"))
                 .willReturn(ok()));
 
         client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_OTHER_ISSUE, projectId))).contentType(APPLICATION_JSON).bodyValue("""
                         {
-                          "githubIssueHtmlUrl": "https://github.com/onlydustxyz/starklings/issues/100"
+                          "githubIssueHtmlUrl": "https://github.com/onlydustxyz/starklings/issues/139"
                         }
                         """)
                 .header("Authorization", BEARER_PREFIX + pierre.jwt())
@@ -85,27 +85,27 @@ public class ProjectsPostRewardableOtherIssueApiIT extends AbstractMarketplaceAp
                 .expectBody()
                 .json("""
                         {
-                          "number": 100,
-                          "id": "1231618572",
+                          "number": 139,
+                          "id": "1243347024",
                           "contributionId": null,
-                          "title": "feature: soluce command in the CLI",
-                          "createdAt": "2022-05-10T19:49:36Z",
-                          "completedAt": "2022-05-12T14:10:19Z",
-                          "githubBody": "using this command (on a specific exercise or while in `watch mode`) will patch the exercise file with it's solution\\r\\nsteps:\\r\\n- `git restore -s origin/main <path to exercise file>` (in order to get rid of any user modification and avoid conflicts)\\r\\n- `patch <path to exercise file> <path to corresponding patch file>`",
+                          "title": "Exercise on the common math operations",
+                          "createdAt": "2022-05-20T15:56:33Z",
+                          "completedAt": null,
+                          "githubBody": "## Description\\r\\nThe common library contains predefined functions to handle common math operations. \\r\\nSuch as `<`, `<=`, `> 0`, range checks, absolute value, felt division.\\r\\nProvide an exercise to learn how to use those functions.\\r\\n\\r\\nResource:\\r\\n - https://perama-v.github.io/cairo/examples/math/\\r\\n\\r\\n## Acceptance criteria\\r\\n - The exercise showcase math common library functions\\r\\n - The contract compiles and tests pass\\r\\n - An exercise patch is generated",
                           "author": {
-                            "githubUserId": 34384633,
-                            "login": "tdelabro",
-                            "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4"
+                            "githubUserId": 98529704,
+                            "login": "tekkac",
+                            "avatarUrl": "https://avatars.githubusercontent.com/u/98529704?v=4"
                           },
                           "repoName": "starklings",
                           "repoId": 480776993,
                           "type": "ISSUE",
                           "commitsCount": null,
                           "userCommitsCount": null,
-                          "commentsCount": 2,
-                          "status": "COMPLETED",
+                          "commentsCount": 1,
+                          "status": "OPEN",
                           "ignored": false,
-                          "htmlUrl": "https://github.com/onlydustxyz/starklings/issues/100"
+                          "htmlUrl": "https://github.com/onlydustxyz/starklings/issues/139"
                         }
                         """);
     }

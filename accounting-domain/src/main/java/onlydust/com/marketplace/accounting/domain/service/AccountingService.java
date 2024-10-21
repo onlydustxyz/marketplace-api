@@ -192,10 +192,11 @@ public class AccountingService implements AccountingFacadePort {
 
         final var refundedAccounts = accountBook.refund(AccountId.of(rewardId)).stream().map(t -> t.path().get(t.path().size() - 2)).collect(toSet());
         saveAccountBook(currency, accountBook);
-        accountingObserver.onRewardCancelled(rewardId);
+        accountingObserver.onRewardCancelledBefore(rewardId);
         refundedAccounts.stream().filter(AccountId::isProject).map(AccountId::projectId)
                 .forEach(refundedProjectId -> onAllowanceUpdated(refundedProjectId, currencyId, accountBook.state()));
         rewardStatusFacadePort.delete(rewardId);
+        accountingObserver.onRewardCancelledAfter(rewardId);
     }
 
     @Override

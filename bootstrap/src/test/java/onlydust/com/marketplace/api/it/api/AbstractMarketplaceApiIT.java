@@ -190,6 +190,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_COMMITTEE_ASSIGNEMENTS = "/api/v1/me/committees/%s";
     protected static final String ME_COMMITTEE_PROJECTS = "/api/v1/me/committees/%s/projects/%s";
     protected static final String PROJECT_CATEGORIES = "/api/v1/project-categories";
+    protected static final String V2_ISSUES_BY_ID = "/api/v2/issues/%s";
     protected static final String ISSUES_BY_ID = "/api/v1/issues/%s";
     protected static final String ISSUES_BY_ID_APPLICANTS = "/api/v1/issues/%s/applicants";
     protected static final String LANGUAGES = "/api/v1/languages";
@@ -216,6 +217,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECT_CONTRIBUTOR_LABELS = "/api/v1/projects/%s/contributor-labels";
     protected static final String CONTRIBUTOR_LABEL_BY_ID = "/api/v1/contributor-labels/%s";
     protected static final String PULL_REQUESTS_BY_ID = "/api/v1/pull-requests/%s";
+    protected static final String GET_REWARDS = "/api/v1/rewards";
 
     private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
             .withDatabaseName("marketplace_db")
@@ -344,7 +346,7 @@ public class AbstractMarketplaceApiIT {
     @BeforeEach
     void setupUserHelper() {
         userAuthHelper = new UserAuthHelper(userRepository, backofficeUserRepository, jwtVerifier, githubAuthenticationPort, auth0WireMockServer,
-                githubWireMockServer, appUserFacadePort, faker);
+                githubWireMockServer, appUserFacadePort, faker, githubHelper);
 
         userAuthHelper.mockAuth0UserInfo(134486697L, "axelbconseil");
         userAuthHelper.mockAuth0UserInfo(43467246L, "AnthonyBuisset", "abuisset@gmail.com");

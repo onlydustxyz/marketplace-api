@@ -3,8 +3,6 @@ package onlydust.com.marketplace.project.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.model.*;
 import onlydust.com.marketplace.kernel.port.output.PermissionPort;
-import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.model.GithubPullRequest;
 import onlydust.com.marketplace.project.domain.port.output.*;
 
 import java.util.List;
@@ -86,22 +84,8 @@ public class PermissionService implements PermissionPort {
     }
 
     @Override
-    public boolean canUserUpdateIssue(UserId userId, Long githubIssueId) {
-        for (ProjectId projectId : projectStoragePort.getProjectIdsLinkedToIssueId(GithubIssue.Id.of(githubIssueId))) {
-            if (isUserProjectLead(projectId, userId)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean canUserUpdatePullRequest(UserId userId, Long githubPullRequestId) {
-        for (ProjectId projectId : projectStoragePort.getProjectIdsLinkedToPullRequestId(GithubPullRequest.Id.of(githubPullRequestId))) {
-            if (isUserProjectLead(projectId, userId)) {
-                return true;
-            }
-        }
-        return false;
+    public boolean canUserUpdateContribution(UserId userId, ContributionUUID contributionUUID) {
+        return projectStoragePort.getProjectIdsLinkedToContributionUuid(contributionUUID).stream()
+                .anyMatch(projectId -> isUserProjectLead(projectId, userId));
     }
 }

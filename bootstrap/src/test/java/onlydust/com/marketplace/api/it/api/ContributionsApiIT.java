@@ -5,15 +5,22 @@ import onlydust.com.marketplace.api.contract.model.ContributionActivityPageRespo
 import onlydust.com.marketplace.api.contract.model.ContributionActivityStatus;
 import onlydust.com.marketplace.api.contract.model.ContributionType;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.project.domain.model.ProjectContributorLabel;
+import onlydust.com.marketplace.project.domain.port.input.ProjectContributorLabelFacadePort;
 import org.assertj.core.api.AbstractListAssert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.Comparator.comparing;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,11 +28,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @TagProject
 public class ContributionsApiIT extends AbstractMarketplaceApiIT {
+    private static final AtomicBoolean setupDone = new AtomicBoolean();
+    static ProjectContributorLabel ogLabel;
+
+    @Autowired
+    ProjectContributorLabelFacadePort projectContributorLabelFacadePort;
+
+    @BeforeEach
+    void setup() {
+        if (setupDone.compareAndExchange(false, true)) return;
+
+        final var kaaper = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
+        final var olivier = userAuthHelper.authenticateOlivier();
+        final var projectLead = userAuthHelper.authenticateAntho();
+        ogLabel = projectContributorLabelFacadePort.createLabel(projectLead.userId(), kaaper, "OG");
+        projectContributorLabelFacadePort.updateLabelsOfContributors(projectLead.userId(), kaaper,
+                Map.of(olivier.user().getGithubUserId(), List.of(ogLabel.id())));
+    }
+
     @Test
     void should_get_contribution() {
         // When
         client.get()
-                .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("43506983"), Map.of("pageSize", "1")))
+                .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("f4db1d9b-4e1d-300c-9277-8d05824c804e"), Map.of("pageSize", "1")))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -33,6 +58,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
+                          "uuid": "f4db1d9b-4e1d-300c-9277-8d05824c804e",
                           "type": "PULL_REQUEST",
                           "repo": {
                             "id": 40652912,
@@ -46,7 +72,6 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                             "login": "krzkaczor",
                             "avatarUrl": "https://avatars.githubusercontent.com/u/1814312?v=4"
                           },
-                          "githubId": 43506983,
                           "githubNumber": 8,
                           "githubStatus": "CLOSED",
                           "githubTitle": "Support for promises",
@@ -98,12 +123,13 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 45508,
-                          "totalItemNumber": 45508,
+                          "totalPageNumber": 4694,
+                          "totalItemNumber": 4694,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "contributions": [
                             {
+                              "uuid": "fb8a66f0-b4fc-353a-92ef-14d1a93b02b1",
                               "type": "ISSUE",
                               "repo": {
                                 "id": 21339768,
@@ -117,7 +143,6 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "simonwhitaker",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/116432?v=4"
                               },
-                              "githubId": 39536039,
                               "githubNumber": 1,
                               "githubStatus": "COMPLETED",
                               "githubTitle": "Tutorial uses POST with SimpleHTTPServer",
@@ -161,9 +186,9 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .extracting(ContributionActivityPageItemResponse::getType)
                 .containsOnly(ContributionType.PULL_REQUEST);
 
-        assertContributions(Map.of("ids", "43506983"))
-                .extracting(ContributionActivityPageItemResponse::getGithubId)
-                .containsOnly(43506983L);
+        assertContributions(Map.of("ids", "00c1f2f1-1123-305b-95da-11da17765e39"))
+                .extracting(ContributionActivityPageItemResponse::getUuid)
+                .containsOnly(UUID.fromString("00c1f2f1-1123-305b-95da-11da17765e39"));
 
         assertContributions(Map.of("projectIds", "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e"))
                 .extracting(c -> c.getProject().getName())
@@ -192,11 +217,23 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         assertContributions(Map.of("hasBeenRewarded", "false"))
                 .extracting(ContributionActivityPageItemResponse::getTotalRewardedUsdAmount)
                 .allMatch(a -> a.compareTo(BigDecimal.ZERO) == 0);
+
+        assertContributions(Map.of("projectContributorLabelIds", ogLabel.id().value().toString()))
+                .extracting(ContributionActivityPageItemResponse::getContributors)
+                .allMatch(contributors -> contributors.stream().anyMatch(c -> c.getLogin().equals("ofux")));
+
+        assertContributions(Map.of("rewardIds", "0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf"))
+                .extracting(ContributionActivityPageItemResponse::getTotalRewardedUsdAmount)
+                .allMatch(a -> a.compareTo(BigDecimal.ZERO) > 0);
+
+        assertContributions(Map.of("search", "KAAPER"))
+                .extracting(r -> r.getProject().getName())
+                .containsOnly("kaaper");
     }
 
     private AbstractListAssert<?, ? extends List<? extends ContributionActivityPageItemResponse>, ContributionActivityPageItemResponse> assertContributions(Map<String, String> params) {
         final var q = new HashMap<String, String>();
-        q.put("pageSize", "100");
+        q.put("pageSize", "80");
         q.putAll(params);
 
         final var contributions = client.get()

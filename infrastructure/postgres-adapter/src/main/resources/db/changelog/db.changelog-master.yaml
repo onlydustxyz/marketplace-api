@@ -597,3 +597,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000366_refactor_contribution_data.sql
   - include:
       file: db/changelog/changelogs/00000367_add_archived_github_contributions_table.sql
+  - include:
+      file: db/changelog/changelogs/00000368_use_grouped_contributions.sql

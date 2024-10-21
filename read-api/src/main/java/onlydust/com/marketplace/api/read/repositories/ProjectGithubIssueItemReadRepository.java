@@ -13,92 +13,97 @@ public interface ProjectGithubIssueItemReadRepository extends Repository<Project
 
     @Query(value = """
             select i.*,
-                   p.id project_id,
-                   p.name project_name,
-                   p.slug project_slug,
-                   p.logo_url project_logo_url,
-                   assignees.users assignees,
-                   applications.applications,
-                   labels.strings labels,
-                   jsonb_build_object(
-                                       'githubUserId', author_account.id,
-                                       'login', author_account.login,
-                                       'avatarUrl', user_avatar_url(author_account.id, author_account.avatar_url),
-                                       'isRegistered', od_author.id is not null
-                                    ) author,
-                    jsonb_build_object(
-                                        'id', gr.id,
-                                        'owner', gr.owner_login,
-                                        'name', gr.name,
-                                        'description', gr.description,
-                                        'htmlUrl', gr.html_url
-                                      ) repo
-            FROM projects p
-                    JOIN project_github_repos pgr ON pgr.project_id = p.id
-                    JOIN indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
-                    JOIN indexer_exp.github_issues i on i.repo_id = pgr.github_repo_id
-                    JOIN indexer_exp.github_accounts author_account on i.author_id = author_account.id
-                    LEFT JOIN iam.users od_author on od_author.github_user_id = author_account.id
-                     LEFT JOIN repo_languages rl ON rl.repo_id = i.repo_id
-                     LEFT JOIN LATERAL (select jsonb_agg(
-                                                        jsonb_build_object(
-                                                                'githubUserId', ga.id,
-                                                                'login', ga.login,
-                                                                'avatarUrl', user_avatar_url(ga.id, ga.avatar_url)
+                   p.id                                             project_id,
+                   p.name                                           project_name,
+                   p.slug                                           project_slug,
+                   p.logo_url                                       project_logo_url,
+                   (select jsonb_agg(
+                                   jsonb_build_object(
+                                           'githubUserId', ga.id,
+                                           'login', ga.login,
+                                           'avatarUrl', user_avatar_url(ga.id, ga.avatar_url)
+                                   )
+                           ) users
+                    from indexer_exp.github_accounts ga
+                    where ga.id = any (ccd.assignee_ids))           assignees,
+                   (select jsonb_agg(
+                                   jsonb_build_object(
+                                           'id', a.id,
+                                           'motivations', a.motivations,
+                                           'problemSolvingApproach', a.problem_solving_approach,
+                                           'applicant', jsonb_build_object(
+                                                   'githubUserId', ga2.id,
+                                                   'login', ga2.login,
+                                                   'avatarUrl', user_avatar_url(ga2.id, ga2.avatar_url),
+                                                   'isRegistered', u.id is not null
                                                         )
-                                                ) users
-                                         from indexer_exp.github_issues_assignees gia
-                                                  LEFT JOIN indexer_exp.github_accounts ga on ga.id = gia.user_id
-                                         where gia.issue_id = i.id) assignees on true
-                     LEFT JOIN indexer_exp.github_issues_labels gil ON i.id = gil.issue_id
-                     LEFT JOIN indexer_exp.github_labels gl on gil.label_id = gl.id
-                     LEFT JOIN hackathon_issues h ON h.issue_id = i.id
-                     LEFT JOIN LATERAL (select jsonb_agg(
-                                                            jsonb_build_object(
-                                                                    'id', a.id,
-                                                                    'motivations', a.motivations,
-                                                                    'problemSolvingApproach', a.problem_solving_approach,
-                                                                    'applicant', jsonb_build_object(
-                                                                            'githubUserId', ga2.id,
-                                                                            'login', ga2.login,
-                                                                            'avatarUrl', user_avatar_url(ga2.id, ga2.avatar_url),
-                                                                            'isRegistered', u.id is not null
-                                                                                 )
-                                                            )
-                                                    ) applications
-                                             from applications a
-                                                      join indexer_exp.github_accounts ga2 on ga2.id = a.applicant_id
-                                                      left join iam.users u on u.github_user_id = ga2.id
-                                             where a.issue_id = i.id) applications on true
-                     LEFT JOIN LATERAL (SELECT jsonb_agg(jsonb_build_object(
-                                                        'name', gl.name,
-                                                        'description', gl.description
-                                                          )) strings
-                                         FROM indexer_exp.github_issues_labels gil
-                                                  JOIN indexer_exp.github_labels gl on gil.label_id = gl.id
-                                         where gil.issue_id = i.id) labels on true
+                                   )
+                           ) applications
+                    from applications a
+                             join indexer_exp.github_accounts ga2 on ga2.id = a.applicant_id
+                             left join iam.users u on u.github_user_id = ga2.id
+                    where a.applicant_id = any (ccd.applicant_ids)
+                      and a.issue_id = c.issue_id)                  applications,
+                   c.github_labels                                  labels,
+                   ccd.github_author                                author,
+                   c.github_repo                                    repo
+            FROM projects p
+                     JOIN bi.p_project_global_data pgd ON pgd.project_id = p.id
+                     JOIN bi.p_contribution_data c ON c.project_id = p.id AND c.is_issue = 1
+                     JOIN bi.p_contribution_contributors_data ccd ON ccd.contribution_uuid = c.contribution_uuid
+                     JOIN indexer_exp.github_issues i on i.id = c.issue_id
+                     LEFT JOIN hackathons h ON h.github_labels && (select array_agg(l.label) from (select jsonb_array_elements(c.github_labels) ->> 'name' as label) l)
             WHERE p.id = :projectId
-              AND (coalesce(:statuses) IS NULL OR i.status = ANY (cast(:statuses as indexer_exp.github_issue_status[])))
+              AND (coalesce(:statuses) IS NULL OR c.contribution_status = ANY (cast(:statuses as indexer_exp.contribution_status[])))
               AND (:isAssigned IS NULL
-                OR :isAssigned = TRUE AND assignees.users IS NOT NULL
-                OR :isAssigned = FALSE AND assignees.users IS NULL)
+                OR :isAssigned = TRUE AND array_length(ccd.assignee_ids, 1) > 0
+                OR :isAssigned = FALSE AND (ccd.assignee_ids IS NULL OR array_length(ccd.assignee_ids, 1) = 0))
               AND (:isApplied IS NULL
-                OR :isApplied = TRUE AND applications.applications IS NOT NULL
-                OR :isApplied = FALSE AND applications.applications IS NULL)
+                OR :isApplied = TRUE AND array_length(ccd.applicant_ids, 1) > 0
+                OR :isApplied = FALSE AND (ccd.applicant_ids IS NULL OR array_length(ccd.applicant_ids, 1) = 0))
               AND (:isAvailable IS NULL
-                OR :isAvailable = TRUE AND i.status = 'OPEN' AND assignees.users IS NULL
-                OR :isAvailable = FALSE AND (i.status != 'OPEN' OR assignees.users IS NOT NULL))
+                OR :isAvailable = TRUE AND c.contribution_status = 'IN_PROGRESS' AND (ccd.assignee_ids IS NULL OR array_length(ccd.assignee_ids, 1) = 0)
+                OR :isAvailable = FALSE AND (c.contribution_status != 'IN_PROGRESS' OR array_length(ccd.assignee_ids, 1) > 0))
               AND (:isGoodFirstIssue IS NULL
-                OR :isGoodFirstIssue = TRUE AND cast(labels.strings as text) ILIKE '%good%first%issue%'
-                OR :isGoodFirstIssue = FALSE AND cast(labels.strings as text) NOT ILIKE '%good%first%issue%')
+                OR :isGoodFirstIssue = TRUE AND c.is_good_first_issue
+                OR :isGoodFirstIssue = FALSE AND NOT c.is_good_first_issue)
               AND (:isIncludedInAnyHackathon IS NULL
-                OR :isIncludedInAnyHackathon = TRUE AND h.hackathon_id IS NOT NULL
-                OR :isIncludedInAnyHackathon = FALSE AND NOT exists(SELECT 1 FROM hackathon_issues h2 WHERE h2.issue_id = i.id))
-              AND (:hackathonId IS NULL OR h.hackathon_id = :hackathonId)
-              AND (coalesce(:languageIds) IS NULL OR rl.language_id = ANY (:languageIds))
-              AND (coalesce(:search) IS NULL OR i.title ILIKE '%' || :search || '%')
-            GROUP BY i.id, assignees.users, applications.applications, p.id, author_account.id, od_author.id, gr.id, labels.strings
-            """, nativeQuery = true)
+                OR :isIncludedInAnyHackathon = TRUE AND h.id IS NOT NULL
+                OR :isIncludedInAnyHackathon = FALSE AND NOT exists(SELECT 1 FROM hackathon_issues h2 WHERE h2.issue_id = c.issue_id))
+              AND (:hackathonId IS NULL OR h.id = :hackathonId)
+              AND (coalesce(:languageIds) IS NULL OR pgd.language_ids && cast(:languageIds as uuid[]))
+              AND (coalesce(:search) IS NULL OR c.github_title ILIKE '%' || :search || '%')
+            GROUP BY p.id, pgd.project_id, c.contribution_uuid, ccd.contribution_uuid, i.id
+            """,
+            countQuery = """
+                    select count(c.contribution_uuid)
+                    FROM projects p
+                             JOIN bi.p_project_global_data pgd ON pgd.project_id = p.id
+                             JOIN bi.p_contribution_data c ON c.project_id = p.id AND c.is_issue = 1
+                             JOIN bi.p_contribution_contributors_data ccd ON ccd.contribution_uuid = c.contribution_uuid
+                             LEFT JOIN hackathons h ON h.github_labels && (select array_agg(l.label) from (select jsonb_array_elements(c.github_labels)->>'name' as label) l)
+                    WHERE p.id = :projectId
+                      AND (coalesce(:statuses) IS NULL OR c.contribution_status = ANY (cast(:statuses as indexer_exp.contribution_status[])))
+                      AND (:isAssigned IS NULL
+                        OR :isAssigned = TRUE AND array_length(ccd.assignee_ids, 1) > 0
+                        OR :isAssigned = FALSE AND (ccd.assignee_ids IS NULL OR array_length(ccd.assignee_ids, 1) = 0))
+                      AND (:isApplied IS NULL
+                        OR :isApplied = TRUE AND array_length(ccd.applicant_ids, 1) > 0
+                        OR :isApplied = FALSE AND (ccd.applicant_ids IS NULL OR array_length(ccd.applicant_ids, 1) = 0))
+                      AND (:isAvailable IS NULL
+                        OR :isAvailable = TRUE AND c.contribution_status = 'IN_PROGRESS' AND (ccd.assignee_ids IS NULL OR array_length(ccd.assignee_ids, 1) = 0)
+                        OR :isAvailable = FALSE AND (c.contribution_status != 'IN_PROGRESS' OR array_length(ccd.assignee_ids, 1) > 0))
+                      AND (:isGoodFirstIssue IS NULL
+                        OR :isGoodFirstIssue = TRUE AND c.is_good_first_issue
+                        OR :isGoodFirstIssue = FALSE AND NOT c.is_good_first_issue)
+                      AND (:isIncludedInAnyHackathon IS NULL
+                        OR :isIncludedInAnyHackathon = TRUE AND h.id IS NOT NULL
+                        OR :isIncludedInAnyHackathon = FALSE AND NOT exists(SELECT 1 FROM hackathon_issues h2 WHERE h2.issue_id = c.issue_id))
+                      AND (:hackathonId IS NULL OR h.id = :hackathonId)
+                      AND (coalesce(:languageIds) IS NULL OR pgd.language_ids && cast(:languageIds as uuid[]))
+                      AND (coalesce(:search) IS NULL OR c.github_title ILIKE '%' || :search || '%')
+                    GROUP BY p.id, c.contribution_uuid, ccd.contribution_uuid
+                    """, nativeQuery = true)
     Page<ProjectGithubIssueItemReadEntity> findIssuesOf(@NonNull UUID projectId,
                                                         String[] statuses,
                                                         Boolean isAssigned,

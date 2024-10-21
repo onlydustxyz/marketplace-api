@@ -32,8 +32,13 @@ public class AccountingObserverComposite implements AccountingObserverPort {
     }
 
     @Override
-    public void onRewardCancelled(RewardId rewardId) {
-        observers.forEach(o -> o.onRewardCancelled(rewardId));
+    public void onRewardCancelledBefore(RewardId rewardId) {
+        observers.forEach(o -> o.onRewardCancelledBefore(rewardId));
+    }
+
+    @Override
+    public void onRewardCancelledAfter(RewardId rewardId) {
+        observers.forEach(o -> o.onRewardCancelledAfter(rewardId));
     }
 
     @Override

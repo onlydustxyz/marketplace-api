@@ -1,6 +1,9 @@
 package onlydust.com.marketplace.api.read.entities.bi;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
@@ -14,6 +17,7 @@ import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @NoArgsConstructor(force = true)
@@ -22,17 +26,17 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Immutable
 @Accessors(fluent = true)
-@IdClass(ContributionReadEntity.PrimaryKey.class)
 public class ContributionReadEntity {
     @Id
     @NonNull
-    Long githubId;
+    UUID contributionUuid;
 
-    @Id
     @NonNull
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     ContributionType contributionType;
+
+    String githubId;
 
     @JdbcTypeCode(SqlTypes.JSON)
     ShortGithubRepoResponse githubRepo;
@@ -81,10 +85,11 @@ public class ContributionReadEntity {
 
     public ContributionActivityPageItemResponse toDto() {
         return new ContributionActivityPageItemResponse()
+                .uuid(contributionUuid)
                 .type(contributionType)
+                .githubId(githubId)
                 .repo(githubRepo)
                 .githubAuthor(githubAuthor)
-                .githubId(githubId)
                 .githubNumber(githubNumber)
                 .githubStatus(githubStatus)
                 .githubTitle(githubTitle)
@@ -102,11 +107,5 @@ public class ContributionReadEntity {
                 .linkedIssues(linkedIssues)
                 .totalRewardedUsdAmount(totalRewardedUsdAmount)
                 ;
-    }
-
-    @EqualsAndHashCode
-    public static class PrimaryKey {
-        Long githubId;
-        ContributionType contributionType;
     }
 }

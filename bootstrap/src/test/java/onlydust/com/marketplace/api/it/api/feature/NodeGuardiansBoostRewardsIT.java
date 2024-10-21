@@ -199,14 +199,14 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
                 .currencyId(currencyId)
                 .recipientId(recipientId)
                 .items(List.of(
-                        new RewardItemRequest().id("0011051356")
+                        new RewardItemRequest().id("1126203259")
                                 .type(RewardType.PULL_REQUEST)
-                                .number(1L)
-                                .repoId(55223344L),
-                        new RewardItemRequest().id("0001051356")
+                                .number(43L)
+                                .repoId(493591124L),
+                        new RewardItemRequest().id("995654334")
                                 .type(RewardType.PULL_REQUEST)
-                                .number(1L)
-                                .repoId(11223344L)
+                                .number(19L)
+                                .repoId(493591124L)
                 ));
 
         // When

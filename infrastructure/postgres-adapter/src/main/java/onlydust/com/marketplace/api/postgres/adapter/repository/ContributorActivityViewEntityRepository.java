@@ -27,6 +27,7 @@ public interface ContributorActivityViewEntityRepository extends JpaRepository<C
                  LEFT JOIN iam.users u ON u.github_user_id = c.contributor_id
             WHERE pgr.project_id = :projectId
               AND c.status = 'COMPLETED'
+              AND c.contributor_id is not null
             GROUP BY c.contributor_id,
                      c.contributor_login,
                      c.contributor_html_url,

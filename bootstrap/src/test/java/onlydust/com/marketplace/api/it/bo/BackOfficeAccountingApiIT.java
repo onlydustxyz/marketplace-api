@@ -235,9 +235,9 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                             "currencyId": "%s",
                             "items": [{
                                 "type": "PULL_REQUEST",
-                                "id": "1703880973",
-                                "number": 325,
-                                "repoId": 698096830
+                                "id": "1015658307",
+                                "number": 27,
+                                "repoId": 493591124
                             }]
                         }
                         """.formatted(ofux.user().getGithubUserId(), USDC))
@@ -417,9 +417,9 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                             "currencyId": "%s",
                             "items": [{
                                 "type": "PULL_REQUEST",
-                                "id": "1703880973",
-                                "number": 325,
-                                "repoId": 698096830
+                                "id": "1015658307",
+                                "number": 27,
+                                "repoId": 493591124
                             }]
                         }
                         """.formatted(ofux.user().getGithubUserId(), USDC))
@@ -577,9 +577,9 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                             "currencyId": "%s",
                             "items": [{
                                 "type": "PULL_REQUEST",
-                                "id": "1703880973",
-                                "number": 325,
-                                "repoId": 698096830
+                                "id": "1015658307",
+                                "number": 27,
+                                "repoId": 493591124
                             }]
                         }
                         """.formatted(ofux.user().getGithubUserId(), APT))

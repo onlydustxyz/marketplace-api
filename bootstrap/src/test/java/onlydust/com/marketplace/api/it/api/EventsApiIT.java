@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.api.it.api;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
+import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CustomIgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
@@ -12,12 +14,16 @@ import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.event.OnContributionChanged;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,12 +48,9 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
             "420bbdd396b23d24fbe94bf6a874736b1430ecb93cc59a42642ecb4a50e79e45", // CODE_REVIEW      2023-04-24 10:36:03
             "25dfb3c26e29787d606fcccffa8fe50f6246c45623147445e1d8a44db7716162", // CODE_REVIEW      2023-04-24 10:36:03
             "0c84f988abd52d1fe7d7889860d2e049072c6bb7879758d0ebc73188f2f93da4", // ISSUE            2023-03-28 14:41:22
-            "4b7b03cff784c0939ed0530e76902bb6bac54ff98c8c9212ccbb6b06d0967980", // ISSUE            2023-03-27 14:56:04
-            "105fa664f0702b603446f5e5d8d4793fedf57add7690487782bb42c299b6345e", // ISSUE            2023-03-27 14:56:51
             "468fdb4de0a8acd91b836a2226ba4db931708f74bd372e9d60f5464c3e2f6b57", // ISSUE            2023-03-28 14:40:35
             "d6703a6b1f0b1d5a91cff05e12e8b0f088adce4f156bc73a04eb03a38786810f", // PULL_REQUEST     2023-02-21 17:07:22
             "f1f013dae1071e7b04c2edd8624a34e85a40bc70afacd1c6f62b469d4a6d97e7", // PULL_REQUEST     2023-02-21 16:43:47
-            "e009fd961fd9cdbc30c3081e38cd1275a44787706b414e1302f9b378bf0da9f6", // PULL_REQUEST     2023-02-21 17:08:12
             "472577e241d9c6dcbf92a512eb673ad3bba5c83bb105dd2a2fa9c64b27b83b82", // PULL_REQUEST     2023-02-21 16:47:09
             "9702804b7be03d3b0460fc145c750b36d5296298de772b5f5c89d821abf9f1dc", // PULL_REQUEST     2023-02-21 16:22:45
             "c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
@@ -64,6 +67,20 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     OutboxConsumerJob indexingEventsOutboxJob;
 
+    @BeforeEach
+    void beforeEach() {
+        indexerApiWireMockServer.stubFor(WireMock.post("/api/v1/events/on-repo-link-changed")
+                .willReturn(WireMock.noContent()));
+        databaseHelper.executeQuery("DELETE FROM indexer_exp.contributions where id != all(:ids)",
+                Map.of("ids", Stream.concat(repo1ContributionIds.stream(), repo2ContributionIds.stream()).toArray(String[]::new)));
+    }
+
+    @SneakyThrows
+    @AfterAll
+    static void cleanUp() {
+        restoreIndexerDump();
+    }
+
     @Test
     public void should_refresh_ignored_contributions_on_contributions_change_event() {
         // Given
@@ -74,7 +91,12 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
         // For now, nothing is ignored
         assertIgnored(projectId);
 
-        indexingEventRepository.saveEvent(OnContributionChanged.builder().repoId(repo1).build());
+        Stream.of(UUID.fromString("510454f0-cf5d-3cd8-9d8a-6aa7e05dac1c"),
+                        UUID.fromString("94bb8524-034c-3bd3-a072-380b2aa93d2b"),
+                        UUID.fromString("dbd89cab-d3a3-385f-8e48-e67d440b1ec3"),
+                        UUID.fromString("d697c288-2e17-3154-9316-845196d00a4e"))
+                .map(id -> OnContributionChanged.builder().repoId(repo1).contributionUUID(id).build())
+                .forEach(indexingEventRepository::saveEvent);
 
         // When
         indexingEventsOutboxJob.run();
@@ -93,12 +115,9 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
                 //"420bbdd396b23d24fbe94bf6a874736b1430ecb93cc59a42642ecb4a50e79e45", // CODE_REVIEW      2023-04-24 10:36:03
                 //"25dfb3c26e29787d606fcccffa8fe50f6246c45623147445e1d8a44db7716162", // CODE_REVIEW      2023-04-24 10:36:03
                 //"0c84f988abd52d1fe7d7889860d2e049072c6bb7879758d0ebc73188f2f93da4", // ISSUE            2023-03-28 14:41:22
-                //"4b7b03cff784c0939ed0530e76902bb6bac54ff98c8c9212ccbb6b06d0967980", // ISSUE            2023-03-27 14:56:04
-                //"105fa664f0702b603446f5e5d8d4793fedf57add7690487782bb42c299b6345e", // ISSUE            2023-03-27 14:56:51
                 //"468fdb4de0a8acd91b836a2226ba4db931708f74bd372e9d60f5464c3e2f6b57" // ISSUE            2023-03-28 14:40:35
                 //"d6703a6b1f0b1d5a91cff05e12e8b0f088adce4f156bc73a04eb03a38786810f", // PULL_REQUEST     2023-02-21 17:07:22
                 //"f1f013dae1071e7b04c2edd8624a34e85a40bc70afacd1c6f62b469d4a6d97e7", // PULL_REQUEST     2023-02-21 16:43:47
-                //"e009fd961fd9cdbc30c3081e38cd1275a44787706b414e1302f9b378bf0da9f6", // PULL_REQUEST     2023-02-21 17:08:12
                 //"472577e241d9c6dcbf92a512eb673ad3bba5c83bb105dd2a2fa9c64b27b83b82", // PULL_REQUEST     2023-02-21 16:47:09
                 //"9702804b7be03d3b0460fc145c750b36d5296298de772b5f5c89d821abf9f1dc", // PULL_REQUEST     2023-02-21 16:22:45
                 //"c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
@@ -117,8 +136,27 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
         // For now, nothing is ignored
         assertIgnored(projectId);
 
-        indexingEventRepository.saveEvent(OnContributionChanged.builder().repoId(repo1).build());
-        indexingEventRepository.saveEvent(OnContributionChanged.builder().repoId(repo2).build());
+        Stream.of(UUID.fromString("510454f0-cf5d-3cd8-9d8a-6aa7e05dac1c"),
+                        UUID.fromString("94bb8524-034c-3bd3-a072-380b2aa93d2b"),
+                        UUID.fromString("dbd89cab-d3a3-385f-8e48-e67d440b1ec3"),
+                        UUID.fromString("d697c288-2e17-3154-9316-845196d00a4e"))
+                .map(id -> OnContributionChanged.builder().repoId(repo1).contributionUUID(id).build())
+                .forEach(indexingEventRepository::saveEvent);
+
+        Stream.of(UUID.fromString("d50a26e5-9622-3686-8e79-313d225b54c6"),
+                        UUID.fromString("e2ed7d72-bc04-34aa-b61b-764699dcf469"),
+                        UUID.fromString("dbd89cab-d3a3-385f-8e48-e67d440b1ec3"),
+                        UUID.fromString("2e1f4f06-3f7b-318c-9816-8a6bb8c5281a"),
+                        UUID.fromString("6f0390a2-1314-3daf-a2ba-77088b2f13de"),
+                        UUID.fromString("c6b35b16-683e-3eb1-bf88-27cefc8617c0"),
+                        UUID.fromString("d904b623-d15c-3a45-a6ee-a781d7aef2ec"),
+                        UUID.fromString("8abac014-9c63-3364-a4e7-a0d77347664d"),
+                        UUID.fromString("d697c288-2e17-3154-9316-845196d00a4e"),
+                        UUID.fromString("3cbccaec-0338-3bcc-8212-d51eaf0bb3bd"),
+                        UUID.fromString("7712ca5a-12ff-39a8-96c0-728ee2ed4994")
+                )
+                .map(id -> OnContributionChanged.builder().repoId(repo2).contributionUUID(id).build())
+                .forEach(indexingEventRepository::saveEvent);
 
         // When
         indexingEventsOutboxJob.run();
@@ -137,19 +175,15 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
                 "420bbdd396b23d24fbe94bf6a874736b1430ecb93cc59a42642ecb4a50e79e45", // CODE_REVIEW      2023-04-24 10:36:03
                 "25dfb3c26e29787d606fcccffa8fe50f6246c45623147445e1d8a44db7716162", // CODE_REVIEW      2023-04-24 10:36:03
                 //"0c84f988abd52d1fe7d7889860d2e049072c6bb7879758d0ebc73188f2f93da4", // ISSUE            2023-03-28 14:41:22
-                //"4b7b03cff784c0939ed0530e76902bb6bac54ff98c8c9212ccbb6b06d0967980", // ISSUE            2023-03-27 14:56:04
-                //"105fa664f0702b603446f5e5d8d4793fedf57add7690487782bb42c299b6345e", // ISSUE            2023-03-27 14:56:51
                 //"468fdb4de0a8acd91b836a2226ba4db931708f74bd372e9d60f5464c3e2f6b57", // ISSUE            2023-03-28 14:40:35
                 "d6703a6b1f0b1d5a91cff05e12e8b0f088adce4f156bc73a04eb03a38786810f", // PULL_REQUEST     2023-02-21 17:07:22
                 "f1f013dae1071e7b04c2edd8624a34e85a40bc70afacd1c6f62b469d4a6d97e7", // PULL_REQUEST     2023-02-21 16:43:47
-                "e009fd961fd9cdbc30c3081e38cd1275a44787706b414e1302f9b378bf0da9f6", // PULL_REQUEST     2023-02-21 17:08:12
                 "472577e241d9c6dcbf92a512eb673ad3bba5c83bb105dd2a2fa9c64b27b83b82", // PULL_REQUEST     2023-02-21 16:47:09
                 "9702804b7be03d3b0460fc145c750b36d5296298de772b5f5c89d821abf9f1dc", // PULL_REQUEST     2023-02-21 16:22:45
                 "c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
         );
         // @formatter:on
     }
-
 
     @Test
     public void should_not_ignore_anything_is_nothing_is_to_ignore() {

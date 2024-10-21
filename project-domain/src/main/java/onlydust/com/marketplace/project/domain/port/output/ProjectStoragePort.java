@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.OrSlug;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
@@ -85,7 +86,5 @@ public interface ProjectStoragePort {
 
     void refreshStats();
 
-    List<ProjectId> getProjectIdsLinkedToIssueId(GithubIssue.Id githubIssueId);
-
-    List<ProjectId> getProjectIdsLinkedToPullRequestId(GithubPullRequest.Id githubPullRequestId);
+    List<ProjectId> getProjectIdsLinkedToContributionUuid(ContributionUUID contributionUUID);
 }

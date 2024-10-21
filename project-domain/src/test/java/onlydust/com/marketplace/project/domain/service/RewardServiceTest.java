@@ -10,6 +10,7 @@ import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.output.AccountingServicePort;
+import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -20,6 +21,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -27,11 +29,13 @@ import static org.mockito.Mockito.*;
 
 public class RewardServiceTest {
     final RewardStoragePort rewardStoragePort = mock(RewardStoragePort.class);
+    final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
     final PermissionService permissionService = mock(PermissionService.class);
     final IndexerPort indexerPort = mock(IndexerPort.class);
     final AccountingServicePort accountingServicePort = mock(AccountingServicePort.class);
     final RewardService rewardService = new RewardService(
             rewardStoragePort,
+            contributionStoragePort,
             permissionService,
             indexerPort,
             accountingServicePort
@@ -44,7 +48,7 @@ public class RewardServiceTest {
 
     @BeforeEach
     void setup() {
-        reset(rewardStoragePort, permissionService, indexerPort, accountingServicePort);
+        reset(rewardStoragePort, contributionStoragePort, permissionService, indexerPort, accountingServicePort);
     }
 
     @Nested
@@ -52,13 +56,21 @@ public class RewardServiceTest {
         @Test
         void should_create_reward() {
             // Given
+            final var codeReviewId = "foobar";
+            final var codeReviewContributionUUID = UUID.randomUUID();
             when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
+            when(contributionStoragePort.getContributionUUID(codeReviewId)).thenReturn(Optional.of(codeReviewContributionUUID));
             final var command = RequestRewardCommand.builder()
                     .projectId(projectId)
                     .recipientId(recipientId)
                     .amount(BigDecimal.TEN)
                     .currencyId(usdcId)
-                    .items(List.of())
+                    .items(List.of(RequestRewardCommand.Item.builder()
+                            .id(codeReviewId)
+                            .number(123L)
+                            .repoId(456L)
+                            .type(RequestRewardCommand.Item.Type.codeReview)
+                            .build()))
                     .build();
 
 
@@ -78,7 +90,15 @@ public class RewardServiceTest {
             assertThat(capturedReward.recipientId()).isEqualTo(recipientId);
             assertThat(capturedReward.amount()).isEqualTo(BigDecimal.TEN);
             assertThat(capturedReward.currencyId()).isEqualTo(usdcId);
-            assertThat(capturedReward.rewardItems()).isEmpty();
+            assertThat(capturedReward.rewardItems()).containsExactly(
+                    Reward.Item.builder()
+                            .contributionUUID(codeReviewContributionUUID)
+                            .id("foobar")
+                            .number(123L)
+                            .repoId(456L)
+                            .type(Reward.Item.Type.CODE_REVIEW)
+                            .build()
+            );
 
             verify(accountingServicePort).createReward(projectId, rewardId, BigDecimal.TEN, usdcId);
         }

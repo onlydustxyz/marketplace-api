@@ -148,63 +148,63 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 206,
-                          "totalItemNumber": 1028,
+                          "totalPageNumber": 9,
+                          "totalItemNumber": 41,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "contributors": [
                             {
-                              "githubUserId": 8019099,
-                              "login": "PeerRich",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/8019099?v=4",
+                              "githubUserId": 43467246,
+                              "login": "AnthonyBuisset",
+                              "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                               "dynamicRank": 1,
-                              "globalRank": 20,
+                              "globalRank": 1,
                               "globalRankCategory": "A",
-                              "contributionCount": 2878,
+                              "contributionCount": 112,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0
                             },
                             {
-                              "githubUserId": 3504472,
-                              "login": "zomars",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/3504472?v=4",
+                              "githubUserId": 21149076,
+                              "login": "oscarwroche",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
                               "dynamicRank": 2,
-                              "globalRank": 22,
+                              "globalRank": 2,
                               "globalRankCategory": "A",
-                              "contributionCount": 2280,
-                              "rewardCount": 0,
-                              "totalEarnedUsd": 0
+                              "contributionCount": 62,
+                              "rewardCount": 1,
+                              "totalEarnedUsd": 1010.00
                             },
                             {
-                              "githubUserId": 1046695,
-                              "login": "emrysal",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/1046695?v=4",
+                              "githubUserId": 16590657,
+                              "login": "PierreOucif",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                               "dynamicRank": 3,
-                              "globalRank": 22,
+                              "globalRank": 6,
                               "globalRankCategory": "A",
-                              "contributionCount": 1733,
+                              "contributionCount": 37,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0
                             },
                             {
-                              "githubUserId": 481465,
-                              "login": "frangio",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/481465?v=4",
+                              "githubUserId": 17259618,
+                              "login": "alexbeno",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
                               "dynamicRank": 4,
-                              "globalRank": 19,
+                              "globalRank": 43,
                               "globalRankCategory": "A",
-                              "contributionCount": 1456,
+                              "contributionCount": 26,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0
                             },
                             {
-                              "githubUserId": 1780212,
-                              "login": "hariombalhara",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/1780212?v=4",
+                              "githubUserId": 595505,
+                              "login": "ofux",
+                              "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                               "dynamicRank": 5,
-                              "globalRank": 27,
+                              "globalRank": 5,
                               "globalRankCategory": "A",
-                              "contributionCount": 1352,
+                              "contributionCount": 22,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0
                             }
@@ -226,63 +226,63 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 206,
-                          "totalItemNumber": 1028,
+                          "totalPageNumber": 9,
+                          "totalItemNumber": 41,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "contributors": [
                             {
-                              "githubUserId": 45264458,
-                              "login": "AbdelStark",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4",
-                              "dynamicRank": 1,
-                              "globalRank": 9,
-                              "globalRankCategory": "A",
-                              "contributionCount": 21,
-                              "rewardCount": 1,
-                              "totalEarnedUsd": 1515.00
-                            },
-                            {
                               "githubUserId": 21149076,
                               "login": "oscarwroche",
                               "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4",
-                              "dynamicRank": 2,
+                              "dynamicRank": 1,
                               "globalRank": 2,
                               "globalRankCategory": "A",
-                              "contributionCount": 213,
+                              "contributionCount": 62,
                               "rewardCount": 1,
                               "totalEarnedUsd": 1010.00
                             },
                             {
-                              "githubUserId": 1046695,
-                              "login": "emrysal",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/1046695?v=4",
-                              "dynamicRank": 3,
-                              "globalRank": 22,
+                              "githubUserId": 16590657,
+                              "login": "PierreOucif",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                              "dynamicRank": 2,
+                              "globalRank": 6,
                               "globalRankCategory": "A",
-                              "contributionCount": 1733,
+                              "contributionCount": 37,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0
                             },
                             {
-                              "githubUserId": 481465,
-                              "login": "frangio",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/481465?v=4",
-                              "dynamicRank": 3,
-                              "globalRank": 19,
+                              "githubUserId": 17259618,
+                              "login": "alexbeno",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/17259618?v=4",
+                              "dynamicRank": 2,
+                              "globalRank": 43,
                               "globalRankCategory": "A",
-                              "contributionCount": 1456,
+                              "contributionCount": 26,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0
                             },
                             {
-                              "githubUserId": 1780212,
-                              "login": "hariombalhara",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/1780212?v=4",
-                              "dynamicRank": 3,
-                              "globalRank": 27,
+                              "githubUserId": 595505,
+                              "login": "ofux",
+                              "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                              "dynamicRank": 2,
+                              "globalRank": 5,
                               "globalRankCategory": "A",
-                              "contributionCount": 1352,
+                              "contributionCount": 22,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0
+                            },
+                            {
+                              "githubUserId": 5160414,
+                              "login": "haydencleary",
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/5160414?v=4",
+                              "dynamicRank": 2,
+                              "globalRank": 39,
+                              "globalRankCategory": "A",
+                              "contributionCount": 20,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0
                             }
@@ -300,7 +300,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
         em.getTransaction().begin();
         em.createNativeQuery("""
                 -- // Add good first issue to project B Conseil
-                INSERT INTO indexer_exp.github_issues_labels (issue_id, label_id) VALUES (1678706027, 3042230479);
+                INSERT INTO indexer_exp.github_issues_labels (issue_id, label_id) VALUES (1564131775, 3042230479);
                 -- // Add tag to project Bretzel
                 INSERT INTO projects_tags (project_id, tag) VALUES ('7d04163c-4187-4313-8066-61504d34fc56', 'FAST_AND_FURIOUS');
                 INSERT INTO projects_tags (project_id, tag) VALUES ('7d04163c-4187-4313-8066-61504d34fc56', 'WORK_IN_PROGRESS');
@@ -374,6 +374,10 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 3,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
                           "projects": [
                             {
                               "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
@@ -400,13 +404,6 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                               ],
                               "contributorsCount": 559,
                               "languages": [
-                                {
-                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
-                                  "slug": "javascript",
-                                  "name": "Javascript",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
-                                },
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                   "slug": "typescript",
@@ -490,13 +487,6 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                 },
                                 {
-                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
-                                  "slug": "python",
-                                  "name": "Python",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
-                                },
-                                {
                                   "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                                   "slug": "rust",
                                   "name": "Rust",
@@ -512,11 +502,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ]
                             }
-                          ],
-                          "hasMore": false,
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 3,
-                          "nextPageIndex": 0
+                          ]
                         }
                         """);
 
@@ -558,13 +544,6 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                               "contributorsCount": 559,
                               "languages": [
                                 {
-                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
-                                  "slug": "javascript",
-                                  "name": "Javascript",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
-                                },
-                                {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                   "slug": "typescript",
                                   "name": "Typescript",
@@ -572,53 +551,8 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                 }
                               ]
-                            },
-                            {
-                              "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
-                              "slug": "zero-title-11",
-                              "name": "Zero title 11",
-                              "shortDescription": "Missing short description",
-                              "logoUrl": null,
-                              "topContributors": [
-                                {
-                                  "githubUserId": 481465,
-                                  "login": "frangio",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/481465?v=4"
-                                },
-                                {
-                                  "githubUserId": 2432299,
-                                  "login": "Amxx",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/2432299?v=4"
-                                },
-                                {
-                                  "githubUserId": 2530770,
-                                  "login": "nventuro",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/2530770?v=4"
-                                }
-                              ],
-                              "contributorsCount": 453,
-                              "languages": [
-                                {
-                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
-                                  "slug": "javascript",
-                                  "name": "Javascript",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
-                                },
-                                {
-                                  "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
-                                  "slug": "solidity",
-                                  "name": "Solidity",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
-                                }
-                              ]
                             }
-                          ],
-                          "hasMore": false,
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 2,
-                          "nextPageIndex": 0
+                          ]
                         }
                         """);
 
@@ -661,35 +595,28 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                               "languages": [
                                 {
                                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
+                                  "slug": "javascript",
                                   "name": "Javascript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                 },
                                 {
-                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
-                                  "name": "Python",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
-                                },
-                                {
                                   "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
+                                  "slug": "rust",
                                   "name": "Rust",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                                 },
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                  "slug": "typescript",
                                   "name": "Typescript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                 }
                               ]
                             }
-                          ],
-                          "hasMore": false,
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 1,
-                          "nextPageIndex": 0
+                          ]
                         }
                         """);
 
@@ -761,6 +688,10 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 3,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
                           "projects": [
                             {
                               "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
@@ -793,13 +724,6 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                   "name": "Javascript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
-                                },
-                                {
-                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
-                                  "slug": "python",
-                                  "name": "Python",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                                 },
                                 {
                                   "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
@@ -858,11 +782,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ]
                             }
-                          ],
-                          "hasMore": false,
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 3,
-                          "nextPageIndex": 0
+                          ]
                         }
                         """, true);
     }

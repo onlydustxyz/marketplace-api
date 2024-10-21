@@ -205,4 +205,14 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 pgr.project_id = :projectId
             """, nativeQuery = true)
     int countBy(Long contributorId, UUID projectId);
+
+    @Query(value = """
+            SELECT
+                c.contribution_uuid
+            FROM
+                indexer_exp.grouped_contributions c
+            WHERE
+                coalesce(cast(c.issue_id as text), cast(c.pull_request_id as text), c.code_review_id) = :issuePRCodeReviewId
+            """, nativeQuery = true)
+    UUID getContributionUUID(String issuePRCodeReviewId);
 }

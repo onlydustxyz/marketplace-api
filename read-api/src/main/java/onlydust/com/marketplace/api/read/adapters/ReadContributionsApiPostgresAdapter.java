@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
-import static onlydust.com.marketplace.api.contract.model.ContributionType.ISSUE;
-import static onlydust.com.marketplace.api.contract.model.ContributionType.PULL_REQUEST;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
@@ -28,15 +27,14 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
     private final ContributionReadRepository contributionReadRepository;
 
     @Override
-    public ResponseEntity<ContributionActivityPageItemResponse> getContributionById(Long contributionGithubId) {
+    public ResponseEntity<ContributionActivityPageItemResponse> getContributionById(UUID contributionUuid) {
         final var page = contributionReadRepository.findAll(new ContributionsQueryParams()
                 .pageIndex(0)
                 .pageSize(1)
-                .ids(List.of(contributionGithubId))
-                .types(List.of(ISSUE, PULL_REQUEST)));
+                .ids(List.of(contributionUuid)));
 
         final var contribution = page.stream().findFirst()
-                .orElseThrow(() -> notFound("Contribution %d not found".formatted(contributionGithubId)));
+                .orElseThrow(() -> notFound("Contribution %s not found".formatted(contributionUuid)));
 
         return ok(contribution.toDto());
     }

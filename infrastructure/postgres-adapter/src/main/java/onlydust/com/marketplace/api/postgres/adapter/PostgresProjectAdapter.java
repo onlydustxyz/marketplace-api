@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.OrSlug;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
@@ -58,6 +59,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final ProjectCategorySuggestionRepository projectCategorySuggestionRepository;
     private final BiRewardDataRepository biRewardDataRepository;
     private final BiContributionDataRepository biContributionDataRepository;
+    private final BiContributionContributorsDataRepository biContributionContributorsDataRepository;
     private final BiProjectGrantsDataRepository biProjectGrantsDataRepository;
     private final BiProjectGlobalDataRepository biProjectGlobalDataRepository;
     private final BiProjectBudgetDataRepository biProjectBudgetDataRepository;
@@ -65,6 +67,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final BiContributorGlobalDataRepository biContributorGlobalDataRepository;
     private final BiContributionRewardDataRepository biContributionRewardDataRepository;
     private final UserProjectRecommendationsRepository userProjectRecommendationsRepository;
+    private final BiPerContributorContributionDataRepository biPerContributorContributionDataRepository;
 
     @Override
     public Optional<ProjectId> getProjectIdBySlug(String slug) {
@@ -479,26 +482,25 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Transactional
     public void refreshStats() {
         projectRepository.refreshStats();
+
         biRewardDataRepository.refresh();
+        
         biContributionDataRepository.refresh();
+        biContributionContributorsDataRepository.refresh();
+        biPerContributorContributionDataRepository.refresh();
+
         biProjectGrantsDataRepository.refresh();
         biProjectGlobalDataRepository.refresh();
         biProjectBudgetDataRepository.refresh();
         biProjectContributionsDataRepository.refresh();
+
         biContributorGlobalDataRepository.refresh();
         biContributionRewardDataRepository.refresh();
     }
 
     @Override
-    public List<ProjectId> getProjectIdsLinkedToIssueId(GithubIssue.Id githubIssueId) {
-        return projectRepository.findProjectIdsLinkedToIssueId(githubIssueId.value()).stream()
-                .map(ProjectId::of)
-                .toList();
-    }
-
-    @Override
-    public List<ProjectId> getProjectIdsLinkedToPullRequestId(GithubPullRequest.Id githubPullRequestId) {
-        return projectRepository.findProjectIdsLinkedToPullRequestId(githubPullRequestId.value()).stream()
+    public List<ProjectId> getProjectIdsLinkedToContributionUuid(ContributionUUID contributionUUID) {
+        return projectRepository.findProjectIdsLinkedToContributionUuid(contributionUUID.value()).stream()
                 .map(ProjectId::of)
                 .toList();
     }

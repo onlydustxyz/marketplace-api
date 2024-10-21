@@ -86,8 +86,8 @@ public class ActivityApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.activities[?(@.timestamp.length() == 0)]").doesNotExist()
                 .json("""
                         {
-                          "totalPageNumber": 18,
-                          "totalItemNumber": 90,
+                          "totalPageNumber": 19,
+                          "totalItemNumber": 91,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "activities": [

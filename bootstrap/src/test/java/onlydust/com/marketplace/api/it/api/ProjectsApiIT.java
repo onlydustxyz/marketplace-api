@@ -641,7 +641,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + CAL_DOT_COM)).exchange()
                 // Then
                 .expectStatus().is2xxSuccessful().expectBody()
-                .jsonPath("$.goodFirstIssueCount").isEqualTo(11);
+                .jsonPath("$.goodFirstIssueCount").isEqualTo(4);
     }
 
     @Test

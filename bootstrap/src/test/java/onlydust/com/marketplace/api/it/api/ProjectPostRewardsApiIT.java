@@ -12,7 +12,6 @@ import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.suites.tags.TagReward;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
@@ -33,9 +32,6 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     public ProjectRepository projectRepository;
-
-    @Autowired
-    AuthenticatedAppUserService authenticatedAppUserService;
 
     @Test
     public void should_be_unauthorized() {
@@ -97,10 +93,11 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                 .currencyId(CurrencyHelper.STRK.value())
                 .recipientId(11111L)
                 .items(List.of(
-                        new RewardItemRequest().id("pr2")
+                        new RewardItemRequest()
+                                .id("1217699807")
                                 .type(RewardType.PULL_REQUEST)
-                                .number(2L)
-                                .repoId(3L)
+                                .number(580L)
+                                .repoId(498695724L)
                 ));
 
         // When
@@ -194,18 +191,18 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                 .currencyId(CurrencyHelper.ETH.value())
                 .recipientId(pierre.user().getGithubUserId())
                 .items(List.of(
-                        new RewardItemRequest().id("pr1")
+                        new RewardItemRequest().id("1518472203")
                                 .type(RewardType.PULL_REQUEST)
-                                .number(1L)
-                                .repoId(2L),
-                        new RewardItemRequest().id("issue1")
+                                .number(1237L)
+                                .repoId(498695724L),
+                        new RewardItemRequest().id("1261585100")
                                 .type(RewardType.ISSUE)
-                                .number(2L)
-                                .repoId(3L),
-                        new RewardItemRequest().id("codeReview1")
+                                .number(5L)
+                                .repoId(498695724L),
+                        new RewardItemRequest().id("12f189eeb0e533949616badf0c03906aef273aedcb0cedd0aa1260f58051fed7")
                                 .type(RewardType.CODE_REVIEW)
-                                .number(3L)
-                                .repoId(4L)
+                                .number(1484L)
+                                .repoId(498695724L)
                 ));
 
         client.post()
@@ -233,7 +230,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                         .withRequestBody(matchingJsonPath("$.message_data.reward.currency", equalTo("ETH")))
                         .withRequestBody(matchingJsonPath("$.message_data.reward.amount", equalTo("12.950")))
                         .withRequestBody(matchingJsonPath("$.message_data.reward.sentBy", equalTo(pierre.user().getGithubLogin())))
-                        .withRequestBody(matchingJsonPath("$.message_data.reward.contributionsNumber", equalTo("0")))
+                        .withRequestBody(matchingJsonPath("$.message_data.reward.contributionsNumber", equalTo("3")))
                         .withRequestBody(matchingJsonPath("$.to", equalTo(pierre.user().getEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("New reward received ✨")))
         );
@@ -258,10 +255,10 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                         .currencyId(CurrencyHelper.ETH.value())
                         .recipientId(pierre.user().getGithubUserId())
                         .items(List.of(
-                                new RewardItemRequest().id("issue1")
+                                new RewardItemRequest().id("1261585100")
                                         .type(RewardType.ISSUE)
                                         .number(5L)
-                                        .repoId(6L)
+                                        .repoId(498695724L)
                         ))
                 ,
                 new RewardRequest()
@@ -269,10 +266,10 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                         .currencyId(CurrencyHelper.ETH.value())
                         .recipientId(pierre.user().getGithubUserId())
                         .items(List.of(
-                                new RewardItemRequest().id("pr1")
+                                new RewardItemRequest().id("1624000021")
                                         .type(RewardType.PULL_REQUEST)
-                                        .number(7L)
-                                        .repoId(8L)
+                                        .number(1502L)
+                                        .repoId(498695724L)
                         ))
         );
 

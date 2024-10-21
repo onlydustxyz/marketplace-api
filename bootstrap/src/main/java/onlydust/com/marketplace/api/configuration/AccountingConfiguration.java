@@ -139,7 +139,7 @@ public class AccountingConfiguration {
                                                      final AccountingNotifier accountingNotifier,
                                                      final AccountingTrackingNotifier accountingTrackingNotifier,
                                                      final PostgresBiProjectorAdapter postgresBiProjectorAdapter) {
-        return new AccountingObserverComposite(accountingNotifier, rewardStatusUpdater, accountingTrackingNotifier, postgresBiProjectorAdapter);
+        return new AccountingObserverComposite(postgresBiProjectorAdapter, accountingNotifier, rewardStatusUpdater, accountingTrackingNotifier);
     }
 
     @Bean

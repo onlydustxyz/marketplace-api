@@ -168,10 +168,11 @@ public class ProjectConfiguration {
 
     @Bean
     public RewardFacadePort rewardFacadePort(final PostgresRewardAdapter postgresRewardAdapter,
+                                             final PostgresContributionAdapter postgresContributionAdapter,
                                              final PermissionService permissionService,
                                              final IndexerPort indexerPort,
                                              final AccountingServicePort accountingServicePort) {
-        return new RewardService(postgresRewardAdapter, permissionService, indexerPort, accountingServicePort);
+        return new RewardService(postgresRewardAdapter, postgresContributionAdapter, permissionService, indexerPort, accountingServicePort);
     }
 
     @Bean
@@ -288,14 +289,15 @@ public class ProjectConfiguration {
                                                 final SlackApiAdapter slackApiAdapter,
                                                 final ContributionService contributionService,
                                                 final PostgresBiProjectorAdapter postgresBiProjectorAdapter) {
-        return new ProjectObserverComposite(outboxProjectService, contributionService, slackApiAdapter, postgresBiProjectorAdapter);
+        return new ProjectObserverComposite(postgresBiProjectorAdapter, outboxProjectService, contributionService, slackApiAdapter);
     }
 
     @Bean
     public ApplicationObserverPort applicationObservers(final SlackApiAdapter slackApiAdapter,
                                                         final OutboxProjectService outboxProjectService,
-                                                        final ApplicationMailNotifier applicationMailNotifier) {
-        return new ApplicationObserverComposite(slackApiAdapter, outboxProjectService, applicationMailNotifier);
+                                                        final ApplicationMailNotifier applicationMailNotifier,
+                                                        final PostgresBiProjectorAdapter postgresBiProjectorAdapter) {
+        return new ApplicationObserverComposite(postgresBiProjectorAdapter, slackApiAdapter, outboxProjectService, applicationMailNotifier);
     }
 
     @Bean
@@ -440,8 +442,9 @@ public class ProjectConfiguration {
 
     @Bean
     public ProjectContributorLabelFacadePort projectContributorLabelFacadePort(final PermissionService permissionService,
-                                                                               final ProjectContributorLabelStoragePort projectContributorLabelStoragePort) {
-        return new ProjectContributorLabelService(permissionService, projectContributorLabelStoragePort);
+                                                                               final ProjectContributorLabelStoragePort projectContributorLabelStoragePort,
+                                                                               final ProjectObserverPort projectObservers) {
+        return new ProjectContributorLabelService(permissionService, projectContributorLabelStoragePort, projectObservers);
     }
 
     @Bean

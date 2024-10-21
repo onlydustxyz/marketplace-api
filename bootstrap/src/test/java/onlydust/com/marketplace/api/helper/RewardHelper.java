@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.helper;
 
-import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
@@ -15,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.stream.IntStream;
+import java.util.List;
 
 @Service
 public class RewardHelper {
@@ -23,26 +22,26 @@ public class RewardHelper {
     private RewardFacadePort rewardFacadePort;
     @Autowired
     private RewardStoragePort rewardStoragePort;
-    private final Faker faker = new Faker();
 
     public RewardId create(ProjectId projectId, UserAuthHelper.AuthenticatedUser lead, GithubUserId recipientId, long amount, Currency.Id currencyId) {
+        return create(projectId, lead, recipientId, amount, currencyId, List.of(RequestRewardCommand.Item.builder()
+                .id("1974448961")
+                .number(77L)
+                .repoId(86943508L)
+                .type(RequestRewardCommand.Item.Type.issue)
+                .build()));
+    }
+
+    public RewardId create(ProjectId projectId, UserAuthHelper.AuthenticatedUser lead, GithubUserId recipientId, long amount, Currency.Id currencyId,
+                           List<RequestRewardCommand.Item> rewardItems) {
         return rewardFacadePort.createReward(UserId.of(lead.user().getId()),
                 RequestRewardCommand.builder()
                         .amount(BigDecimal.valueOf(amount))
                         .currencyId(CurrencyView.Id.of(currencyId.value()))
                         .recipientId(recipientId.value())
-                        .items(IntStream.range(0, 2).mapToObj(this::createRequestRewardCommandItem).toList())
+                        .items(rewardItems)
                         .projectId(projectId)
                         .build());
-    }
-
-    private RequestRewardCommand.Item createRequestRewardCommandItem(int i) {
-        return RequestRewardCommand.Item.builder()
-                .id(String.valueOf(faker.random().nextLong()))
-                .number((long) i)
-                .repoId(faker.random().nextLong())
-                .type(RequestRewardCommand.Item.Type.pullRequest)
-                .build();
     }
 
     public void cancel(ProjectId projectId, UserAuthHelper.AuthenticatedUser lead, RewardId rewardId) {

@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.ContributionStatus;
@@ -70,7 +72,7 @@ public class ContributionService implements ContributionFacadePort, Contribution
     }
 
     @Override
-    public void onContributionsChanged(Long repoId) {
+    public void onContributionsChanged(Long repoId, ContributionUUID contributionUUID) {
         contributionStoragePort.refreshIgnoredContributions(List.of(repoId));
     }
 
@@ -90,5 +92,9 @@ public class ContributionService implements ContributionFacadePort, Contribution
 
     @Override
     public void onProjectCategorySuggested(String categoryName, UserId userId) {
+    }
+
+    @Override
+    public void onLabelsModified(@NonNull ProjectId projectId, Set<Long> githubUserIds) {
     }
 }

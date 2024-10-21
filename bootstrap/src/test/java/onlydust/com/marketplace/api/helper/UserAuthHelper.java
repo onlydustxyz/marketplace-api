@@ -34,6 +34,7 @@ public class UserAuthHelper {
     WireMockServer githubWireMockServer;
     AppUserFacadePort appUserFacadePort;
     Faker faker;
+    GithubHelper githubHelper;
 
     public AuthenticatedUser create() {
         return create(faker.internet().slug());
@@ -61,9 +62,11 @@ public class UserAuthHelper {
                         onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.ADMIN} :
                 new onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role[]{onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.USER});
         userRepository.saveAndFlush(user);
-
+        
         mockAuth0UserInfo(user);
-        return authenticateUser(user);
+        final var authenticatedUser = authenticateUser(user);
+        githubHelper.createAccount(authenticatedUser);
+        return authenticatedUser;
     }
 
     public AuthenticatedUser signInUser(AuthenticatedUser user) {

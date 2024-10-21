@@ -34,200 +34,177 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                           "totalPageNumber": 1,
-                           "totalItemNumber": 5,
-                           "hasMore": false,
-                           "nextPageIndex": 0,
-                           "languages": [
-                             {
-                               "rank": 2,
-                               "contributingStatus": "GREEN",
-                               "contributedProjectCount": 6,
-                               "contributionCount": 217,
-                               "rewardCount": 10,
-                               "totalEarnedUsd": 900080.00,
-                               "projects": [
-                                 {
-                                   "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
-                                   "slug": "kaaper",
-                                   "name": "kaaper",
-                                   "logoUrl": null
-                                 },
-                                 {
-                                   "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                                   "slug": "mooooooonlight",
-                                   "name": "Mooooooonlight",
-                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                 },
-                                 {
-                                   "id": "5aabf0f1-7495-4bff-8de2-4396837ce6b4",
-                                   "slug": "marketplace-2",
-                                   "name": "Marketplace 2",
-                                   "logoUrl": null
-                                 },
-                                 {
-                                   "id": "90fb751a-1137-4815-b3c4-54927a5db059",
-                                   "slug": "no-sponsors",
-                                   "name": "No sponsors",
-                                   "logoUrl": null
-                                 },
-                                 {
-                                   "id": "d4e8ab3b-a4a8-493d-83bd-a4c8283b94f9",
-                                   "slug": "oscars-awesome-project",
-                                   "name": "oscar's awesome project",
-                                   "logoUrl": null
-                                 },
-                                 {
-                                   "id": "f39b827f-df73-498c-8853-99bc3f562723",
-                                   "slug": "qa-new-contributions",
-                                   "name": "QA new contributions",
-                                   "logoUrl": null
-                                 }
-                               ],
-                               "language": {
-                                 "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
-                                 "name": "Typescript",
-                                 "slug": "typescript",
-                                 "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                                 "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
-                               }
-                             },
-                             {
-                               "rank": 2,
-                               "contributingStatus": "GREEN",
-                               "contributedProjectCount": 5,
-                               "contributionCount": 192,
-                               "rewardCount": 12,
-                               "totalEarnedUsd": 10605.00,
-                               "projects": [
-                                 {
-                                   "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
-                                   "slug": "kaaper",
-                                   "name": "kaaper",
-                                   "logoUrl": null
-                                 },
-                                 {
-                                   "id": "29cdf359-f60c-41a0-8b11-18d6841311f6",
-                                   "slug": "kaaper-3",
-                                   "name": "kaaper 3",
-                                   "logoUrl": null
-                                 },
-                                 {
-                                   "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                                   "slug": "mooooooonlight",
-                                   "name": "Mooooooonlight",
-                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                 },
-                                 {
-                                   "id": "90fb751a-1137-4815-b3c4-54927a5db059",
-                                   "slug": "no-sponsors",
-                                   "name": "No sponsors",
-                                   "logoUrl": null
-                                 },
-                                 {
-                                   "id": "f39b827f-df73-498c-8853-99bc3f562723",
-                                   "slug": "qa-new-contributions",
-                                   "name": "QA new contributions",
-                                   "logoUrl": null
-                                 }
-                               ],
-                               "language": {
-                                 "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
-                                 "name": "Rust",
-                                 "slug": "rust",
-                                 "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
-                                 "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
-                               }
-                             },
-                             {
-                               "rank": 3,
-                               "contributingStatus": "GREEN",
-                               "contributedProjectCount": 4,
-                               "contributionCount": 24,
-                               "rewardCount": 0,
-                               "totalEarnedUsd": 0,
-                               "projects": [
-                                 {
-                                   "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
-                                   "slug": "kaaper",
-                                   "name": "kaaper",
-                                   "logoUrl": null
-                                 },
-                                 {
-                                   "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                                   "slug": "mooooooonlight",
-                                   "name": "Mooooooonlight",
-                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                 },
-                                 {
-                                   "id": "90fb751a-1137-4815-b3c4-54927a5db059",
-                                   "slug": "no-sponsors",
-                                   "name": "No sponsors",
-                                   "logoUrl": null
-                                 },
-                                 {
-                                   "id": "f39b827f-df73-498c-8853-99bc3f562723",
-                                   "slug": "qa-new-contributions",
-                                   "name": "QA new contributions",
-                                   "logoUrl": null
-                                 }
-                               ],
-                               "language": {
-                                 "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
-                                 "name": "Javascript",
-                                 "slug": "javascript",
-                                 "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                                 "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
-                               }
-                             },
-                             {
-                               "rank": 16,
-                               "contributingStatus": "GREEN",
-                               "contributedProjectCount": 1,
-                               "contributionCount": 9,
-                               "rewardCount": 0,
-                               "totalEarnedUsd": 0,
-                               "projects": [
-                                 {
-                                   "id": "00490be6-2c03-4720-993b-aea3e07edd81",
-                                   "slug": "zama",
-                                   "name": "Zama",
-                                   "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M"
-                                 }
-                               ],
-                               "language": {
-                                 "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
-                                 "name": "Cairo",
-                                 "slug": "cairo",
-                                 "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
-                                 "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
-                               }
-                             },
-                             {
-                               "rank": 20,
-                               "contributingStatus": "GREEN",
-                               "contributedProjectCount": 1,
-                               "contributionCount": 7,
-                               "rewardCount": 0,
-                               "totalEarnedUsd": 0,
-                               "projects": [
-                                 {
-                                   "id": "00490be6-2c03-4720-993b-aea3e07edd81",
-                                   "slug": "zama",
-                                   "name": "Zama",
-                                   "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M"
-                                 }
-                               ],
-                               "language": {
-                                 "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
-                                 "name": "Python",
-                                 "slug": "python",
-                                 "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
-                                 "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
-                               }
-                             }
-                           ]
-                         }
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 4,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "languages": [
+                            {
+                              "rank": 2,
+                              "contributingStatus": "GREEN",
+                              "contributedProjectCount": 6,
+                              "contributionCount": 49,
+                              "rewardCount": 10,
+                              "totalEarnedUsd": 900080.00,
+                              "projects": [
+                                {
+                                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                  "slug": "kaaper",
+                                  "name": "kaaper",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                  "slug": "mooooooonlight",
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                },
+                                {
+                                  "id": "5aabf0f1-7495-4bff-8de2-4396837ce6b4",
+                                  "slug": "marketplace-2",
+                                  "name": "Marketplace 2",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
+                                  "slug": "no-sponsors",
+                                  "name": "No sponsors",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "d4e8ab3b-a4a8-493d-83bd-a4c8283b94f9",
+                                  "slug": "oscars-awesome-project",
+                                  "name": "oscar's awesome project",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                                  "slug": "qa-new-contributions",
+                                  "name": "QA new contributions",
+                                  "logoUrl": null
+                                }
+                              ],
+                              "language": {
+                                "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                "slug": "typescript",
+                                "name": "Typescript",
+                                "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                              }
+                            },
+                            {
+                              "rank": 1,
+                              "contributingStatus": "GREEN",
+                              "contributedProjectCount": 5,
+                              "contributionCount": 29,
+                              "rewardCount": 12,
+                              "totalEarnedUsd": 10605.00,
+                              "projects": [
+                                {
+                                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                  "slug": "kaaper",
+                                  "name": "kaaper",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "29cdf359-f60c-41a0-8b11-18d6841311f6",
+                                  "slug": "kaaper-3",
+                                  "name": "kaaper 3",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                  "slug": "mooooooonlight",
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                },
+                                {
+                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
+                                  "slug": "no-sponsors",
+                                  "name": "No sponsors",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                                  "slug": "qa-new-contributions",
+                                  "name": "QA new contributions",
+                                  "logoUrl": null
+                                }
+                              ],
+                              "language": {
+                                "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
+                                "slug": "rust",
+                                "name": "Rust",
+                                "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
+                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
+                              }
+                            },
+                            {
+                              "rank": 6,
+                              "contributingStatus": "ORANGE",
+                              "contributedProjectCount": 4,
+                              "contributionCount": 1,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0,
+                              "projects": [
+                                {
+                                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                  "slug": "kaaper",
+                                  "name": "kaaper",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                  "slug": "mooooooonlight",
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                },
+                                {
+                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
+                                  "slug": "no-sponsors",
+                                  "name": "No sponsors",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                                  "slug": "qa-new-contributions",
+                                  "name": "QA new contributions",
+                                  "logoUrl": null
+                                }
+                              ],
+                              "language": {
+                                "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
+                                "slug": "javascript",
+                                "name": "Javascript",
+                                "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
+                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                              }
+                            },
+                            {
+                              "rank": 12,
+                              "contributingStatus": "ORANGE",
+                              "contributedProjectCount": 1,
+                              "contributionCount": 1,
+                              "rewardCount": 0,
+                              "totalEarnedUsd": 0,
+                              "projects": [
+                                {
+                                  "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                  "slug": "zama",
+                                  "name": "Zama",
+                                  "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M"
+                                }
+                              ],
+                              "language": {
+                                "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
+                                "slug": "python",
+                                "name": "Python",
+                                "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
+                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
+                              }
+                            }
+                          ]
+                        }
                         """, true);
     }
 
@@ -252,7 +229,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "rank": 1,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
-                              "contributionCount": 888,
+                              "contributionCount": 112,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0,
                               "projects": [
@@ -274,10 +251,10 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
-                              "rank": 9,
+                              "rank": 1,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
-                              "contributionCount": 888,
+                              "contributionCount": 112,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0,
                               "projects": [
@@ -302,7 +279,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "rank": 1,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
-                              "contributionCount": 888,
+                              "contributionCount": 112,
                               "rewardCount": 0,
                               "totalEarnedUsd": 0,
                               "projects": [
@@ -343,10 +320,10 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                           "nextPageIndex": 0,
                           "ecosystems": [
                             {
-                              "rank": 4,
+                              "rank": 2,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
-                              "contributionCount": 213,
+                              "contributionCount": 62,
                               "rewardCount": 1,
                               "totalEarnedUsd": 10100.00,
                               "projects": [
@@ -368,10 +345,10 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
-                              "rank": 28,
+                              "rank": 3,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
-                              "contributionCount": 213,
+                              "contributionCount": 62,
                               "rewardCount": 1,
                               "totalEarnedUsd": 1010.00,
                               "projects": [
@@ -393,10 +370,10 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
-                              "rank": 4,
+                              "rank": 2,
                               "contributingStatus": "GREEN",
                               "contributedProjectCount": 1,
-                              "contributionCount": 213,
+                              "contributionCount": 62,
                               "rewardCount": 1,
                               "totalEarnedUsd": 1010.00,
                               "projects": [
@@ -470,7 +447,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                           "githubUserId": 777,
                           "login": "AnGeL",
                           "avatarUrl": "https://angel.com/avatar.jpg",
-                          "htmlUrl": null,
+                          "htmlUrl": "https://github.com/AnGeL",
                           "location": null,
                           "bio": null,
                           "website": null,
@@ -502,7 +479,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                           "githubUserId": 777,
                           "login": "AnGeL",
                           "avatarUrl": "https://angel.com/avatar.jpg",
-                          "htmlUrl": null,
+                          "htmlUrl": "https://github.com/AnGeL",
                           "location": null,
                           "bio": null,
                           "website": null,
@@ -609,7 +586,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             "rankCategory": "A",
                             "contributedProjectCount": 7,
                             "leadedProjectCount": 2,
-                            "contributionCount": 938,
+                            "contributionCount": 137,
                             "rewardCount": 21
                           },
                           "ecosystems": [
@@ -685,7 +662,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             "rankCategory": "A",
                             "contributedProjectCount": 7,
                             "leadedProjectCount": 2,
-                            "contributionCount": 938,
+                            "contributionCount": 137,
                             "rewardCount": 21
                           },
                           "ecosystems": [
@@ -739,47 +716,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "week": 15,
                               "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 4,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 16,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 0,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 17,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 6,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 18,
-                              "codeReviewCount": 1,
-                              "issueCount": 0,
-                              "pullRequestCount": 0,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 19,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 0,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 20,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 0,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
@@ -792,18 +729,10 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "year": 2022,
-                              "week": 24,
-                              "codeReviewCount": 0,
-                              "issueCount": 0,
-                              "pullRequestCount": 2,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
                               "week": 25,
-                              "codeReviewCount": 1,
+                              "codeReviewCount": 0,
                               "issueCount": 3,
-                              "pullRequestCount": 3,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
@@ -811,52 +740,28 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               "week": 26,
                               "codeReviewCount": 4,
                               "issueCount": 0,
-                              "pullRequestCount": 3,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 27,
-                              "codeReviewCount": 8,
+                              "codeReviewCount": 0,
                               "issueCount": 3,
-                              "pullRequestCount": 10,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 28,
-                              "codeReviewCount": 8,
+                              "codeReviewCount": 5,
                               "issueCount": 5,
-                              "pullRequestCount": 8,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 29,
-                              "codeReviewCount": 8,
-                              "issueCount": 0,
-                              "pullRequestCount": 1,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 30,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 1,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 31,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 15,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 32,
                               "codeReviewCount": 1,
                               "issueCount": 0,
                               "pullRequestCount": 0,
@@ -864,336 +769,128 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "year": 2022,
-                              "week": 33,
-                              "codeReviewCount": 2,
+                              "week": 30,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 2,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
-                              "week": 34,
-                              "codeReviewCount": 3,
+                              "week": 31,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 35,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 11,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 36,
-                              "codeReviewCount": 8,
-                              "issueCount": 0,
-                              "pullRequestCount": 13,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 37,
-                              "codeReviewCount": 5,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 38,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 39,
-                              "codeReviewCount": 3,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 40,
-                              "codeReviewCount": 8,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 41,
-                              "codeReviewCount": 3,
-                              "issueCount": 0,
-                              "pullRequestCount": 2,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 42,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 43,
-                              "codeReviewCount": 5,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 2,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 44,
-                              "codeReviewCount": 0,
-                              "issueCount": 0,
-                              "pullRequestCount": 3,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 45,
-                              "codeReviewCount": 4,
-                              "issueCount": 0,
-                              "pullRequestCount": 4,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 46,
-                              "codeReviewCount": 14,
+                              "codeReviewCount": 3,
                               "issueCount": 0,
-                              "pullRequestCount": 8,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 47,
-                              "codeReviewCount": 10,
-                              "issueCount": 0,
-                              "pullRequestCount": 10,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 48,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 6,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 49,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 10,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 50,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 4,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 51,
-                              "codeReviewCount": 8,
-                              "issueCount": 0,
-                              "pullRequestCount": 12,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 52,
-                              "codeReviewCount": 5,
-                              "issueCount": 0,
-                              "pullRequestCount": 8,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 1,
-                              "codeReviewCount": 9,
-                              "issueCount": 0,
-                              "pullRequestCount": 9,
-                              "rewardCount": 1
-                            },
-                            {
-                              "year": 2023,
-                              "week": 2,
-                              "codeReviewCount": 10,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 3,
-                              "codeReviewCount": 13,
-                              "issueCount": 0,
-                              "pullRequestCount": 8,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 4,
-                              "codeReviewCount": 18,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 11,
+                              "pullRequestCount": 0,
                               "rewardCount": 2
                             },
                             {
                               "year": 2023,
                               "week": 5,
-                              "codeReviewCount": 19,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 19,
+                              "pullRequestCount": 4,
                               "rewardCount": 1
                             },
                             {
                               "year": 2023,
                               "week": 6,
-                              "codeReviewCount": 9,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 9,
+                              "pullRequestCount": 3,
                               "rewardCount": 1
                             },
                             {
                               "year": 2023,
                               "week": 8,
-                              "codeReviewCount": 10,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 7,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 9,
-                              "codeReviewCount": 13,
-                              "issueCount": 0,
-                              "pullRequestCount": 14,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 10,
-                              "codeReviewCount": 11,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 20,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 11,
-                              "codeReviewCount": 10,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 9,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 12,
-                              "codeReviewCount": 6,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 16,
+                              "pullRequestCount": 2,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 13,
-                              "codeReviewCount": 5,
-                              "issueCount": 4,
-                              "pullRequestCount": 7,
+                              "codeReviewCount": 0,
+                              "issueCount": 2,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 14,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 15,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 16,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 10,
-                              "rewardCount": 1
                             },
                             {
                               "year": 2023,
                               "week": 17,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 18,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 18,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 17,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 19,
-                              "codeReviewCount": 10,
-                              "issueCount": 0,
-                              "pullRequestCount": 9,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 20,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 14,
-                              "rewardCount": 1
-                            },
-                            {
-                              "year": 2023,
-                              "week": 21,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 14,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 22,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 8,
+                              "pullRequestCount": 2,
                               "rewardCount": 2
                             },
                             {
                               "year": 2023,
                               "week": 23,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 9,
                               "rewardCount": 0
@@ -1201,7 +898,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 24,
-                              "codeReviewCount": 4,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 5,
                               "rewardCount": 0
@@ -1209,7 +906,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 25,
-                              "codeReviewCount": 3,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 8,
                               "rewardCount": 2
@@ -1217,7 +914,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 26,
-                              "codeReviewCount": 6,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 13,
                               "rewardCount": 0
@@ -1225,7 +922,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 27,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
@@ -1233,7 +930,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 28,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 15,
                               "rewardCount": 0
@@ -1241,7 +938,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 29,
-                              "codeReviewCount": 3,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 4,
                               "rewardCount": 0
@@ -1249,7 +946,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 30,
-                              "codeReviewCount": 5,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
@@ -1257,7 +954,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 31,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 4,
                               "rewardCount": 0
@@ -1265,7 +962,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 32,
-                              "codeReviewCount": 4,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 12,
                               "rewardCount": 0
@@ -1273,70 +970,54 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 35,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 3,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 36,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 37,
-                              "codeReviewCount": 1,
-                              "issueCount": 0,
-                              "pullRequestCount": 3,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 38,
-                              "codeReviewCount": 4,
-                              "issueCount": 0,
-                              "pullRequestCount": 10,
-                              "rewardCount": 10
-                            },
-                            {
-                              "year": 2023,
-                              "week": 39,
-                              "codeReviewCount": 1,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
-                              "week": 40,
-                              "codeReviewCount": 1,
+                              "week": 36,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 0,
+                              "pullRequestCount": 2,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
-                              "week": 41,
-                              "codeReviewCount": 1,
+                              "week": 37,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 0,
+                              "pullRequestCount": 2,
                               "rewardCount": 0
+                            },
+                            {
+                              "year": 2023,
+                              "week": 38,
+                              "codeReviewCount": 0,
+                              "issueCount": 0,
+                              "pullRequestCount": 4,
+                              "rewardCount": 10
                             }
                           ],
                           "earnings": {
                             "totalEarnedUsd": 2692632.50,
                             "perProject": [
                               {
+                                "projectName": "kaaper 3",
+                                "totalEarnedUsd": 2525.00
+                              },
+                              {
+                                "projectName": "oscar's awesome project",
+                                "totalEarnedUsd": 1010.00
+                              },
+                              {
                                 "projectName": "kaaper",
                                 "totalEarnedUsd": 1792080.00
                               },
                               {
-                                "projectName": "kaaper 3",
-                                "totalEarnedUsd": 2525.00
+                                "projectName": "Aldébaran du Taureau",
+                                "totalEarnedUsd": 1767.50
                               },
                               {
                                 "projectName": "Pizzeria Yoshi !",
@@ -1345,21 +1026,13 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                               {
                                 "projectName": "Marketplace 2",
                                 "totalEarnedUsd": 890990.00
-                              },
-                              {
-                                "projectName": "Aldébaran du Taureau",
-                                "totalEarnedUsd": 1767.50
-                              },
-                              {
-                                "projectName": "oscar's awesome project",
-                                "totalEarnedUsd": 1010.00
                               }
                             ]
                           },
                           "workDistribution": {
-                            "codeReviewCount": 406,
-                            "issueCount": 15,
-                            "pullRequestCount": 517
+                            "codeReviewCount": 22,
+                            "issueCount": 13,
+                            "pullRequestCount": 102
                           }
                         }
                         """);
@@ -1385,408 +1058,96 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                           "activity": [
                             {
                               "year": 2022,
-                              "week": 24,
-                              "codeReviewCount": 0,
-                              "issueCount": 0,
-                              "pullRequestCount": 2,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
                               "week": 25,
-                              "codeReviewCount": 1,
-                              "issueCount": 3,
-                              "pullRequestCount": 3,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 26,
                               "codeReviewCount": 0,
-                              "issueCount": 0,
-                              "pullRequestCount": 3,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 27,
-                              "codeReviewCount": 8,
                               "issueCount": 3,
-                              "pullRequestCount": 10,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 28,
-                              "codeReviewCount": 3,
-                              "issueCount": 5,
-                              "pullRequestCount": 8,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 29,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 1,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 30,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 1,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 31,
-                              "codeReviewCount": 5,
-                              "issueCount": 0,
-                              "pullRequestCount": 15,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 32,
-                              "codeReviewCount": 1,
-                              "issueCount": 0,
                               "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
-                              "week": 33,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 2,
+                              "week": 27,
+                              "codeReviewCount": 0,
+                              "issueCount": 3,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
-                              "week": 34,
-                              "codeReviewCount": 3,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 35,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 11,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 36,
-                              "codeReviewCount": 8,
-                              "issueCount": 0,
-                              "pullRequestCount": 13,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 37,
-                              "codeReviewCount": 5,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 38,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 39,
-                              "codeReviewCount": 3,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 40,
-                              "codeReviewCount": 8,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 41,
-                              "codeReviewCount": 3,
-                              "issueCount": 0,
-                              "pullRequestCount": 2,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 42,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
+                              "week": 28,
+                              "codeReviewCount": 0,
+                              "issueCount": 5,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2022,
                               "week": 43,
-                              "codeReviewCount": 4,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 2,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
-                              "year": 2022,
-                              "week": 44,
+                              "year": 2023,
+                              "week": 5,
+                              "codeReviewCount": 0,
+                              "issueCount": 0,
+                              "pullRequestCount": 4,
+                              "rewardCount": 0
+                            },
+                            {
+                              "year": 2023,
+                              "week": 6,
                               "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 3,
                               "rewardCount": 0
                             },
                             {
-                              "year": 2022,
-                              "week": 45,
-                              "codeReviewCount": 4,
-                              "issueCount": 0,
-                              "pullRequestCount": 4,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 46,
-                              "codeReviewCount": 11,
-                              "issueCount": 0,
-                              "pullRequestCount": 8,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 47,
-                              "codeReviewCount": 10,
-                              "issueCount": 0,
-                              "pullRequestCount": 10,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 48,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 6,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 49,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 10,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 50,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 4,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 51,
-                              "codeReviewCount": 8,
-                              "issueCount": 0,
-                              "pullRequestCount": 12,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2022,
-                              "week": 52,
-                              "codeReviewCount": 5,
-                              "issueCount": 0,
-                              "pullRequestCount": 8,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 1,
-                              "codeReviewCount": 9,
-                              "issueCount": 0,
-                              "pullRequestCount": 9,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 2,
-                              "codeReviewCount": 10,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 3,
-                              "codeReviewCount": 13,
-                              "issueCount": 0,
-                              "pullRequestCount": 8,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 4,
-                              "codeReviewCount": 17,
-                              "issueCount": 0,
-                              "pullRequestCount": 11,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 5,
-                              "codeReviewCount": 18,
-                              "issueCount": 0,
-                              "pullRequestCount": 19,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 6,
-                              "codeReviewCount": 9,
-                              "issueCount": 0,
-                              "pullRequestCount": 9,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 8,
-                              "codeReviewCount": 9,
-                              "issueCount": 0,
-                              "pullRequestCount": 6,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 9,
-                              "codeReviewCount": 13,
-                              "issueCount": 0,
-                              "pullRequestCount": 14,
-                              "rewardCount": 0
-                            },
-                            {
                               "year": 2023,
                               "week": 10,
-                              "codeReviewCount": 11,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 20,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 11,
-                              "codeReviewCount": 10,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 9,
+                              "pullRequestCount": 1,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 12,
-                              "codeReviewCount": 6,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 16,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 13,
-                              "codeReviewCount": 5,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 14,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 7,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 15,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 16,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 10,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 17,
-                              "codeReviewCount": 7,
-                              "issueCount": 0,
-                              "pullRequestCount": 17,
+                              "pullRequestCount": 2,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 18,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 1,
                               "issueCount": 0,
-                              "pullRequestCount": 17,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 19,
-                              "codeReviewCount": 10,
-                              "issueCount": 0,
-                              "pullRequestCount": 9,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 20,
-                              "codeReviewCount": 6,
-                              "issueCount": 0,
-                              "pullRequestCount": 14,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 21,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 14,
+                              "pullRequestCount": 0,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 22,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 8,
+                              "pullRequestCount": 2,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
                               "week": 23,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 9,
                               "rewardCount": 0
@@ -1794,7 +1155,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 24,
-                              "codeReviewCount": 4,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 5,
                               "rewardCount": 0
@@ -1802,7 +1163,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 25,
-                              "codeReviewCount": 3,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 8,
                               "rewardCount": 0
@@ -1810,7 +1171,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 26,
-                              "codeReviewCount": 6,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 13,
                               "rewardCount": 0
@@ -1818,7 +1179,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 27,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
@@ -1826,7 +1187,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 28,
-                              "codeReviewCount": 7,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 15,
                               "rewardCount": 0
@@ -1834,7 +1195,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 29,
-                              "codeReviewCount": 3,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 4,
                               "rewardCount": 0
@@ -1842,7 +1203,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 30,
-                              "codeReviewCount": 5,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
@@ -1850,7 +1211,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 31,
-                              "codeReviewCount": 2,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 4,
                               "rewardCount": 0
@@ -1858,7 +1219,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 32,
-                              "codeReviewCount": 4,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 12,
                               "rewardCount": 0
@@ -1866,57 +1227,33 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             {
                               "year": 2023,
                               "week": 35,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 3,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 36,
-                              "codeReviewCount": 2,
-                              "issueCount": 0,
-                              "pullRequestCount": 5,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 37,
-                              "codeReviewCount": 1,
-                              "issueCount": 0,
-                              "pullRequestCount": 3,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 38,
-                              "codeReviewCount": 4,
-                              "issueCount": 0,
-                              "pullRequestCount": 10,
-                              "rewardCount": 0
-                            },
-                            {
-                              "year": 2023,
-                              "week": 39,
-                              "codeReviewCount": 1,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
                               "pullRequestCount": 2,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
-                              "week": 40,
-                              "codeReviewCount": 1,
+                              "week": 36,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 0,
+                              "pullRequestCount": 2,
                               "rewardCount": 0
                             },
                             {
                               "year": 2023,
-                              "week": 41,
-                              "codeReviewCount": 1,
+                              "week": 37,
+                              "codeReviewCount": 0,
                               "issueCount": 0,
-                              "pullRequestCount": 0,
+                              "pullRequestCount": 2,
+                              "rewardCount": 0
+                            },
+                            {
+                              "year": 2023,
+                              "week": 38,
+                              "codeReviewCount": 0,
+                              "issueCount": 0,
+                              "pullRequestCount": 4,
                               "rewardCount": 0
                             }
                           ],
@@ -1925,9 +1262,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                             "perProject": []
                           },
                           "workDistribution": {
-                            "codeReviewCount": 372,
+                            "codeReviewCount": 2,
                             "issueCount": 11,
-                            "pullRequestCount": 505
+                            "pullRequestCount": 99
                           }
                         }
                         """);

@@ -69,12 +69,12 @@ public class ProjectsPostRewardableOtherPullRequestApiIT extends AbstractMarketp
         final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         // When
-        indexerApiWireMockServer.stubFor(put(urlEqualTo("/api/v1/repos/tokio-rs/tracing/pull-requests/608"))
+        indexerApiWireMockServer.stubFor(put(urlEqualTo("/api/v1/repos/tokio-rs/tracing/pull-requests/2820"))
                 .willReturn(ok()));
 
         client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_OTHER_PR, projectId))).contentType(APPLICATION_JSON).bodyValue("""
                         {
-                          "githubPullRequestHtmlUrl": "https://github.com/tokio-rs/tracing/pull/608"
+                          "githubPullRequestHtmlUrl": "https://github.com/tokio-rs/tracing/pull/2820"
                         }
                         """)
                 .header("Authorization", BEARER_PREFIX + pierre.jwt())
@@ -85,27 +85,27 @@ public class ProjectsPostRewardableOtherPullRequestApiIT extends AbstractMarketp
                 .expectBody()
                 .json("""
                         {
-                          "number": 608,
-                          "id": "381072085",
+                          "number": 2820,
+                          "id": "1621758565",
                           "contributionId": null,
-                          "title": "Fix typo in example code",
-                          "createdAt": "2020-02-27T21:03:44Z",
-                          "completedAt": "2020-02-27T21:29:57Z",
-                          "githubBody": "Hi, I noticed a small typo while checking out the README \\uD83D\\uDE42 ",
+                          "title": "tracing: add index API for `Field`",
+                          "createdAt": "2023-11-29T12:36:19Z",
+                          "completedAt": null,
+                          "githubBody": "<!--\\r\\nThank you for your Pull Request. Please provide a description above and review\\r\\nthe requirements below.\\r\\n\\r\\nBug fixes and new features should include tests.\\r\\n\\r\\nContributors guide: https://github.com/tokio-rs/tracing/blob/master/CONTRIBUTING.md\\r\\n-->\\r\\n\\r\\n## Motivation\\r\\n\\r\\nExpose the index of the field. See more at: https://github.com/tokio-rs/console/issues/462#issuecomment-1830842319\\r\\n\\r\\n## Solution\\r\\n\\r\\nJust added a new API.",
                           "author": {
-                            "githubUserId": 7748404,
-                            "login": "kvrhdn",
-                            "avatarUrl": "https://avatars.githubusercontent.com/u/7748404?v=4"
+                            "githubUserId": 29879298,
+                            "login": "hi-rustin",
+                            "avatarUrl": "https://avatars.githubusercontent.com/u/29879298?v=4"
                           },
                           "repoName": "tracing",
                           "repoId": 165289175,
                           "type": "PULL_REQUEST",
-                          "commitsCount": 1,
+                          "commitsCount": 2,
                           "userCommitsCount": null,
                           "commentsCount": null,
-                          "status": "MERGED",
+                          "status": "OPEN",
                           "ignored": false,
-                          "htmlUrl": "https://github.com/tokio-rs/tracing/pull/608"
+                          "htmlUrl": "https://github.com/tokio-rs/tracing/pull/2820"
                         }
                         """);
     }

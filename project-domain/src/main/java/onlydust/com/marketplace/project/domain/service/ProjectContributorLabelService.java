@@ -6,6 +6,7 @@ import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.ProjectContributorLabel;
 import onlydust.com.marketplace.project.domain.port.input.ProjectContributorLabelFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectContributorLabelStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 public class ProjectContributorLabelService implements ProjectContributorLabelFacadePort {
     private final PermissionService permissionService;
     private final ProjectContributorLabelStoragePort projectContributorLabelStoragePort;
+    private final ProjectObserverPort projectObserverPort;
 
     @Override
     @Transactional
@@ -68,5 +70,7 @@ public class ProjectContributorLabelService implements ProjectContributorLabelFa
                 projectContributorLabelStoragePort.saveLabelOfContributor(labelId, contributorId);
             });
         });
+
+        projectObserverPort.onLabelsModified(projectId, labelsPerContributor.keySet());
     }
 }

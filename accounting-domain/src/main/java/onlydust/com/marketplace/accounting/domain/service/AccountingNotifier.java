@@ -63,7 +63,7 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
     }
 
     @Override
-    public void onRewardCancelled(RewardId rewardId) {
+    public void onRewardCancelledBefore(RewardId rewardId) {
         final var reward = accountingRewardStoragePort.getReward(rewardId)
                 .orElseThrow(() -> internalServerError("Reward %s not found".formatted(rewardId)));
 
@@ -82,6 +82,11 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
         } else {
             LOGGER.warn("Unable to send cancel reward mail to recipient %s due to missing email".formatted(reward.recipient().login()));
         }
+    }
+
+    @Override
+    public void onRewardCancelledAfter(RewardId rewardId) {
+
     }
 
     @Override
@@ -193,7 +198,7 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
 
     @Override
     public void onFundsGrantedToProject(ProgramId from, ProjectId to, PositiveAmount amount, Currency.Id currencyId) {
-        
+
     }
 
     @Override
