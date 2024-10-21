@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -11,14 +12,18 @@ import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPor
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.*;
 import onlydust.com.marketplace.kernel.model.*;
+import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.port.input.ContributionObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
+import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPort;
 import onlydust.com.marketplace.user.domain.port.input.UserObserverPort;
 
 import java.util.Set;
 
 @AllArgsConstructor
-public class PostgresBiProjectorAdapter implements AccountingObserverPort, ContributionObserverPort, ProjectObserverPort, UserObserverPort {
+public class PostgresBiProjectorAdapter implements AccountingObserverPort, ContributionObserverPort, ProjectObserverPort, UserObserverPort,
+        ApplicationObserverPort {
+    private final EntityManager entityManager;
     private final BiRewardDataRepository biRewardDataRepository;
     private final BiContributionDataRepository biContributionDataRepository;
     private final BiContributionContributorsDataRepository biContributionContributorsDataRepository;
@@ -33,60 +38,61 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
-
     }
 
     @Override
     public void onSponsorAccountUpdated(SponsorAccountStatement sponsorAccount) {
-
     }
 
     @Override
     public void onRewardCreated(RewardId rewardId, AccountBookFacade accountBookFacade) {
+        entityManager.flush();
         biRewardDataRepository.refresh(rewardId);
         biContributionRewardDataRepository.refreshByReward(rewardId);
     }
 
     @Override
-    public void onRewardCancelled(RewardId rewardId) {
+    public void onRewardCancelledBefore(RewardId rewardId) {
+    }
+
+    @Override
+    public void onRewardCancelledAfter(RewardId rewardId) {
+        entityManager.flush();
         biRewardDataRepository.refresh(rewardId);
         biContributionRewardDataRepository.refreshByReward(rewardId);
     }
 
     @Override
     public void onRewardPaid(RewardId rewardId) {
+        entityManager.flush();
         biRewardDataRepository.refresh(rewardId);
         biContributionRewardDataRepository.refreshByReward(rewardId);
     }
 
     @Override
     public void onPayoutPreferenceChanged(BillingProfile.Id billingProfileId, UserId userId, ProjectId projectId) {
-
     }
 
     @Override
     public void onBillingProfileEnableChanged(BillingProfile.Id billingProfileId, Boolean enabled) {
-
     }
 
     @Override
     public void onBillingProfileDeleted(BillingProfile.Id billingProfileId) {
-
     }
 
     @Override
     public void onFundsAllocatedToProgram(SponsorId from, ProgramId to, PositiveAmount amount, Currency.Id currencyId) {
-
     }
 
     @Override
     public void onFundsRefundedByProgram(ProgramId from, SponsorId to, PositiveAmount amount, Currency.Id currencyId) {
-
     }
 
     @Override
     @Transactional
     public void onFundsGrantedToProject(ProgramId from, ProjectId to, PositiveAmount amount, Currency.Id currencyId) {
+        entityManager.flush();
         biProjectGrantsDataRepository.refresh(from, to);
         biProjectBudgetDataRepository.refreshByProject(to);
     }
@@ -94,6 +100,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     @Override
     @Transactional
     public void onFundsRefundedByProject(ProjectId from, ProgramId to, PositiveAmount amount, Currency.Id currencyId) {
+        entityManager.flush();
         biProjectGrantsDataRepository.refresh(to, from);
         biProjectBudgetDataRepository.refreshByProject(from);
     }
@@ -101,6 +108,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     @Override
     @Transactional
     public void onContributionsChanged(Long repoId, ContributionUUID contributionUUID) {
+        // No need to flush here, as the updates have been done on indexer side
         biContributionDataRepository.refreshByUUID(contributionUUID);
         biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
         biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
@@ -111,6 +119,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     @Override
     @Transactional
     public void onLinkedReposChanged(ProjectId projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds) {
+        entityManager.flush();
         linkedRepoIds.forEach(biContributionDataRepository::refreshByRepo);
         unlinkedRepoIds.forEach(biContributionDataRepository::refreshByRepo);
         linkedRepoIds.forEach(biContributionContributorsDataRepository::refreshByRepo);
@@ -125,19 +134,18 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
 
     @Override
     public void onRewardSettingsChanged(ProjectId projectId) {
-
     }
 
     @Override
     @Transactional
     public void onProjectCreated(ProjectId projectId, UserId projectLeadId) {
+        entityManager.flush();
         biProjectGlobalDataRepository.refreshByProject(projectId);
         biProjectBudgetDataRepository.refreshByProject(projectId);
     }
 
     @Override
     public void onProjectCategorySuggested(String categoryName, UserId userId) {
-
     }
 
     @Override
@@ -148,7 +156,32 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     @Override
     @Transactional
     public void onUserSignedUp(AuthenticatedUser user) {
+        entityManager.flush();
         biContributorGlobalDataRepository.refresh(user.githubUserId());
         userProjectRecommendationsRepository.refresh(user.githubUserId());
+    }
+
+    @Override
+    public void onApplicationCreated(Application application) {
+        entityManager.flush();
+        final var contributionUUID = ContributionUUID.of(application.issueId().value());
+        biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
+        biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
+    }
+
+    @Override
+    public void onApplicationAccepted(Application application, UserId projectLeadId) {
+        entityManager.flush();
+        final var contributionUUID = ContributionUUID.of(application.issueId().value());
+        biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
+        biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
+    }
+
+    @Override
+    public void onApplicationRefused(Application application) {
+        entityManager.flush();
+        final var contributionUUID = ContributionUUID.of(application.issueId().value());
+        biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
+        biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
     }
 }

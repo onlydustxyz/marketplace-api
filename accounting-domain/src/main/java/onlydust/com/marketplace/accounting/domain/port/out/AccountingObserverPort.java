@@ -14,7 +14,9 @@ public interface AccountingObserverPort {
 
     void onRewardCreated(RewardId rewardId, AccountBookFacade accountBookFacade);
 
-    void onRewardCancelled(RewardId rewardId);
+    void onRewardCancelledBefore(RewardId rewardId);
+
+    void onRewardCancelledAfter(RewardId rewardId);
 
     void onRewardPaid(RewardId rewardId);
 

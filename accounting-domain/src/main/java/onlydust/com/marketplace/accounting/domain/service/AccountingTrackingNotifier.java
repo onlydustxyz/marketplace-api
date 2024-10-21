@@ -49,8 +49,11 @@ public class AccountingTrackingNotifier implements AccountingObserverPort {
     }
 
     @Override
-    public void onRewardCancelled(RewardId rewardId) {
+    public void onRewardCancelledBefore(RewardId rewardId) {
+    }
 
+    @Override
+    public void onRewardCancelledAfter(RewardId rewardId) {
     }
 
     @Override

@@ -28,12 +28,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableAutoConfiguration
-@EntityScan(basePackages = {
-        "onlydust.com.marketplace.api.postgres.adapter.entity"
-})
-@EnableJpaRepositories(basePackages = {
-        "onlydust.com.marketplace.api.postgres.adapter.repository"
-})
+@EntityScan(basePackages = {"onlydust.com.marketplace.api.postgres.adapter.entity"})
+@EnableJpaRepositories(basePackages = {"onlydust.com.marketplace.api.postgres.adapter.repository"})
 @EnableTransactionManagement
 @EnableJpaAuditing
 public class PostgresConfiguration {
@@ -542,7 +538,8 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    PostgresBiProjectorAdapter postgresBiProjectorAdapter(final BiRewardDataRepository biRewardDataRepository,
+    PostgresBiProjectorAdapter postgresBiProjectorAdapter(final EntityManager entityManager,
+                                                          final BiRewardDataRepository biRewardDataRepository,
                                                           final BiContributionDataRepository biContributionDataRepository,
                                                           final BiContributionContributorsDataRepository biContributionContributorsDataRepository,
                                                           final BiPerContributorContributionDataRepository biPerContributorContributionDataRepository,
@@ -553,7 +550,8 @@ public class PostgresConfiguration {
                                                           final BiContributorGlobalDataRepository biContributorGlobalDataRepository,
                                                           final BiContributionRewardDataRepository biContributionRewardDataRepository,
                                                           final UserProjectRecommendationsRepository userProjectRecommendationsRepository) {
-        return new PostgresBiProjectorAdapter(biRewardDataRepository,
+        return new PostgresBiProjectorAdapter(entityManager,
+                biRewardDataRepository,
                 biContributionDataRepository,
                 biContributionContributorsDataRepository,
                 biPerContributorContributionDataRepository,

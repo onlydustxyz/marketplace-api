@@ -289,14 +289,15 @@ public class ProjectConfiguration {
                                                 final SlackApiAdapter slackApiAdapter,
                                                 final ContributionService contributionService,
                                                 final PostgresBiProjectorAdapter postgresBiProjectorAdapter) {
-        return new ProjectObserverComposite(outboxProjectService, contributionService, slackApiAdapter, postgresBiProjectorAdapter);
+        return new ProjectObserverComposite(postgresBiProjectorAdapter, outboxProjectService, contributionService, slackApiAdapter);
     }
 
     @Bean
     public ApplicationObserverPort applicationObservers(final SlackApiAdapter slackApiAdapter,
                                                         final OutboxProjectService outboxProjectService,
-                                                        final ApplicationMailNotifier applicationMailNotifier) {
-        return new ApplicationObserverComposite(slackApiAdapter, outboxProjectService, applicationMailNotifier);
+                                                        final ApplicationMailNotifier applicationMailNotifier,
+                                                        final PostgresBiProjectorAdapter postgresBiProjectorAdapter) {
+        return new ApplicationObserverComposite(postgresBiProjectorAdapter, slackApiAdapter, outboxProjectService, applicationMailNotifier);
     }
 
     @Bean

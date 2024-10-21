@@ -62,6 +62,7 @@ public class ApplicationService implements ApplicationFacadePort {
     }
 
     @Override
+    @Transactional
     public void acceptApplication(Application.Id id, UserId userId) {
         final var application = projectApplicationStoragePort.findApplication(id)
                 .orElseThrow(() -> notFound("Application %s not found".formatted(id)));

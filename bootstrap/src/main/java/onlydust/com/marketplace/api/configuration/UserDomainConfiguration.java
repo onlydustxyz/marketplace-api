@@ -73,7 +73,7 @@ public class UserDomainConfiguration {
     public UserObserverPort userObservers(final OutboxUserService outboxUserService,
                                           final UserObserverPort notificationSettingsService,
                                           final PostgresBiProjectorAdapter postgresBiProjectorAdapter) {
-        return new UserObserverComposite(outboxUserService, notificationSettingsService, postgresBiProjectorAdapter);
+        return new UserObserverComposite(postgresBiProjectorAdapter, outboxUserService, notificationSettingsService);
     }
 
     @Bean

@@ -164,7 +164,7 @@ public class AccountingNotifierTest {
             when(accountingRewardStoragePort.getReward(rewardId)).thenReturn(Optional.of(reward));
 
             // When
-            accountingNotifier.onRewardCancelled(rewardId);
+            accountingNotifier.onRewardCancelledBefore(rewardId);
 
             // Then
             final var notificationCaptor = ArgumentCaptor.forClass(RewardCanceled.class);
@@ -205,7 +205,7 @@ public class AccountingNotifierTest {
             when(accountingRewardStoragePort.getReward(rewardId)).thenReturn(Optional.of(reward));
 
             // When
-            accountingNotifier.onRewardCancelled(rewardId);
+            accountingNotifier.onRewardCancelledBefore(rewardId);
 
             // Then
             verifyNoInteractions(notificationPort);

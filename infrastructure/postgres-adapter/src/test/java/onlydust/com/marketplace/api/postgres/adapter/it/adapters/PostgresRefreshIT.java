@@ -30,7 +30,8 @@ public class PostgresRefreshIT extends AbstractPostgresIT {
         assertDoesNotThrow(() -> projectStoragePort.refreshRecommendations());
         assertDoesNotThrow(() -> projectStoragePort.refreshStats());
         assertDoesNotThrow(() -> postgresBiProjectorAdapter.onRewardCreated(RewardId.random(), null));
-        assertDoesNotThrow(() -> postgresBiProjectorAdapter.onRewardCancelled(RewardId.random()));
+        assertDoesNotThrow(() -> postgresBiProjectorAdapter.onRewardCancelledBefore(RewardId.random()));
+        assertDoesNotThrow(() -> postgresBiProjectorAdapter.onRewardCancelledAfter(RewardId.random()));
         assertDoesNotThrow(() -> postgresBiProjectorAdapter.onRewardPaid(RewardId.random()));
         assertDoesNotThrow(() -> postgresBiProjectorAdapter.onFundsGrantedToProject(ProgramId.random(), ProjectId.random(), PositiveAmount.of(1000L),
                 Currency.Id.random()));
