@@ -1,18 +1,21 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.api.contract.model.GithubIssuePageItemResponse;
 import onlydust.com.marketplace.api.contract.model.GithubIssuePageResponse;
 import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
+import org.assertj.core.api.AbstractListAssert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static onlydust.com.marketplace.api.it.api.ApplicationsApiIT.fakeApplication;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -20,22 +23,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @TagProject
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     private ApplicationRepository applicationRepository;
 
-    final UUID projectAppliedTo1 = UUID.fromString("27ca7e18-9e71-468f-8825-c64fe6b79d66");
-    final UUID projectAppliedTo2 = UUID.fromString("57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8");
+    private final static UUID projectAppliedTo1 = UUID.fromString("27ca7e18-9e71-468f-8825-c64fe6b79d66");
+    private final static UUID projectAppliedTo2 = UUID.fromString("57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8");
+    private static UserAuthHelper.AuthenticatedUser projectLead;
+    private static AtomicBoolean setupDone = new AtomicBoolean();
 
-    @Test
-    @Order(0)
-    void setupOnce() {
+    @BeforeEach
+    void setup() {
+        projectLead = userAuthHelper.authenticateUser(134486697L);
+
+        if (setupDone.compareAndExchange(false, true)) return;
+
         final var pierre = userAuthHelper.authenticatePierre();
         final var antho = userAuthHelper.authenticateAntho();
         final var olivier = userAuthHelper.authenticateOlivier();
-
         applicationRepository.saveAll(List.of(
                 // 1652216316L has 2 applicants on project 2
                 // 1652216317L has 2 applicants on project 1 and 1 applicant on project 2
@@ -50,14 +56,10 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    @Order(1)
     void should_return_project_issues() {
-        // Given
-        final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
-
         client.get()
                 .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "3")))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + projectLead.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -166,102 +168,53 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    @Order(1)
     void should_return_assigned_project_issues() {
-        // Given
-        final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
-
-        final var issues = client.get()
-                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "30", "isAssigned", "true")))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody(GithubIssuePageResponse.class).returnResult().getResponseBody().getIssues();
-
-        assertThat(issues).isNotEmpty();
-        issues.forEach(issue -> assertThat(issue.getAssignees()).isNotEmpty());
+        assertIssues(Map.of("isAssigned", "true"))
+                .allMatch(issue -> !issue.getAssignees().isEmpty());
     }
 
     @Test
-    @Order(1)
     void should_return_unassigned_project_issues() {
-        // Given
-        final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
-
-        final var issues = client.get()
-                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "30", "isAssigned", "false")))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody(GithubIssuePageResponse.class).returnResult().getResponseBody().getIssues();
-
-        assertThat(issues).isNotEmpty();
-        issues.forEach(issue -> assertThat(issue.getAssignees()).isEmpty());
+        assertIssues(Map.of("isAssigned", "false"))
+                .allMatch(issue -> issue.getAssignees().isEmpty());
     }
 
     @Test
-    @Order(1)
     void should_return_unassigned_open_project_issues() {
-        // Given
-        final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
-
-        final var issues = client.get()
-                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of(
-                        "pageIndex", "0",
-                        "pageSize", "30",
-                        "isAssigned", "false",
-                        "statuses", "OPEN")))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody(GithubIssuePageResponse.class).returnResult().getResponseBody().getIssues();
-
-        assertThat(issues).isNotEmpty();
-        assertThat(issues).allMatch(issue -> issue.getAssignees().isEmpty() && issue.getStatus() == GithubIssueStatus.OPEN);
+        assertIssues(Map.of("isAssigned", "false", "statuses", "OPEN"))
+                .allMatch(issue -> issue.getAssignees().isEmpty() && issue.getStatus() == GithubIssueStatus.OPEN);
     }
 
     @Test
-    @Order(1)
     void should_return_applied_project_issues() {
-        // Given
-        final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
-
-        final var issues = client.get()
-                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "30", "isApplied", "true")))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody(GithubIssuePageResponse.class).returnResult().getResponseBody().getIssues();
-
-        assertThat(issues).isNotEmpty();
-        issues.forEach(issue -> assertThat(issue.getApplicants()).isNotEmpty());
+        assertIssues(Map.of("isApplied", "true"))
+                .allMatch(issue -> !issue.getApplicants().isEmpty());
     }
 
     @Test
-    @Order(1)
     void should_return_not_applied_project_issues() {
-        // Given
-        final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
+        assertIssues(Map.of("isApplied", "false"))
+                .allMatch(issue -> issue.getApplicants().isEmpty());
+    }
+
+    private AbstractListAssert<?, ? extends List<? extends GithubIssuePageItemResponse>, GithubIssuePageItemResponse> assertIssues(Map<String, String> params) {
+        final var q = new HashMap<String, String>();
+        q.put("pageIndex", "0");
+        q.put("pageSize", "30");
+        q.putAll(params);
 
         final var issues = client.get()
-                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "30", "isApplied", "false")))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), q))
+                .header("Authorization", BEARER_PREFIX + projectLead.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
-                .expectBody(GithubIssuePageResponse.class).returnResult().getResponseBody().getIssues();
+                .expectBody(GithubIssuePageResponse.class)
+                .returnResult()
+                .getResponseBody()
+                .getIssues();
 
-        assertThat(issues).isNotEmpty();
-        issues.forEach(issue -> assertThat(issue.getApplicants()).isEmpty());
+        return assertThat(issues).isNotEmpty();
     }
-
 }
