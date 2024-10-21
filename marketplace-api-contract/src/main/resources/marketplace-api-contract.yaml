@@ -8250,18 +8250,12 @@ components:
       required:
         - type
         - githubStatus
-        - githubId
         - githubNumber
         - githubTitle
         - githubHtmlUrl
       properties:
         type:
           $ref: '#/components/schemas/ContributionType'
-        githubId:
-          type: integer
-          format: int64
-          description: Github item id
-          example: 6
         githubNumber:
           type: integer
           format: int64
@@ -8288,7 +8282,6 @@ components:
         - githubAuthor
         - githubTitle
         - githubHtmlUrl
-        - githubId
       properties:
         uuid:
           $ref: '#/components/schemas/ContributionUuid'
@@ -8296,11 +8289,6 @@ components:
           $ref: '#/components/schemas/ContributionType'
         repo:
           $ref: '#/components/schemas/ShortGithubRepoResponse'
-        githubId:
-          type: integer
-          format: int64
-          description: Github item id
-          example: 6
         githubAuthor:
           $ref: '#/components/schemas/GithubUserResponse'
         githubNumber:
@@ -12096,6 +12084,10 @@ components:
             - lastUpdatedAt
             - activityStatus
           properties:
+            githubId:
+              type: string
+              description: Github item id
+              deprecated: true
             createdAt:
               type: string
               format: date-time

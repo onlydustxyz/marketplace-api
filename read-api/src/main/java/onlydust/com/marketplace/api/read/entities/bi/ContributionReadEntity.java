@@ -36,6 +36,8 @@ public class ContributionReadEntity {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     ContributionType contributionType;
 
+    String githubId;
+
     @JdbcTypeCode(SqlTypes.JSON)
     ShortGithubRepoResponse githubRepo;
 
@@ -85,6 +87,7 @@ public class ContributionReadEntity {
         return new ContributionActivityPageItemResponse()
                 .uuid(contributionUuid)
                 .type(contributionType)
+                .githubId(githubId)
                 .repo(githubRepo)
                 .githubAuthor(githubAuthor)
                 .githubNumber(githubNumber)

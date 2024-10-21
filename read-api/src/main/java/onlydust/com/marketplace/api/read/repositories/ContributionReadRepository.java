@@ -18,6 +18,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
     @Query(value = """
             select c.contribution_uuid                       as contribution_uuid,
                    c.contribution_type                       as contribution_type,
+                   c.github_id                               as github_id,
                    c.github_repo                             as github_repo,
                    ccd.github_author                         as github_author,
                    c.github_number                           as github_number,
