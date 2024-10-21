@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -417,6 +418,13 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<Void> unassignContribution(UUID projectId, String contributionId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         contributionsFacadePort.unassign(ProjectId.of(projectId), authenticatedUser.id(), contributionId);
+        return noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> unassignContributionV2(UUID projectId, UUID contributionUuid, Long contributorId) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        contributionsFacadePort.unassign(ProjectId.of(projectId), authenticatedUser.id(), ContributionUUID.of(contributionUuid), contributorId);
         return noContent().build();
     }
 

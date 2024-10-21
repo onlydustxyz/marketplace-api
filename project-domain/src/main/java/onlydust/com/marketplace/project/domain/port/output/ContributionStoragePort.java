@@ -7,6 +7,7 @@ import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.view.ContributionDetailsView;
+import onlydust.com.marketplace.project.domain.view.ContributionLinkView;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
 
 import java.util.List;
@@ -22,6 +23,8 @@ public interface ContributionStoragePort {
                                              Integer pageSize);
 
     ContributionDetailsView findContributionById(ProjectId projectId, String contributionId);
+
+    Optional<ContributionView> findContributionByUUIDAndContributorId(ProjectId projectId, ContributionUUID contributionUUID, Long contributorId);
 
     List<Project> listProjectsByContributor(Long contributorId, ContributionView.Filters filters);
 
