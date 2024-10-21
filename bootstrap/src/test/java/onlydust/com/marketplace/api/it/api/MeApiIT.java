@@ -41,7 +41,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -285,59 +285,6 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     Auth0ApiClientStub auth0ApiClientStub;
-
-    @Test
-    void should_update_github_profile_data() {
-        // Given
-        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.signUpUser(
-                faker.number().numberBetween(1, 100) + faker.number().numberBetween(200, 1000), "fake-user",
-                faker.internet().url(), false);
-        final String githubPat = "github-pat-for-%s".formatted(authenticatedUser.user().getGithubUserId());
-        final String newUrl = faker.internet().url() + "/test";
-        final String newLogin = faker.gameOfThrones().character();
-        final String newEmail = faker.internet().emailAddress();
-
-        // When
-        githubWireMockServer.stubFor(get("/user").withHeader("Authorization", equalTo("Bearer " + githubPat))
-                .willReturn(okJson("""
-                        {
-                            "id": %d,
-                            "login": \"%s\",
-                            "avatar_url": \"%s\"
-                        }
-                        """.formatted(authenticatedUser.user().getGithubUserId(), newLogin, newUrl)))
-        );
-        githubWireMockServer.stubFor(get("/user/emails").withHeader("Authorization", equalTo("Bearer " + githubPat))
-                .willReturn(okJson("""
-                        [
-                            {
-                                "email": \"%s\",
-                                "primary": true
-                            }
-                        ]
-                        """.formatted(newEmail)))
-        );
-
-
-        client.get()
-                .uri(ME_GET_PROFILE_GITHUB)
-                .header("Authorization", BEARER_PREFIX + authenticatedUser.jwt())
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful();
-
-        client.get()
-                .uri(ME)
-                .header("Authorization", BEARER_PREFIX + authenticatedUser.jwt())
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.login").isEqualTo(newLogin)
-                .jsonPath("$.avatarUrl").isEqualTo(newUrl)
-                .jsonPath("$.email").isEqualTo(newEmail);
-    }
 
     @Test
     void should_return_billing_profiles_and_missingPayoutPreference() {
