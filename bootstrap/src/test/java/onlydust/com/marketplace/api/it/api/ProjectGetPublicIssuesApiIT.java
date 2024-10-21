@@ -2,11 +2,16 @@ package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.api.contract.model.GithubIssuePageResponse;
 import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
+import onlydust.com.marketplace.api.helper.DatabaseHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Application;
+import onlydust.com.marketplace.project.domain.model.GithubComment;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import org.junit.jupiter.api.*;
@@ -31,6 +36,10 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
     private ApplicationRepository applicationRepository;
     @Autowired
     HackathonStoragePort hackathonStoragePort;
+    @Autowired
+    PostgresBiProjectorAdapter biProjectorAdapter;
+    @Autowired
+    DatabaseHelper databaseHelper;
 
     private UserAuthHelper.AuthenticatedUser antho;
 
@@ -40,7 +49,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
         final var pierre = userAuthHelper.authenticatePierre();
         final var ofux = userAuthHelper.authenticateOlivier();
 
-        applicationRepository.saveAll(List.of(
+        final var applications = List.of(
                 new ApplicationEntity(
                         UUID.fromString("f3706f53-bd79-4991-8a76-7dd12aef81dd"),
                         ZonedDateTime.of(2023, 11, 5, 9, 40, 41, 0, ZoneOffset.UTC),
@@ -91,7 +100,21 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                         1113L,
                         "I could do it",
                         null)
-        ));
+        );
+        databaseHelper.executeInTransaction(() -> {
+            applicationRepository.saveAll(applications);
+            applications.forEach(a -> biProjectorAdapter.onApplicationCreated(new Application(
+                    Application.Id.of(a.id()),
+                    ProjectId.of(a.projectId()),
+                    a.applicantId(),
+                    a.origin(),
+                    a.receivedAt(),
+                    GithubIssue.Id.of(a.issueId()),
+                    GithubComment.Id.of(a.commentId()),
+                    a.motivations(),
+                    a.problemSolvingApproach()
+            )));
+        });
 
 
         final var startDate = ZonedDateTime.of(2024, 4, 19, 0, 0, 0, 0, ZonedDateTime.now().getZone());
@@ -668,7 +691,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                         "pageSize", "5",
                         "statuses", "OPEN",
                         "hackathonId", "e06aeec6-cec6-40e1-86cb-e741e0dacf25",
-                        "languageIds", "ca600cac-0f45-44e9-a6e8-25e21b0c6887,c83881b3-5aef-4819-9596-fdbbbedf2b0b",
+                        "languageIds", "ca600cac-0f45-44e9-a6e8-25e21b0c6887,75ce6b37-8610-4600-8d2d-753b50aeda1e",
                         "direction", "DESC"
                 )))
                 // Then
@@ -886,7 +909,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(HACKATHON_BY_ID_PROJECT_ISSUES.formatted("e06aeec6-cec6-40e1-86cb-e741e0dacf25"), Map.of(
                         "statuses", "OPEN",
-                        "languageIds", "ca600cac-0f45-44e9-a6e8-25e21b0c6887,c83881b3-5aef-4819-9596-fdbbbedf2b0b"
+                        "languageIds", "ca600cac-0f45-44e9-a6e8-25e21b0c6887,75ce6b37-8610-4600-8d2d-753b50aeda1e"
                 )))
                 // Then
                 .exchange()
@@ -1349,6 +1372,13 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "languages": [
+                            {
+                              "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
+                              "slug": "javascript",
+                              "name": "Javascript",
+                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
+                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                            },
                             {
                               "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                               "slug": "typescript",
@@ -1895,7 +1925,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
             final var antho = userAuthHelper.authenticateAntho();
             final var olivier = userAuthHelper.authenticateOlivier();
 
-            applicationRepository.saveAll(List.of(
+            final var applications = List.of(
                     // 1652216316L has 2 applicants on project 2
                     // 1652216317L has 2 applicants on project 1 and 1 applicant on project 2
                     fakeApplication(projectAppliedTo1, pierre, 1651834617L, 112L),
@@ -1905,7 +1935,21 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                     fakeApplication(projectAppliedTo2, antho, 1651834617L, 113L),
 
                     fakeApplication(projectAppliedTo1, olivier, 1651834617L, 112L)
-            ));
+            );
+            databaseHelper.executeInTransaction(() -> {
+                applicationRepository.saveAll(applications);
+                applications.forEach(a -> biProjectorAdapter.onApplicationCreated(new Application(
+                        Application.Id.of(a.id()),
+                        ProjectId.of(a.projectId()),
+                        a.applicantId(),
+                        a.origin(),
+                        a.receivedAt(),
+                        GithubIssue.Id.of(a.issueId()),
+                        GithubComment.Id.of(a.commentId()),
+                        a.motivations(),
+                        a.problemSolvingApproach()
+                )));
+            });
         }
 
         @Test

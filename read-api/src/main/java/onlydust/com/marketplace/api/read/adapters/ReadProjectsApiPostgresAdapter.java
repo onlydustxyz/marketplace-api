@@ -54,12 +54,12 @@ import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.contract.model.FinancialTransactionType.*;
-import static onlydust.com.marketplace.api.contract.model.GithubIssueStatus.OPEN;
 import static onlydust.com.marketplace.api.read.properties.Cache.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapRewardSettings;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
+import static onlydust.com.marketplace.project.domain.model.ContributionStatus.IN_PROGRESS;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.http.HttpStatus.OK;
@@ -186,7 +186,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     @Override
     public ResponseEntity<GithubIssuePageResponse> getProjectGoodFirstIssues(UUID projectId, Integer pageIndex, Integer pageSize) {
         final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
-        final var page = projectGithubIssueItemReadRepository.findIssuesOf(projectId, new String[]{OPEN.name()}, false, null, true, true, false,
+        final var page = projectGithubIssueItemReadRepository.findIssuesOf(projectId, new String[]{IN_PROGRESS.name()}, false, null, true, true, false,
                 null, null, null, PageRequest.of(pageIndex, pageSize, Sort.by("i.created_at").descending()));
         return ok(new GithubIssuePageResponse()
                 .issues(page.stream().map(i -> i.toPageItemResponse(caller.map(AuthenticatedUser::githubUserId).orElse(null))).toList())
@@ -213,7 +213,11 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                                           SortDirection direction) {
         final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
         final var page = projectGithubIssueItemReadRepository.findIssuesOf(projectId,
-                isNull(statuses) ? null : statuses.stream().distinct().map(Enum::name).toArray(String[]::new),
+                isNull(statuses) ? null : statuses.stream().distinct().map(issueStatus -> switch (issueStatus) {
+                    case OPEN -> ContributionStatus.IN_PROGRESS;
+                    case COMPLETED -> ContributionStatus.COMPLETED;
+                    case CANCELLED -> ContributionStatus.CANCELLED;
+                }).map(Enum::name).toArray(String[]::new),
                 isAssigned,
                 isApplied,
                 isAvailable,
@@ -222,7 +226,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 hackathonId,
                 isNull(languageIds) ? null : languageIds.stream().distinct().toArray(UUID[]::new),
                 search,
-                PageRequest.of(pageIndex, pageSize, Sort.by(direction == SortDirection.ASC ? ASC : Sort.Direction.DESC, switch (sort) {
+                PageRequest.of(pageIndex, pageSize, Sort.by(direction == SortDirection.ASC ? ASC : DESC, switch (sort) {
                     case CREATED_AT -> "i.created_at";
                     case CLOSED_AT -> "i.closed_at";
                 })));
@@ -429,7 +433,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         };
         final var sortDirection = switch (direction) {
             case ASC -> ASC;
-            case DESC -> Sort.Direction.DESC;
+            case DESC -> DESC;
         };
         final var pageable = PageRequest.of(sanitizePageIndex, sanitizePageSize,
                 JpaSort.unsafe(sortDirection, sortBy).andUnsafe(ASC, "(login)"));
