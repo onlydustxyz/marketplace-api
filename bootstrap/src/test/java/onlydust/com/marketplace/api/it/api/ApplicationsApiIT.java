@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.project.domain.model.Application;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -795,7 +796,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_list_applications() {
         client.get()
-                .uri(getApiURI(ISSUES_BY_ID_APPLICANTS.formatted(1736474921L)))
+                .uri(getApiURI(ISSUES_BY_ID_APPLICANTS.formatted("81dca58e-497a-36f4-9917-8c703174718e")))
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
@@ -1549,12 +1550,11 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                     final @NonNull Map<String, String> params,
                                     final @NonNull Consumer<IssueApplicantsPageResponse> asserter) {
         client.get()
-                .uri(getApiURI(ISSUES_BY_ID_APPLICANTS.formatted(issueId), params))
+                .uri(getApiURI(ISSUES_BY_ID_APPLICANTS.formatted(ContributionUUID.of(issueId)), params))
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody(IssueApplicantsPageResponse.class)
-                .consumeWith(System.out::println)
                 .consumeWith(r -> asserter.accept(r.getResponseBody()));
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -47,8 +48,8 @@ public class ReadIssuesApiPostgresAdapter implements ReadIssuesApi {
     }
 
     @Override
-    public ResponseEntity<IssueApplicantsPageResponse> getIssueApplicants(Long issueId, ApplicantsQueryParams q) {
-        final var applications = applicationReadRepository.findAllByIssueId(issueId,
+    public ResponseEntity<IssueApplicantsPageResponse> getIssueApplicants(UUID contributionUuid, ApplicantsQueryParams q) {
+        final var applications = applicationReadRepository.findAllByContributionUuid(contributionUuid,
                         q.getIsIgnored(),
                         q.getIsApplicantProjectMember(),
                         q.getSearch())

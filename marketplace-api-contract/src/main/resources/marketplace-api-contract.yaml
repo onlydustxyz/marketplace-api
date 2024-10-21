@@ -3472,7 +3472,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
 
-  /api/v1/issues/{issueId}/applicants:
+  /api/v1/issues/{contributionUuid}/applicants:
     get:
       tags:
         - ReadIssues
@@ -3482,10 +3482,10 @@ paths:
         Get the list of all users that applied to an issue.
       parameters:
         - in: path
-          name: issueId
+          name: contributionUuid
           required: true
           schema:
-            $ref: '#/components/schemas/IssueId'
+            $ref: '#/components/schemas/ContributionUuid'
         - in: query
           name: params
           schema:

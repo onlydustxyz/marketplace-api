@@ -22,6 +22,7 @@ import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
@@ -36,6 +37,9 @@ public class GithubIssueReadEntity {
     @EqualsAndHashCode.Include
     @NonNull
     Long id;
+
+    @NonNull
+    UUID contributionUuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @NonNull
