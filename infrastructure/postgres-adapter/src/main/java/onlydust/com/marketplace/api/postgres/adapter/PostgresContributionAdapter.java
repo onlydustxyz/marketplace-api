@@ -91,6 +91,12 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                 .withRewards(rewards.stream().map(ContributionRewardQueryEntity::toView).toList());
     }
 
+    @Override
+    public Optional<ContributionView> findContributionByUUIDAndContributorId(ProjectId projectId, ContributionUUID contributionUUID, Long contributorId) {
+        return contributionViewEntityRepository.findByUuidAndContributorId(projectId.value(), contributionUUID.value(), contributorId)
+                .map(ContributionViewEntity::toView);
+    }
+
     private Sort sortBy(ContributionView.Sort sort, Sort.Direction direction) {
         return switch (sort) {
             case CREATED_AT -> Sort.by(direction, "created_at");

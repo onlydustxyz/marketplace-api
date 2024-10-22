@@ -64,4 +64,57 @@ public class ProjectUnassignContributionsIT extends AbstractMarketplaceApiIT {
 
         githubWireMockServer.verify(deleteRequestedFor(urlEqualTo("/repositories/663102799/issues/4/assignees")));
     }
+
+    @Test
+    void should_unassign_contribution_v2() {
+        // Given
+        final var projectId = UUID.fromString("61076487-6ec5-4751-ab0d-3b876c832239");
+        final var contributionUuid = UUID.fromString("0445357e-1734-30b9-a3e2-64f27d894e70");
+        final var projectLead = userAuthHelper.authenticateOlivier();
+        final var contributorId = 16590657L;
+
+        githubWireMockServer.stubFor(post(urlEqualTo("/app/installations/44741576/access_tokens"))
+                .withHeader("Authorization", matching("Bearer .*"))
+                .willReturn(aResponse()
+                        .withStatus(201)
+                        .withBody("""
+                                {
+                                    "token": "GITHUB_APP_PERSONAL_ACCESS_TOKEN",
+                                    "permissions": {
+                                        "issues": "write"
+                                    }
+                                }
+                                """)
+                ));
+
+        githubWireMockServer.stubFor(delete(urlEqualTo("/repositories/663102799/issues/4/assignees"))
+                .withHeader("Authorization", matching("Bearer GITHUB_APP_PERSONAL_ACCESS_TOKEN"))
+                .withRequestBody(equalToJson("""
+                        {
+                          "assignees" : [ "PierreOucif" ]
+                        }
+                        """))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withBody("""
+                                {
+                                    "id": 1974125983
+                                }
+                                """)
+                ));
+
+        client.post()
+                .uri(getApiURI(PROJECT_CONTRIBUTION_UNASSIGN_V2.formatted(projectId, contributionUuid, contributorId)))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + projectLead.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .exchange()
+                // Then
+                .expectStatus()
+                .isNoContent();
+
+        githubWireMockServer.verify(deleteRequestedFor(urlEqualTo("/repositories/663102799/issues/4/assignees")));
+    }
+
+
+
 }

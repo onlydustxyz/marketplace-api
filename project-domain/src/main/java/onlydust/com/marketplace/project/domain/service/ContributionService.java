@@ -56,19 +56,36 @@ public class ContributionService implements ContributionFacadePort, Contribution
             throw forbidden("Only project leaders can unassign contributions");
 
         final var contribution = contributionStoragePort.findContributionById(projectId, contributionId);
-        if (contribution.getType() != ContributionType.ISSUE)
+        unassignIssue(contribution.getType(), contribution.getStatus(), contribution.getGithubRepo().getId(), contribution.getGithubNumber(),
+                contribution.getContributor().getLogin());
+    }
+
+    @Override
+    public void unassign(ProjectId projectId, UserId projectLeadId, ContributionUUID contributionUUID, Long contributorId) {
+        if (!permissionService.isUserProjectLead(projectId, projectLeadId))
+            throw forbidden("Only project leaders can unassign contributions");
+
+        final var contribution = contributionStoragePort.findContributionByUUIDAndContributorId(projectId, contributionUUID, contributorId)
+                .orElseThrow(() -> notFound("Contribution %s not found for contributor %s".formatted(contributionUUID, contributorId)));
+        unassignIssue(contribution.getType(), contribution.getStatus(), contribution.getGithubRepo().getId(), contribution.getGithubNumber(),
+                contribution.getContributor().getLogin());
+    }
+
+    private void unassignIssue(ContributionType contributionType, ContributionStatus contributionStatus, Long githubRepoId, Long githubNumber,
+                               String contributorLogin) {
+        if (contributionType != ContributionType.ISSUE)
             throw badRequest("Only issues can be unassigned");
 
-        if (contribution.getStatus() != ContributionStatus.IN_PROGRESS)
+        if (contributionStatus != ContributionStatus.IN_PROGRESS)
             throw badRequest("Only in progress contributions can be unassigned");
 
-        final var githubToken = githubAppService.getInstallationTokenFor(contribution.getGithubRepo().getId())
-                .orElseThrow(() -> internalServerError("Could not to generate installation token for GitHub repo %d".formatted(contribution.getGithubRepo().getId())));
+        final var githubToken = githubAppService.getInstallationTokenFor(githubRepoId)
+                .orElseThrow(() -> internalServerError("Could not to generate installation token for GitHub repo %d".formatted(githubRepoId)));
 
         githubApiPort.unassign(githubToken.token(),
-                contribution.getGithubRepo().getId(),
-                contribution.getGithubNumber(),
-                contribution.getContributor().getLogin());
+                githubRepoId,
+                githubNumber,
+                contributorLogin);
     }
 
     @Override
