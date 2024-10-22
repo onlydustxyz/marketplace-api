@@ -43,6 +43,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                      left join bi.p_contribution_reward_data rd on rd.contribution_uuid = c.contribution_uuid
                      left join project_contributor_labels pcl on coalesce(:projectContributorLabelIds) is not null and pcl.project_id = c.project_id
                      left join contributor_project_contributor_labels cpcl on coalesce(:projectContributorLabelIds) is not null and cpcl.label_id = pcl.id and cpcl.github_user_id = any (ccd.contributor_ids)
+                     left join indexer_exp.github_pull_requests_closing_issues ci on ci.issue_id = c.issue_id
             where (coalesce(:ids) is null or c.contribution_uuid = any (:ids))
               and (coalesce(:types) is null or c.contribution_type = any (cast(:types as indexer_exp.contribution_type[])))
               and (coalesce(:projectIds) is null or c.project_id = any (:projectIds))
@@ -54,6 +55,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
               and (coalesce(:rewardIds) is null or rd.reward_ids && :rewardIds)
               and (coalesce(:hasBeenRewarded) is null or :hasBeenRewarded = (coalesce(rd.total_rewarded_usd_amount, 0) > 0))
               and (coalesce(:search) is null or c.search ilike '%' || :search || '%' or ccd.search ilike '%' || :search || '%')
+              and (coalesce(:showLinkedIssues) is null or :showLinkedIssues = (ci.pull_request_id is not null))
             group by c.contribution_uuid,
                      ccd.contribution_uuid,
                      rd.contribution_uuid
@@ -68,6 +70,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                                          UUID[] projectContributorLabelIds,
                                          UUID[] rewardIds,
                                          Boolean hasBeenRewarded,
+                                         Boolean showLinkedIssues,
                                          String search,
                                          Pageable pageable);
 
@@ -83,6 +86,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                 q.getProjectContributorLabelIds() == null ? null : q.getProjectContributorLabelIds().toArray(UUID[]::new),
                 q.getRewardIds() == null ? null : q.getRewardIds().toArray(UUID[]::new),
                 q.getHasBeenRewarded(),
+                q.getShowLinkedIssues(),
                 q.getSearch(),
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC :
                         Sort.Direction.ASC, getSortProperty(q.getSort()))));
