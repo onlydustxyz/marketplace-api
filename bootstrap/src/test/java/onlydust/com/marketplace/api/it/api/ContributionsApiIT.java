@@ -5,9 +5,12 @@ import onlydust.com.marketplace.api.contract.model.ContributionActivityPageRespo
 import onlydust.com.marketplace.api.contract.model.ContributionActivityStatus;
 import onlydust.com.marketplace.api.contract.model.ContributionType;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.ProjectContributorLabel;
+import onlydust.com.marketplace.project.domain.model.UpdatePullRequestCommand;
 import onlydust.com.marketplace.project.domain.port.input.ProjectContributorLabelFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.PullRequestFacadePort;
 import org.assertj.core.api.AbstractListAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +36,8 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     ProjectContributorLabelFacadePort projectContributorLabelFacadePort;
+    @Autowired
+    PullRequestFacadePort pullRequestFacadePort;
 
     @BeforeEach
     void setup() {
@@ -50,7 +55,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     void should_get_contribution() {
         // When
         client.get()
-                .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("f4db1d9b-4e1d-300c-9277-8d05824c804e"), Map.of("pageSize", "1")))
+                .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("f4db1d9b-4e1d-300c-9277-8d05824c804e")))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -121,6 +126,41 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .isOk();
+    }
+
+    @Test
+    void should_show_archived_contribution_right_away() {
+        // Given
+        final var projectLead = userAuthHelper.authenticateAntho();
+        final var contributionUuid = ContributionUUID.of(UUID.fromString("f4db1d9b-4e1d-300c-9277-8d05824c804e"));
+
+        // When
+        pullRequestFacadePort.updatePullRequest(projectLead.userId(), UpdatePullRequestCommand.builder()
+                .id(contributionUuid)
+                .archived(true)
+                .build());
+
+        // Then
+        client.get()
+                .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted(contributionUuid.value())))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.activityStatus").isEqualTo("ARCHIVED");
+
+        // When
+        pullRequestFacadePort.updatePullRequest(projectLead.userId(), UpdatePullRequestCommand.builder()
+                .id(contributionUuid)
+                .archived(false)
+                .build());
+
+        // Then
+        client.get()
+                .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted(contributionUuid.value())))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.activityStatus").isEqualTo("DONE");
     }
 
     @Test

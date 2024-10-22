@@ -4,12 +4,11 @@ import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.port.output.PermissionPort;
 import onlydust.com.marketplace.project.domain.model.UpdatePullRequestCommand;
+import onlydust.com.marketplace.project.domain.port.input.ContributionObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.mockito.Mockito.*;
 
@@ -18,12 +17,14 @@ public class PullRequestServiceTest {
     private PullRequestService pullRequestService;
     private PermissionPort permissionPort;
     private ContributionStoragePort contributionStoragePort;
+    private ContributionObserverPort contributionObserverPort;
 
     @BeforeEach
     public void setUp() {
         permissionPort = mock(PermissionPort.class);
         contributionStoragePort = mock(ContributionStoragePort.class);
-        pullRequestService = new PullRequestService(permissionPort, contributionStoragePort);
+        contributionObserverPort = mock(ContributionObserverPort.class);
+        pullRequestService = new PullRequestService(permissionPort, contributionStoragePort, contributionObserverPort);
     }
 
     @Test
@@ -34,10 +35,11 @@ public class PullRequestServiceTest {
 
         // When
         when(permissionPort.canUserUpdateContribution(userId, contributionUuid)).thenReturn(true);
-        pullRequestService.updatePullRequest(userId, new UpdatePullRequestCommand(contributionUuid, false, List.of()));
+        pullRequestService.updatePullRequest(userId, new UpdatePullRequestCommand(contributionUuid, false));
 
         // Then
         verify(contributionStoragePort).archiveContribution(contributionUuid, false);
+        verify(contributionObserverPort).onContributionsChanged(contributionUuid);
     }
 
     @Test
@@ -50,7 +52,7 @@ public class PullRequestServiceTest {
         when(permissionPort.canUserUpdateContribution(userId, contributionUuid)).thenReturn(false);
         Exception exception = null;
         try {
-            pullRequestService.updatePullRequest(userId, new UpdatePullRequestCommand(contributionUuid, false, List.of()));
+            pullRequestService.updatePullRequest(userId, new UpdatePullRequestCommand(contributionUuid, false));
         } catch (Exception e) {
             exception = e;
         }

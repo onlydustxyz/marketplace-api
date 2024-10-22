@@ -6,6 +6,7 @@ import onlydust.com.marketplace.kernel.port.output.PermissionPort;
 import onlydust.com.marketplace.project.domain.model.GithubAppAccessToken;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.UpdateIssueCommand;
+import onlydust.com.marketplace.project.domain.port.input.ContributionObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.IssueFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.GithubApiPort;
@@ -22,6 +23,7 @@ public class IssueService implements IssueFacadePort {
     private final GithubApiPort githubApiPort;
     private final GithubStoragePort githubStoragePort;
     private final GithubAppService githubAppService;
+    private final ContributionObserverPort contributionObserverPort;
 
     @Override
     public void updateIssue(UserId projectLeadId, UpdateIssueCommand updateIssueCommand) {
@@ -29,8 +31,11 @@ public class IssueService implements IssueFacadePort {
             throw unauthorized(String.format("User %s must be project lead to update issue %s linked to its projects", projectLeadId,
                     updateIssueCommand.id()));
 
-        if (nonNull(updateIssueCommand.archived()))
+        if (nonNull(updateIssueCommand.archived())) {
             contributionStoragePort.archiveContribution(updateIssueCommand.id(), updateIssueCommand.archived());
+            contributionObserverPort.onContributionsChanged(updateIssueCommand.id());
+        }
+
         if (nonNull(updateIssueCommand.closed()) && updateIssueCommand.closed()) {
             final GithubIssue issue = githubStoragePort.findIssueByUUID(updateIssueCommand.id()).orElseThrow(() -> notFound("Issue not found"));
             final Long repoId = issue.repoId();

@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.project.domain.model;
 
+import lombok.Builder;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
 
-import java.util.List;
-
-public record UpdatePullRequestCommand(ContributionUUID id, Boolean archived, List<GithubIssue.Id> linkedIssueIds) {
+@Builder
+public record UpdatePullRequestCommand(ContributionUUID id, Boolean archived) {
 }

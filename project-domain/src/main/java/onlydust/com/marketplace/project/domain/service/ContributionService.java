@@ -89,6 +89,10 @@ public class ContributionService implements ContributionFacadePort, Contribution
     }
 
     @Override
+    public void onContributionsChanged(ContributionUUID contributionUUID) {
+    }
+
+    @Override
     public void onContributionsChanged(Long repoId, ContributionUUID contributionUUID) {
         contributionStoragePort.refreshIgnoredContributions(List.of(repoId));
     }

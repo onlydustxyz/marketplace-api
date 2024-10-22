@@ -8,6 +8,7 @@ import onlydust.com.marketplace.kernel.port.output.PermissionPort;
 import onlydust.com.marketplace.project.domain.model.GithubAppAccessToken;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.UpdateIssueCommand;
+import onlydust.com.marketplace.project.domain.port.input.ContributionObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.GithubApiPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
@@ -28,6 +29,7 @@ public class IssueServiceTest {
     private GithubStoragePort githubStoragePort;
     private GithubAppService githubAppService;
     private GithubApiPort githubApiPort;
+    private ContributionObserverPort contributionObserverPort;
     private final Faker faker = new Faker();
 
     @BeforeEach
@@ -37,7 +39,8 @@ public class IssueServiceTest {
         githubStoragePort = mock(GithubStoragePort.class);
         githubAppService = mock(GithubAppService.class);
         githubApiPort = mock(GithubApiPort.class);
-        issueService = new IssueService(permissionPort, contributionStoragePort, githubApiPort, githubStoragePort, githubAppService);
+        contributionObserverPort = mock(ContributionObserverPort.class);
+        issueService = new IssueService(permissionPort, contributionStoragePort, githubApiPort, githubStoragePort, githubAppService, contributionObserverPort);
     }
 
     @Test
@@ -52,6 +55,7 @@ public class IssueServiceTest {
 
         // Then
         verify(contributionStoragePort).archiveContribution(contributionUuid, false);
+        verify(contributionObserverPort).onContributionsChanged(contributionUuid);
     }
 
     @Test
@@ -94,6 +98,7 @@ public class IssueServiceTest {
 
         // Then
         verifyNoInteractions(contributionStoragePort);
+        verifyNoInteractions(contributionObserverPort);
         verify(githubApiPort).closeIssue(githubAppAccessToken.token(), githubIssue.repoId(), githubIssue.number());
     }
 
