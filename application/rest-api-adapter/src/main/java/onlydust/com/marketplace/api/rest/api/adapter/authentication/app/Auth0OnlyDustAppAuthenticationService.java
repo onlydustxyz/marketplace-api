@@ -68,7 +68,7 @@ public class Auth0OnlyDustAppAuthenticationService implements AuthenticationServ
 
         final var impersonated = getUserFromClaims(claims, true);
 
-        LOGGER.info("User {} is impersonating {}", impersonator, impersonated);
+//        LOGGER.info("User {} is impersonating {}", impersonator, impersonated);
 
         return Optional.of(Auth0OnlyDustAppAuthentication.builder()
                 .authorities(impersonated.roles().stream().map(OnlyDustAppGrantedAuthority::new).collect(Collectors.toList()))
