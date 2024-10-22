@@ -128,6 +128,7 @@ FROM (SELECT c.*,
 $$, 'contributor_id');
 
 ------------------------------------------------------------------------------------------------------------------------
+-- add remove repo owner and name from search
 CREATE OR REPLACE VIEW bi.v_contribution_data AS
 SELECT v.*, md5(v::text) as hash
 FROM (with ranked_project_github_repos_relationship AS (SELECT *,
@@ -216,8 +217,6 @@ FROM (with ranked_project_github_repos_relationship AS (SELECT *,
                                                    'githubHtmlUrl', i.html_url)) filter ( where i.id is not null )    as linked_issues,
              concat(c.github_number, ' ',
                     c.github_title, ' ',
-                    gr.owner_login, ' ',
-                    gr.name, ' ',
                     string_agg(gl.name, ' '), ' ',
                     string_agg(l.name, ' '), ' ',
                     string_agg(i.number || ' ' || i.title, ' ')
