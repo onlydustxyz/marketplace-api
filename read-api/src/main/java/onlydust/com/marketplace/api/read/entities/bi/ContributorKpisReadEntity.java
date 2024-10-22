@@ -19,6 +19,7 @@ import java.util.List;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
+import static onlydust.com.marketplace.api.read.entities.user.PublicUserProfileResponseV2Entity.prettyRankPercentile;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
 @Entity
@@ -78,9 +79,16 @@ public class ContributorKpisReadEntity {
                                         Trend.STABLE);
     }
 
+    private ContributorOverviewResponse pretty(ContributorOverviewResponse contributor) {
+        if (contributor.getGlobalRankPercentile() != null)
+            contributor.globalRankPercentile(prettyRankPercentile(contributor.getGlobalRankPercentile()));
+
+        return contributor;
+    }
+
     public BiContributorsPageItemResponse toDto() {
         return new BiContributorsPageItemResponse()
-                .contributor(contributor)
+                .contributor(pretty(contributor))
                 .projects(projects == null ? null : projects.stream().sorted(comparing(ProjectLinkResponse::getName)).toList())
                 .categories(categories == null ? null : categories.stream().sorted(comparing(ProjectCategoryResponse::getName)).toList())
                 .languages(languages == null ? null : languages.stream().sorted(comparing(LanguageResponse::getName)).toList())
@@ -120,7 +128,7 @@ public class ContributorKpisReadEntity {
         return new IssueApplicantsPageItemResponse()
                 .applicationId(application.id())
                 .appliedAt(application.receivedAt())
-                .contributor(contributor)
+                .contributor(pretty(contributor))
                 .projects(projects == null ? null : projects.stream().sorted(comparing(ProjectLinkResponse::getName)).toList())
                 .categories(categories == null ? null : categories.stream().sorted(comparing(ProjectCategoryResponse::getName)).toList())
                 .languages(languages == null ? null : languages.stream().sorted(comparing(LanguageResponse::getName)).toList())

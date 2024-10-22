@@ -864,7 +864,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": true,
                                 "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
                                 "globalRank": 1,
-                                "globalRankPercentile": 0.000041734485205125,
+                                "globalRankPercentile": 0.1,
                                 "globalRankCategory": "A"
                               },
                               "projects": [
@@ -1079,7 +1079,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": true,
                                 "id": "fc92397c-3431-4a84-8054-845376b630a0",
                                 "globalRank": 5,
-                                "globalRankPercentile": 0.00020867242602562499,
+                                "globalRankPercentile": 0.1,
                                 "globalRankCategory": "A"
                               },
                               "projects": [
@@ -1243,7 +1243,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": true,
                                 "id": "45e98bf6-25c2-4edf-94da-e340daba8964",
                                 "globalRank": 6,
-                                "globalRankPercentile": 0.00025040691123075,
+                                "globalRankPercentile": 0.1,
                                 "globalRankCategory": "A"
                               },
                               "projects": [
@@ -1333,7 +1333,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": true,
                                 "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
                                 "globalRank": 4,
-                                "globalRankPercentile": 0.0001669379408205,
+                                "globalRankPercentile": 0.1,
                                 "globalRankCategory": "A"
                               },
                               "projects": [
