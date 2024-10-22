@@ -10,7 +10,9 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.Applicatio
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Application;
+import onlydust.com.marketplace.project.domain.port.input.ProjectContributorLabelFacadePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,8 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     private ApplicationRepository applicationRepository;
+    @Autowired
+    ProjectContributorLabelFacadePort projectContributorLabelFacadePort;
 
     private final static UUID projectAppliedTo1 = UUID.fromString("3c22af5d-2cf8-48a1-afa0-c3441df7fb3b");
     private final static UUID projectAppliedTo2 = UUID.fromString("6239cb20-eece-466a-80a0-742c1071dd3c");
@@ -52,6 +56,11 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
         gregoire = userAuthHelper.authenticateGregoire();
 
         if (setupDone.compareAndExchange(false, true)) return;
+
+        final var label = projectContributorLabelFacadePort.createLabel(gregoire.userId(), ProjectId.of(projectAppliedTo1), "Some label");
+        projectContributorLabelFacadePort.updateLabelsOfContributors(gregoire.userId(), ProjectId.of(projectAppliedTo1), Map.of(
+                pierre.githubUserId().value(), List.of(label.id())
+        ));
 
         applications = List.of(
                 fakeApplication(projectAppliedTo1, gregoire, 2012380735L, 110L),
@@ -1171,7 +1180,12 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                   "hidden": null
                                 }
                               ],
-                              "projectContributorLabels": null,
+                              "projectContributorLabels": [
+                                {
+                                  "slug": "some-label",
+                                  "name": "Some label"
+                                }
+                              ],
                               "countryCode": null,
                               "totalRewardedUsdAmount": {
                                 "value": 6060.00,
