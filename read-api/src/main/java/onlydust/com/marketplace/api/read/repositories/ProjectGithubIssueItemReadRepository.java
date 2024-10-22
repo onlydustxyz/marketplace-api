@@ -49,7 +49,7 @@ public interface ProjectGithubIssueItemReadRepository extends Repository<Project
                    c.github_repo                                    repo
             FROM projects p
                      JOIN bi.p_project_global_data pgd ON pgd.project_id = p.id
-                     JOIN bi.p_contribution_data c ON c.project_id = p.id AND c.is_issue = 1
+                     JOIN bi.p_contribution_data c ON c.project_id = p.id AND c.contribution_type = 'ISSUE'
                      JOIN bi.p_contribution_contributors_data ccd ON ccd.contribution_uuid = c.contribution_uuid
                      JOIN indexer_exp.github_issues i on i.id = c.issue_id
                      LEFT JOIN hackathons h ON h.github_labels && (select array_agg(l.label) from (select jsonb_array_elements(c.github_labels) ->> 'name' as label) l)
