@@ -12236,6 +12236,8 @@ components:
       properties:
         archived:
           type: boolean
+        closed:
+          type: boolean
 
     PullRequestPatchRequest:
       type: object

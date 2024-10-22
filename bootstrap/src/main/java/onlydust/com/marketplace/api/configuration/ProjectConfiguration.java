@@ -448,8 +448,10 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public IssueFacadePort issueFacadePort(final PermissionPort permissionPort, final ContributionStoragePort contributionStoragePort) {
-        return new IssueService(permissionPort, contributionStoragePort);
+    public IssueFacadePort issueFacadePort(final PermissionPort permissionPort, final ContributionStoragePort contributionStoragePort,
+                                           final GithubApiPort githubApiPort, final GithubStoragePort githubStoragePort,
+                                           final GithubAppService githubAppService) {
+        return new IssueService(permissionPort, contributionStoragePort, githubApiPort, githubStoragePort, githubAppService);
     }
 
     @Bean
