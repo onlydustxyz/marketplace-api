@@ -79,4 +79,19 @@ public class GithubIssueViewEntity {
                 isNull(labels) ? List.of() : labels.stream().map(GithubLabelViewEntity::getName).sorted(String::compareTo).toList()
         );
     }
+
+    public GithubIssue toSimpleDomain(){
+        return new GithubIssue(GithubIssue.Id.of(id),
+                repoId,
+                number,
+                title,
+                body,
+                htmlUrl,
+                repoName,
+                0,
+                null,
+                null,
+                null
+        );
+    }
 }

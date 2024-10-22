@@ -4,15 +4,21 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposit
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
-import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface GithubIssueViewRepository extends Repository<GithubIssueViewEntity, Long> {
     Optional<GithubIssueViewEntity> findById(Long id);
+
+    @Query(value = """
+            select distinct gi.*
+            from indexer_exp.github_issues gi
+            join indexer_exp.grouped_contributions gc on gc.issue_id = gi.id
+            where gc.contribution_uuid = :contributionUuid
+            """, nativeQuery = true)
+    Optional<GithubIssueViewEntity> findByUUID(UUID contributionUuid);
 
     @Query(value = """
             select distinct gi.*

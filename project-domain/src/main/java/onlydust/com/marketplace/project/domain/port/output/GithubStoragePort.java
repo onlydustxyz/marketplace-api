@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.project.domain.model.GithubAccount;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
@@ -15,6 +16,8 @@ public interface GithubStoragePort {
     List<GithubAccount> findInstalledAccountsByIds(List<Long> userGithubAccountIds);
 
     Optional<GithubIssue> findIssueById(GithubIssue.Id issueId);
+
+    Optional<GithubIssue> findIssueByUUID(ContributionUUID contributionUUID);
 
     Optional<Long> findInstallationIdByRepoId(Long repoId);
 

@@ -14,4 +14,6 @@ public interface GithubApiPort {
     void updateComment(@NonNull String githubPersonalToken, @NonNull Long repoId, @NonNull GithubComment.Id id, @NonNull String body);
 
     void deleteComment(@NonNull String personalAccessToken, @NonNull Long repoId, @NonNull GithubComment.Id id);
+
+    void closeIssue(@NonNull String githubAppAccessToken, @NonNull Long repoId, @NonNull Long githubIssueNumber);
 }

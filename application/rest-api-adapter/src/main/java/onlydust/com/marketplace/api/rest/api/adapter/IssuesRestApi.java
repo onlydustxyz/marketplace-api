@@ -26,7 +26,7 @@ public class IssuesRestApi implements IssuesApi {
     @Override
     public ResponseEntity<Void> updateIssue(UUID contributionUuid, IssuePatchRequest issuePatchRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        issueFacadePort.updateIssue(authenticatedUser.id(), new UpdateIssueCommand(ContributionUUID.of(contributionUuid), issuePatchRequest.getArchived()));
+        issueFacadePort.updateIssue(authenticatedUser.id(), new UpdateIssueCommand(ContributionUUID.of(contributionUuid), issuePatchRequest.getArchived(), issuePatchRequest.getClosed()));
         return ResponseEntity.noContent().build();
     }
 }
