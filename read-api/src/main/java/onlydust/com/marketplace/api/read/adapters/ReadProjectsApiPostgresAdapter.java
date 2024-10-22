@@ -359,7 +359,6 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     public ResponseEntity<RewardsPageResponse> getProjectRewards(UUID projectId, Integer pageIndex, Integer pageSize, List<UUID> currencies,
                                                                  List<Long> contributors, String fromDate, String toDate, String search,
                                                                  RewardsSort sort, SortDirection direction) {
-        // TODO implement search
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
 
@@ -371,7 +370,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final var pageRequest = PageRequest.of(sanitizePageIndex, sanitizePageSize,
                 RewardDetailsReadRepository.sortBy(sort, direction));
 
-        final var page = rewardDetailsReadRepository.findProjectRewards(projectId, currencies, contributors, fromDate, toDate,
+        final var page = rewardDetailsReadRepository.findProjectRewards(projectId, currencies, contributors, fromDate, toDate, search,
                 pageRequest);
         final var budgetStats = budgetStatsReadRepository.findByProject(projectId, currencies, contributors, fromDate, toDate);
 

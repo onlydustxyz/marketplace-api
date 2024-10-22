@@ -43,6 +43,7 @@ public interface RewardDetailsReadRepository extends JpaRepository<RewardDetails
                  LEFT JOIN iam.users recipient ON recipient.github_user_id = r.recipient_id
                  JOIN iam.users requestor ON requestor.id = r.requestor_id
                  JOIN indexer_exp.github_accounts github_requestor ON github_requestor.id = requestor.github_user_id
+                 JOIN currencies c on c.id = r.currency_id
             """;
 
     static Sort sortBy(final RewardsSort sort, final SortDirection sortDirection) {
@@ -65,9 +66,15 @@ public interface RewardDetailsReadRepository extends JpaRepository<RewardDetails
               AND (coalesce(:currencyIds) IS NULL OR r.currency_id IN (:currencyIds))
               AND (coalesce(:fromDate) IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
               AND (coalesce(:toDate) IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
+              AND (coalesce(:search) IS NULL 
+                        OR (github_recipient.login ilike '%' || cast(:search as text) || '%' 
+                                OR cast(r.reward_id as text) ilike '%' || cast(:search as text) || '%'
+                                OR c.code ilike '%' || cast(:search as text) || '%'
+                           )
+                  )
             """, nativeQuery = true)
     Page<RewardDetailsReadEntity> findProjectRewards(UUID projectId, List<UUID> currencyIds, List<Long> contributorIds, String fromDate, String toDate,
-                                                     Pageable pageable);
+                                                     String search, Pageable pageable);
 
     @Query(value = SELECT + """
             WHERE (

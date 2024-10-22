@@ -182,6 +182,7 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
 
         final Page<RewardDetailsReadEntity> projectRewards = rewardDetailsReadRepository.findProjectRewards(marketplace.value(), null, List.of(oliver), null,
                 null,
+                null,
                 PageRequest.of(0, 50, RewardDetailsReadRepository.sortBy(RewardsSort.REQUESTED_AT,
                         SortDirection.DESC)));
 
