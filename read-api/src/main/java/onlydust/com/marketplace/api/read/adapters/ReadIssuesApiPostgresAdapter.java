@@ -57,7 +57,8 @@ public class ReadIssuesApiPostgresAdapter implements ReadIssuesApi {
 
         q.setContributorIds(applications.keySet().stream().toList());
 
-        final var page = contributorKpisReadRepository.findAll(q);
+        final var page = contributorKpisReadRepository.findAll(q,
+                applications.values().stream().flatMap(List::stream).map(ApplicationReadEntity::projectId).toList());
 
         return ok(new IssueApplicantsPageResponse()
                 .totalItemNumber((int) page.getTotalElements())

@@ -14,6 +14,7 @@ import org.springframework.data.repository.Repository;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -68,7 +69,10 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                             join projects p on p.id = pcl.project_id
                                          where cpcl.github_user_id = d.contributor_id and
                                                (coalesce(:projectIds) is null or p.id = any(:projectIds)) and
-                                               (coalesce(:projectSlugs) is null or p.slug = any(:projectSlugs))) contributor_labels ON cast(:projectIds as uuid[]) is not null or cast(:projectSlugs as text[]) is not null
+                                               (coalesce(:labelProjectIds) is null or p.id = any(:labelProjectIds)) and
+                                               (coalesce(:projectSlugs) is null or p.slug = any(:projectSlugs))) contributor_labels ON cast(:projectIds as uuid[]) is not null or
+                                                                                                                                       cast(:labelProjectIds as uuid[]) is not null or
+                                                                                                                                       cast(:projectSlugs as text[]) is not null
             
             WHERE (coalesce(:totalRewardedUsdAmountMin) is null or d.total_rewarded_usd_amount >= :totalRewardedUsdAmountMin)
               and (coalesce(:totalRewardedUsdAmountEq) is null or d.total_rewarded_usd_amount = :totalRewardedUsdAmountEq)
@@ -128,6 +132,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                             Long[] contributorIds,
                                             UUID[] contributionUuids,
                                             UUID[] projectIds,
+                                            UUID[] labelProjectIds,
                                             String[] projectSlugs,
                                             UUID[] categoryIds,
                                             UUID[] languageIds,
@@ -163,6 +168,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                 q.getContributorIds() == null ? null : q.getContributorIds().toArray(Long[]::new),
                 q.getContributedTo() == null ? null : q.getContributedTo().toArray(UUID[]::new),
                 q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
+                q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
                 q.getProjectSlugs() == null ? null : q.getProjectSlugs().toArray(String[]::new),
                 q.getCategoryIds() == null ? null : q.getCategoryIds().toArray(UUID[]::new),
                 q.getLanguageIds() == null ? null : q.getLanguageIds().toArray(UUID[]::new),
@@ -184,7 +190,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
         );
     }
 
-    default Page<ContributorKpisReadEntity> findAll(ApplicantsQueryParams q) {
+    default Page<ContributorKpisReadEntity> findAll(ApplicantsQueryParams q, List<UUID> labelProjectIds) {
         return findAll(
                 null,
                 null,
@@ -196,6 +202,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                 q.getContributorIds() == null ? null : q.getContributorIds().toArray(Long[]::new),
                 null,
                 q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
+                labelProjectIds.toArray(UUID[]::new),
                 q.getProjectSlugs() == null ? null : q.getProjectSlugs().toArray(String[]::new),
                 q.getCategoryIds() == null ? null : q.getCategoryIds().toArray(UUID[]::new),
                 q.getLanguageIds() == null ? null : q.getLanguageIds().toArray(UUID[]::new),
