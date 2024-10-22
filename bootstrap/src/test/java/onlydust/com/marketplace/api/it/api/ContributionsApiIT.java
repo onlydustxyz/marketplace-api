@@ -111,6 +111,18 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
+
+    @Test
+    void should_get_linked_issue_by_id() {
+        // When
+        client.get()
+                .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("0446104b-7f0f-3852-8121-74d138bb9920")))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk();
+    }
+
     @Test
     void should_get_contributions() {
         // When
@@ -229,6 +241,11 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         assertContributions(Map.of("search", "KAAPER"))
                 .extracting(r -> r.getProject().getName())
                 .containsOnly("kaaper");
+
+        assertContributions(Map.of("search", "coinbase", "showLinkedIssues", "false"))
+                .extracting(ContributionActivityPageItemResponse::getUuid)
+                .doesNotContain(UUID.fromString("0446104b-7f0f-3852-8121-74d138bb9920")) // Issue linked to PR below
+                .contains(UUID.fromString("74ecdb48-9e1c-3f54-ab9c-df4dbd2a6ed3")); // PR linked to issue above
     }
 
     private AbstractListAssert<?, ? extends List<? extends ContributionActivityPageItemResponse>, ContributionActivityPageItemResponse> assertContributions(Map<String, String> params) {

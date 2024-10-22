@@ -12098,6 +12098,8 @@ components:
             $ref: '#/components/schemas/RewardId'
         hasBeenRewarded:
           type: boolean
+        showLinkedIssues:
+          type: boolean
 
     # To rename to ContributionPageResponse when all the marketplace is migrated on the saas
     ContributionActivityPageResponse:
