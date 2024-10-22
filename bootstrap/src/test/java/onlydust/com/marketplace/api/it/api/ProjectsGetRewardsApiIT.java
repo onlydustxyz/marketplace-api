@@ -4,6 +4,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
+import onlydust.com.marketplace.api.contract.model.RewardsPageResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagReward;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @TagReward
@@ -494,5 +496,64 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.spentAmount.totalUsdEquivalent").isEqualTo(1010)
                 .jsonPath("$.remainingBudget.totalUsdEquivalent").isEqualTo(4040)
         ;
+    }
+
+    @Test
+    void should_get_projects_rewards_with_search() {
+        // Given
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "20",
+                        "search", "STRK"
+                )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.rewards[*].amount.currency.code").isEqualTo("STRK")
+        ;
+
+        // When
+        final RewardsPageResponse responseBody = client.get()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "20",
+                        "search", "PierreO"
+                )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody(RewardsPageResponse.class)
+                .returnResult().getResponseBody();
+
+        responseBody.getRewards()
+                .forEach(reward -> assertEquals("PierreOucif", reward.getRewardedUser().getLogin()));
+
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "20",
+                        "search", "2AC80"
+                )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.rewards[0].id").isEqualTo("2ac80cc6-7e83-4eef-bc0c-932b58f683c0")
+                .jsonPath("$.totalItemNumber").isEqualTo(1);
+
     }
 }
