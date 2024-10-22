@@ -1078,7 +1078,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true,
                                 "id": "fc92397c-3431-4a84-8054-845376b630a0",
-                                "globalRank": 5,
+                                "globalRank": 6,
                                 "globalRankPercentile": 0.1,
                                 "globalRankCategory": "A"
                               },
@@ -1242,7 +1242,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                                 "isRegistered": true,
                                 "id": "45e98bf6-25c2-4edf-94da-e340daba8964",
-                                "globalRank": 6,
+                                "globalRank": 4,
                                 "globalRankPercentile": 0.1,
                                 "globalRankCategory": "A"
                               },
@@ -1332,7 +1332,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                                 "isRegistered": true,
                                 "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
-                                "globalRank": 4,
+                                "globalRank": 5,
                                 "globalRankPercentile": 0.1,
                                 "globalRankCategory": "A"
                               },

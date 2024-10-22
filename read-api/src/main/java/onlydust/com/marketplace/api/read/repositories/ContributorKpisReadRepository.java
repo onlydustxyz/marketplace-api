@@ -58,9 +58,9 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                    coalesce(previous_period.pr_count, 0)                    as previous_period_pr_count,
                    coalesce(previous_period.code_review_count, 0)           as previous_period_code_review_count
             
-            FROM bi.select_contributors(:fromDate, :toDate, :dataSourceIds, :contributorIds, :contributionUuids, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis) d
+            FROM bi.select_contributors(:fromDate, :toDate, :dataSourceIds, :contributorIds, :contributionUuids, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis, :includeApplicants) d
                      LEFT JOIN (
-                            select * from bi.select_contributors(:fromDatePreviousPeriod, :toDatePreviousPeriod, :dataSourceIds, :contributorIds, :contributionUuids, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis)
+                            select * from bi.select_contributors(:fromDatePreviousPeriod, :toDatePreviousPeriod, :dataSourceIds, :contributorIds, :contributionUuids, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis, :includeApplicants)
                          ) previous_period ON coalesce(:fromDatePreviousPeriod, :toDatePreviousPeriod) is not null and previous_period.contributor_id = d.contributor_id
             
                      LEFT JOIN LATERAL ( select jsonb_agg(jsonb_build_object('id', pcl.id, 'slug', pcl.slug, 'name', pcl.name)) as list
@@ -98,7 +98,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
             """,
             countQuery = """
                     SELECT count(d.contributor_id)
-                    FROM bi.select_contributors(:fromDate, :toDate, :dataSourceIds, :contributorIds, :contributionUuids, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis) d
+                    FROM bi.select_contributors(:fromDate, :toDate, :dataSourceIds, :contributorIds, :contributionUuids, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis, :includeApplicants) d
                     WHERE (coalesce(:totalRewardedUsdAmountMin) is null or d.total_rewarded_usd_amount >= :totalRewardedUsdAmountMin)
                       and (coalesce(:totalRewardedUsdAmountEq) is null or d.total_rewarded_usd_amount = :totalRewardedUsdAmountEq)
                       and (coalesce(:totalRewardedUsdAmountMax) is null or d.total_rewarded_usd_amount <= :totalRewardedUsdAmountMax)
@@ -139,6 +139,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                             UUID[] ecosystemIds,
                                             String[] countryCodes,
                                             String[] contributionStatuses,
+                                            Boolean includeApplicants,
                                             BigDecimal totalRewardedUsdAmountMin,
                                             BigDecimal totalRewardedUsdAmountEq,
                                             BigDecimal totalRewardedUsdAmountMax,
@@ -175,6 +176,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                 q.getEcosystemIds() == null ? null : q.getEcosystemIds().toArray(UUID[]::new),
                 q.getCountryCodes() == null ? null : q.getCountryCodes().stream().map(c -> Country.fromIso2(c).iso3Code()).toArray(String[]::new),
                 q.getContributionStatuses() == null ? null : q.getContributionStatuses().stream().map(Enum::name).toArray(String[]::new),
+                q.getIncludeApplicants(),
                 Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
                 Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
                 Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
@@ -209,6 +211,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                 q.getEcosystemIds() == null ? null : q.getEcosystemIds().toArray(UUID[]::new),
                 q.getCountryCodes() == null ? null : q.getCountryCodes().stream().map(c -> Country.fromIso2(c).iso3Code()).toArray(String[]::new),
                 q.getContributionStatuses() == null ? null : q.getContributionStatuses().stream().map(Enum::name).toArray(String[]::new),
+                q.getIncludeApplicants(),
                 Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
                 Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
                 Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),

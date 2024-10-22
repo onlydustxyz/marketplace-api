@@ -11817,6 +11817,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectSlug'
+        includeApplicants:
+          type: boolean
         categoryIds:
           type: array
           items:

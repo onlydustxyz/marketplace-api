@@ -5,10 +5,12 @@ import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagBI;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import org.junit.jupiter.api.AfterAll;
@@ -34,6 +36,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     ProjectFacadePort projectFacadePort;
+    @Autowired
+    ApplicationRepository applicationRepository;
 
     @Nested
     class ActiveContributors {
@@ -136,6 +140,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
 
             at("2021-01-01T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho, List.of("java")));
             final var issueId = at("2021-01-01T00:00:03Z", () -> githubHelper.createIssue(marketplace_frontend, mehdi));
+            applicationHelper.create(onlyDust, GithubIssue.Id.of(issueId), james.githubUserId());
             githubHelper.assignIssueToContributor(issueId, mehdi.user().getGithubUserId());
             at("2021-01-01T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi, List.of("ts")));
             at("2021-01-01T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden, List.of("ts")));
@@ -626,6 +631,14 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                             .extracting(BiContributorsPageItemResponse::getContributionCount)
                             .extracting(NumberKpi::getValue)
                             .contains(4), true);
+            test_contributors_stats(Map.of("includeApplicants", "true", "projectIds", onlyDust.value().toString()),
+                    response -> assertThat(response.getContributors())
+                            .extracting(c -> c.getContributor().getLogin())
+                            .containsExactlyInAnyOrder("antho", "hayden", "mehdi", "james"), true);
+            test_contributors_stats(Map.of("includeApplicants", "true", "projectSlugs", onlyDustSlug),
+                    response -> assertThat(response.getContributors())
+                            .extracting(c -> c.getContributor().getLogin())
+                            .containsExactlyInAnyOrder("antho", "hayden", "mehdi", "james"), true);
         }
 
         @Test
