@@ -12257,6 +12257,15 @@ components:
     RewardsQueryParams:
       type: object
       properties:
+        includeProjectLeds:
+          type: boolean
+          default: true
+        includeBillingProfileAdministrated:
+          type: boolean
+          default: true
+        includeAsRecipient:
+          type: boolean
+          default: true
         statuses:
           type: array
           items:
@@ -12273,6 +12282,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectId'
+        billingProfileIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingProfileId'
 
     RewardPageResponse:
       allOf:
@@ -12314,5 +12327,7 @@ components:
         unlockDate:
           type: string
           format: date-time
-        projectId:
-          $ref: '#/components/schemas/ProjectId'
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
+        billingProfileId:
+          $ref: '#/components/schemas/BillingProfileId'

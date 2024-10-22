@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.it.api;
 
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Country;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.api.contract.model.RewardPageResponse;
 import onlydust.com.marketplace.api.contract.model.RewardStatusContract;
@@ -48,6 +49,8 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
     private static ProjectCategory defi;
     private static ProjectId onlyDust;
     private static ProjectId madara;
+    private static BillingProfile anthoBillingProfile;
+    private static BillingProfile pierreBillingProfile;
 
     @AfterAll
     @SneakyThrows
@@ -99,17 +102,20 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
         at("2021-01-06T00:00:00Z", () -> accountingHelper.grant(explorationTeam, madara, 120, STRK));
         at("2021-01-05T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, madara, 25, ETH));
 
-        var bp = billingProfileHelper.verify(antho, Country.fromIso3("FRA"), Set.of(onlyDust));
-        billingProfileHelper.addPayoutInfo(bp.id(), PayoutInfo.builder()
+        anthoBillingProfile = billingProfileHelper.verify(antho, Country.fromIso3("FRA"), Set.of(onlyDust));
+        billingProfileHelper.addPayoutInfo(anthoBillingProfile.id(), PayoutInfo.builder()
                 .ethWallet(Ethereum.wallet("antho.eth"))
                 .starknetAddress(new StarknetAccountAddress("0x123"))
                 .build());
 
-        bp = billingProfileHelper.verify(pierre, Country.fromIso3("FRA"), Set.of(madara));
-        billingProfileHelper.addPayoutInfo(bp.id(), PayoutInfo.builder()
+        pierreBillingProfile = billingProfileHelper.verifyCompany(pierre, Country.fromIso3("FRA"), Set.of(madara), Set.of(), Set.of(antho.userId()));
+        billingProfileHelper.addPayoutInfo(pierreBillingProfile.id(), PayoutInfo.builder()
                 .ethWallet(Ethereum.wallet("pierre.eth"))
                 .starknetAddress(new StarknetAccountAddress("0x666"))
                 .build());
+
+        // Antho selects pierreBillingProfile for project madara, so Pierre will be able to view the rewards of Antho on madara
+        billingProfileHelper.selectForProject(antho.userId(), pierreBillingProfile.id(), madara);
 
         at("2024-06-01T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, antho.githubUserId(), 1, STRK, List.of(
                 // contributionUUID = f9360345-3145-33f0-a9b0-cbaa3ba78a4e
@@ -125,6 +131,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
 
         at("2024-06-03T00:00:00Z", () -> rewardHelper.create(madara, hayden, antho.githubUserId(), 4, ETH));
         at("2024-06-10T00:00:00Z", () -> rewardHelper.create(madara, hayden, pierre.githubUserId(), 5, ETH));
+        at("2024-06-03T00:00:00Z", () -> rewardHelper.create(madara, hayden, james.githubUserId(), 6, ETH));
     }
 
     @Test
@@ -133,7 +140,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(String.format(GET_REWARDS), Map.of(
                         "pageIndex", "0",
-                        "pageSize", "5")
+                        "pageSize", "10")
                 ))
                 .header("Authorization", BEARER_PREFIX + pierre.jwt())
                 .exchange()
@@ -144,7 +151,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "totalPageNumber": 1,
-                          "totalItemNumber": 4,
+                          "totalItemNumber": 5,
                           "hasMore": false,
                           "nextPageIndex": 0,
                           "rewards": [
@@ -162,37 +169,39 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "usdEquivalent": 8909.90,
                                 "usdConversionRate": 1781.98
                               },
-                              "status": "INDIVIDUAL_LIMIT_REACHED",
+                              "status": "LOCKED",
                               "from": {
                                 "login": "hayden"
                               },
                               "to": {
                                 "login": "pierre"
                               },
+                              "requestedAt": "2024-06-10T00:00:00Z",
                               "processedAt": null,
                               "unlockDate": null
                             },
                             {
                               "amount": {
-                                "amount": 1,
-                                "prettyAmount": 1,
+                                "amount": 4,
+                                "prettyAmount": 4,
                                 "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": 0.5,
-                                "usdConversionRate": 0.5
+                                "usdEquivalent": 7127.92,
+                                "usdConversionRate": 1781.98
                               },
-                              "status": "PENDING_CONTRIBUTOR",
+                              "status": "LOCKED",
                               "from": {
-                                "login": "pierre"
+                                "login": "hayden"
                               },
                               "to": {
                                 "login": "antho"
                               },
+                              "requestedAt": "2024-06-03T00:00:00Z",
                               "processedAt": null,
                               "unlockDate": null
                             },
@@ -217,6 +226,32 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "to": {
                                 "login": "antho"
                               },
+                              "requestedAt": "2024-06-01T00:00:00Z",
+                              "processedAt": null,
+                              "unlockDate": null
+                            },
+                            {
+                              "amount": {
+                                "amount": 1,
+                                "prettyAmount": 1,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0.5,
+                                "usdConversionRate": 0.5
+                              },
+                              "status": "PENDING_CONTRIBUTOR",
+                              "from": {
+                                "login": "pierre"
+                              },
+                              "to": {
+                                "login": "antho"
+                              },
+                              "requestedAt": "2024-06-01T00:00:00Z",
                               "processedAt": null,
                               "unlockDate": null
                             },
@@ -241,6 +276,84 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "to": {
                                 "login": "james"
                               },
+                              "requestedAt": "2024-06-01T00:00:00Z",
+                              "processedAt": null,
+                              "unlockDate": null
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    void should_list_pierre_rewards_as_recipient_and_bp_admin_only() {
+        // When
+        client.get()
+                .uri(getApiURI(String.format(GET_REWARDS), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10",
+                        "includeProjectLeds", "false")
+                ))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isEqualTo(HttpStatus.OK)
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "rewards": [
+                            {
+                              "amount": {
+                                "amount": 5,
+                                "prettyAmount": 5,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 8909.90,
+                                "usdConversionRate": 1781.98
+                              },
+                              "status": "LOCKED",
+                              "from": {
+                                "login": "hayden"
+                              },
+                              "to": {
+                                "login": "pierre"
+                              },
+                              "requestedAt": "2024-06-10T00:00:00Z",
+                              "processedAt": null,
+                              "unlockDate": null
+                            },
+                            {
+                              "amount": {
+                                "amount": 4,
+                                "prettyAmount": 4,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 7127.92,
+                                "usdConversionRate": 1781.98
+                              },
+                              "status": "LOCKED",
+                              "from": {
+                                "login": "hayden"
+                              },
+                              "to": {
+                                "login": "antho"
+                              },
+                              "requestedAt": "2024-06-03T00:00:00Z",
                               "processedAt": null,
                               "unlockDate": null
                             }
@@ -269,7 +382,13 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Test
     public void should_get_rewards_with_filters() {
         test_get_rewards(Map.of("projectIds", onlyDust.toString()),
-                response -> response.getRewards().forEach(reward -> assertThat(reward.getProjectId()).isEqualTo(onlyDust.value())), true
+                response -> response.getRewards().forEach(reward -> {
+                    assertThat(reward.getProject().getId()).isEqualTo(onlyDust.value());
+                    assertThat(reward.getProject().getName()).contains("OnlyDust");
+                }), true
+        );
+        test_get_rewards(Map.of("billingProfileIds", anthoBillingProfile.id().toString()),
+                response -> response.getRewards().forEach(reward -> assertThat(reward.getBillingProfileId()).isEqualTo(anthoBillingProfile.id().value())), true
         );
         test_get_rewards(Map.of("recipientIds", pierre.githubUserId().toString()),
                 response -> response.getRewards().forEach(reward -> assertThat(reward.getTo().getGithubUserId()).isEqualTo(pierre.githubUserId().value())), true
@@ -277,9 +396,13 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
         test_get_rewards(Map.of("recipientIds", james.githubUserId().toString()),
                 response -> response.getRewards().forEach(reward -> assertThat(reward.getTo().getGithubUserId()).isEqualTo(james.githubUserId().value())), true
         );
-        test_get_rewards(Map.of("statuses", "INDIVIDUAL_LIMIT_REACHED"),
-                response -> response.getRewards().forEach(reward -> assertThat(reward.getStatus()).isEqualTo(RewardStatusContract.INDIVIDUAL_LIMIT_REACHED)),
+        test_get_rewards(Map.of("statuses", "LOCKED"),
+                response -> response.getRewards().forEach(reward -> assertThat(reward.getStatus() == RewardStatusContract.LOCKED || reward.getStatus() == RewardStatusContract.PENDING_CONTRIBUTOR)),
                 true
+        );
+        test_get_rewards(Map.of("statuses", "GEO_BLOCKED"),
+                response -> response.getRewards().forEach(reward -> assertThat(reward.getStatus() == RewardStatusContract.GEO_BLOCKED)),
+                false
         );
         test_get_rewards(Map.of("contributionUUIDs", "f9360345-3145-33f0-a9b0-cbaa3ba78a4e"),
                 response -> response.getRewards().forEach(reward -> {
