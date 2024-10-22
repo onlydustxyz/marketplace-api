@@ -11,47 +11,60 @@ import java.util.UUID;
 public interface RewardReadV2Repository extends JpaRepository<RewardV2ReadEntity, UUID> {
 
     @Query(value = """
-            select r.reward_id             as id,
-                   r.status                as status,
-                   r.project_id            as project_id,
-                   r.billing_profile_id    as billing_profile_id,
-                   r.currency_id           as currency_id,
-                   r.amount                as amount,
+            select r.reward_id                               as id,
+                   r.status                                  as status,
+                   r.project_id                              as project_id,
+                   r.billing_profile_id                      as billing_profile_id,
+                   r.currency_id                             as currency_id,
+                   r.amount                                  as amount,
                    jsonb_build_object(
                            'id', requestor.user_id,
                            'githubUserId', requestor.github_user_id,
                            'login', requestor.login,
                            'avatarUrl', requestor.avatar_url,
                            'isRegistered', requestor.user_id is not null
-                   )                       as requestor,
-                   r.requestor_id          as requestor_id,
+                   )                                         as requestor,
+                   r.requestor_id                            as requestor_id,
                    jsonb_build_object(
                            'id', recipient.user_id,
                            'githubUserId', recipient.github_user_id,
                            'login', recipient.login,
                            'avatarUrl', recipient.avatar_url,
                            'isRegistered', recipient.user_id is not null
-                   )                       as recipient,
-                   r.recipient_id          as recipient_id,
-                   r.requested_at          as requested_at,
-                   r.paid_at               as processed_at,
-                   r.unlock_date           as unlock_date,
-                   r.usd_conversion_rate   as usd_conversion_rate,
-                   r.amount_usd_equivalent as amount_usd_equivalent
+                   )                                         as recipient,
+                   jsonb_build_object('id', p.id,
+                                      'slug', p.slug,
+                                      'name', p.name,
+                                      'logoUrl', p.logo_url) as project,
+                   r.recipient_id                            as recipient_id,
+                   r.requested_at                            as requested_at,
+                   r.paid_at                                 as processed_at,
+                   r.unlock_date                             as unlock_date,
+                   r.usd_conversion_rate                     as usd_conversion_rate,
+                   r.amount_usd_equivalent                   as amount_usd_equivalent
             from accounting.reward_statuses r
                      join iam.all_indexed_users requestor on r.requestor_id = requestor.user_id
                      join iam.all_indexed_users recipient on r.recipient_id = recipient.github_user_id
+                     join projects p on p.id = r.project_id
             
-            where (cast(:dataSourceIds as uuid[]) is not null and r.project_id = any (cast(:dataSourceIds as uuid[])) or r.recipient_id = :dataSourceRecipientId)
+            where (:includeProjectLeds and cast(:dataSourceProjectLedIds as uuid[]) is not null and r.project_id = any (cast(:dataSourceProjectLedIds as uuid[]))
+                or :includeBillingProfileAdministrated and cast(:dataSourceBillingProfileIds as uuid[]) is not null and r.billing_profile_id = any (cast(:dataSourceBillingProfileIds as uuid[]))
+                or :includeAsRecipient and r.recipient_id = :dataSourceRecipientId)
               and (cast(:statuses as accounting.reward_status[]) is null or r.status = any (cast(:statuses as accounting.reward_status[])))
               and (cast(:projectIds as uuid[]) is null or r.project_id = any (cast(:projectIds as uuid[])))
+              and (cast(:billingProfileIds as uuid[]) is null or r.billing_profile_id = any (cast(:billingProfileIds as uuid[])))
               and (cast(:recipientIds as bigint[]) is null or r.recipient_id = any (cast(:recipientIds as bigint[])))
               and (cast(:contributionUUIDs as uuid[]) is null or r.reward_id = any (get_reward_ids_of_contributions(cast(:contributionUUIDs as uuid[]))))
             """, nativeQuery = true)
-    Page<RewardV2ReadEntity> findAll(UUID[] dataSourceIds,
+    Page<RewardV2ReadEntity> findAll(boolean includeProjectLeds,
+                                     boolean includeBillingProfileAdministrated,
+                                     boolean includeAsRecipient,
+                                     UUID[] dataSourceProjectLedIds,
+                                     UUID[] dataSourceBillingProfileIds,
                                      Long dataSourceRecipientId,
                                      String[] statuses,
                                      UUID[] projectIds,
+                                     UUID[] billingProfileIds,
                                      UUID[] contributionUUIDs,
                                      Long[] recipientIds,
                                      Pageable pageable);

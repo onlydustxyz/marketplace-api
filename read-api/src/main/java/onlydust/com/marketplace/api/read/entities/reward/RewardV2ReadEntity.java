@@ -55,6 +55,9 @@ public class RewardV2ReadEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     @NonNull
     ContributorResponse recipient;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @NonNull
+    ProjectLinkResponse project;
     @NonNull
     ZonedDateTime requestedAt;
     ZonedDateTime processedAt;
@@ -73,7 +76,8 @@ public class RewardV2ReadEntity {
                 .requestedAt(requestedAt)
                 .processedAt(processedAt)
                 .unlockDate(unlockDate)
-                .projectId(projectId);
+                .billingProfileId(billingProfileId)
+                .project(project);
     }
 
     private Money amount() {

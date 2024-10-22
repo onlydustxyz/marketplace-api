@@ -13,6 +13,7 @@ import onlydust.com.marketplace.kernel.model.UserId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 @Service
@@ -40,7 +41,27 @@ public class BillingProfileHelper {
         return bp;
     }
 
+    public BillingProfile verifyCompany(AuthenticatedUser user, Country country, Set<ProjectId> selectForProjects, Set<UserId> admins, Set<UserId> members) {
+        final var bp = billingProfileFacadePort.createCompanyBillingProfile(UserId.of(user.user().getId()), "Company", selectForProjects);
+        billingProfileStoragePort.saveKyb(bp.kyb().toBuilder()
+                .country(country)
+                .status(VerificationStatus.VERIFIED)
+                .usEntity(false)
+                .subjectToEuropeVAT(false)
+                .name("Company Inc.")
+                .address("123 Main St")
+                .build());
+        billingProfileStoragePort.updateBillingProfileStatus(bp.id(), VerificationStatus.VERIFIED);
+        admins.forEach(userId -> billingProfileStoragePort.saveCoworker(bp.id(), userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()));
+        members.forEach(userId -> billingProfileStoragePort.saveCoworker(bp.id(), userId, BillingProfile.User.Role.MEMBER, ZonedDateTime.now()));
+        return bp;
+    }
+
     public void addPayoutInfo(BillingProfile.Id billingProfileId, PayoutInfo payoutInfo) {
         billingProfileStoragePort.savePayoutInfoForBillingProfile(payoutInfo, billingProfileId);
+    }
+
+    public void selectForProject(UserId userId, BillingProfile.Id billingProfileId, ProjectId projectId) {
+        billingProfileStoragePort.savePayoutPreference(billingProfileId, userId, projectId);
     }
 }
