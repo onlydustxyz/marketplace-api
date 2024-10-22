@@ -450,12 +450,15 @@ public class ProjectConfiguration {
     @Bean
     public IssueFacadePort issueFacadePort(final PermissionPort permissionPort, final ContributionStoragePort contributionStoragePort,
                                            final GithubApiPort githubApiPort, final GithubStoragePort githubStoragePort,
-                                           final GithubAppService githubAppService) {
-        return new IssueService(permissionPort, contributionStoragePort, githubApiPort, githubStoragePort, githubAppService);
+                                           final GithubAppService githubAppService,
+                                           final ContributionObserverPort contributionObservers) {
+        return new IssueService(permissionPort, contributionStoragePort, githubApiPort, githubStoragePort, githubAppService, contributionObservers);
     }
 
     @Bean
-    public PullRequestFacadePort pullRequestFacadePort(final PermissionPort permissionPort, final ContributionStoragePort contributionStoragePort) {
-        return new PullRequestService(permissionPort, contributionStoragePort);
+    public PullRequestFacadePort pullRequestFacadePort(final PermissionPort permissionPort,
+                                                       final ContributionStoragePort contributionStoragePort,
+                                                       final ContributionObserverPort contributionObservers) {
+        return new PullRequestService(permissionPort, contributionStoragePort, contributionObservers);
     }
 }

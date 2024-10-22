@@ -107,6 +107,16 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
 
     @Override
     @Transactional
+    public void onContributionsChanged(ContributionUUID contributionUUID) {
+        entityManager.flush(); // For archived status change
+        biContributionDataRepository.refreshByUUID(contributionUUID);
+        biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
+        biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
+        biContributionRewardDataRepository.refreshByUUID(contributionUUID);
+    }
+
+    @Override
+    @Transactional
     public void onContributionsChanged(Long repoId, ContributionUUID contributionUUID) {
         // No need to flush here, as the updates have been done on indexer side
         biContributionDataRepository.refreshByUUID(contributionUUID);

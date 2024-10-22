@@ -17,4 +17,9 @@ public class ContributionObserverComposite implements ContributionObserverPort {
     public void onContributionsChanged(Long repoId, ContributionUUID contributionUUID) {
         observers.forEach(observer -> observer.onContributionsChanged(repoId, contributionUUID));
     }
+
+    @Override
+    public void onContributionsChanged(ContributionUUID contributionUUID) {
+        observers.forEach(observer -> observer.onContributionsChanged(contributionUUID));
+    }
 }
