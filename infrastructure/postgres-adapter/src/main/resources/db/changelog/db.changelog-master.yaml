@@ -607,3 +607,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000369_add_index_on_hackathon_labels.sql
   - include:
       file: db/changelog/changelogs/00000370_split_contributor_global_data.sql
+  - include:
+      file: db/changelog/changelogs/00000371_include_applicants.sql
