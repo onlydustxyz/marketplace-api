@@ -178,6 +178,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         final var contributionUUID = ContributionUUID.of(application.issueId().value());
         biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
         biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
+        biContributorGlobalDataRepository.refresh(application.applicantId());
     }
 
     @Override
@@ -187,6 +188,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         final var contributionUUID = ContributionUUID.of(application.issueId().value());
         biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
         biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
+        biContributorGlobalDataRepository.refresh(application.applicantId());
     }
 
     @Override
@@ -196,5 +198,6 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         final var contributionUUID = ContributionUUID.of(application.issueId().value());
         biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
         biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
+        biContributorGlobalDataRepository.refresh(application.applicantId());
     }
 }

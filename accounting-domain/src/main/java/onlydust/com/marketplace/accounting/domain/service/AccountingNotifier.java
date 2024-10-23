@@ -29,7 +29,6 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
     private final NotificationPort notificationPort;
     private final EmailStoragePort emailStoragePort;
     private final ProjectServicePort projectServicePort;
-    private final DepositStoragePort depositStoragePort;
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {

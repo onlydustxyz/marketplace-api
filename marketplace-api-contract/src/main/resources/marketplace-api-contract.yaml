@@ -5980,6 +5980,14 @@ components:
           description: Direct URL to user's avatar image
           example: 'https://avatars.githubusercontent.com/u/595505?v=4'
 
+    DatedGithubUserResponse:
+      allOf:
+        - $ref: '#/components/schemas/GithubUserResponse'
+        - type: object
+          properties:
+            since:
+              type: string
+
     RegisteredUserResponse:
       allOf:
         - $ref: '#/components/schemas/GithubUserResponse'
@@ -11817,6 +11825,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectSlug'
+        includeApplicants:
+          type: boolean
         categoryIds:
           type: array
           items:
@@ -12148,11 +12158,11 @@ components:
             contributors:
               type: array
               items:
-                $ref: '#/components/schemas/GithubUserResponse'
+                $ref: '#/components/schemas/DatedGithubUserResponse'
             applicants:
               type: array
               items:
-                $ref: '#/components/schemas/GithubUserResponse'
+                $ref: '#/components/schemas/DatedGithubUserResponse'
             languages:
               type: array
               items:

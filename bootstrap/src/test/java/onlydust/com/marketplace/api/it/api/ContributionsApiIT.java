@@ -1,13 +1,17 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.api.contract.model.ContributionActivityPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ContributionActivityPageResponse;
 import onlydust.com.marketplace.api.contract.model.ContributionActivityStatus;
 import onlydust.com.marketplace.api.contract.model.ContributionType;
+import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.ProjectContributorLabel;
+import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.UpdatePullRequestCommand;
 import onlydust.com.marketplace.project.domain.port.input.ProjectContributorLabelFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.PullRequestFacadePort;
@@ -26,6 +30,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.Comparator.comparing;
+import static onlydust.com.marketplace.api.helper.DateHelper.at;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -49,10 +54,20 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         ogLabel = projectContributorLabelFacadePort.createLabel(projectLead.userId(), kaaper, "OG");
         projectContributorLabelFacadePort.updateLabelsOfContributors(projectLead.userId(), kaaper,
                 Map.of(olivier.user().getGithubUserId(), List.of(ogLabel.id())));
+
+        rewardHelper.create(kaaper, projectLead, GithubUserId.of(1814312), 123, CurrencyHelper.USDC, List.of(
+                RequestRewardCommand.Item.builder()
+                        .id("1300430041")
+                        .number(68L)
+                        .repoId(498695724L)
+                        .type(RequestRewardCommand.Item.Type.issue)
+                        .build()));
+
+        at("2024-10-23T09:30:40.738086Z", () -> applicationHelper.create(kaaper, GithubIssue.Id.of(1300430041L), olivier.githubUserId()));
     }
 
     @Test
-    void should_get_contribution() {
+    void should_get_pr_contribution() {
         // When
         client.get()
                 .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("f4db1d9b-4e1d-300c-9277-8d05824c804e")))
@@ -97,7 +112,8 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                             {
                               "githubUserId": 1814312,
                               "login": "krzkaczor",
-                              "avatarUrl": "https://avatars.githubusercontent.com/u/1814312?v=4"
+                              "avatarUrl": "https://avatars.githubusercontent.com/u/1814312?v=4",
+                              "since": "2024-10-17T14:03:10.967909"
                             }
                           ],
                           "applicants": null,
@@ -116,6 +132,96 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
+    @Test
+    void should_get_issue_contribution() {
+        // When
+        client.get()
+                .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("0f8d789f-fbbd-3171-ad03-9b2b6f8d9174")))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "uuid": "0f8d789f-fbbd-3171-ad03-9b2b6f8d9174",
+                          "type": "ISSUE",
+                          "repo": {
+                            "id": 498695724,
+                            "owner": "onlydustxyz",
+                            "name": "marketplace-frontend",
+                            "description": "Contributions marketplace backend services",
+                            "htmlUrl": "https://github.com/onlydustxyz/marketplace-frontend"
+                          },
+                          "githubAuthor": {
+                            "githubUserId": 43467246,
+                            "login": "AnthonyBuisset",
+                            "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                          },
+                          "githubNumber": 68,
+                          "githubStatus": "COMPLETED",
+                          "githubTitle": "when thread panick, need to restart the back-end",
+                          "githubHtmlUrl": "https://github.com/onlydustxyz/marketplace-frontend/issues/68",
+                          "githubBody": null,
+                          "githubLabels": [
+                            {
+                              "name": "Context: isolated",
+                              "description": "no previous knowledge of the codebase required"
+                            },
+                            {
+                              "name": "Difficulty: easy",
+                              "description": "anybody can understand it"
+                            },
+                            {
+                              "name": "Duration: under a day",
+                              "description": "wil take up to one day"
+                            },
+                            {
+                              "name": "State: open",
+                              "description": "ready for contribution"
+                            },
+                            {
+                              "name": "Techno: rust",
+                              "description": "rust"
+                            },
+                            {
+                              "name": "Type: bug",
+                              "description": "fix a bug"
+                            }
+                          ],
+                          "lastUpdatedAt": "2023-11-24T10:27:45.175549Z",
+                          "githubId": "1300430041",
+                          "createdAt": "2022-07-11T09:14:38Z",
+                          "completedAt": "2022-08-05T08:07:52Z",
+                          "activityStatus": "DONE",
+                          "project": {
+                            "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                            "slug": "kaaper",
+                            "name": "kaaper",
+                            "logoUrl": null
+                          },
+                          "contributors": [
+                            {
+                              "githubUserId": 595505,
+                              "login": "ofux",
+                              "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                              "since": "2024-10-17T14:03:10.967909"
+                            }
+                          ],
+                          "applicants": [
+                            {
+                              "githubUserId": 595505,
+                              "login": "ofux",
+                              "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                              "since": "2024-10-23T09:30:40.738"
+                            }
+                          ],
+                          "languages": null,
+                          "linkedIssues": null,
+                          "totalRewardedUsdAmount": 124.23
+                        }
+                        """);
+    }
 
     @Test
     void should_get_linked_issue_by_id() {
