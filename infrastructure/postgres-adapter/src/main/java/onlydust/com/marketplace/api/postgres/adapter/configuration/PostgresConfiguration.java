@@ -69,6 +69,8 @@ public class PostgresConfiguration {
                                                  final BiProjectBudgetDataRepository biProjectBudgetDataRepository,
                                                  final BiProjectContributionsDataRepository biProjectContributionsDataRepository,
                                                  final BiContributorGlobalDataRepository biContributorGlobalDataRepository,
+                                                 final BiContributorApplicationDataRepository biContributorApplicationDataRepository,
+                                                 final BiContributorRewardDataRepository biContributorRewardDataRepository,
                                                  final BiContributionRewardDataRepository biContributionRewardDataRepository,
                                                  final UserProjectRecommendationsRepository userProjectRecommendationsRepository) {
         return new PostgresProjectAdapter(
@@ -95,6 +97,8 @@ public class PostgresConfiguration {
                 biProjectBudgetDataRepository,
                 biProjectContributionsDataRepository,
                 biContributorGlobalDataRepository,
+                biContributorApplicationDataRepository,
+                biContributorRewardDataRepository,
                 biContributionRewardDataRepository,
                 userProjectRecommendationsRepository,
                 biPerContributorContributionDataRepository
@@ -132,6 +136,8 @@ public class PostgresConfiguration {
                                                            final BiProjectBudgetDataRepository biProjectBudgetDataRepository,
                                                            final BiProjectContributionsDataRepository biProjectContributionsDataRepository,
                                                            final BiContributorGlobalDataRepository biContributorGlobalDataRepository,
+                                                           final BiContributorApplicationDataRepository biContributorApplicationDataRepository,
+                                                           final BiContributorRewardDataRepository biContributorRewardDataRepository,
                                                            final BiContributionRewardDataRepository biContributionRewardDataRepository,
                                                            final UserProjectRecommendationsRepository userProjectRecommendationsRepository) {
         return new PostgresProjectAdapter(
@@ -158,6 +164,8 @@ public class PostgresConfiguration {
                 biProjectBudgetDataRepository,
                 biProjectContributionsDataRepository,
                 biContributorGlobalDataRepository,
+                biContributorApplicationDataRepository,
+                biContributorRewardDataRepository,
                 biContributionRewardDataRepository,
                 userProjectRecommendationsRepository,
                 biPerContributorContributionDataRepository
@@ -528,6 +536,16 @@ public class PostgresConfiguration {
     }
 
     @Bean
+    public BiContributorApplicationDataRepository biContributorApplicationDataRepository(final EntityManager entityManager) {
+        return new BiContributorApplicationDataRepository(entityManager);
+    }
+
+    @Bean
+    public BiContributorRewardDataRepository biContributorRewardDataRepository(final EntityManager entityManager) {
+        return new BiContributorRewardDataRepository(entityManager);
+    }
+
+    @Bean
     public BiContributionRewardDataRepository biContributionRewardDataRepository(final EntityManager entityManager) {
         return new BiContributionRewardDataRepository(entityManager);
     }
@@ -548,6 +566,8 @@ public class PostgresConfiguration {
                                                           final BiProjectBudgetDataRepository biProjectBudgetDataRepository,
                                                           final BiProjectContributionsDataRepository biProjectContributionsDataRepository,
                                                           final BiContributorGlobalDataRepository biContributorGlobalDataRepository,
+                                                          final BiContributorApplicationDataRepository biContributorApplicationDataRepository,
+                                                          final BiContributorRewardDataRepository biContributorRewardDataRepository,
                                                           final BiContributionRewardDataRepository biContributionRewardDataRepository,
                                                           final UserProjectRecommendationsRepository userProjectRecommendationsRepository) {
         return new PostgresBiProjectorAdapter(entityManager,
@@ -560,6 +580,8 @@ public class PostgresConfiguration {
                 biProjectBudgetDataRepository,
                 biProjectContributionsDataRepository,
                 biContributorGlobalDataRepository,
+                biContributorApplicationDataRepository,
+                biContributorRewardDataRepository,
                 biContributionRewardDataRepository,
                 userProjectRecommendationsRepository);
     }
