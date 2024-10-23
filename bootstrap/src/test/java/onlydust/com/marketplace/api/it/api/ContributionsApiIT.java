@@ -1,13 +1,16 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.api.contract.model.ContributionActivityPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ContributionActivityPageResponse;
 import onlydust.com.marketplace.api.contract.model.ContributionActivityStatus;
 import onlydust.com.marketplace.api.contract.model.ContributionType;
+import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.ProjectContributorLabel;
+import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.UpdatePullRequestCommand;
 import onlydust.com.marketplace.project.domain.port.input.ProjectContributorLabelFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.PullRequestFacadePort;
@@ -49,6 +52,14 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         ogLabel = projectContributorLabelFacadePort.createLabel(projectLead.userId(), kaaper, "OG");
         projectContributorLabelFacadePort.updateLabelsOfContributors(projectLead.userId(), kaaper,
                 Map.of(olivier.user().getGithubUserId(), List.of(ogLabel.id())));
+
+        rewardHelper.create(kaaper, projectLead, GithubUserId.of(1814312), 123, CurrencyHelper.USDC, List.of(
+                RequestRewardCommand.Item.builder()
+                        .id("43506983")
+                        .number(8L)
+                        .repoId(40652912L)
+                        .type(RequestRewardCommand.Item.Type.pullRequest)
+                        .build()));
     }
 
     @Test
@@ -111,11 +122,10 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "linkedIssues": null,
-                          "totalRewardedUsdAmount": 0
+                          "totalRewardedUsdAmount": 124.23
                         }
                         """);
     }
-
 
     @Test
     void should_get_linked_issue_by_id() {

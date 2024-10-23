@@ -87,10 +87,9 @@ public class AccountingConfiguration {
                                                  final @NonNull InvoiceStoragePort invoiceStoragePort,
                                                  final @NonNull NotificationPort notificationPort,
                                                  final @NonNull EmailStoragePort emailStoragePort,
-                                                 final @NonNull ProjectServicePort projectServicePort,
-                                                 final @NonNull DepositStoragePort depositStoragePort) {
+                                                 final @NonNull ProjectServicePort projectServicePort) {
         return new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, notificationPort, emailStoragePort,
-                projectServicePort, depositStoragePort);
+                projectServicePort);
     }
 
     @Bean
@@ -139,7 +138,7 @@ public class AccountingConfiguration {
                                                      final AccountingNotifier accountingNotifier,
                                                      final AccountingTrackingNotifier accountingTrackingNotifier,
                                                      final PostgresBiProjectorAdapter postgresBiProjectorAdapter) {
-        return new AccountingObserverComposite(postgresBiProjectorAdapter, accountingNotifier, rewardStatusUpdater, accountingTrackingNotifier);
+        return new AccountingObserverComposite(rewardStatusUpdater, postgresBiProjectorAdapter, accountingNotifier, accountingTrackingNotifier);
     }
 
     @Bean
