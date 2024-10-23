@@ -601,3 +601,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000368_use_grouped_contributions.sql
   - include:
       file: db/changelog/changelogs/00000369_fix_views.sql
+  - include:
+      file: db/changelog/changelogs/00000370_fix_timestamp.sql
