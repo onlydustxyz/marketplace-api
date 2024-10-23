@@ -603,3 +603,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000369_fix_views.sql
   - include:
       file: db/changelog/changelogs/00000370_fix_timestamp.sql
+  - include:
+      file: db/changelog/changelogs/00000369_add_index_on_hackathon_labels.sql

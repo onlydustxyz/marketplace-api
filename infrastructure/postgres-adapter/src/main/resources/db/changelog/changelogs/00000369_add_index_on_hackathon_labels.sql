@@ -1,0 +1,1 @@
+create index on hackathons using gin (github_labels);
