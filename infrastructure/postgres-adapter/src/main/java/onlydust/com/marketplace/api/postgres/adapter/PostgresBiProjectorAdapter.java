@@ -33,6 +33,8 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     private final BiProjectBudgetDataRepository biProjectBudgetDataRepository;
     private final BiProjectContributionsDataRepository biProjectContributionsDataRepository;
     private final BiContributorGlobalDataRepository biContributorGlobalDataRepository;
+    private final BiContributorApplicationDataRepository biContributorApplicationDataRepository;
+    private final BiContributorRewardDataRepository biContributorRewardDataRepository;
     private final BiContributionRewardDataRepository biContributionRewardDataRepository;
     private final UserProjectRecommendationsRepository userProjectRecommendationsRepository;
 
@@ -49,6 +51,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         entityManager.flush();
         biRewardDataRepository.refresh(rewardId);
         biContributionRewardDataRepository.refreshByReward(rewardId);
+        biContributorRewardDataRepository.refreshByReward(rewardId);
     }
 
     @Override
@@ -60,6 +63,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         entityManager.flush();
         biRewardDataRepository.refresh(rewardId);
         biContributionRewardDataRepository.refreshByReward(rewardId);
+        biContributorRewardDataRepository.refreshByReward(rewardId);
     }
 
     @Override
@@ -67,6 +71,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         entityManager.flush();
         biRewardDataRepository.refresh(rewardId);
         biContributionRewardDataRepository.refreshByReward(rewardId);
+        biContributorRewardDataRepository.refreshByReward(rewardId);
     }
 
     @Override
@@ -168,6 +173,8 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     public void onUserSignedUp(AuthenticatedUser user) {
         entityManager.flush();
         biContributorGlobalDataRepository.refresh(user.githubUserId());
+        biContributorApplicationDataRepository.refresh(user.githubUserId());
+        biContributorRewardDataRepository.refresh(user.githubUserId());
         userProjectRecommendationsRepository.refresh(user.githubUserId());
     }
 
@@ -178,7 +185,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         final var contributionUUID = ContributionUUID.of(application.issueId().value());
         biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
         biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
-        biContributorGlobalDataRepository.refresh(application.applicantId());
+        biContributorApplicationDataRepository.refresh(application.applicantId());
     }
 
     @Override
@@ -188,7 +195,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         final var contributionUUID = ContributionUUID.of(application.issueId().value());
         biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
         biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
-        biContributorGlobalDataRepository.refresh(application.applicantId());
+        biContributorApplicationDataRepository.refresh(application.applicantId());
     }
 
     @Override
@@ -198,7 +205,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         final var contributionUUID = ContributionUUID.of(application.issueId().value());
         biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
         biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
-        biContributorGlobalDataRepository.refresh(application.applicantId());
+        biContributorApplicationDataRepository.refresh(application.applicantId());
     }
 
     @Override
@@ -208,6 +215,6 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         final var contributionUUID = ContributionUUID.of(application.issueId().value());
         biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
         biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
-        biContributorGlobalDataRepository.refresh(application.applicantId());
+        biContributorApplicationDataRepository.refresh(application.applicantId());
     }
 }

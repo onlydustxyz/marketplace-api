@@ -229,8 +229,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   ],
                                   "countryCode": "FR",
                                   "totalRewardedUsdAmount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
+                                    "value": 1.5,
+                                    "trend": "UP"
                                   },
                                   "rewardCount": {
                                     "value": 2,
@@ -372,8 +372,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   ],
                                   "countryCode": "GB",
                                   "totalRewardedUsdAmount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
+                                    "value": 3.5,
+                                    "trend": "UP"
                                   },
                                   "rewardCount": {
                                     "value": 2,
@@ -696,8 +696,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                               "projectContributorLabels": null,
                               "countryCode": "FR",
                               "totalRewardedUsdAmount": {
-                                "value": 0,
-                                "trend": "STABLE"
+                                "value": 1.5,
+                                "trend": "UP"
                               },
                               "rewardCount": {
                                 "value": 2,

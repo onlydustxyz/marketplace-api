@@ -51,7 +51,7 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
 
         if (setupDone.compareAndExchange(false, true)) return;
 
-        recipientLogin = faker.lordOfTheRings().character();
+        recipientLogin = "Vercingetorix";
         mySponsor = sponsorHelper.create(caller);
         myProgram = programHelper.create(mySponsor.id(), caller);
         final var project1Id = projectHelper.create(caller, "p1").getLeft();
