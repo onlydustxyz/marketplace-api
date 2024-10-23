@@ -274,7 +274,8 @@ select c.contribution_uuid                                                      
 
        jsonb_agg(distinct jsonb_set(cd.contributor, '{since}', to_jsonb(gcc.tech_created_at), true)) filter ( where cd.contributor_id is not null ) as contributors,
 
-       jsonb_agg(distinct jsonb_set(apd.contributor, '{since}', to_jsonb(a.received_at), true)) filter ( where apd.contributor_id is not null )      as applicants,
+       jsonb_agg(distinct jsonb_set(jsonb_set(apd.contributor, '{since}', to_jsonb(a.received_at), true),
+                                        '{applicationId}', to_jsonb(a.id), true)) filter ( where apd.contributor_id is not null )      as applicants,
 
        concat(c.github_number, ' ',
               c.github_title, ' ',
