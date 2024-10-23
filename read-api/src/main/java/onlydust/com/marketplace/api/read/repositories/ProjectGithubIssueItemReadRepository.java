@@ -1,13 +1,17 @@
 package onlydust.com.marketplace.api.read.repositories;
 
+import jakarta.persistence.QueryHint;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.read.entities.github.ProjectGithubIssueItemReadEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.Repository;
 
 import java.util.UUID;
+
+import static org.hibernate.annotations.QueryHints.CACHEABLE;
 
 public interface ProjectGithubIssueItemReadRepository extends Repository<ProjectGithubIssueItemReadEntity, Long> {
 
@@ -104,6 +108,7 @@ public interface ProjectGithubIssueItemReadRepository extends Repository<Project
                       AND (coalesce(:search) IS NULL OR c.github_title ILIKE '%' || :search || '%')
                     GROUP BY p.id, c.contribution_uuid, ccd.contribution_uuid
                     """, nativeQuery = true)
+    @QueryHints(@QueryHint(name = CACHEABLE, value = "true"))
     Page<ProjectGithubIssueItemReadEntity> findIssuesOf(@NonNull UUID projectId,
                                                         String[] statuses,
                                                         Boolean isAssigned,

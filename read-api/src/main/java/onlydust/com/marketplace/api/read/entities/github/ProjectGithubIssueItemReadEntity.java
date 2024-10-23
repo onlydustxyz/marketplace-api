@@ -28,6 +28,8 @@ import static java.util.Objects.isNull;
 @Table(schema = "indexer_exp", name = "github_issues")
 @Immutable
 @Accessors(fluent = true)
+//@Cacheable
+//@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ProjectGithubIssueItemReadEntity {
     @Id
     @EqualsAndHashCode.Include

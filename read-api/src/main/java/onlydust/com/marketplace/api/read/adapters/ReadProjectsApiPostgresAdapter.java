@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.read.adapters;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.ReadProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectMoreInfoViewEntity;
@@ -40,6 +41,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,6 +50,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -71,6 +74,7 @@ import static org.springframework.http.ResponseEntity.status;
 @AllArgsConstructor
 @Transactional(readOnly = true)
 @Profile("api")
+@Slf4j
 public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     private static final int TOP_CONTRIBUTOR_COUNT = 3;
 
@@ -196,6 +200,8 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
     }
 
+    private final AtomicInteger atomicInteger = new AtomicInteger(0);
+
     @Override
     public ResponseEntity<GithubIssuePageResponse> getProjectPublicIssues(UUID projectId,
                                                                           Integer pageIndex,
@@ -211,7 +217,12 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                                           String search,
                                                                           @NotNull ProjectIssuesSort sort,
                                                                           SortDirection direction) {
+        final var count = atomicInteger.incrementAndGet();
+        if (count > 24500)
+            LOGGER.info(String.valueOf(count));
         final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
+        final StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         final var page = projectGithubIssueItemReadRepository.findIssuesOf(projectId,
                 isNull(statuses) ? null : statuses.stream().distinct().map(issueStatus -> switch (issueStatus) {
                     case OPEN -> ContributionStatus.IN_PROGRESS;
@@ -230,6 +241,11 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                     case CREATED_AT -> "i.created_at";
                     case CLOSED_AT -> "i.closed_at";
                 })));
+        stopWatch.stop();
+        if (stopWatch.getTotalTimeMillis() > 100) {
+            LOGGER.info(stopWatch.getTotalTimeMillis() + "ms");
+        }
+        
         return ok()
                 .cacheControl(cache.whenAnonymous(caller, XS))
                 .body(new GithubIssuePageResponse()

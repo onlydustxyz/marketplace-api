@@ -75,12 +75,21 @@ spring:
       connectionTimeout: 30000
       idleTimeout: 30000
       maxLifetime: 60000
-      maximumPoolSize: 5
-      minimumIdle: 5
+      maximumPoolSize: 50
+      minimumIdle: 10
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
+        cache:
+          region.factory_class: org.hibernate.cache.jcache.internal.JCacheRegionFactory
+          use_second_level_cache: false
+          use_query_cache: true
+        javax:
+          cache:
+            provider: org.ehcache.jsr107.EhcacheCachingProvider
+            uri: classpath:ehcache.xml
+          missing_cache_strategy: fail
         query:
           in_clause_parameter_padding: true
         event:
