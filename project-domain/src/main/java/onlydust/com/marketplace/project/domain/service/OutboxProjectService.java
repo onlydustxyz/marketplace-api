@@ -51,4 +51,8 @@ public class OutboxProjectService implements ProjectObserverPort, ApplicationObs
     @Override
     public void onApplicationRefused(Application application) {
     }
+
+    @Override
+    public void onApplicationDeleted(Application application) {
+    }
 }

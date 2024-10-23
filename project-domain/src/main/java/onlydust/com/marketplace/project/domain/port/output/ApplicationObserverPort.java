@@ -9,4 +9,6 @@ public interface ApplicationObserverPort {
     void onApplicationAccepted(Application application, UserId projectLeadId);
 
     void onApplicationRefused(Application application);
+
+    void onApplicationDeleted(Application application);
 }
