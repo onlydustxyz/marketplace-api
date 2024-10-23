@@ -205,7 +205,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                               "githubUserId": 595505,
                               "login": "ofux",
                               "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
-                              "since": "2024-10-17T12:03:10.967909Z"
+                              "since": "2024-10-17T14:03:10.967909Z"
                             }
                           ],
                           "applicants": [
