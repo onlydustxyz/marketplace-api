@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRep
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectLeadViewRepository;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.accounting.AllTransactionReadEntity;
+import onlydust.com.marketplace.api.read.entities.github.ProjectGithubIssueItemReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectCategorySuggestionReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectContributorLabelReadEntity;
@@ -185,15 +186,16 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
     @Override
     public ResponseEntity<GithubIssuePageResponse> getProjectGoodFirstIssues(UUID projectId, Integer pageIndex, Integer pageSize) {
-        final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
         final var page = projectGithubIssueItemReadRepository.findIssuesOf(projectId, new String[]{IN_PROGRESS.name()}, false, null, true, true, false,
                 null, null, null, PageRequest.of(pageIndex, pageSize, Sort.by("i.created_at").descending()));
-        return ok(new GithubIssuePageResponse()
-                .issues(page.stream().map(i -> i.toPageItemResponse(caller.map(AuthenticatedUser::githubUserId).orElse(null))).toList())
-                .totalPageNumber(page.getTotalPages())
-                .totalItemNumber((int) page.getTotalElements())
-                .hasMore(hasMore(pageIndex, page.getTotalPages()))
-                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
+        return ok()
+                .cacheControl(cache.forEverybody(XS))
+                .body(new GithubIssuePageResponse()
+                        .issues(page.stream().map(ProjectGithubIssueItemReadEntity::toPageItemResponse).toList())
+                        .totalPageNumber(page.getTotalPages())
+                        .totalItemNumber((int) page.getTotalElements())
+                        .hasMore(hasMore(pageIndex, page.getTotalPages()))
+                        .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
     }
 
     @Override
@@ -211,7 +213,6 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                                           String search,
                                                                           @NotNull ProjectIssuesSort sort,
                                                                           SortDirection direction) {
-        final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
         final var page = projectGithubIssueItemReadRepository.findIssuesOf(projectId,
                 isNull(statuses) ? null : statuses.stream().distinct().map(issueStatus -> switch (issueStatus) {
                     case OPEN -> ContributionStatus.IN_PROGRESS;
@@ -231,9 +232,9 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                     case CLOSED_AT -> "i.closed_at";
                 })));
         return ok()
-                .cacheControl(cache.whenAnonymous(caller, XS))
+                .cacheControl(cache.forEverybody(XS))
                 .body(new GithubIssuePageResponse()
-                        .issues(page.stream().map(i -> i.toPageItemResponse(caller.map(AuthenticatedUser::githubUserId).orElse(null))).toList())
+                        .issues(page.stream().map(ProjectGithubIssueItemReadEntity::toPageItemResponse).toList())
                         .totalPageNumber(page.getTotalPages())
                         .totalItemNumber((int) page.getTotalElements())
                         .hasMore(hasMore(pageIndex, page.getTotalPages()))

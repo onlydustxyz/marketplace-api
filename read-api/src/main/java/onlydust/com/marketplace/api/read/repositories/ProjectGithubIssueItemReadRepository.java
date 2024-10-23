@@ -17,8 +17,7 @@ public interface ProjectGithubIssueItemReadRepository extends Repository<Project
                    p.name                                           project_name,
                    p.slug                                           project_slug,
                    p.logo_url                                       project_logo_url,
-                   (select jsonb_agg(
-                                   jsonb_build_object(
+                   (select jsonb_agg(distinct jsonb_build_object(
                                            'githubUserId', ga.id,
                                            'login', ga.login,
                                            'avatarUrl', user_avatar_url(ga.id, ga.avatar_url)
@@ -26,17 +25,13 @@ public interface ProjectGithubIssueItemReadRepository extends Repository<Project
                            ) users
                     from indexer_exp.github_accounts ga
                     where ga.id = any (ccd.assignee_ids))           assignees,
-                   (select jsonb_agg(
-                                   jsonb_build_object(
-                                           'id', a.id,
-                                           'motivations', a.motivations,
-                                           'problemSolvingApproach', a.problem_solving_approach,
-                                           'applicant', jsonb_build_object(
-                                                   'githubUserId', ga2.id,
-                                                   'login', ga2.login,
-                                                   'avatarUrl', user_avatar_url(ga2.id, ga2.avatar_url),
-                                                   'isRegistered', u.id is not null
-                                                        )
+                   (select jsonb_agg(distinct jsonb_build_object(
+                                           'githubUserId', ga2.id,
+                                           'login', ga2.login,
+                                           'avatarUrl', user_avatar_url(ga2.id, ga2.avatar_url),
+                                           'isRegistered', u.id is not null,
+                                           'id', u.id,
+                                           'applicationId', a.id
                                    )
                            ) applications
                     from applications a
