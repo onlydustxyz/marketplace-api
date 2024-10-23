@@ -97,7 +97,7 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
 
     @Override
     public void onLabelsModified(@NonNull ProjectId projectId, Set<Long> githubUserIds) {
-        
+
     }
 
     @Override
@@ -124,6 +124,10 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     @Override
     public void onApplicationRefused(Application application) {
 
+    }
+
+    @Override
+    public void onApplicationDeleted(Application application) {
     }
 
     @Override

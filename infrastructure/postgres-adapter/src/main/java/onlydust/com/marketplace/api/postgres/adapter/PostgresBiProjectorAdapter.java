@@ -200,4 +200,14 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
         biContributorGlobalDataRepository.refresh(application.applicantId());
     }
+
+    @Override
+    @Transactional
+    public void onApplicationDeleted(Application application) {
+        entityManager.flush();
+        final var contributionUUID = ContributionUUID.of(application.issueId().value());
+        biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
+        biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
+        biContributorGlobalDataRepository.refresh(application.applicantId());
+    }
 }

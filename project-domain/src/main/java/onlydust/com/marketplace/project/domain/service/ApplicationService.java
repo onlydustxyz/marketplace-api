@@ -32,6 +32,7 @@ public class ApplicationService implements ApplicationFacadePort {
     private final GlobalConfig globalConfig;
 
     @Override
+    @Transactional
     public void deleteApplication(Application.Id id, UserId userId, Long githubUserId) {
         final var application = projectApplicationStoragePort.findApplication(id)
                 .orElseThrow(() -> notFound("Application %s not found".formatted(id)));
@@ -45,6 +46,7 @@ public class ApplicationService implements ApplicationFacadePort {
         }
 
         projectApplicationStoragePort.deleteApplications(id);
+        applicationObserver.onApplicationDeleted(application);
 
         if (deleteSelfApplication && application.origin() == Application.Origin.MARKETPLACE)
             tryDeleteGithubComment(application);

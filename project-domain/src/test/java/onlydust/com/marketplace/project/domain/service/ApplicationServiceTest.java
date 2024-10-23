@@ -362,6 +362,7 @@ public class ApplicationServiceTest {
 
         // Then
         verify(projectApplicationStoragePort).deleteApplications(application.id());
+        verify(applicationObserver).onApplicationDeleted(application);
         verify(githubApiPort).deleteComment(personalAccessToken, issue.repoId(), application.commentId());
     }
 
@@ -386,6 +387,7 @@ public class ApplicationServiceTest {
 
         // Then
         verify(projectApplicationStoragePort).deleteApplications(application.id());
+        verify(applicationObserver).onApplicationDeleted(application);
         verifyNoInteractions(githubApiPort);
     }
 
@@ -410,6 +412,7 @@ public class ApplicationServiceTest {
 
         // Then
         verify(projectApplicationStoragePort).deleteApplications(application.id());
+        verify(applicationObserver).onApplicationDeleted(application);
         verify(githubApiPort).deleteComment(personalAccessToken, issue.repoId(), application.commentId());
     }
 
@@ -433,6 +436,7 @@ public class ApplicationServiceTest {
 
         // Then
         verify(projectApplicationStoragePort).deleteApplications(application.id());
+        verify(applicationObserver).onApplicationDeleted(application);
         verifyNoInteractions(githubApiPort);
     }
 

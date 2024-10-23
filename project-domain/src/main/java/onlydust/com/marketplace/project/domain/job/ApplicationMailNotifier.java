@@ -74,4 +74,9 @@ public class ApplicationMailNotifier implements ApplicationObserverPort {
                     .build());
         });
     }
+
+    @Override
+    public void onApplicationDeleted(Application application) {
+
+    }
 }
