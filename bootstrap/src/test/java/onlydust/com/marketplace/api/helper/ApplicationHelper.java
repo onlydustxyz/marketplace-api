@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.helper;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 public class ApplicationHelper {
     @Autowired
     private ProjectApplicationStoragePort projectApplicationStoragePort;
+    @Autowired
+    private PostgresBiProjectorAdapter postgresBiProjectorAdapter;
 
     private final Faker faker = new Faker();
 
@@ -27,6 +30,7 @@ public class ApplicationHelper {
                 null
         );
         projectApplicationStoragePort.save(application);
+        postgresBiProjectorAdapter.onApplicationCreated(application);
         return application;
     }
 }

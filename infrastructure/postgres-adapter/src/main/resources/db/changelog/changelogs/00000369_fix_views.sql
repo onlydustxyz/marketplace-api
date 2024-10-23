@@ -272,9 +272,9 @@ select c.contribution_uuid                                                      
 
        case when ad.contributor_id is not null then ad.contributor end                        as github_author,
 
-       jsonb_agg(distinct cd.contributor) filter ( where cd.contributor_id is not null )      as contributors,
+       jsonb_agg(distinct jsonb_set(cd.contributor, '{since}', to_jsonb(gcc.tech_created_at), true)) filter ( where cd.contributor_id is not null ) as contributors,
 
-       jsonb_agg(distinct apd.contributor) filter ( where apd.contributor_id is not null )    as applicants,
+       jsonb_agg(distinct jsonb_set(apd.contributor, '{since}', to_jsonb(a.received_at), true)) filter ( where apd.contributor_id is not null )      as applicants,
 
        concat(c.github_number, ' ',
               c.github_title, ' ',

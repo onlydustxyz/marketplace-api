@@ -73,7 +73,7 @@ public class Application {
                 projectId,
                 applicantId,
                 Origin.MARKETPLACE,
-                ZonedDateTime.now(),
+                CurrentDateProvider.now().toInstant().atZone(ZoneOffset.UTC),
                 issueId,
                 commentId,
                 motivations,

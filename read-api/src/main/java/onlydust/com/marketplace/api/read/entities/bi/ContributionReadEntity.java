@@ -69,10 +69,10 @@ public class ContributionReadEntity {
     ProjectLinkResponse project;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    List<GithubUserResponse> contributors;
+    List<DatedGithubUserResponse> contributors;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    List<GithubUserResponse> applicants;
+    List<DatedGithubUserResponse> applicants;
 
     @JdbcTypeCode(SqlTypes.JSON)
     List<LanguageResponse> languages;
