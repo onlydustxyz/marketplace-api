@@ -125,16 +125,19 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "githubUserId": 43467246,
                                   "login": "AnthonyBuisset",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                  "isRegistered": true,
+                                  "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4"
                                 },
                                 {
                                   "githubUserId": 16590657,
                                   "login": "PierreOucif",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                  "isRegistered": true,
+                                  "id": "fc92397c-3431-4a84-8054-845376b630a0"
                                 }
                               ],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 1643866301,
@@ -164,21 +167,26 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "githubUserId": 43467246,
                                   "login": "AnthonyBuisset",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                  "isRegistered": true,
+                                  "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4"
                                 },
                                 {
                                   "githubUserId": 16590657,
                                   "login": "PierreOucif",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                  "isRegistered": true,
+                                  "id": "fc92397c-3431-4a84-8054-845376b630a0"
                                 },
                                 {
                                   "githubUserId": 595505,
                                   "login": "ofux",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                                  "isRegistered": true,
+                                  "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
                                 }
                               ],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 1643867196,
@@ -211,8 +219,7 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "login": "AnthonyBuisset",
                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
                                 }
-                              ],
-                              "currentUserApplication": null
+                              ]
                             }
                           ]
                         }

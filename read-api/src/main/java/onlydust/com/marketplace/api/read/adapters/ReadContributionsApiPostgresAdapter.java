@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadContributionsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.bi.ContributionReadEntity;
+import onlydust.com.marketplace.api.read.properties.Cache;
 import onlydust.com.marketplace.api.read.repositories.ContributionReadRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.api.read.properties.Cache.XS;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
@@ -24,6 +26,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @Transactional(readOnly = true)
 @Profile("api")
 public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi {
+    private final Cache cache;
     private final ContributionReadRepository contributionReadRepository;
 
     @Override
@@ -36,7 +39,9 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
         final var contribution = page.stream().findFirst()
                 .orElseThrow(() -> notFound("Contribution %s not found".formatted(contributionUuid)));
 
-        return ok(contribution.toDto());
+        return ok()
+                .cacheControl(cache.forEverybody(XS))
+                .body(contribution.toDto());
     }
 
     @Override
@@ -67,11 +72,13 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
     public ResponseEntity<ContributionActivityPageResponse> getContributions(ContributionsQueryParams q) {
         final var page = contributionReadRepository.findAll(q);
 
-        return ok(new ContributionActivityPageResponse()
-                .contributions(page.stream().map(ContributionReadEntity::toDto).toList())
-                .hasMore(hasMore(q.getPageIndex(), page.getTotalPages()))
-                .nextPageIndex(nextPageIndex(q.getPageIndex(), page.getTotalPages()))
-                .totalItemNumber((int) page.getTotalElements())
-                .totalPageNumber(page.getTotalPages()));
+        return ok()
+                .cacheControl(cache.forEverybody(XS))
+                .body(new ContributionActivityPageResponse()
+                        .contributions(page.stream().map(ContributionReadEntity::toDto).toList())
+                        .hasMore(hasMore(q.getPageIndex(), page.getTotalPages()))
+                        .nextPageIndex(nextPageIndex(q.getPageIndex(), page.getTotalPages()))
+                        .totalItemNumber((int) page.getTotalElements())
+                        .totalPageNumber(page.getTotalPages()));
     }
 }

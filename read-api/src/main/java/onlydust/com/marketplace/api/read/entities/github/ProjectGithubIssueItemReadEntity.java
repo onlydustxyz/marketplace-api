@@ -14,9 +14,7 @@ import org.hibernate.type.SqlTypes;
 import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 
@@ -82,25 +80,14 @@ public class ProjectGithubIssueItemReadEntity {
     List<GithubUserResponse> assignees;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    List<ProjectApplicationShortResponse> applications;
+    List<ApplicationLinkResponse> applications;
 
     UUID projectId;
     String projectSlug;
     String projectName;
     String projectLogoUrl;
 
-    public GithubIssuePageItemResponse toPageItemResponse(Long githubUserId) {
-
-        final Optional<ProjectApplicationShortResponse> currentUserApplication = isNull(applications) ?
-                Optional.empty() : applications.stream()
-                .filter(application -> application.getApplicant().getGithubUserId().equals(githubUserId))
-                .peek(projectApplicationShortResponse -> projectApplicationShortResponse.setProject(new ProjectLinkResponse()
-                        .id(projectId)
-                        .logoUrl(projectLogoUrl)
-                        .slug(projectSlug)
-                        .name(projectName)))
-                .findFirst();
-
+    public GithubIssuePageItemResponse toPageItemResponse() {
         return new GithubIssuePageItemResponse()
                 .id(id)
                 .number(number)
@@ -113,18 +100,8 @@ public class ProjectGithubIssueItemReadEntity {
                 .closedAt(closedAt)
                 .body(body)
                 .labels(isNull(labels) ? List.of() : labels.stream().sorted(Comparator.comparing(GithubLabel::getName)).toList())
-                .applicants(isNull(applications) ? List.of() :
-                        applications.stream().map(ProjectApplicationShortResponse::getApplicant)
-                                .map(contributorResponse -> new GithubUserResponse(
-                                        contributorResponse.getGithubUserId(),
-                                        contributorResponse.getLogin(),
-                                        contributorResponse.getAvatarUrl()))
-                                .collect(Collectors.toSet())
-                                .stream()
-                                .sorted(Comparator.comparing(GithubUserResponse::getLogin))
-                                .toList())
+                .applicants(isNull(applications) ? List.of() : applications.stream().sorted(Comparator.comparing(ApplicationLinkResponse::getLogin)).toList())
                 .assignees(isNull(assignees) ? List.of() : assignees.stream().sorted(Comparator.comparing(GithubUserResponse::getLogin)).toList())
-                .currentUserApplication(currentUserApplication.orElse(null))
                 ;
     }
 }

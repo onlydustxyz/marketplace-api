@@ -20,7 +20,7 @@ public class Cache {
     private boolean noCache = false;
     private long defaultStaleWhileRevalidateSeconds = 10L;
 
-    public static final Duration XS = Duration.ofSeconds(5);
+    public static final Duration XS = Duration.ofSeconds(1);
     public static final Duration S = Duration.ofSeconds(30);
     public static final Duration M = Duration.ofMinutes(5);
     public static final Duration L = Duration.ofMinutes(20);

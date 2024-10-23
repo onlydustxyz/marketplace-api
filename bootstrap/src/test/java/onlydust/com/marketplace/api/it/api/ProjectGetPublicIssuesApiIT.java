@@ -280,11 +280,13 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "githubUserId": 43467246,
                                   "login": "AnthonyBuisset",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                  "isRegistered": true,
+                                  "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                                  "applicationId": "90ec1b4e-4447-4997-aa9c-f25bb53a25d7"
                                 }
                               ],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 1998815347,
@@ -331,21 +333,37 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "githubUserId": 43467246,
                                   "login": "AnthonyBuisset",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                  "isRegistered": true,
+                                  "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                                  "applicationId": "536532eb-ed7b-4461-884d-20e54ba9bec6"
+                                },
+                                {
+                                  "githubUserId": 43467246,
+                                  "login": "AnthonyBuisset",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                  "isRegistered": true,
+                                  "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                                  "applicationId": "bf6a909e-243d-4698-aa9f-5f40e3fb4826"
                                 },
                                 {
                                   "githubUserId": 16590657,
                                   "login": "PierreOucif",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                  "isRegistered": true,
+                                  "id": "fc92397c-3431-4a84-8054-845376b630a0",
+                                  "applicationId": "f3706f53-bd79-4991-8a76-7dd12aef81dd"
                                 },
                                 {
                                   "githubUserId": 595505,
                                   "login": "ofux",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                                  "isRegistered": true,
+                                  "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
+                                  "applicationId": "609231c0-b38c-4d5c-b21d-6307595f520f"
                                 }
                               ],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             }
                           ]
                         }
@@ -442,40 +460,39 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               ],
                               "applicants": [
                                 {
-                                  "githubUserId": 43467246,
-                                  "login": "AnthonyBuisset",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
-                                },
-                                {
                                   "githubUserId": 16590657,
                                   "login": "PierreOucif",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                  "isRegistered": true,
+                                  "id": "fc92397c-3431-4a84-8054-845376b630a0",
+                                  "applicationId": "f3706f53-bd79-4991-8a76-7dd12aef81dd"
                                 },
                                 {
                                   "githubUserId": 595505,
                                   "login": "ofux",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
-                                }
-                              ],
-                              "assignees": [],
-                              "currentUserApplication": {
-                                "id": "bf6a909e-243d-4698-aa9f-5f40e3fb4826",
-                                "applicant": {
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                                  "isRegistered": true,
+                                  "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
+                                  "applicationId": "609231c0-b38c-4d5c-b21d-6307595f520f"
+                                },
+                                {
                                   "githubUserId": 43467246,
                                   "login": "AnthonyBuisset",
                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                   "isRegistered": true,
-                                  "id": null
+                                  "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                                  "applicationId": "bf6a909e-243d-4698-aa9f-5f40e3fb4826"
                                 },
-                                "project": {
-                                  "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
-                                  "slug": "calcom",
-                                  "name": "Cal.com",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
-                                },
-                                "motivations": "I could do it",
-                                "problemSolvingApproach": "No idea yet ¯\\\\_(ツ)_/¯"
-                              }
+                                {
+                                  "githubUserId": 43467246,
+                                  "login": "AnthonyBuisset",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                  "isRegistered": true,
+                                  "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                                  "applicationId": "536532eb-ed7b-4461-884d-20e54ba9bec6"
+                                }
+                              ],
+                              "assignees": []
                             },
                             {
                               "id": 2012872003,
@@ -530,28 +547,13 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "githubUserId": 43467246,
                                   "login": "AnthonyBuisset",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
-                                }
-                              ],
-                              "assignees": [],
-                              "currentUserApplication": {
-                                "id": "90ec1b4e-4447-4997-aa9c-f25bb53a25d7",
-                                "applicant": {
-                                  "githubUserId": 43467246,
-                                  "login": "AnthonyBuisset",
                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                   "isRegistered": true,
-                                  "id": null
-                                },
-                                "project": {
-                                  "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
-                                  "slug": "calcom",
-                                  "name": "Cal.com",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
-                                },
-                                "motivations": "I could do it",
-                                "problemSolvingApproach": null
-                              }
+                                  "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                                  "applicationId": "90ec1b4e-4447-4997-aa9c-f25bb53a25d7"
+                                }
+                              ],
+                              "assignees": []
                             }
                           ]
                         }
@@ -785,8 +787,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 1892847006,
@@ -826,8 +827,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 1898017205,
@@ -867,8 +867,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 1917712505,
@@ -926,8 +925,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "login": "Udit-takkar",
                                   "avatarUrl": "https://avatars.githubusercontent.com/u/53316345?v=4"
                                 }
-                              ],
-                              "currentUserApplication": null
+                              ]
                             },
                             {
                               "id": 1979376167,
@@ -967,8 +965,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             }
                           ]
                         }
@@ -1082,8 +1079,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 2022224998,
@@ -1115,8 +1111,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 2021483969,
@@ -1152,8 +1147,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 2019022252,
@@ -1201,8 +1195,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 2017770882,
@@ -1248,8 +1241,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "login": "Udit-takkar",
                                   "avatarUrl": "https://avatars.githubusercontent.com/u/53316345?v=4"
                                 }
-                              ],
-                              "currentUserApplication": null
+                              ]
                             }
                           ]
                         }
@@ -1348,8 +1340,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 1967171318,
@@ -1393,8 +1384,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 1981399962,
@@ -1452,8 +1442,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "login": "ciaranha",
                                   "avatarUrl": "https://avatars.githubusercontent.com/u/4536123?v=4"
                                 }
-                              ],
-                              "currentUserApplication": null
+                              ]
                             },
                             {
                               "id": 1963778975,
@@ -1497,8 +1486,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 2000525280,
@@ -1538,8 +1526,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             }
                           ]
                         }
@@ -1638,8 +1625,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "login": "Udit-takkar",
                                   "avatarUrl": "https://avatars.githubusercontent.com/u/53316345?v=4"
                                 }
-                              ],
-                              "currentUserApplication": null
+                              ]
                             }
                           ]
                         }
@@ -1767,8 +1753,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 1270661065,
@@ -1824,8 +1809,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 1262933369,
@@ -1885,8 +1869,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 1243347024,
@@ -1938,8 +1921,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             }
                           ]
                         }
@@ -2022,8 +2004,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 1270661065,
@@ -2079,8 +2060,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 1262933369,
@@ -2140,8 +2120,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             },
                             {
                               "id": 1243347024,
@@ -2193,8 +2172,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "assignees": [],
-                              "currentUserApplication": null
+                              "assignees": []
                             }
                           ]
                         }
@@ -2288,8 +2266,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "body": "Real cool documentation",
                                   "labels": [],
                                   "applicants": [],
-                                  "assignees": [],
-                                  "currentUserApplication": null
+                                  "assignees": []
                                 },
                                 {
                                   "id": 1643866301,
@@ -2316,8 +2293,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "body": "Real cool documentation",
                                   "labels": [],
                                   "applicants": [],
-                                  "assignees": [],
-                                  "currentUserApplication": null
+                                  "assignees": []
                                 },
                                 {
                                   "id": 1643867196,
@@ -2350,8 +2326,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                       "login": "AnthonyBuisset",
                                       "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
                                     }
-                                  ],
-                                  "currentUserApplication": null
+                                  ]
                                 }
                               ]
                             }

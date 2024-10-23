@@ -8067,14 +8067,22 @@ components:
               type: array
               description: The list of applicants for this issue
               items:
-                $ref: '#/components/schemas/GithubUserResponse'
+                $ref: '#/components/schemas/ApplicationLinkResponse'
             assignees:
               type: array
               description: The list of assignees for this issue
               items:
                 $ref: '#/components/schemas/GithubUserResponse'
-            currentUserApplication:
-              $ref: '#/components/schemas/ProjectApplicationShortResponse'
+
+    ApplicationLinkResponse:
+      allOf:
+        - $ref: '#/components/schemas/ContributorResponse'
+        - type: object
+          required:
+            - applicationId
+          properties:
+            applicationId:
+              $ref: '#/components/schemas/ProjectApplicationId'
 
     GithubLabel:
       type: object
