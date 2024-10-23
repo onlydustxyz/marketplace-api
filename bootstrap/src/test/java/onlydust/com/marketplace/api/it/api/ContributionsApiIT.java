@@ -328,6 +328,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     void should_sort_contributions(String sort, String direction) {
         var comparator = switch (sort) {
             case "CREATED_AT" -> comparing(ContributionActivityPageItemResponse::getCreatedAt);
+            case "UPDATED_AT" -> comparing(ContributionActivityPageItemResponse::getLastUpdatedAt);
             case "TYPE" -> comparing(ContributionActivityPageItemResponse::getType);
             default -> throw new IllegalArgumentException("Invalid sort field: " + sort);
         };

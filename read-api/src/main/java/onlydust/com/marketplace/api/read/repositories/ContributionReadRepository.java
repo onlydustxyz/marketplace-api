@@ -95,6 +95,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
     static String getSortProperty(ContributionsSortEnum sort) {
         return sort == null ? "created_at" : switch (sort) {
             case CREATED_AT -> "created_at";
+            case UPDATED_AT -> "updated_at";
             case TYPE -> "contribution_type";
         };
     }

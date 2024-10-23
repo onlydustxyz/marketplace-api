@@ -12051,6 +12051,7 @@ components:
       type: string
       enum:
         - CREATED_AT
+        - UPDATED_AT
         - TYPE
 
     ContributionsQueryParams:
