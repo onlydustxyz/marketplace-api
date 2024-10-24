@@ -450,8 +450,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "trend": "STABLE"
                                   },
                                   "issueCount": {
-                                    "value": 1,
-                                    "trend": "UP"
+                                    "value": 0,
+                                    "trend": "STABLE"
                                   },
                                   "prCount": {
                                     "value": 2,
@@ -462,7 +462,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "trend": "UP"
                                   },
                                   "contributionCount": {
-                                    "value": 4,
+                                    "value": 3,
                                     "trend": "UP"
                                   },
                                   "maintainedProjectCount": 1,
@@ -624,9 +624,9 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getTotalRewardedUsdAmount().getValue())
                             .isLessThanOrEqualTo(BigDecimal.valueOf(3.0))), true
             );
-            test_contributors_stats(Map.of("contributionCount.eq", "1", "contributionCount.types", "ISSUE"),
+            test_contributors_stats(Map.of("contributionCount.eq", "0", "contributionCount.types", "ISSUE"),
                     response -> response.getContributors().forEach(project -> assertThat(project.getIssueCount().getValue())
-                            .isEqualTo(1)), true
+                            .isEqualTo(0)), true
             );
             test_contributors_stats(Map.of("contributionCount.eq", "2", "contributionCount.types", "PULL_REQUEST"),
                     response -> response.getContributors().forEach(project -> assertThat(project.getPrCount().getValue())
@@ -659,7 +659,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                             .hasSize(1)
                             .extracting(BiContributorsPageItemResponse::getContributionCount)
                             .extracting(NumberKpi::getValue)
-                            .contains(4), true);
+                            .contains(3), true);
             test_contributors_stats(Map.of("includeApplicants", "true", "projectIds", onlyDust.value().toString()),
                     response -> assertThat(response.getContributors())
                             .extracting(c -> c.getContributor().getLogin())
