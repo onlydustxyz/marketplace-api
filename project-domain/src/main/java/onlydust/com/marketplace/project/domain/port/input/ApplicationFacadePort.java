@@ -11,8 +11,7 @@ public interface ApplicationFacadePort {
     Application applyOnProject(@NonNull Long githubUserId,
                                @NonNull ProjectId projectId,
                                @NonNull GithubIssue.Id issueId,
-                               @NonNull String motivation,
-                               String problemSolvingApproach);
+                               @NonNull String githubComment);
 
     void updateApplication(@NonNull UserId userId,
                            @NonNull Application.Id applicationId,

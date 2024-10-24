@@ -34,7 +34,6 @@ public class ApplicationServiceTest {
     private final GithubApiPort githubApiPort = mock(GithubApiPort.class);
     private final GithubAuthenticationPort githubAuthenticationPort = mock(GithubAuthenticationPort.class);
     private final GithubAppService githubAppService = mock(GithubAppService.class);
-    private final GlobalConfig globalConfig = new GlobalConfig().setAppBaseUrl("https://local-app.onlydust.xyz");
 
     private final ApplicationService applicationService = new ApplicationService(
             userStoragePort,
@@ -45,8 +44,7 @@ public class ApplicationServiceTest {
             githubStoragePort,
             githubApiPort,
             githubAuthenticationPort,
-            githubAppService,
-            globalConfig);
+            githubAppService);
 
     final Long githubUserId = faker.number().randomNumber(10, true);
     final UserId userId = UserId.random();
@@ -59,8 +57,7 @@ public class ApplicationServiceTest {
             faker.rickAndMorty().character(),
             0, faker.pokemon().name(), faker.pokemon().name(), List.of());
     final GithubComment.Id commentId = GithubComment.Id.random();
-    final String motivation = faker.lorem().sentence();
-    final String problemSolvingApproach = faker.lorem().sentence();
+    final String githubComment = faker.lorem().sentence();
     final String personalAccessToken = faker.internet().password();
     final ProjectId projectId = ProjectId.random();
     final Project project = Project.builder()
@@ -87,7 +84,7 @@ public class ApplicationServiceTest {
         when(githubUserPermissionsService.isUserAuthorizedToApplyOnProject(githubUserId)).thenReturn(false);
 
         // When
-        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
+        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), githubComment))
                 // Then
                 .isInstanceOf(OnlyDustException.class).hasMessage("User is not authorized to apply on project");
     }
@@ -98,7 +95,7 @@ public class ApplicationServiceTest {
         when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.empty());
 
         // When
-        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
+        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), githubComment))
                 // Then
                 .isInstanceOf(OnlyDustException.class).hasMessage("Issue %s not found".formatted(issue.id()));
     }
@@ -116,7 +113,7 @@ public class ApplicationServiceTest {
                 1, faker.pokemon().name(), faker.pokemon().name(), List.of())));
 
         // When
-        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
+        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), githubComment))
                 // Then
                 .isInstanceOf(OnlyDustException.class).hasMessage("Issue %s is already assigned".formatted(issue.id()));
     }
@@ -125,11 +122,11 @@ public class ApplicationServiceTest {
     void should_reject_duplicate_applications() {
         // Given
         final var application = new Application(Application.Id.random(), projectId, githubUserId, Application.Origin.MARKETPLACE, ZonedDateTime.now(),
-                issue.id(), commentId, motivation, problemSolvingApproach);
+                issue.id(), commentId, githubComment);
         when(projectApplicationStoragePort.findApplication(githubUserId, projectId, issue.id())).thenReturn(Optional.of(application));
 
         // When
-        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
+        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), githubComment))
                 // Then
                 .isInstanceOf(OnlyDustException.class).hasMessage("User already applied to this issue");
     }
@@ -140,7 +137,7 @@ public class ApplicationServiceTest {
         when(projectStoragePort.getById(projectId)).thenReturn(Optional.empty());
 
         // When
-        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
+        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), githubComment))
                 // Then
                 .isInstanceOf(OnlyDustException.class).hasMessage("Project %s not found".formatted(projectId));
     }
@@ -151,7 +148,7 @@ public class ApplicationServiceTest {
         when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(Set.of(faker.number().randomNumber()));
 
         // When
-        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
+        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), githubComment))
                 // Then
                 .isInstanceOf(OnlyDustException.class).hasMessage("Issue %s does not belong to project %s".formatted(issue.id(), projectId));
     }
@@ -162,7 +159,7 @@ public class ApplicationServiceTest {
         when(githubApiPort.createComment(eq(personalAccessToken), eq(issue), any())).thenReturn(commentId);
 
         // When
-        final var application = applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach);
+        final var application = applicationService.applyOnProject(githubUserId, projectId, issue.id(), githubComment);
 
         // Then
         assertThat(application.id()).isNotNull();
@@ -172,39 +169,11 @@ public class ApplicationServiceTest {
         assertThat(application.origin()).isEqualTo(Application.Origin.MARKETPLACE);
         assertThat(application.issueId()).isEqualTo(issue.id());
         assertThat(application.commentId()).isEqualTo(commentId);
-        assertThat(application.motivations()).isEqualTo(motivation);
-        assertThat(application.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
+        assertThat(application.commentBody()).isEqualTo(githubComment);
 
         verify(projectApplicationStoragePort).save(application);
         verify(applicationObserver).onApplicationCreated(application);
-        verify(githubApiPort).createComment(personalAccessToken, issue, """
-                I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.xyz/p/%s).
-                
-                ### My background and how it can be leveraged
-                %s
-                
-                ### How I plan on tackling this issue
-                %s
-                """.formatted(project.getSlug(), motivation, problemSolvingApproach));
-    }
-
-    @Test
-    void should_apply_on_project_without_problem_solving_approach() {
-        // Given
-        when(githubApiPort.createComment(eq(personalAccessToken), eq(issue), any())).thenReturn(commentId);
-
-        // When
-        final var application = applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, " ");
-
-        // Then
-        assertThat(application.problemSolvingApproach()).isEqualTo(" ");
-
-        verify(githubApiPort).createComment(personalAccessToken, issue, """
-                I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.xyz/p/%s).
-                
-                ### My background and how it can be leveraged
-                %s
-                """.formatted(project.getSlug(), motivation));
+        verify(githubApiPort).createComment(personalAccessToken, issue, githubComment);
     }
 
     @Test
@@ -229,7 +198,6 @@ public class ApplicationServiceTest {
                 faker.number().randomNumber(),
                 issue.id(),
                 GithubComment.Id.random(),
-                faker.lorem().sentence(),
                 faker.lorem().sentence()
         );
 
@@ -251,7 +219,6 @@ public class ApplicationServiceTest {
                 githubUserId,
                 issue.id(),
                 GithubComment.Id.random(),
-                faker.lorem().sentence(),
                 faker.lorem().sentence()
         );
 
@@ -300,7 +267,6 @@ public class ApplicationServiceTest {
                 githubUserId,
                 issue.id(),
                 GithubComment.Id.random(),
-                faker.lorem().sentence(),
                 faker.lorem().sentence()
         );
 
@@ -324,7 +290,6 @@ public class ApplicationServiceTest {
                 faker.number().randomNumber(),
                 issue.id(),
                 GithubComment.Id.random(),
-                faker.lorem().sentence(),
                 faker.lorem().sentence()
         );
 
@@ -352,7 +317,6 @@ public class ApplicationServiceTest {
                 githubUserId,
                 issue.id(),
                 GithubComment.Id.random(),
-                faker.lorem().sentence(),
                 faker.lorem().sentence()
         );
 
@@ -435,7 +399,6 @@ public class ApplicationServiceTest {
                     githubUserId + 1,
                     issue.id(),
                     GithubComment.Id.random(),
-                    faker.lorem().sentence(),
                     faker.lorem().sentence()
             );
             when(projectApplicationStoragePort.findApplicationsOnIssueAndProject(application.issueId(), application.projectId()))
@@ -456,7 +419,6 @@ public class ApplicationServiceTest {
                 githubUserId,
                 issue.id(),
                 GithubComment.Id.random(),
-                faker.lorem().sentence(),
                 faker.lorem().sentence()
         );
 

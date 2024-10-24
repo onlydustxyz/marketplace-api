@@ -74,8 +74,7 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
                     a.receivedAt(),
                     GithubIssue.Id.of(a.issueId()),
                     GithubComment.Id.of(a.commentId()),
-                    a.motivations(),
-                    a.problemSolvingApproach()
+                    a.commentBody()
             )));
         });
     }

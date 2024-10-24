@@ -800,8 +800,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                             "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
                           },
                           "origin": "MARKETPLACE",
-                          "motivation": "ofux motivations on 2012380735/3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
-                          "problemSolvingApproach": null
+                          "githubComment": "ofux motivations on 2012380735/3c22af5d-2cf8-48a1-afa0-c3441df7fb3b"
                         }
                         """);
     }

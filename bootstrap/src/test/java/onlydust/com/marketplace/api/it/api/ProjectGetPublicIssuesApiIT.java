@@ -58,8 +58,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                         Application.Origin.MARKETPLACE,
                         1998815347L,
                         1111L,
-                        "I would like to work on this issue",
-                        "I would do this and that"),
+                        "I would like to work on this issue"),
                 new ApplicationEntity(
                         UUID.fromString("609231c0-b38c-4d5c-b21d-6307595f520f"),
                         ZonedDateTime.of(2023, 11, 7, 15, 26, 35, 0, ZoneOffset.UTC),
@@ -78,8 +77,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                         Application.Origin.MARKETPLACE,
                         1998815347L,
                         1113L,
-                        "I could do it",
-                        "No idea yet ¯\\_(ツ)_/¯"),
+                        "I could do it"),
                 new ApplicationEntity(
                         UUID.fromString("536532eb-ed7b-4461-884d-20e54ba9bec6"),
                         ZonedDateTime.of(2023, 11, 7, 20, 2, 11, 0, ZoneOffset.UTC),
@@ -111,8 +109,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                     a.receivedAt(),
                     GithubIssue.Id.of(a.issueId()),
                     GithubComment.Id.of(a.commentId()),
-                    a.motivations(),
-                    a.problemSolvingApproach()
+                    a.commentBody()
             )));
         });
 
@@ -2214,8 +2211,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                         a.receivedAt(),
                         GithubIssue.Id.of(a.issueId()),
                         GithubComment.Id.of(a.commentId()),
-                        a.motivations(),
-                        a.problemSolvingApproach()
+                        a.commentBody()
                 )));
             });
         }
