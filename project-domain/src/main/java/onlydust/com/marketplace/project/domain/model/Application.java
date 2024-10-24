@@ -32,6 +32,7 @@ public class Application {
     final GithubIssue.Id issueId;
     @NonNull
     final GithubComment.Id commentId;
+    @Setter
     @NonNull
     String commentBody;
     ZonedDateTime ignoredAt;

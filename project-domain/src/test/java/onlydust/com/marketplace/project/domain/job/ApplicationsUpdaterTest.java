@@ -248,6 +248,45 @@ class ApplicationsUpdaterTest {
         }
 
         @Test
+        void should_update_existing_application() {
+            // Given
+            final var existingApplications = List.of(
+                    new Application(Application.Id.random(),
+                            projectId1,
+                            event.authorId(),
+                            Application.Origin.MARKETPLACE,
+                            faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
+                            issue.id(),
+                            GithubComment.Id.of(event.id()),
+                            faker.lorem().sentence()),
+                    new Application(Application.Id.random(),
+                            projectId2,
+                            event.authorId(),
+                            Application.Origin.GITHUB,
+                            faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
+                            issue.id(),
+                            GithubComment.Id.of(event.id()),
+                            faker.lorem().sentence(),
+                            null)
+            );
+
+            when(projectApplicationStoragePort.findApplications(GithubComment.Id.of(event.id()))).thenReturn(existingApplications);
+
+            // When
+            applicationsUpdater.process(event);
+
+            // Then
+            final var applicationsCaptor = ArgumentCaptor.forClass(Application[].class);
+            verify(projectApplicationStoragePort).save(applicationsCaptor.capture());
+            final var applications = applicationsCaptor.getValue();
+            assertThat(applications).hasSize(2);
+
+            assertThat(Arrays.stream(applications)).extracting(Application::projectId).containsExactlyInAnyOrder(projectId1, projectId2);
+            assertThat(applications).allMatch(application -> application.commentId().value().equals(event.id()));
+            assertThat(applications).allMatch(application -> application.commentBody().equals(event.body()));
+        }
+
+        @Test
         void should_not_call_llm_if_not_needed() {
             // Given
             final var existingApplications = List.of(

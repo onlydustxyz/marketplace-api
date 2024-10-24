@@ -57,6 +57,7 @@ public class ApplicationsUpdater implements OutboxConsumer {
     private void process(OnGithubCommentEdited event) {
         final var comment = GithubComment.of(event);
         deleteObsoleteGithubApplications(comment.id(), Optional.of(comment.body()));
+        updateExistingApplications(comment);
         createMissingApplications(comment);
     }
 
@@ -73,6 +74,12 @@ public class ApplicationsUpdater implements OutboxConsumer {
     private void process(OnGithubIssueTransferred event) {
         final var issueId = GithubIssue.Id.of(event.id());
         projectApplicationStoragePort.deleteApplicationsByIssueId(issueId);
+    }
+
+    private void updateExistingApplications(GithubComment comment) {
+        final var applications = projectApplicationStoragePort.findApplications(comment.id());
+        applications.forEach(a -> a.commentBody(comment.body()));
+        projectApplicationStoragePort.save(applications.toArray(Application[]::new));
     }
 
     private void createMissingApplications(GithubComment comment) {
