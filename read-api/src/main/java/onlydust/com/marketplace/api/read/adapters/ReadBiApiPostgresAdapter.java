@@ -81,6 +81,8 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     public ResponseEntity<BiContributorsPageItemResponse> getBIContributor(Long contributorId) {
         final var page = contributorKpisReadRepository.findAll(new BiContributorsQueryParams()
                 .contributorIds(List.of(contributorId))
+                .contributionStatuses(null)
+                .includeApplicants(true)
                 .pageIndex(0).pageSize(1));
         return ok()
                 .cacheControl(cache.forEverybody(Cache.S))
