@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.it.bo;
 
 import com.github.javafaker.Faker;
-import jakarta.persistence.EntityManagerFactory;
 import onlydust.com.backoffice.api.contract.model.PayRewardRequest;
 import onlydust.com.backoffice.api.contract.model.PostBatchPaymentRequest;
 import onlydust.com.backoffice.api.contract.model.TransactionNetwork;
@@ -11,7 +10,6 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.helper.AccountingHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfileReadEntity;
@@ -49,8 +47,6 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
     @Autowired
     BillingProfileService billingProfileService;
     @Autowired
-    BillingProfileRepository billingProfileRepository;
-    @Autowired
     BillingProfileReadRepository billingProfileReadRepository;
     @Autowired
     AccountingHelper accountingHelper;
@@ -58,8 +54,6 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
     KycRepository kycRepository;
     @Autowired
     KybRepository kybRepository;
-    @Autowired
-    EntityManagerFactory entityManagerFactory;
     @Autowired
     BackofficeAccountingManagementRestApi backofficeAccountingManagementRestApi;
     UserAuthHelper.AuthenticatedBackofficeUser camille;
@@ -219,7 +213,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
 
     @Test
     @Order(2)
-    void should_create_batch_payments_given_list_of_invoice_ids() throws IOException {
+    void should_create_batch_payments_given_list_of_invoice_ids() {
         // When
         final var network1 = new MutableObject<String>();
         final var batchPaymentId1 = new MutableObject<String>();

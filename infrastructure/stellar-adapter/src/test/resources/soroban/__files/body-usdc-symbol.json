@@ -1,0 +1,22 @@
+{
+    "jsonrpc": "2.0",
+    "result": {
+        "transactionData": "AAAAAAAAAAEAAAAGAAAAAa3vzlmu5Slo92Bh1JTCUlt1ZZ+kKWpl9JnvKeVkd+SWAAAAFAAAAAEAAAAAAAJyMwAAAdwAAAAAAAAAAAAA2zM=",
+        "minResourceFee": "56115",
+        "events": [
+            "AAAAAQAAAAAAAAAAAAAAAgAAAAAAAAADAAAADwAAAAdmbl9jYWxsAAAAAA0AAAAgre/OWa7lKWj3YGHUlMJSW3Vln6QpamX0me8p5WR35JYAAAAPAAAABnN5bWJvbAAAAAAAAQ==",
+            "AAAAAQAAAAAAAAABre/OWa7lKWj3YGHUlMJSW3Vln6QpamX0me8p5WR35JYAAAACAAAAAAAAAAIAAAAPAAAACWZuX3JldHVybgAAAAAAAA8AAAAGc3ltYm9sAAAAAAAOAAAABFVTREM="
+        ],
+        "results": [
+            {
+                "auth": [],
+                "xdr": "AAAADgAAAARVU0RD"
+            }
+        ],
+        "cost": {
+            "cpuInsns": "110307",
+            "memBytes": "32371"
+        },
+        "latestLedger": 52923809
+    }
+}
