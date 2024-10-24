@@ -225,7 +225,6 @@ public class ProjectConfiguration {
     public OutboxConsumer applicationsUpdater(final ProjectStoragePort projectStoragePort,
                                               final ProjectApplicationStoragePort projectApplicationStoragePort,
                                               final IndexerPort indexerPort,
-                                              final GithubStoragePort githubStoragePort,
                                               final ApplicationObserverPort applicationObservers,
                                               final LangchainLLMAdapter langchainLLMAdapter) {
         return new SkippedOnFailureOutboxConsumer(new RetriedOutboxConsumer(
@@ -233,7 +232,6 @@ public class ProjectConfiguration {
                         projectApplicationStoragePort,
                         langchainLLMAdapter,
                         indexerPort,
-                        githubStoragePort,
                         applicationObservers)));
     }
 
