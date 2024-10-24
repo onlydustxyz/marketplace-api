@@ -78,8 +78,10 @@ public class ApplicationsUpdater implements OutboxConsumer {
 
     private void updateExistingApplications(GithubComment comment) {
         final var applications = projectApplicationStoragePort.findApplications(comment.id());
-        applications.forEach(a -> a.commentBody(comment.body()));
-        projectApplicationStoragePort.save(applications.toArray(Application[]::new));
+        if (!applications.isEmpty()) {
+            applications.forEach(a -> a.commentBody(comment.body()));
+            projectApplicationStoragePort.save(applications.toArray(Application[]::new));
+        }
     }
 
     private void createMissingApplications(GithubComment comment) {

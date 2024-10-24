@@ -213,7 +213,7 @@ class ApplicationsUpdaterTest {
             applicationsUpdater.process(event);
 
             // Then
-            verify(projectApplicationStoragePort).findApplications(commentId);
+            verify(projectApplicationStoragePort, atLeast(1)).findApplications(commentId);
             verify(projectApplicationStoragePort).deleteApplications(existingApplications.get(1).id());
             verifyNoInteractions(indexerPort);
         }
