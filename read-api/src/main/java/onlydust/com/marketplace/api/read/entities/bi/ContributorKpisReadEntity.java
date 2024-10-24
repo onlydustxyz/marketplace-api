@@ -47,6 +47,8 @@ public class ContributorKpisReadEntity {
     List<EcosystemLinkResponse> ecosystems;
     @JdbcTypeCode(SqlTypes.JSON)
     List<ProjectContributorLabelResponse> projectContributorLabels;
+    @JdbcTypeCode(SqlTypes.JSON)
+    List<ProjectLinkResponse> maintainedProjects;
     String contributorCountry;
 
     BigDecimal totalRewardedUsdAmount;
@@ -55,6 +57,8 @@ public class ContributorKpisReadEntity {
     Integer issueCount;
     Integer prCount;
     Integer codeReviewCount;
+    Integer inProgressIssueCount;
+    Integer pendingApplicationCount;
 
     BigDecimal previousPeriodTotalRewardedUsdAmount;
     Integer previousPeriodRewardCount;
@@ -62,6 +66,8 @@ public class ContributorKpisReadEntity {
     Integer previousPeriodIssueCount;
     Integer previousPeriodPrCount;
     Integer previousPeriodCodeReviewCount;
+    Integer previousPeriodInProgressIssueCount;
+    Integer previousPeriodPendingApplicationCount;
 
     private static DecimalNumberKpi toDecimalNumberKpi(BigDecimal value, BigDecimal valueOfPreviousPeriod) {
         return new DecimalNumberKpi().value(value)
@@ -102,6 +108,9 @@ public class ContributorKpisReadEntity {
                 .issueCount(toNumberKpi(issueCount, previousPeriodIssueCount))
                 .prCount(toNumberKpi(prCount, previousPeriodPrCount))
                 .codeReviewCount(toNumberKpi(codeReviewCount, previousPeriodCodeReviewCount))
+                .inProgressIssueCount(inProgressIssueCount)
+                .pendingApplicationCount(pendingApplicationCount)
+                .maintainedProjectCount(maintainedProjects == null ? 0 : maintainedProjects.size())
                 ;
     }
 
@@ -142,6 +151,9 @@ public class ContributorKpisReadEntity {
                 .issueCount(toNumberKpi(issueCount, previousPeriodIssueCount))
                 .prCount(toNumberKpi(prCount, previousPeriodPrCount))
                 .codeReviewCount(toNumberKpi(codeReviewCount, previousPeriodCodeReviewCount))
+                .inProgressIssueCount(inProgressIssueCount)
+                .pendingApplicationCount(pendingApplicationCount)
+                .maintainedProjectCount(maintainedProjects == null ? 0 : maintainedProjects.size())
                 ;
     }
 }
