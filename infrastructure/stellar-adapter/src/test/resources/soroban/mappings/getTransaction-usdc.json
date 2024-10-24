@@ -1,0 +1,23 @@
+{
+    "request": {
+        "url": "/",
+        "method": "POST",
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "jsonrpc": "2.0",
+                    "method": "getTransaction",
+                    "params": {
+                        "hash": "97157d6c947af69ea379edee2883562cb4b18a7882d366d368b595d899d82835"
+                    }
+                },
+                "ignoreArrayOrder": true,
+                "ignoreExtraElements": true
+            }
+        ]
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-getTransaction-usdc.json"
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "request": {
+        "url": "/assets?asset_issuer=GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN&asset_code=USDC&limit=1",
+        "method": "GET"
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-assets-usdc.json"
+    }
+}
