@@ -12,13 +12,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -207,104 +205,6 @@ public class ApplicationServiceTest {
                 ### My background and how it can be leveraged
                 %s
                 """.formatted(project.getSlug(), motivation));
-    }
-
-    @Test
-    void should_prevent_update_of_non_existing_application() {
-        // Given
-        final var applicationId = Application.Id.random();
-
-        when(projectApplicationStoragePort.findApplication(applicationId)).thenReturn(Optional.empty());
-
-        // When
-        assertThatThrownBy(() -> applicationService.updateApplication(applicationId, githubUserId, faker.lorem().sentence(), faker.lorem().sentence()))
-                // Then
-                .isInstanceOf(OnlyDustException.class).hasMessage("Application %s not found".formatted(applicationId));
-    }
-
-    @Test
-    void should_prevent_update_of_another_contributor_application() {
-        // Given
-        final var application = Application.fromMarketplace(
-                projectId,
-                faker.number().randomNumber(),
-                issue.id(),
-                GithubComment.Id.random(),
-                faker.lorem().sentence(),
-                faker.lorem().sentence()
-        );
-
-        when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
-
-        // When
-        final var newMotivation = faker.lorem().sentence();
-        final var newProblemSolvingApproach = faker.lorem().sentence();
-        assertThatThrownBy(() -> applicationService.updateApplication(application.id(), githubUserId, newMotivation, newProblemSolvingApproach))
-                // Then
-                .isInstanceOf(OnlyDustException.class).hasMessage("User is not authorized to update this application");
-    }
-
-    @Test
-    void should_prevent_application_update_if_no_github_permissions() {
-        // Given
-        final var application = Application.fromGithubComment(
-                new GithubComment(GithubComment.Id.random(), issue.id(),
-                        faker.number().randomNumber(),
-                        githubUserId,
-                        faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
-                        faker.lorem().sentence()),
-                projectId
-        );
-
-        when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
-        when(githubUserPermissionsService.isUserAuthorizedToApplyOnProject(githubUserId)).thenReturn(false);
-
-        // When
-        assertThatThrownBy(() -> applicationService.updateApplication(application.id(), githubUserId, motivation, problemSolvingApproach))
-                // Then
-                .isInstanceOf(OnlyDustException.class)
-                .hasMessage("User is not authorized to update this application");
-    }
-
-    @Test
-    void should_update_application() {
-        // Given
-        final var application = Application.fromGithubComment(
-                new GithubComment(commentId,
-                        issue.id(),
-                        faker.number().randomNumber(),
-                        githubUserId,
-                        faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
-                        faker.lorem().sentence()),
-                projectId
-        );
-
-        when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
-
-        // When
-        final var motivations = faker.lorem().sentence();
-        final var problemSolvingApproach = faker.lorem().sentence();
-        final var updatedApplication = applicationService.updateApplication(application.id(), githubUserId, motivations, problemSolvingApproach);
-
-        // Then
-        assertThat(updatedApplication.id()).isEqualTo(application.id());
-        assertThat(updatedApplication.projectId()).isEqualTo(application.projectId());
-        assertThat(updatedApplication.applicantId()).isEqualTo(application.applicantId());
-        assertThat(updatedApplication.appliedAt()).isEqualTo(application.appliedAt());
-        assertThat(updatedApplication.origin()).isEqualTo(Application.Origin.MARKETPLACE);
-        assertThat(updatedApplication.motivations()).isEqualTo(motivations);
-        assertThat(updatedApplication.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
-        verify(projectApplicationStoragePort).save(updatedApplication);
-
-        verify(githubApiPort).updateComment(personalAccessToken, issue.repoId(), commentId, """
-                I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.xyz/p/%s).
-                
-                ### My background and how it can be leveraged
-                %s
-                
-                ### How I plan on tackling this issue
-                %s
-                """.formatted(project.getSlug(), updatedApplication.motivations(), updatedApplication.problemSolvingApproach()));
     }
 
     @Test

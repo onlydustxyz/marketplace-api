@@ -1041,36 +1041,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/me/applications/{applicationId}:
-    put:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Me
-      summary: Update project application
-      operationId: updateProjectApplication
-      description: |
-        Update application. Only the applicant can update its application.
-      parameters:
-        - in: path
-          name: applicationId
-          required: true
-          schema:
-            $ref: '#/components/schemas/ProjectApplicationId'
-      requestBody:
-        description: 'Application'
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProjectApplicationUpdateRequest'
-      responses:
-        "204":
-          description: 'The application was updated successfully.'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
   /api/v1/me/rewards/{rewardId}:
     get:
       security:
@@ -8608,18 +8578,6 @@ components:
           $ref: '#/components/schemas/ProjectId'
         issueId:
           $ref: '#/components/schemas/IssueId'
-        motivation:
-          type: string
-          description: The applicant's motivation to work on the issue
-        problemSolvingApproach:
-          type: string
-          description: The applicant's approach to solving the issue
-
-    ProjectApplicationUpdateRequest:
-      type: object
-      required:
-        - motivation
-      properties:
         motivation:
           type: string
           description: The applicant's motivation to work on the issue

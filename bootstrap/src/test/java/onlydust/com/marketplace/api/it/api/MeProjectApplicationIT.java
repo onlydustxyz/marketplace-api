@@ -4,7 +4,6 @@ import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import onlydust.com.marketplace.api.contract.model.ContributionsQueryParams;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateRequest;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateResponse;
-import onlydust.com.marketplace.api.contract.model.ProjectApplicationUpdateRequest;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndexingEventRepository;
@@ -201,62 +200,6 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .isBadRequest();
-    }
-
-    @Test
-    void should_update_application() {
-        // Given
-        final var user = userAuthHelper.authenticateAntho();
-        final var applicationId = UUID.randomUUID();
-
-        applicationRepository.save(new ApplicationEntity(
-                applicationId,
-                ZonedDateTime.now(),
-                UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"),
-                user.user().getGithubUserId(),
-                Application.Origin.GITHUB,
-                1974137199L,
-                111L,
-                "My motivations",
-                null
-        ));
-
-        final var motivations = faker.lorem().paragraph();
-        final var problemSolvingApproach = faker.lorem().paragraph();
-
-        githubWireMockServer.stubFor(patch(urlEqualTo("/repositories/380954304/issues/comments/111"))
-                .withRequestBody(containing("https://local-app.onlydust.com/p/bretzel")
-                        .and(containing(motivations))
-                        .and(containing(problemSolvingApproach)))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withBody("""
-                                {
-                                    "id": 111
-                                }
-                                """)));
-
-        final var request = new ProjectApplicationUpdateRequest()
-                .motivation(motivations)
-                .problemSolvingApproach(problemSolvingApproach);
-
-        // When
-        client.put()
-                .uri(getApiURI(ME_APPLICATION.formatted(applicationId)))
-                .header("Authorization", BEARER_PREFIX + user.jwt())
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(request)
-                // Then
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-
-        final var application = applicationRepository.findById(applicationId).orElseThrow();
-        assertThat(application.origin()).isEqualTo(Application.Origin.MARKETPLACE);
-        assertThat(application.motivations()).isEqualTo(motivations);
-        assertThat(application.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
-
-        githubWireMockServer.verify(patchRequestedFor(urlEqualTo("/repositories/380954304/issues/comments/111")));
     }
 
     @Test

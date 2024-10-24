@@ -14,11 +14,6 @@ public interface ApplicationFacadePort {
                                @NonNull String motivation,
                                String problemSolvingApproach);
 
-    Application updateApplication(@NonNull Application.Id applicationId,
-                                  @NonNull Long githubUserId,
-                                  @NonNull String motivation,
-                                  String problemSolvingApproach);
-
     void updateApplication(@NonNull UserId userId,
                            @NonNull Application.Id applicationId,
                            Boolean isIgnored);
