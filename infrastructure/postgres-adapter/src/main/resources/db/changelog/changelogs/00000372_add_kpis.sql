@@ -62,22 +62,39 @@ create index bi_p_application_data_contributor_id_quarter_timestamp_idx_inv on b
 create index bi_p_application_data_contributor_id_year_timestamp_idx_inv on bi.p_application_data (year_timestamp, contributor_id);
 
 
+------------------------------------------------------------------------------------------------------------------------
+DROP FUNCTION bi.select_contributors(fromDate timestamptz,
+                                     toDate timestamptz,
+                                     dataSourceIds uuid[],
+                                     contributorIds bigint[],
+                                     contributedTo uuid[],
+                                     projectIds uuid[],
+                                     projectSlugs text[],
+                                     categoryIds uuid[],
+                                     languageIds uuid[],
+                                     ecosystemIds uuid[],
+                                     countryCodes text[],
+                                     contributionStatuses indexer_exp.contribution_status[],
+                                     searchQuery text,
+                                     filteredKpis boolean,
+                                     includeApplicants boolean);
 
-CREATE OR REPLACE FUNCTION bi.select_contributors(fromDate timestamptz,
-                                                  toDate timestamptz,
-                                                  dataSourceIds uuid[],
-                                                  contributorIds bigint[],
-                                                  contributedTo uuid[],
-                                                  projectIds uuid[],
-                                                  projectSlugs text[],
-                                                  categoryIds uuid[],
-                                                  languageIds uuid[],
-                                                  ecosystemIds uuid[],
-                                                  countryCodes text[],
-                                                  contributionStatuses indexer_exp.contribution_status[],
-                                                  searchQuery text,
-                                                  filteredKpis boolean,
-                                                  includeApplicants boolean)
+
+CREATE FUNCTION bi.select_contributors(fromDate timestamptz,
+                                       toDate timestamptz,
+                                       dataSourceIds uuid[],
+                                       contributorIds bigint[],
+                                       contributedTo uuid[],
+                                       projectIds uuid[],
+                                       projectSlugs text[],
+                                       categoryIds uuid[],
+                                       languageIds uuid[],
+                                       ecosystemIds uuid[],
+                                       countryCodes text[],
+                                       contributionStatuses indexer_exp.contribution_status[],
+                                       searchQuery text,
+                                       filteredKpis boolean,
+                                       includeApplicants boolean)
     RETURNS TABLE
             (
                 contributor_id            bigint,
@@ -94,7 +111,9 @@ CREATE OR REPLACE FUNCTION bi.select_contributors(fromDate timestamptz,
                 issue_count               bigint,
                 pr_count                  bigint,
                 code_review_count         bigint,
-                contribution_count        bigint
+                contribution_count        bigint,
+                in_progress_issue_count   bigint,
+                pending_application_count bigint
             )
     STABLE
     PARALLEL SAFE
@@ -114,16 +133,19 @@ SELECT c.contributor_id                  as contributor_id,
        sum(cd.issue_count)               as issue_count,
        sum(cd.pr_count)                  as pr_count,
        sum(cd.code_review_count)         as code_review_count,
-       sum(cd.contribution_count)        as contribution_count
+       sum(cd.contribution_count)        as contribution_count,
+       sum(cd.in_progress_issue_count)   as in_progress_issue_count,
+       sum(ad.pending_application_count) as pending_application_count
 FROM bi.p_contributor_global_data c
          JOIN bi.p_contributor_reward_data crd ON crd.contributor_id = c.contributor_id
          JOIN bi.p_contributor_application_data cad ON cad.contributor_id = c.contributor_id
 
          LEFT JOIN (select cd.contributor_id,
-                           count(cd.contribution_uuid)         as contribution_count,
-                           coalesce(sum(cd.is_issue), 0)       as issue_count,
-                           coalesce(sum(cd.is_pr), 0)          as pr_count,
-                           coalesce(sum(cd.is_code_review), 0) as code_review_count
+                           count(cd.contribution_uuid)                                                           as contribution_count,
+                           coalesce(sum(cd.is_issue), 0)                                                         as issue_count,
+                           coalesce(sum(cd.is_pr), 0)                                                            as pr_count,
+                           coalesce(sum(cd.is_code_review), 0)                                                   as code_review_count,
+                           coalesce(sum(cd.is_issue) filter ( where cd.contribution_status = 'IN_PROGRESS' ), 0) as in_progress_issue_count
                     from bi.p_per_contributor_contribution_data cd
                     where (fromDate is null or cd.timestamp >= fromDate)
                       and (toDate is null or cd.timestamp < toDate)
