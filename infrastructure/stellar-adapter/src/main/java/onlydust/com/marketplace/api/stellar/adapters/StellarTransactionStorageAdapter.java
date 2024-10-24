@@ -13,6 +13,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarTransferT
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.responses.sorobanrpc.GetTransactionResponse;
 import org.stellar.sdk.scval.Scv;
+import org.stellar.sdk.xdr.CreateAccountOp;
 import org.stellar.sdk.xdr.PaymentOp;
 import org.stellar.sdk.xdr.Transaction;
 import org.stellar.sdk.xdr.TransactionEnvelope;
@@ -53,11 +54,12 @@ public class StellarTransactionStorageAdapter implements BlockchainTransactionSt
 
         return Arrays.stream(tx.getOperations())
                 .flatMap(op -> switch (op.getBody().getDiscriminant()) {
+                    case CREATE_ACCOUNT -> Stream.of(from(reference, response, op.getBody().getCreateAccountOp(), tx));
                     case PAYMENT -> Stream.of(from(reference, response, op.getBody().getPaymentOp(), tx));
                     default -> Stream.empty();
                 })
                 .findFirst()
-                .orElseThrow(() -> badRequest("Transaction %s does not contain any payment operation".formatted(reference)));
+                .orElseThrow(() -> badRequest("Transaction %s does not contain any supported operation".formatted(reference)));
     }
 
     private @NonNull StellarTransferTransaction from(@NonNull StellarTransaction.Hash reference,
@@ -85,6 +87,25 @@ public class StellarTransactionStorageAdapter implements BlockchainTransactionSt
                 StellarAccountId.of(KeyPair.fromPublicKey(op.getDestination().getEd25519().getUint256()).getAccountId()),
                 BigDecimal.valueOf(op.getAmount().getInt64(), decimals.intValue()),
                 contractAddress
+        );
+    }
+
+    private @NonNull StellarTransferTransaction from(@NonNull StellarTransaction.Hash reference,
+                                                     @NonNull GetTransactionResponse response,
+                                                     @NonNull CreateAccountOp op,
+                                                     @NonNull Transaction tx) {
+        return new StellarTransferTransaction(
+                reference,
+                Instant.ofEpochSecond(response.getCreatedAt()).atZone(ZoneOffset.UTC),
+                switch (response.getStatus()) {
+                    case NOT_FOUND -> PENDING;
+                    case SUCCESS -> CONFIRMED;
+                    case FAILED -> FAILED;
+                },
+                StellarAccountId.of(KeyPair.fromPublicKey(tx.getSourceAccount().getEd25519().getUint256()).getAccountId()),
+                StellarAccountId.of(KeyPair.fromPublicKey(op.getDestination().getAccountID().getEd25519().getUint256()).getAccountId()),
+                BigDecimal.valueOf(op.getStartingBalance().getInt64(), 7),
+                null
         );
     }
 }

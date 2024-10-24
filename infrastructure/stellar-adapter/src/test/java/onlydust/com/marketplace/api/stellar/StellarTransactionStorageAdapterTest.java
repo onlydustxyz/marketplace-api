@@ -72,4 +72,20 @@ class StellarTransactionStorageAdapterTest {
         assertThat(transfer.contractAddress()).isEmpty();
         assertThat(transfer.amount()).isEqualByComparingTo(BigDecimal.valueOf(1.276));
     }
+
+    @Test
+    void should_create_transactions_from_account_creation_operation() {
+        final var transaction = adapter.get(Stellar.transactionHash("69e9fe804c4a2416aa3e041c5ed585bfc853a26c3226ff0f8da034b4091b71c2")).orElseThrow();
+        assertThat(transaction.timestamp()).isEqualTo(ZonedDateTime.parse("2024-10-24T08:53:53Z"));
+        assertThat(transaction.blockchain()).isEqualTo(Blockchain.STELLAR);
+        assertThat(transaction.reference()).isEqualTo("69e9fe804c4a2416aa3e041c5ed585bfc853a26c3226ff0f8da034b4091b71c2");
+        assertThat(transaction.status()).isEqualTo(Blockchain.Transaction.Status.CONFIRMED);
+
+        assertThat(transaction).isInstanceOf(StellarTransferTransaction.class);
+        final var transfer = (Blockchain.TransferTransaction) transaction;
+        assertThat(transfer.senderAddress()).isEqualTo("GCY2AHYGO4DBKMMNITVD7ZHYG5W2PEYFW7XOCJVUPI3GAOYNR5HVRN3O");
+        assertThat(transfer.recipientAddress()).isEqualTo("GAY2YYJRUHE2YEXVNTHGTS3W74RCAA5FH4X3L7ECM254YZATR5IOQLZB");
+        assertThat(transfer.contractAddress()).isEmpty();
+        assertThat(transfer.amount()).isEqualByComparingTo(BigDecimal.valueOf(5303.6883360));
+    }
 }
