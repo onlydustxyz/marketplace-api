@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.helper;
 import com.github.javafaker.Faker;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.GithubAccount;
@@ -14,6 +15,7 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class GithubHelper {
@@ -24,6 +26,8 @@ public class GithubHelper {
     ProjectHelper projectHelper;
     @Autowired
     DatabaseHelper databaseHelper;
+    @Autowired
+    PostgresBiProjectorAdapter postgresBiProjectorAdapter;
 
     public GithubAccount createAccount() {
         return createAccount(faker.random().nextLong());
@@ -101,6 +105,11 @@ public class GithubHelper {
     }
 
     public ContributionUUID createPullRequest(GithubRepo repo, UserAuthHelper.AuthenticatedUser contributor, List<String> mainFileExtensions) {
+        return createPullRequest(repo, CurrentDateProvider.now().plusDays(1), contributor, mainFileExtensions);
+    }
+
+    public ContributionUUID createPullRequest(GithubRepo repo, ZonedDateTime completedAt, UserAuthHelper.AuthenticatedUser contributor,
+                                              List<String> mainFileExtensions) {
         final var prId = faker.random().nextLong();
         final var contributionUuid = ContributionUUID.of(prId);
         final var prNumber = faker.random().nextInt(1000);
@@ -113,7 +122,7 @@ public class GithubHelper {
         parameters.put("repoId", repo.getId());
         parameters.put("contributorId", contributor.user().getGithubUserId());
         parameters.put("createdAt", CurrentDateProvider.now());
-        parameters.put("completedAt", CurrentDateProvider.now().plusDays(1));
+        parameters.put("completedAt", completedAt);
         parameters.put("githubNumber", prNumber);
         parameters.put("githubTitle", faker.lorem().sentence());
         parameters.put("githubHtmlUrl", "https://github.com/%s/%s/pull/%d".formatted(repo.getOwner(), repo.getName(), prNumber));
@@ -156,11 +165,11 @@ public class GithubHelper {
         return contributionUuid;
     }
 
-    public Long createIssue(GithubRepo repo, UserAuthHelper.AuthenticatedUser contributor) {
-        return createIssue(repo.getId(), CurrentDateProvider.now(), CurrentDateProvider.now().plusDays(1), "COMPLETED", contributor);
+    public Long createIssue(GithubRepo repo, UserAuthHelper.AuthenticatedUser author) {
+        return createIssue(repo.getId(), CurrentDateProvider.now(), CurrentDateProvider.now().plusDays(1), "COMPLETED", author);
     }
 
-    public Long createIssue(Long repoId, ZonedDateTime createdAt, ZonedDateTime closedAt, String status, UserAuthHelper.AuthenticatedUser contributor) {
+    public Long createIssue(Long repoId, ZonedDateTime createdAt, ZonedDateTime closedAt, String status, UserAuthHelper.AuthenticatedUser author) {
         final var parameters = new HashMap<String, Object>();
         parameters.put("repoId", repoId);
         parameters.put("number", faker.random().nextInt(10));
@@ -170,7 +179,7 @@ public class GithubHelper {
         parameters.put("commentsCount", faker.random().nextInt(10));
         parameters.put("createdAt", createdAt);
         parameters.put("closedAt", closedAt);
-        parameters.put("authorId", contributor.user().getGithubUserId());
+        parameters.put("authorId", author.user().getGithubUserId());
         parameters.put("htmlUrl", faker.internet().url());
 
         final Long nextIssueId = databaseHelper.<Long>executeReadQuery(
@@ -182,7 +191,7 @@ public class GithubHelper {
         );
         parameters.put("issueId", nextIssueId);
 
-        createAccount(contributor);
+        createAccount(author);
 
         databaseHelper.executeQuery(
                 """
@@ -212,6 +221,8 @@ public class GithubHelper {
                         """,
                 parameters
         );
+
+        createContributionFromIssue(nextIssueId, null);
 
         return nextIssueId;
     }
@@ -271,13 +282,13 @@ public class GithubHelper {
                         gpr.repo_id,
                         ga.id,
                         'PULL_REQUEST',
-                        'COMPLETED',
+                        case when gpr.status = 'OPEN' then cast('IN_PROGRESS' as indexer_exp.contribution_status) else 'COMPLETED' end,
                         gpr.id,
                         gpr.created_at,
                         gpr.updated_at,
                         gpr.closed_at,
                         gpr.number,
-                        'MERGED',
+                        gpr.status,
                         gpr.title,
                         gpr.html_url,
                         gpr.body,
@@ -305,6 +316,10 @@ public class GithubHelper {
         addGroupedContributionFromContribution(contributionId, contributorId);
         addRepoContributorFromPullRequest(prId, contributorId);
         addUserMainFileExtensionsFromPullRequest(prId, contributorId);
+
+        final UUID contributionUUID = databaseHelper.executeReadQuery("select contribution_uuid from indexer_exp.github_pull_requests where id = :prId",
+                Map.of("prId", prId));
+        postgresBiProjectorAdapter.onContributionsChanged(ContributionUUID.of(contributionUUID));
     }
 
     private void createContributionFromIssue(Long issueId, Long contributorId) {
@@ -316,13 +331,13 @@ public class GithubHelper {
                                 gi.repo_id,
                                 ga.id,
                                 'ISSUE',
-                                'COMPLETED',
+                                case when gi.status = 'OPEN' then cast('IN_PROGRESS' as indexer_exp.contribution_status) else 'COMPLETED' end,
                                 gi.id,
                                 gi.created_at,
                                 gi.updated_at,
                                 gi.closed_at,
                                 gi.number,
-                                'COMPLETED',
+                                gi.status,
                                 gi.title,
                                 gi.html_url,
                                 gi.body,
@@ -340,18 +355,24 @@ public class GithubHelper {
                                 'APPROVED',
                                 null
                         from indexer_exp.github_issues gi
-                        join indexer_exp.github_accounts ga on ga.id = :contributorId
+                        join indexer_exp.github_accounts ga on ga.id = gi.author_id
                         where gi.id = :issueId
                         on conflict do nothing;
                 """, Map.of("contributionId", contributionId,
-                "issueId", issueId,
-                "contributorId", contributorId));
+                "issueId", issueId));
 
         addGroupedContributionFromContribution(contributionId, contributorId);
         addRepoContributorFromIssue(issueId, contributorId);
+
+        final UUID contributionUUID = databaseHelper.executeReadQuery("select contribution_uuid from indexer_exp.github_issues where id = :issueId", Map.of(
+                "issueId", issueId));
+        postgresBiProjectorAdapter.onContributionsChanged(ContributionUUID.of(contributionUUID));
     }
 
     private void addRepoContributorFromIssue(Long issueId, Long contributorId) {
+        if (contributorId == null)
+            return;
+
         databaseHelper.executeQuery("""
                 insert into indexer_exp.repos_contributors(repo_id, contributor_id, completed_contribution_count, total_contribution_count)
                 select distinct repo_id, :contributorId, case when c.status = 'COMPLETED' THEN 1 ELSE 0 END, 1
@@ -499,10 +520,14 @@ public class GithubHelper {
                 FROM indexer_exp.contributions c
                 WHERE c.id = :contributionId
                 ON CONFLICT DO NOTHING;
-                
-                INSERT INTO indexer_exp.grouped_contribution_contributors (contribution_uuid, contributor_id)
-                VALUES ((select c.contribution_uuid from indexer_exp.contributions c where c.id = :contributionId), :contributorId)
-                ON CONFLICT DO NOTHING;
-                """, Map.of("contributionId", contributionId, "contributorId", contributorId));
+                """, Map.of("contributionId", contributionId));
+
+        if (contributorId != null) {
+            databaseHelper.executeQuery("""
+                    INSERT INTO indexer_exp.grouped_contribution_contributors (contribution_uuid, contributor_id)
+                    VALUES ((select c.contribution_uuid from indexer_exp.contributions c where c.id = :contributionId), :contributorId)
+                    ON CONFLICT DO NOTHING;
+                    """, Map.of("contributionId", contributionId, "contributorId", contributorId));
+        }
     }
 }

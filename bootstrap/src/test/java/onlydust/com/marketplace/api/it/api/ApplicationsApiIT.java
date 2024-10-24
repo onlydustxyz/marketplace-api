@@ -823,7 +823,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_list_applications() {
         client.get()
-                .uri(getApiURI(ISSUES_BY_ID_APPLICANTS.formatted("4b06fec5-1219-3680-bb2e-0bf9c10acdc2")))
+                .uri(getApiURI(ISSUES_BY_ID_APPLICANTS.formatted("4b06fec5-1219-3680-bb2e-0bf9c10acdc2"), Map.of("contributionStatuses", "COMPLETED")))
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()

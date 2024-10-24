@@ -611,3 +611,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000371_include_applicants.sql
   - include:
       file: db/changelog/changelogs/00000372_update_applications.sql
+  - include:
+      file: db/changelog/changelogs/00000372_add_kpis.sql

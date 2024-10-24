@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.it.api.bi;
 
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Country;
+import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
@@ -139,9 +140,15 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
 
 
             at("2021-01-01T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho, List.of("java")));
-            final var issueId = at("2021-01-01T00:00:03Z", () -> githubHelper.createIssue(marketplace_frontend, mehdi));
-            applicationHelper.create(onlyDust, GithubIssue.Id.of(issueId), james.githubUserId());
-            githubHelper.assignIssueToContributor(issueId, mehdi.user().getGithubUserId());
+
+            final var issueId1 = at("2021-01-01T00:00:03Z", () -> githubHelper.createIssue(marketplace_frontend, mehdi));
+            at("2021-01-01T02:00:03Z", () -> applicationHelper.create(onlyDust, GithubIssue.Id.of(issueId1), james.githubUserId()));
+
+            final var issueId2 = at("2021-01-01T00:00:04Z", () -> githubHelper.createIssue(marketplace_frontend.getId(), CurrentDateProvider.now(),
+                    null, "OPEN", mehdi));
+            at("2021-01-01T02:00:04Z", () -> applicationHelper.create(onlyDust, GithubIssue.Id.of(issueId2), james.githubUserId())); // SHELVED
+            githubHelper.assignIssueToContributor(issueId2, mehdi.user().getGithubUserId());
+
             at("2021-01-01T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi, List.of("ts")));
             at("2021-01-01T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden, List.of("ts")));
             at("2021-01-01T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma, List.of("cairo")));
@@ -155,7 +162,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             at("2021-01-06T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
             at("2021-01-07T00:00:09Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
 
-            at("2021-02-01T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho));
+            at("2021-02-01T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, null, antho, null));
             at("2021-02-02T00:00:02Z", () -> githubHelper.createPullRequest(marketplace_api, pierre));
             at("2021-02-03T00:00:03Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
             at("2021-02-05T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
@@ -184,7 +191,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .uri(getApiURI(BI_CONTRIBUTORS, Map.of("pageIndex", "0",
                             "pageSize", "100",
                             "fromDate", "2021-01-01",
-                            "toDate", "2021-01-07")))
+                            "toDate", "2021-01-07",
+                            "contributionStatuses", "COMPLETED")))
                     .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(caller).jwt())
                     // Then
                     .exchange()
@@ -227,6 +235,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                       "slug": "universe-ecosystem"
                                     }
                                   ],
+                                  "projectContributorLabels": null,
                                   "countryCode": "FR",
                                   "totalRewardedUsdAmount": {
                                     "value": 1.5,
@@ -251,7 +260,10 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "contributionCount": {
                                     "value": 2,
                                     "trend": "UP"
-                                  }
+                                  },
+                                  "maintainedProjectCount": 0,
+                                  "inProgressIssueCount": 0,
+                                  "pendingApplicationCount": 0
                                 },
                                 {
                                   "contributor": {
@@ -278,6 +290,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                       "slug": "universe-ecosystem"
                                     }
                                   ],
+                                  "projectContributorLabels": null,
                                   "countryCode": null,
                                   "totalRewardedUsdAmount": {
                                     "value": 0,
@@ -302,7 +315,10 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "contributionCount": {
                                     "value": 4,
                                     "trend": "UP"
-                                  }
+                                  },
+                                  "maintainedProjectCount": 0,
+                                  "inProgressIssueCount": 0,
+                                  "pendingApplicationCount": 0
                                 },
                                 {
                                   "contributor": {
@@ -323,6 +339,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                       "slug": "universe-ecosystem"
                                     }
                                   ],
+                                  "projectContributorLabels": null,
                                   "countryCode": "GB",
                                   "totalRewardedUsdAmount": {
                                     "value": 0,
@@ -347,7 +364,10 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "contributionCount": {
                                     "value": 2,
                                     "trend": "UP"
-                                  }
+                                  },
+                                  "maintainedProjectCount": 1,
+                                  "inProgressIssueCount": 0,
+                                  "pendingApplicationCount": 0
                                 },
                                 {
                                   "contributor": {
@@ -370,6 +390,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                       "slug": "universe-ecosystem"
                                     }
                                   ],
+                                  "projectContributorLabels": null,
                                   "countryCode": "GB",
                                   "totalRewardedUsdAmount": {
                                     "value": 3.5,
@@ -394,7 +415,10 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "contributionCount": {
                                     "value": 0,
                                     "trend": "STABLE"
-                                  }
+                                  },
+                                  "maintainedProjectCount": 0,
+                                  "inProgressIssueCount": 0,
+                                  "pendingApplicationCount": 0
                                 },
                                 {
                                   "contributor": {
@@ -415,6 +439,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                       "slug": "universe-ecosystem"
                                     }
                                   ],
+                                  "projectContributorLabels": null,
                                   "countryCode": "MA",
                                   "totalRewardedUsdAmount": {
                                     "value": 0,
@@ -425,8 +450,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "trend": "STABLE"
                                   },
                                   "issueCount": {
-                                    "value": 1,
-                                    "trend": "UP"
+                                    "value": 0,
+                                    "trend": "STABLE"
                                   },
                                   "prCount": {
                                     "value": 2,
@@ -437,9 +462,12 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "trend": "UP"
                                   },
                                   "contributionCount": {
-                                    "value": 4,
+                                    "value": 3,
                                     "trend": "UP"
-                                  }
+                                  },
+                                  "maintainedProjectCount": 1,
+                                  "inProgressIssueCount": 0,
+                                  "pendingApplicationCount": 0
                                 }
                               ]
                             }
@@ -525,6 +553,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             queryParams.put("pageSize", "100");
             queryParams.put("fromDate", "2021-01-01");
             queryParams.put("toDate", "2021-01-10");
+            queryParams.put("contributionStatuses", "COMPLETED");
             queryParams.put("dataSourceIds", allProgramOrEcosystemIds);
             queryParams.putAll(queryParamsWithValues);
             final var response = client.get()
@@ -595,9 +624,9 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getTotalRewardedUsdAmount().getValue())
                             .isLessThanOrEqualTo(BigDecimal.valueOf(3.0))), true
             );
-            test_contributors_stats(Map.of("contributionCount.eq", "1", "contributionCount.types", "ISSUE"),
+            test_contributors_stats(Map.of("contributionCount.eq", "0", "contributionCount.types", "ISSUE"),
                     response -> response.getContributors().forEach(project -> assertThat(project.getIssueCount().getValue())
-                            .isEqualTo(1)), true
+                            .isEqualTo(0)), true
             );
             test_contributors_stats(Map.of("contributionCount.eq", "2", "contributionCount.types", "PULL_REQUEST"),
                     response -> response.getContributors().forEach(project -> assertThat(project.getPrCount().getValue())
@@ -630,7 +659,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                             .hasSize(1)
                             .extracting(BiContributorsPageItemResponse::getContributionCount)
                             .extracting(NumberKpi::getValue)
-                            .contains(4), true);
+                            .contains(3), true);
             test_contributors_stats(Map.of("includeApplicants", "true", "projectIds", onlyDust.value().toString()),
                     response -> assertThat(response.getContributors())
                             .extracting(c -> c.getContributor().getLogin())
@@ -649,7 +678,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
         }
 
         @Test
-        public void should_get_contributor_by_id() {
+        public void should_get_antho_by_id() {
             // When
             client.get()
                     .uri(getApiURI(BI_CONTRIBUTORS_BY_ID.formatted(antho.githubUserId().toString())))
@@ -718,7 +747,79 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                               "contributionCount": {
                                 "value": 3,
                                 "trend": "UP"
-                              }
+                              },
+                              "maintainedProjectCount": 0,
+                              "inProgressIssueCount": 0,
+                              "pendingApplicationCount": 0
+                            }
+                            """);
+        }
+
+        @Test
+        public void should_get_pierre_by_id() {
+            // When
+            client.get()
+                    .uri(getApiURI(BI_CONTRIBUTORS_BY_ID.formatted(pierre.githubUserId().toString())))
+                    .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(hayden).jwt())
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .json("""
+                            {
+                              "contributor": {
+                                "login": "pierre"
+                              },
+                              "maintainedProjectCount": 1,
+                              "inProgressIssueCount": 0,
+                              "pendingApplicationCount": 0
+                            }
+                            """);
+        }
+
+        @Test
+        public void should_get_mehdi_by_id() {
+            // When
+            client.get()
+                    .uri(getApiURI(BI_CONTRIBUTORS_BY_ID.formatted(mehdi.githubUserId().toString())))
+                    .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(hayden).jwt())
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .json("""
+                            {
+                              "contributor": {
+                                "login": "mehdi"
+                              },
+                              "maintainedProjectCount": 1,
+                              "inProgressIssueCount": 1,
+                              "pendingApplicationCount": 0
+                            }
+                            """);
+        }
+
+        @Test
+        public void should_get_james_by_id() {
+            // When
+            client.get()
+                    .uri(getApiURI(BI_CONTRIBUTORS_BY_ID.formatted(james.githubUserId().toString())))
+                    .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(hayden).jwt())
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .json("""
+                            {
+                              "contributor": {
+                                "login": "james"
+                              },
+                              "maintainedProjectCount": 0,
+                              "inProgressIssueCount": 0,
+                              "pendingApplicationCount": 1
                             }
                             """);
         }

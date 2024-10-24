@@ -43,6 +43,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                    d.categories,
                    d.languages,
                    d.ecosystems,
+                   d.maintained_projects,
                    contributor_labels.list as project_contributor_labels,
                    -- /// filtered & computed data /// --
                    coalesce(d.total_rewarded_usd_amount, 0)                 as total_rewarded_usd_amount,
@@ -51,12 +52,16 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                    coalesce(d.issue_count, 0)                               as issue_count,
                    coalesce(d.pr_count, 0)                                  as pr_count,
                    coalesce(d.code_review_count, 0)                         as code_review_count,
+                   coalesce(d.in_progress_issue_count, 0)                   as in_progress_issue_count,
+                   coalesce(d.pending_application_count, 0)                 as pending_application_count,
                    coalesce(previous_period.total_rewarded_usd_amount, 0)   as previous_period_total_rewarded_usd_amount,
                    coalesce(previous_period.reward_count, 0)                as previous_period_reward_count,
                    coalesce(previous_period.contribution_count, 0)          as previous_period_contribution_count,
                    coalesce(previous_period.issue_count, 0)                 as previous_period_issue_count,
                    coalesce(previous_period.pr_count, 0)                    as previous_period_pr_count,
-                   coalesce(previous_period.code_review_count, 0)           as previous_period_code_review_count
+                   coalesce(previous_period.code_review_count, 0)           as previous_period_code_review_count,
+                   coalesce(previous_period.in_progress_issue_count, 0)     as previous_period_in_progress_issue_count,
+                   coalesce(previous_period.pending_application_count, 0)   as previous_period_pending_application_count
             
             FROM bi.select_contributors(:fromDate, :toDate, :dataSourceIds, :contributorIds, :contributionUuids, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis, :includeApplicants) d
                      LEFT JOIN (
