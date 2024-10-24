@@ -1,8 +1,7 @@
 package onlydust.com.marketplace.api.read.entities.project;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
@@ -20,15 +19,13 @@ import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Data
 @Table(name = "applications", schema = "public")
 @Immutable
+@Getter
 @Accessors(fluent = true)
 public class ApplicationReadEntity {
     @Id
     @NonNull
-    @EqualsAndHashCode.Include
     UUID id;
 
     @NonNull
@@ -53,9 +50,7 @@ public class ApplicationReadEntity {
     Long applicantId;
 
     @NonNull
-    String motivations;
-
-    String problemSolvingApproach;
+    String commentBody;
 
     ZonedDateTime ignoredAt;
 
@@ -67,8 +62,7 @@ public class ApplicationReadEntity {
         return new ProjectApplicationShortResponse()
                 .id(id)
                 .applicant(applicant.toContributorResponse())
-                .motivations(motivations)
-                .problemSolvingApproach(problemSolvingApproach)
+                .githubComment(commentBody)
                 .project(project.toLinkResponse())
                 ;
     }
@@ -90,8 +84,7 @@ public class ApplicationReadEntity {
                 .issue(issue.toLinkDto())
                 .applicant(applicant.toContributorResponse())
                 .origin(origin)
-                .motivation(motivations)
-                .problemSolvingApproach(problemSolvingApproach)
+                .githubComment(commentBody)
                 ;
     }
 }

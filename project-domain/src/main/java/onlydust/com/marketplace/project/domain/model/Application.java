@@ -33,8 +33,7 @@ public class Application {
     @NonNull
     final GithubComment.Id commentId;
     @NonNull
-    String motivations;
-    String problemSolvingApproach;
+    String commentBody;
     ZonedDateTime ignoredAt;
 
     public Application(final @NonNull Id id,
@@ -44,9 +43,8 @@ public class Application {
                        final @NonNull ZonedDateTime appliedAt,
                        final @NonNull GithubIssue.Id issueId,
                        final @NonNull GithubComment.Id commentId,
-                       final @NonNull String motivation,
-                       String problemSolvingApproach) {
-        this(id, projectId, applicantId, origin, appliedAt, issueId, commentId, motivation, problemSolvingApproach, null);
+                       final @NonNull String commentBody) {
+        this(id, projectId, applicantId, origin, appliedAt, issueId, commentId, commentBody, null);
     }
 
     @NoArgsConstructor(staticName = "random")
@@ -67,8 +65,7 @@ public class Application {
                                               @NonNull Long applicantId,
                                               @NonNull GithubIssue.Id issueId,
                                               @NonNull GithubComment.Id commentId,
-                                              @NonNull String motivations,
-                                              String problemSolvingApproach) {
+                                              @NonNull String commentBody) {
         return new Application(Id.random(),
                 projectId,
                 applicantId,
@@ -76,8 +73,7 @@ public class Application {
                 CurrentDateProvider.now().toInstant().atZone(ZoneOffset.UTC),
                 issueId,
                 commentId,
-                motivations,
-                problemSolvingApproach,
+                commentBody,
                 null);
     }
 
@@ -90,7 +86,6 @@ public class Application {
                 comment.issueId(),
                 comment.id(),
                 comment.body(),
-                null,
                 null);
     }
 

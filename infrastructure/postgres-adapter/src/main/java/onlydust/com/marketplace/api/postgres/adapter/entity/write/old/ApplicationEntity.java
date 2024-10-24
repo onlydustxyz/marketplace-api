@@ -42,14 +42,13 @@ public class ApplicationEntity {
     @NonNull
     Long commentId;
     @NonNull
-    String motivations;
-    String problemSolvingApproach;
+    String commentBody;
 
     ZonedDateTime ignoredAt;
 
     public ApplicationEntity(@NonNull UUID id, @NonNull ZonedDateTime receivedAt, @NonNull UUID projectId, @NonNull Long applicantId,
                              @NonNull Application.Origin origin, @NonNull Long issueId, @NonNull Long commentId,
-                             @NonNull String motivations, String problemSolvingApproach) {
+                             @NonNull String commentBody) {
         this.id = id;
         this.receivedAt = receivedAt;
         this.projectId = projectId;
@@ -57,8 +56,7 @@ public class ApplicationEntity {
         this.origin = origin;
         this.issueId = issueId;
         this.commentId = commentId;
-        this.motivations = motivations;
-        this.problemSolvingApproach = problemSolvingApproach;
+        this.commentBody = commentBody;
     }
 
     public static ApplicationEntity fromDomain(Application application) {
@@ -70,8 +68,7 @@ public class ApplicationEntity {
                 .origin(application.origin())
                 .issueId(application.issueId().value())
                 .commentId(application.commentId().value())
-                .motivations(application.motivations())
-                .problemSolvingApproach(application.problemSolvingApproach())
+                .commentBody(application.commentBody())
                 .ignoredAt(application.ignoredAt())
                 .build();
     }
@@ -85,8 +82,7 @@ public class ApplicationEntity {
                 receivedAt,
                 GithubIssue.Id.of(issueId),
                 GithubComment.Id.of(commentId),
-                motivations,
-                problemSolvingApproach,
+                commentBody,
                 ignoredAt);
     }
 }

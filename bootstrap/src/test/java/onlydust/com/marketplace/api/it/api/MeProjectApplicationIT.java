@@ -61,20 +61,21 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         // Given
         final var user = userAuthHelper.authenticateAntho();
         final Long issueId = 1974127467L;
-        final var motivations = faker.lorem().paragraph();
-        final var problemSolvingApproach = faker.lorem().paragraph();
+        final var githubComment = faker.lorem().paragraph();
         final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
 
         final var request = new ProjectApplicationCreateRequest()
                 .projectId(projectId)
                 .issueId(issueId)
-                .motivation(motivations)
-                .problemSolvingApproach(problemSolvingApproach);
+                .githubComment(githubComment);
 
         githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/7/comments"))
-                .withRequestBody(containing("https://local-app.onlydust.com/p/bretzel")
-                        .and(containing(motivations))
-                        .and(containing(problemSolvingApproach)))
+                .withRequestBody(equalToJson("""
+                        {
+                          "body": "%s"
+                        }
+                        """.formatted(githubComment))
+                )
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withBody("""
@@ -106,8 +107,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         assertThat(application.issueId()).isEqualTo(issueId);
         assertThat(application.origin()).isEqualTo(Application.Origin.MARKETPLACE);
         assertThat(application.commentId()).isEqualTo(123456789L);
-        assertThat(application.motivations()).isEqualTo(motivations);
-        assertThat(application.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
+        assertThat(application.commentBody()).isEqualTo(githubComment);
 
         final var contributionAfter =
                 contributionReadRepository.findAll(new ContributionsQueryParams().ids(List.of(ContributionUUID.of(issueId).value()))).stream().findFirst().orElseThrow();
@@ -135,13 +135,13 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         // Given
         final var user = userAuthHelper.authenticateOlivier();
         final Long issueId = 1974127467L;
-        final var motivations = faker.lorem().paragraph();
+        final var githubComment = faker.lorem().paragraph();
         final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
 
         final var request = new ProjectApplicationCreateRequest()
                 .projectId(projectId)
                 .issueId(issueId)
-                .motivation(motivations);
+                .githubComment(githubComment);
 
         githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/7/comments"))
                 .willReturn(unauthorized()));
@@ -181,14 +181,12 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 null
         ));
 
-        final var motivations = faker.lorem().paragraph();
-        final var problemSolvingApproach = faker.lorem().paragraph();
+        final var githubComment = faker.lorem().paragraph();
 
         final var request = new ProjectApplicationCreateRequest()
                 .projectId(projectId)
                 .issueId(issueId)
-                .motivation(motivations)
-                .problemSolvingApproach(problemSolvingApproach);
+                .githubComment(githubComment);
 
         // When
         client.post()
@@ -504,8 +502,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         assertThat(application.issueId()).isEqualTo(issueId);
         assertThat(application.applicantId()).isEqualTo(antho.user().getGithubUserId());
         assertThat(application.origin()).isEqualTo(Application.Origin.GITHUB);
-        assertThat(application.motivations()).isEqualTo(commentBody);
-        assertThat(application.problemSolvingApproach()).isNull();
+        assertThat(application.commentBody()).isEqualTo(commentBody);
 
         indexerApiWireMockServer.verify(putRequestedFor(urlEqualTo("/api/v1/users/" + antho.user().getGithubUserId())));
         verify(slackApiAdapter).onApplicationCreated(any(Application.class));
@@ -568,14 +565,12 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
 
         final var projectId = UUID.fromString("77777777-4444-4444-4444-61504d34fc56");
         final var issueId = 1736474921L;
-        final var motivations = faker.lorem().paragraph();
-        final var problemSolvingApproach = faker.lorem().paragraph();
+        final var githubComment = faker.lorem().paragraph();
 
         final var request = new ProjectApplicationCreateRequest()
                 .projectId(projectId)
                 .issueId(issueId)
-                .motivation(motivations)
-                .problemSolvingApproach(problemSolvingApproach);
+                .githubComment(githubComment);
 
         // When
         client.post()
@@ -646,8 +641,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                                 "name": "Bretzel",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                               },
-                              "motivations": "My motivations 2",
-                              "problemSolvingApproach": null
+                              "githubComment": "My motivations 2"
                             },
                             {
                               "applicant": {
@@ -662,8 +656,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                                 "name": "Yolo croute",
                                 "logoUrl": "https://i.natgeofe.com/n/8271db90-5c35-46bc-9429-588a9529e44a/raccoon_thumb_3x4.JPG"
                               },
-                              "motivations": "My motivations",
-                              "problemSolvingApproach": null
+                              "githubComment": "My motivations"
                             }
                           ]
                         }

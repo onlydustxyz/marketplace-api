@@ -141,7 +141,6 @@ class TrackingEventPublisherOutboxConsumerTest {
                     faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
                     GithubIssue.Id.random(),
                     GithubComment.Id.random(),
-                    faker.lorem().sentence(),
                     faker.lorem().sentence());
 
             // When
@@ -279,7 +278,6 @@ class TrackingEventPublisherOutboxConsumerTest {
                     faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
                     GithubIssue.Id.random(),
                     GithubComment.Id.random(),
-                    faker.lorem().sentence(),
                     faker.lorem().sentence());
 
             // When

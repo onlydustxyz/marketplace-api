@@ -82,8 +82,7 @@ public interface UserMapper {
         return new ProjectApplicationShortResponse()
                 .id(application.id().value())
                 .applicant(map(authenticatedUser))
-                .motivations(application.motivations())
-                .problemSolvingApproach(application.problemSolvingApproach());
+                .githubComment(application.commentBody());
     }
 
     static ContributorResponse map(AuthenticatedUser authenticatedUser) {

@@ -95,7 +95,6 @@ class ApplicationsUpdaterTest {
                     faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
                     GithubIssue.Id.of(event.issueId()),
                     GithubComment.Id.of(event.id()),
-                    faker.lorem().sentence(),
                     faker.lorem().sentence());
 
             when(projectApplicationStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(List.of(existingApplication));
@@ -183,8 +182,7 @@ class ApplicationsUpdaterTest {
             assertThat(applications).allMatch(application -> application.origin().equals(Application.Origin.GITHUB));
             assertThat(applications).allMatch(application -> application.commentId().value().equals(event.id()));
             assertThat(applications).allMatch(application -> application.appliedAt().equals(event.createdAt()));
-            assertThat(applications).allMatch(application -> application.motivations().equals(event.body()));
-            assertThat(applications).allMatch(application -> application.problemSolvingApproach() == null);
+            assertThat(applications).allMatch(application -> application.commentBody().equals(event.body()));
 
             verify(indexerPort).indexUser(event.authorId());
             Arrays.stream(applications).forEach(application -> verify(applicationObserverPort).onApplicationCreated(application));
@@ -242,7 +240,6 @@ class ApplicationsUpdaterTest {
                             faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
                             GithubIssue.Id.of(event.issueId()),
                             commentId,
-                            faker.lorem().sentence(),
                             faker.lorem().sentence()),
                     new Application(Application.Id.random(),
                             projectId2,
@@ -290,8 +287,7 @@ class ApplicationsUpdaterTest {
             assertThat(applications).allMatch(application -> application.origin().equals(Application.Origin.GITHUB));
             assertThat(applications).allMatch(application -> application.commentId().value().equals(event.id()));
             assertThat(applications).allMatch(application -> application.appliedAt().equals(event.updatedAt()));
-            assertThat(applications).allMatch(application -> application.motivations().equals(event.body()));
-            assertThat(applications).allMatch(application -> application.problemSolvingApproach() == null);
+            assertThat(applications).allMatch(application -> application.commentBody().equals(event.body()));
 
             verify(indexerPort).indexUser(event.authorId());
 
@@ -309,7 +305,6 @@ class ApplicationsUpdaterTest {
                             faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
                             GithubIssue.Id.of(event.issueId()),
                             GithubComment.Id.of(event.id()),
-                            faker.lorem().sentence(),
                             faker.lorem().sentence())
             );
             when(projectApplicationStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(existingApplications);
@@ -345,7 +340,6 @@ class ApplicationsUpdaterTest {
                             faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
                             issueId,
                             GithubComment.Id.of(event.id()),
-                            faker.lorem().sentence(),
                             faker.lorem().sentence()),
                     new Application(Application.Id.random(),
                             projectId2,

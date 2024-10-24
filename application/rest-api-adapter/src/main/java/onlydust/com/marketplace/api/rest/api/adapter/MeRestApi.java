@@ -93,8 +93,7 @@ public class MeRestApi implements MeApi {
         final var application = applicationFacadePort.applyOnProject(authenticatedUser.githubUserId(),
                 ProjectId.of(applicationRequest.getProjectId()),
                 GithubIssue.Id.of(applicationRequest.getIssueId()),
-                applicationRequest.getMotivation(),
-                applicationRequest.getProblemSolvingApproach());
+                applicationRequest.getGithubComment());
         return ok(new ProjectApplicationCreateResponse().id(application.id().value()));
     }
 

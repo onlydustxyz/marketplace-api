@@ -7,8 +7,6 @@ import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.model.GlobalConfig;
-import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.port.input.ApplicationFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +27,6 @@ public class ApplicationService implements ApplicationFacadePort {
     private final GithubApiPort githubApiPort;
     private final GithubAuthenticationPort githubAuthenticationPort;
     private final GithubAppService githubAppService;
-    private final GlobalConfig globalConfig;
 
     @Override
     @Transactional
@@ -95,8 +92,7 @@ public class ApplicationService implements ApplicationFacadePort {
     public Application applyOnProject(@NonNull Long githubUserId,
                                       @NonNull ProjectId projectId,
                                       @NonNull GithubIssue.Id issueId,
-                                      @NonNull String motivation,
-                                      String problemSolvingApproach) {
+                                      @NonNull String githubComment) {
         if (!githubUserPermissionsService.isUserAuthorizedToApplyOnProject(githubUserId))
             throw forbidden("User is not authorized to apply on project");
 
@@ -117,36 +113,14 @@ public class ApplicationService implements ApplicationFacadePort {
 
         final var personalAccessToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
 
-        final var commentId = githubApiPort.createComment(personalAccessToken, issue, formatComment(project, motivation, problemSolvingApproach));
+        final var commentId = githubApiPort.createComment(personalAccessToken, issue, githubComment);
 
-        final var application = Application.fromMarketplace(projectId, githubUserId, issueId, commentId, motivation, problemSolvingApproach);
+        final var application = Application.fromMarketplace(projectId, githubUserId, issueId, commentId, githubComment);
 
         projectApplicationStoragePort.save(application);
         applicationObserver.onApplicationCreated(application);
 
         return application;
-    }
-
-    private @NonNull String formatComment(final @NonNull Project project,
-                                          final @NonNull String motivations,
-                                          final String problemSolvingApproach) {
-        final var header = """
-                I am applying to this issue via [OnlyDust platform](%s/p/%s).
-                """.formatted(globalConfig.getAppBaseUrl(), project.getSlug());
-
-        final var motivationsSection = """
-                
-                ### My background and how it can be leveraged
-                %s
-                """.formatted(motivations);
-
-        final var problemSolvingApproachSection = (problemSolvingApproach == null || problemSolvingApproach.isBlank()) ? "" : """
-                
-                ### How I plan on tackling this issue
-                %s
-                """.formatted(problemSolvingApproach);
-
-        return header + motivationsSection + problemSolvingApproachSection;
     }
 
     @Override

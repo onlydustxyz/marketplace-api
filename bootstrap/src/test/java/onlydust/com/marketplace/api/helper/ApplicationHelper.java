@@ -26,8 +26,7 @@ public class ApplicationHelper {
                 applicantId.value(),
                 issueId,
                 GithubComment.Id.random(),
-                faker.lorem().sentence(),
-                null
+                faker.lorem().sentence()
         );
         projectApplicationStoragePort.save(application);
         postgresBiProjectorAdapter.onApplicationCreated(application);
