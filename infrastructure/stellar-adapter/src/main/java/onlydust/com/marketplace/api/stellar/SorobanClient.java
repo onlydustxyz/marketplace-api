@@ -13,6 +13,7 @@ import org.stellar.sdk.xdr.SCVal;
 import java.io.IOException;
 import java.util.Optional;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static org.stellar.sdk.AbstractTransaction.MIN_BASE_FEE;
 import static org.stellar.sdk.InvokeHostFunctionOperation.invokeContractFunctionOperationBuilder;
@@ -48,7 +49,7 @@ public class SorobanClient {
             return switch (response.getStatus()) {
                 case NOT_FOUND -> Optional.empty();
                 case SUCCESS -> Optional.of(response);
-                case FAILED -> throw internalServerError("Error while fetching transaction");
+                case FAILED -> throw badRequest("Transaction has failed");
             };
         } catch (ErrorResponse | SorobanRpcErrorResponse e) {
             throw internalServerError("Error while fetching transaction", e);
