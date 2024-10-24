@@ -37,6 +37,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     private final BiContributorRewardDataRepository biContributorRewardDataRepository;
     private final BiContributionRewardDataRepository biContributionRewardDataRepository;
     private final UserProjectRecommendationsRepository userProjectRecommendationsRepository;
+    private final BiApplicationDataRepository biApplicationDataRepository;
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
@@ -118,6 +119,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
         biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
         biContributionRewardDataRepository.refreshByUUID(contributionUUID);
+        biApplicationDataRepository.refreshByContributionUUID(contributionUUID);
     }
 
     @Override
@@ -129,6 +131,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
         biProjectContributionsDataRepository.refreshByRepo(repoId);
         biContributionRewardDataRepository.refreshByUUID(contributionUUID);
+        biApplicationDataRepository.refreshByContributionUUID(contributionUUID);
     }
 
     @Override
@@ -145,6 +148,8 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         biProjectContributionsDataRepository.refreshByProject(projectId);
         linkedRepoIds.forEach(biContributionRewardDataRepository::refreshByRepo);
         unlinkedRepoIds.forEach(biContributionRewardDataRepository::refreshByRepo);
+        linkedRepoIds.forEach(biApplicationDataRepository::refreshByRepo);
+        unlinkedRepoIds.forEach(biApplicationDataRepository::refreshByRepo);
     }
 
     @Override
@@ -186,6 +191,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
         biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
         biContributorApplicationDataRepository.refresh(application.applicantId());
+        biApplicationDataRepository.refresh(application.id());
     }
 
     @Override
@@ -196,6 +202,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
         biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
         biContributorApplicationDataRepository.refresh(application.applicantId());
+        biApplicationDataRepository.refresh(application.id());
     }
 
     @Override
@@ -206,6 +213,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
         biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
         biContributorApplicationDataRepository.refresh(application.applicantId());
+        biApplicationDataRepository.refresh(application.id());
     }
 
     @Override
@@ -216,5 +224,6 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
         biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
         biContributorApplicationDataRepository.refresh(application.applicantId());
+        biApplicationDataRepository.refresh(application.id());
     }
 }
