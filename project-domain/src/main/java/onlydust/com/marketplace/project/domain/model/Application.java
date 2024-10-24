@@ -17,6 +17,7 @@ import java.util.UUID;
 @Accessors(fluent = true)
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@ToString
 public class Application {
     @NonNull
     final Id id;

@@ -16,6 +16,8 @@ public interface ApplicationRepository extends JpaRepository<ApplicationEntity, 
 
     List<ApplicationEntity> findAllByCommentId(Long commentId);
 
+    List<ApplicationEntity> findAllByIssueId(Long issueId);
+
     void deleteAllByIssueId(Long issueId);
 
     @Modifying

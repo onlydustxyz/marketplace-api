@@ -216,6 +216,7 @@ class ApplicationsUpdaterTest {
             verify(projectApplicationStoragePort, atLeast(1)).findApplications(commentId);
             verify(projectApplicationStoragePort).deleteApplications(existingApplications.get(1).id());
             verifyNoInteractions(indexerPort);
+            verify(applicationObserverPort).onApplicationDeleted(existingApplications.get(1));
         }
 
         @Test
@@ -351,41 +352,94 @@ class ApplicationsUpdaterTest {
 
             // Then
             verifyNoInteractions(llmPort);
-            verify(projectApplicationStoragePort).deleteApplications(existingApplications.get(1).id());
+            verify(projectApplicationStoragePort).deleteApplications(existingApplications.stream().map(Application::id).toArray(Application.Id[]::new));
+            existingApplications.forEach(application -> verify(applicationObserverPort).onApplicationDeleted(application));
         }
     }
 
     @Nested
     class OnGithubIssueDeletedProcessing {
         final OnGithubIssueDeleted event = OnGithubIssueDeleted.builder()
-                .id(GithubIssue.Id.random().value())
+                .id(issue.id().value())
                 .build();
 
         @Test
         void should_delete_github_applications() {
+            // Given
+            final var authorId = faker.number().randomNumber();
+
+            final var existingApplications = List.of(
+                    new Application(Application.Id.random(),
+                            projectId1,
+                            authorId,
+                            Application.Origin.MARKETPLACE,
+                            faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
+                            issue.id(),
+                            GithubComment.Id.of(event.id()),
+                            faker.lorem().sentence()),
+                    new Application(Application.Id.random(),
+                            projectId2,
+                            authorId,
+                            Application.Origin.GITHUB,
+                            faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
+                            issue.id(),
+                            GithubComment.Id.of(event.id()),
+                            faker.lorem().sentence(),
+                            null)
+            );
+
+            when(projectApplicationStoragePort.findApplications(issue.id())).thenReturn(existingApplications);
+
             // When
             applicationsUpdater.process(event);
 
             // Then
             verifyNoInteractions(llmPort);
             verify(projectApplicationStoragePort).deleteApplicationsByIssueId(GithubIssue.Id.of(event.id()));
+            existingApplications.forEach(application -> verify(applicationObserverPort).onApplicationDeleted(application));
         }
     }
 
     @Nested
     class OnGithubIssueTransferredProcessing {
         final OnGithubIssueTransferred event = OnGithubIssueTransferred.builder()
-                .id(GithubIssue.Id.random().value())
+                .id(issue.id().value())
                 .build();
 
         @Test
         void should_delete_github_applications() {
+            // Given
+            final var authorId = faker.number().randomNumber();
+
+            final var existingApplications = List.of(
+                    new Application(Application.Id.random(),
+                            projectId1,
+                            authorId,
+                            Application.Origin.MARKETPLACE,
+                            faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
+                            issue.id(),
+                            GithubComment.Id.of(event.id()),
+                            faker.lorem().sentence()),
+                    new Application(Application.Id.random(),
+                            projectId2,
+                            authorId,
+                            Application.Origin.GITHUB,
+                            faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
+                            issue.id(),
+                            GithubComment.Id.of(event.id()),
+                            faker.lorem().sentence(),
+                            null)
+            );
+
+            when(projectApplicationStoragePort.findApplications(issue.id())).thenReturn(existingApplications);
+
             // When
             applicationsUpdater.process(event);
 
             // Then
             verifyNoInteractions(llmPort);
             verify(projectApplicationStoragePort).deleteApplicationsByIssueId(GithubIssue.Id.of(event.id()));
+            existingApplications.forEach(application -> verify(applicationObserverPort).onApplicationDeleted(application));
         }
     }
 }

@@ -46,6 +46,12 @@ public class PostgresProjectApplicationAdapter implements ProjectApplicationStor
     }
 
     @Override
+    public List<Application> findApplications(GithubIssue.Id issueId) {
+        return applicationRepository.findAllByIssueId(issueId.value()).stream()
+                .map(ApplicationEntity::toDomain).toList();
+    }
+
+    @Override
     @Transactional
     public void deleteApplications(Application.Id... applicationIds) {
         applicationRepository.deleteAllById(Arrays.stream(applicationIds).map(UuidWrapper::value).toList());
