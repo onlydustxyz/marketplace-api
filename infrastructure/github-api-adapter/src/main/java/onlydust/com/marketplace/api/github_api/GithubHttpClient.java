@@ -124,7 +124,8 @@ public class GithubHttpClient {
                             .method(method.name(), bodyPublisher)
                             .build(), HttpResponse.BodyHandlers.ofByteArray());
             return switch (httpResponse.statusCode()) {
-                case 200, 201, 204, 206 -> isNull(httpResponse.body()) ? Optional.empty() : Optional.ofNullable(decode(httpResponse.body(), responseClass));
+                case 200, 201, 204, 206 -> isNull(httpResponse.body()) || httpResponse.body().length == 0 ? Optional.empty() :
+                        Optional.ofNullable(decode(httpResponse.body(), responseClass));
                 case 301, 302, 307, 308 -> {
                     final var location = httpResponse.headers().firstValue("Location")
                             .orElseThrow(() -> internalServerError("%d status received without Location header".formatted(httpResponse.statusCode())));

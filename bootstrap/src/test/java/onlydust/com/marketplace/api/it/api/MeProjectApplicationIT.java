@@ -242,6 +242,12 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         final var user = userAuthHelper.authenticateOlivier();
         final var applicationId = UUID.randomUUID();
 
+        githubWireMockServer.stubFor(delete(urlEqualTo("/repositories/380954304/issues/comments/111"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withBody("")
+                ));
+
         applicationRepository.save(new ApplicationEntity(
                 applicationId,
                 ZonedDateTime.now(),
