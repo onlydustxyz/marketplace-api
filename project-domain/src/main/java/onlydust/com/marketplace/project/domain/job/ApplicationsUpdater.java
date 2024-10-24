@@ -68,12 +68,16 @@ public class ApplicationsUpdater implements OutboxConsumer {
 
     private void process(OnGithubIssueDeleted event) {
         final var issueId = GithubIssue.Id.of(event.id());
+        final var applications = projectApplicationStoragePort.findApplications(issueId);
         projectApplicationStoragePort.deleteApplicationsByIssueId(issueId);
+        applications.forEach(applicationObserverPort::onApplicationDeleted);
     }
 
     private void process(OnGithubIssueTransferred event) {
         final var issueId = GithubIssue.Id.of(event.id());
+        final var applications = projectApplicationStoragePort.findApplications(issueId);
         projectApplicationStoragePort.deleteApplicationsByIssueId(issueId);
+        applications.forEach(applicationObserverPort::onApplicationDeleted);
     }
 
     private void updateExistingApplications(GithubComment comment) {
@@ -119,12 +123,15 @@ public class ApplicationsUpdater implements OutboxConsumer {
     }
 
     private void deleteObsoleteGithubApplications(@NonNull GithubComment.Id commentId, @NonNull Optional<String> commentBody) {
-        final var githubApplicationIds = projectApplicationStoragePort.findApplications(commentId).stream()
-                .filter(a -> a.origin() == Application.Origin.GITHUB)
-                .map(Application::id)
-                .toArray(Application.Id[]::new);
+        final var applicationToDeletes = projectApplicationStoragePort.findApplications(commentId).stream()
+                .filter(a -> a.origin() == Application.Origin.GITHUB || commentBody.isEmpty())
+                .toList();
 
-        if (githubApplicationIds.length > 0 && commentBody.map(body -> !llmPort.isCommentShowingInterestToContribute(body)).orElse(true))
-            projectApplicationStoragePort.deleteApplications(githubApplicationIds);
+        if (!applicationToDeletes.isEmpty() && commentBody.map(body -> !llmPort.isCommentShowingInterestToContribute(body)).orElse(true)) {
+            projectApplicationStoragePort.deleteApplications(applicationToDeletes.stream()
+                    .map(Application::id)
+                    .toArray(Application.Id[]::new));
+            applicationToDeletes.forEach(applicationObserverPort::onApplicationDeleted);
+        }
     }
 }

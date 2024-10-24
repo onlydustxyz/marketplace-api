@@ -21,6 +21,8 @@ public interface ProjectApplicationStoragePort {
 
     List<Application> findApplications(GithubComment.Id commentId);
 
+    List<Application> findApplications(GithubIssue.Id issueId);
+
     void deleteApplications(Application.Id... applicationIds);
 
     void deleteApplicationsByIssueId(GithubIssue.Id issueId);
