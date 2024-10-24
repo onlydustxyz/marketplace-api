@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.helper;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.project.domain.model.Project;
@@ -27,6 +28,8 @@ public class ProjectHelper {
     private DatabaseHelper databaseHelper;
     @Autowired
     private ProjectCategoryStoragePort projectCategoryStoragePort;
+    @Autowired
+    private PostgresBiProjectorAdapter postgresBiProjectorAdapter;
 
     private final Faker faker = new Faker();
 
@@ -88,5 +91,16 @@ public class ProjectHelper {
                 "projectId", projectId.value(),
                 "categoryId", categoryId.value()
         ));
+    }
+
+    public void inviteProjectLead(ProjectId projectId, UserAuthHelper.AuthenticatedUser lead) {
+        databaseHelper.executeQuery("""
+                insert into pending_project_leader_invitations(id, project_id, github_user_id)
+                select gen_random_uuid(), :projectId, :githubUserId
+                """, Map.of(
+                "projectId", projectId.value(),
+                "githubUserId", lead.githubUserId().value()
+        ));
+        postgresBiProjectorAdapter.onProjectCreated(projectId, lead.userId());
     }
 }
