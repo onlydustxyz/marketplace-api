@@ -30,7 +30,7 @@ public class ApplicationService implements ApplicationFacadePort {
 
     @Override
     @Transactional
-    public void deleteApplication(Application.Id id, UserId userId, Long githubUserId) {
+    public void deleteApplication(Application.Id id, UserId userId, Long githubUserId, boolean deleteGithubComment) {
         final var application = projectApplicationStoragePort.findApplication(id)
                 .orElseThrow(() -> notFound("Application %s not found".formatted(id)));
 
@@ -45,19 +45,15 @@ public class ApplicationService implements ApplicationFacadePort {
         projectApplicationStoragePort.deleteApplications(id);
         applicationObserver.onApplicationDeleted(application);
 
-        if (deleteSelfApplication && application.origin() == Application.Origin.MARKETPLACE)
-            tryDeleteGithubComment(application);
+        if (deleteSelfApplication && deleteGithubComment)
+            deleteGithubComment(application);
     }
 
-    private void tryDeleteGithubComment(Application application) {
-        try {
-            final var issue = githubStoragePort.findIssueById(application.issueId())
-                    .orElseThrow(() -> notFound("Issue %s not found".formatted(application.issueId())));
-            final var personalAccessToken = githubAuthenticationPort.getGithubPersonalToken(application.applicantId());
-            githubApiPort.deleteComment(personalAccessToken, issue.repoId(), application.commentId());
-        } catch (Exception e) {
-            LOGGER.info("Could not delete GitHub comment for application %s".formatted(application.id()), e);
-        }
+    private void deleteGithubComment(Application application) {
+        final var issue = githubStoragePort.findIssueById(application.issueId())
+                .orElseThrow(() -> notFound("Issue %s not found".formatted(application.issueId())));
+        final var personalAccessToken = githubAuthenticationPort.getGithubPersonalToken(application.applicantId());
+        githubApiPort.deleteComment(personalAccessToken, issue.repoId(), application.commentId());
     }
 
     @Override

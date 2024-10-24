@@ -17,7 +17,7 @@ public interface ApplicationFacadePort {
                            @NonNull Application.Id applicationId,
                            Boolean isIgnored);
 
-    void deleteApplication(Application.Id id, UserId userId, Long githubUserId);
+    void deleteApplication(Application.Id id, UserId userId, Long githubUserId, boolean deleteGithubComment);
 
     void acceptApplication(Application.Id id, UserId userId);
 }
