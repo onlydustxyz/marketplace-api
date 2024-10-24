@@ -11,7 +11,10 @@ import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.port.output.*;
+import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPort;
+import onlydust.com.marketplace.project.domain.port.output.LLMPort;
+import onlydust.com.marketplace.project.domain.port.output.ProjectApplicationStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
@@ -20,7 +23,6 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static java.util.stream.Collectors.joining;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @Slf4j
 @AllArgsConstructor
@@ -30,7 +32,6 @@ public class ApplicationsUpdater implements OutboxConsumer {
     private final ProjectApplicationStoragePort projectApplicationStoragePort;
     private final LLMPort llmPort;
     private final IndexerPort indexerPort;
-    private final GithubStoragePort githubStoragePort;
     private final ApplicationObserverPort applicationObserverPort;
 
     @Override
@@ -75,14 +76,6 @@ public class ApplicationsUpdater implements OutboxConsumer {
     }
 
     private void createMissingApplications(GithubComment comment) {
-        final var issue = githubStoragePort.findIssueById(comment.issueId())
-                .orElseThrow(() -> internalServerError("Issue %s not found".formatted(comment.issueId())));
-
-        if (issue.isAssigned()) {
-            LOGGER.debug("Skipping comment {} as issue is already assigned", comment.id());
-            return;
-        }
-
         final var existingApplicationsForUser = projectApplicationStoragePort.findApplications(comment.authorId(), comment.issueId());
         if (!existingApplicationsForUser.isEmpty()) {
             LOGGER.debug("Skipping comment {} as user already applied to this issue", comment.id());

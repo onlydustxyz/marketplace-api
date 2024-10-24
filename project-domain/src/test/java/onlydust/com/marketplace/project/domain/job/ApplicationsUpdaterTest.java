@@ -1,14 +1,16 @@
 package onlydust.com.marketplace.project.domain.job;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.event.*;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.port.output.*;
+import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPort;
+import onlydust.com.marketplace.project.domain.port.output.LLMPort;
+import onlydust.com.marketplace.project.domain.port.output.ProjectApplicationStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,11 +19,9 @@ import org.mockito.ArgumentCaptor;
 import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 class ApplicationsUpdaterTest {
@@ -29,11 +29,9 @@ class ApplicationsUpdaterTest {
     final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
     final LLMPort llmPort = mock(LLMPort.class);
     final IndexerPort indexerPort = mock(IndexerPort.class);
-    final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
     final ApplicationObserverPort applicationObserverPort = mock(ApplicationObserverPort.class);
     final ApplicationsUpdater applicationsUpdater = new ApplicationsUpdater(projectStoragePort, projectApplicationStoragePort, llmPort,
-            indexerPort, githubStoragePort,
-            applicationObserverPort);
+            indexerPort, applicationObserverPort);
 
     final Faker faker = new Faker();
 
@@ -50,7 +48,7 @@ class ApplicationsUpdaterTest {
 
     @BeforeEach
     void setup() {
-        reset(projectStoragePort, llmPort, indexerPort, githubStoragePort, applicationObserverPort);
+        reset(projectStoragePort, llmPort, indexerPort, applicationObserverPort);
     }
 
     @Nested
@@ -68,7 +66,6 @@ class ApplicationsUpdaterTest {
         void setup() {
             when(projectStoragePort.findProjectIdsByRepoId(event.repoId())).thenReturn(List.of(projectId1, projectId2));
             when(projectApplicationStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(List.of());
-            when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(issue));
         }
 
         @Test
@@ -121,45 +118,6 @@ class ApplicationsUpdaterTest {
             verify(projectApplicationStoragePort, never()).save(any(Application[].class));
             verifyNoInteractions(indexerPort);
             verifyNoInteractions(applicationObserverPort);
-        }
-
-        @Test
-        void should_throw_if_issue_is_not_indexed() {
-            // Given
-            when(githubStoragePort.findIssueById(any())).thenReturn(Optional.empty());
-
-            // When
-            assertThatThrownBy(() -> applicationsUpdater.process(event))
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Issue %s not found".formatted(event.issueId()));
-
-            // Then
-            verify(projectApplicationStoragePort, never()).save(any(Application[].class));
-            verifyNoInteractions(applicationObserverPort);
-            verifyNoInteractions(indexerPort);
-            verifyNoInteractions(llmPort);
-        }
-
-        @Test
-        void should_not_create_application_if_issue_is_assigned() {
-            // Given
-            when(githubStoragePort.findIssueById(any())).thenReturn(Optional.of(new GithubIssue(GithubIssue.Id.random(),
-                    faker.number().randomNumber(),
-                    faker.number().randomNumber(),
-                    faker.rickAndMorty().character(),
-                    faker.rickAndMorty().quote(),
-                    faker.internet().url(),
-                    faker.rickAndMorty().character(),
-                    1, faker.pokemon().name(), faker.pokemon().name(), List.of())));
-
-            // When
-            applicationsUpdater.process(event);
-
-            // Then
-            verify(projectApplicationStoragePort, never()).save(any(Application[].class));
-            verifyNoInteractions(applicationObserverPort);
-            verifyNoInteractions(indexerPort);
-            verifyNoInteractions(llmPort);
         }
 
         @Test
@@ -222,11 +180,6 @@ class ApplicationsUpdaterTest {
                 .authorId(faker.number().randomNumber())
                 .body(faker.lorem().sentence())
                 .build();
-
-        @BeforeEach
-        void setup() {
-            when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(issue));
-        }
 
         @Test
         void should_delete_github_applications_if_new_comment_does_not_express_interest() {
