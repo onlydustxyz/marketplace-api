@@ -11920,6 +11920,9 @@ components:
         - prCount
         - codeReviewCount
         - contributionCount
+        - maintainedProjectCount
+        - inProgressIssueCount
+        - pendingApplicationCount
       properties:
         contributor:
           $ref: '#/components/schemas/ContributorOverviewResponse'
@@ -11957,6 +11960,12 @@ components:
           $ref: '#/components/schemas/NumberKpi'
         contributionCount:
           $ref: '#/components/schemas/NumberKpi'
+        maintainedProjectCount:
+          type: integer
+        inProgressIssueCount:
+          type: integer
+        pendingApplicationCount:
+          type: integer
 
     ContributorOverviewResponse:
       allOf:
