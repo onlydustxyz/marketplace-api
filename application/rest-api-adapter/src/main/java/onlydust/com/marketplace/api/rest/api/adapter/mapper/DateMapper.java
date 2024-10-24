@@ -14,6 +14,8 @@ import static java.util.Objects.isNull;
 
 public interface DateMapper {
 
+    ZonedDateTime DEFAULT_FROM_DATE = ZonedDateTime.parse("2007-10-20T05:24:19Z");
+
     static ZonedDateTime toZoneDateTime(final Date date) {
         return isNull(date) ? null : ZonedDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC"));
     }

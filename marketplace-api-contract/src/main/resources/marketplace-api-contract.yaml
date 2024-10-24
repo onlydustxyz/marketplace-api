@@ -202,6 +202,40 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/contributors/{contributorId}/kpi:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadContributors
+      summary: Get contributor kpi
+      operationId: getContributorKPI
+      description: |
+        Get contributor kpi.
+      parameters:
+        - name: contributorId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/GithubUserId'
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
+      responses:
+        "200":
+          description: 'Contribution list'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributorKpiResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 
   /api/v1/contributions:
     get:
@@ -12353,3 +12387,26 @@ components:
           $ref: '#/components/schemas/ProjectLinkResponse'
         billingProfileId:
           $ref: '#/components/schemas/BillingProfileId'
+
+    ContributorKpiResponse:
+      type: object
+      required:
+        - maintained_projects
+        - contributed_projects
+        - rewards
+        - merged_pr
+        - resolved_issues
+        - pending_applications
+      properties:
+        maintainedProjects:
+          type: integer
+        contributedProjects:
+          type: integer
+        rewards:
+          type: integer
+        mergedPRs:
+          type: integer
+        resolvedIssues:
+          type: integer
+        pendingApplications:
+          type: integer
