@@ -79,13 +79,10 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
 
     @Override
     public ResponseEntity<BiContributorsPageItemResponse> getBIContributor(Long contributorId) {
-        final var page = contributorKpisReadRepository.findAll(new BiContributorsQueryParams()
-                .contributorIds(List.of(contributorId))
-                .includeApplicants(true)
-                .pageIndex(0).pageSize(1));
+        final var contributor = contributorKpisReadRepository.findById(contributorId);
         return ok()
                 .cacheControl(cache.forEverybody(Cache.S))
-                .body(page.stream().findFirst().map(ContributorKpisReadEntity::toDto)
+                .body(contributor.map(ContributorKpisReadEntity::toDto)
                         .orElseThrow(() -> notFound("Contributor with id %d not found".formatted(contributorId))));
     }
 
