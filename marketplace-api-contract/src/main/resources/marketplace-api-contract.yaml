@@ -3574,7 +3574,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
     delete:
-      deprecated: true
       security:
         - bearerAuth: [ ]
       tags:
@@ -3589,6 +3588,11 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/ProjectApplicationId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectApplicationDeleteRequest'
       responses:
         "204":
           description: 'The application was deleted successfully.'
@@ -8668,6 +8672,14 @@ components:
         - status
       properties:
         isIgnored:
+          type: boolean
+
+    ProjectApplicationDeleteRequest:
+      type: object
+      required:
+        - deleteGithubComment
+      properties:
+        deleteGithubComment:
           type: boolean
 
     ProjectApplicationResponse:

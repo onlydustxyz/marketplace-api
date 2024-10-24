@@ -184,7 +184,7 @@ public class ApplicationServiceTest {
         when(projectApplicationStoragePort.findApplication(applicationId)).thenReturn(Optional.empty());
 
         // When
-        assertThatThrownBy(() -> applicationService.deleteApplication(applicationId, userId, githubUserId))
+        assertThatThrownBy(() -> applicationService.deleteApplication(applicationId, userId, githubUserId, false))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Application %s not found".formatted(applicationId));
@@ -205,7 +205,7 @@ public class ApplicationServiceTest {
         when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(UserId.random()));
 
         // When
-        assertThatThrownBy(() -> applicationService.deleteApplication(application.id(), userId, githubUserId))
+        assertThatThrownBy(() -> applicationService.deleteApplication(application.id(), userId, githubUserId, false))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("User is not authorized to delete this application");
@@ -225,7 +225,7 @@ public class ApplicationServiceTest {
         when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
 
         // When
-        applicationService.deleteApplication(application.id(), userId, githubUserId);
+        applicationService.deleteApplication(application.id(), userId, githubUserId, true);
 
         // Then
         verify(projectApplicationStoragePort).deleteApplications(application.id());
@@ -250,7 +250,7 @@ public class ApplicationServiceTest {
         when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
 
         // When
-        applicationService.deleteApplication(application.id(), userId, githubUserId);
+        applicationService.deleteApplication(application.id(), userId, githubUserId, false);
 
         // Then
         verify(projectApplicationStoragePort).deleteApplications(application.id());
@@ -274,7 +274,9 @@ public class ApplicationServiceTest {
         when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
 
         // When
-        applicationService.deleteApplication(application.id(), userId, githubUserId);
+        assertThatThrownBy(() -> applicationService.deleteApplication(application.id(), userId, githubUserId, true))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("User is not authorized to delete this application");
 
         // Then
         verify(projectApplicationStoragePort).deleteApplications(application.id());
@@ -297,7 +299,7 @@ public class ApplicationServiceTest {
         when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(userId));
 
         // When
-        applicationService.deleteApplication(application.id(), userId, githubUserId);
+        applicationService.deleteApplication(application.id(), userId, githubUserId, true);
 
         // Then
         verify(projectApplicationStoragePort).deleteApplications(application.id());

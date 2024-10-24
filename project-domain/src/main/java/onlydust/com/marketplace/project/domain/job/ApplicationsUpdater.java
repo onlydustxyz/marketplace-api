@@ -55,8 +55,8 @@ public class ApplicationsUpdater implements OutboxConsumer {
 
     private void process(OnGithubCommentEdited event) {
         final var comment = GithubComment.of(event);
-        createMissingApplications(comment);
         deleteObsoleteGithubApplications(comment.id(), Optional.of(comment.body()));
+        createMissingApplications(comment);
     }
 
     private void process(OnGithubCommentDeleted event) {

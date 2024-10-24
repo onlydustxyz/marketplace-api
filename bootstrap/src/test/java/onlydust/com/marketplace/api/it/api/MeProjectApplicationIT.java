@@ -4,6 +4,7 @@ import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import onlydust.com.marketplace.api.contract.model.ContributionsQueryParams;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateRequest;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateResponse;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationDeleteRequest;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndexingEventRepository;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 
 import java.time.ZonedDateTime;
@@ -219,9 +221,12 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         ));
 
         // When
-        client.delete()
+        client.method(HttpMethod.DELETE)
                 .uri(getApiURI(APPLICATION.formatted(applicationId)))
                 .header("Authorization", BEARER_PREFIX + user.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new ProjectApplicationDeleteRequest()
+                        .deleteGithubComment(false))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -250,9 +255,12 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         ));
 
         // When
-        client.delete()
+        client.method(HttpMethod.DELETE)
                 .uri(getApiURI(APPLICATION.formatted(applicationId)))
                 .header("Authorization", BEARER_PREFIX + user.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new ProjectApplicationDeleteRequest()
+                        .deleteGithubComment(true))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -282,9 +290,12 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         ));
 
         // When
-        client.delete()
+        client.method(HttpMethod.DELETE)
                 .uri(getApiURI(APPLICATION.formatted(applicationId)))
                 .header("Authorization", BEARER_PREFIX + projectLead.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new ProjectApplicationDeleteRequest()
+                        .deleteGithubComment(false))
                 // Then
                 .exchange()
                 .expectStatus()

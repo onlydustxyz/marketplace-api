@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ProjectApplicationsApi;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationDeleteRequest;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationPatchRequest;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.project.domain.model.Application;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+import static java.lang.Boolean.TRUE;
 import static org.springframework.http.ResponseEntity.noContent;
 
 @RestController
@@ -32,9 +34,10 @@ public class ProjectApplicationsRestApi implements ProjectApplicationsApi {
     }
 
     @Override
-    public ResponseEntity<Void> deleteProjectApplication(UUID applicationId) {
+    public ResponseEntity<Void> deleteProjectApplication(UUID applicationId, ProjectApplicationDeleteRequest request) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        applicationFacadePort.deleteApplication(Application.Id.of(applicationId), authenticatedUser.id(), authenticatedUser.githubUserId());
+        applicationFacadePort.deleteApplication(Application.Id.of(applicationId), authenticatedUser.id(), authenticatedUser.githubUserId(),
+                TRUE.equals(request.getDeleteGithubComment()));
         return noContent().build();
     }
 
