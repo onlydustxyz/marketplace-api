@@ -94,13 +94,6 @@ public class Application {
                 null);
     }
 
-    public void updateMotivations(@NonNull String motivations,
-                                  String problemSolvingApproach) {
-        this.origin = Origin.MARKETPLACE;
-        this.motivations = motivations;
-        this.problemSolvingApproach = problemSolvingApproach;
-    }
-
     public void ignore() {
         this.ignoredAt = CurrentDateProvider.now().toInstant().atZone(ZoneOffset.UTC);
     }
