@@ -130,7 +130,9 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 hasGoodFirstIssues,
                 PageRequest.of(pageIndex, pageSize, isNull(sort) ? JpaSort.unsafe(ASC, "project_name") :
                         switch (sort) {
-                            case RANK -> JpaSort.unsafe(DESC, "rank").and(JpaSort.unsafe(ASC, "project_name"));
+                            case RANK -> JpaSort.unsafe(DESC, "coalesce(is_invited_as_project_lead.value, false)")
+                                    .and(JpaSort.unsafe(DESC, "coalesce(pr.rank, p.rank)"))
+                                    .and(JpaSort.unsafe(ASC, "project_name"));
                             case NAME -> JpaSort.unsafe(ASC, "project_name");
                             case REPO_COUNT -> JpaSort.unsafe(DESC, "coalesce(array_length(p.repo_ids, 1), 0)").and(JpaSort.unsafe(ASC, "project_name"));
                             case CONTRIBUTOR_COUNT -> JpaSort.unsafe(DESC, "coalesce(pcd.contributor_count, 0)").and(JpaSort.unsafe(ASC, "project_name"));

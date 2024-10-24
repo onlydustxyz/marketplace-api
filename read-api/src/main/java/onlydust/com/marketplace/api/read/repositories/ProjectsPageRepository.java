@@ -30,12 +30,16 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                                                                                  as remaining_usd_budget,
                    coalesce(pcd.good_first_issue_count, 0) > 0                                   as has_good_first_issues,
                    p.has_repos_without_github_app_installed                                      as has_repos_without_github_app_installed,
-                   (:userId is not null and
-                    p.invited_project_lead_ids is not null and :userId = any (p.invited_project_lead_ids) and
-                    not (p.project_lead_ids is not null and :userId = any (p.project_lead_ids))) as is_invited_as_project_lead
+                   is_invited_as_project_lead.value                                              as is_invited_as_project_lead
             FROM bi.p_project_global_data p
                      JOIN bi.p_project_budget_data pb on p.project_id = pb.project_id
                      JOIN bi.p_project_contributions_data pcd on p.project_id = pcd.project_id
+                     LEFT JOIN p_user_project_recommendations pr on pr.project_id = p.project_id and pr.user_id = :userId
+                     LEFT JOIN LATERAL (
+                         select (:userId is not null and
+                                p.invited_project_lead_ids is not null and :userId = any (p.invited_project_lead_ids) and
+                                not (p.project_lead_ids is not null and :userId = any (p.project_lead_ids))) as value
+                     ) as is_invited_as_project_lead on true
             
             WHERE (p.project_visibility = 'PUBLIC' and array_length(p.repo_ids, 1) > 0 or
                    :userId = any (p.project_lead_ids) or

@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.api.contract.model.ProjectPageItemResponse;
+import onlydust.com.marketplace.api.contract.model.ProjectPageResponse;
 import onlydust.com.marketplace.api.helper.DatabaseHelper;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
@@ -26,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 
 @TagProject
@@ -3161,6 +3165,32 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .json(GET_PROJECTS_FOR_AUTHENTICATED_USER_JSON_RESPONSE);
+    }
+
+    @Test
+    @Order(7)
+    void should_sort_projects_by_recommendation() {
+        // Given
+        final var caller = userAuthHelper.authenticateAntho();
+        projectHelper.inviteProjectLead(ProjectId.of("00490be6-2c03-4720-993b-aea3e07edd81"), caller);
+
+        // When
+        final var projects = client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "sort", "RANK")))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(ProjectPageResponse.class)
+                .returnResult()
+                .getResponseBody()
+                .getProjects();
+
+        assertThat(projects)
+                .extracting(ProjectPageItemResponse::getSlug)
+                .startsWith("zama", // as pending project lead
+                        "qa-new-contributions", "toto", "aiolia-du-lion" // as recommended
+                );
     }
 
     @Test
