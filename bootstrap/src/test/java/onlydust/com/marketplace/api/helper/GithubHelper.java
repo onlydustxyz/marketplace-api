@@ -165,11 +165,11 @@ public class GithubHelper {
         return contributionUuid;
     }
 
-    public Long createIssue(GithubRepo repo, UserAuthHelper.AuthenticatedUser contributor) {
-        return createIssue(repo.getId(), CurrentDateProvider.now(), CurrentDateProvider.now().plusDays(1), "COMPLETED", contributor);
+    public Long createIssue(GithubRepo repo, UserAuthHelper.AuthenticatedUser author) {
+        return createIssue(repo.getId(), CurrentDateProvider.now(), CurrentDateProvider.now().plusDays(1), "COMPLETED", author);
     }
 
-    public Long createIssue(Long repoId, ZonedDateTime createdAt, ZonedDateTime closedAt, String status, UserAuthHelper.AuthenticatedUser contributor) {
+    public Long createIssue(Long repoId, ZonedDateTime createdAt, ZonedDateTime closedAt, String status, UserAuthHelper.AuthenticatedUser author) {
         final var parameters = new HashMap<String, Object>();
         parameters.put("repoId", repoId);
         parameters.put("number", faker.random().nextInt(10));
@@ -179,7 +179,7 @@ public class GithubHelper {
         parameters.put("commentsCount", faker.random().nextInt(10));
         parameters.put("createdAt", createdAt);
         parameters.put("closedAt", closedAt);
-        parameters.put("authorId", contributor.user().getGithubUserId());
+        parameters.put("authorId", author.user().getGithubUserId());
         parameters.put("htmlUrl", faker.internet().url());
 
         final Long nextIssueId = databaseHelper.<Long>executeReadQuery(
@@ -191,7 +191,7 @@ public class GithubHelper {
         );
         parameters.put("issueId", nextIssueId);
 
-        createAccount(contributor);
+        createAccount(author);
 
         databaseHelper.executeQuery(
                 """
@@ -222,7 +222,7 @@ public class GithubHelper {
                 parameters
         );
 
-        createContributionFromIssue(nextIssueId, contributor.user().getGithubUserId());
+        createContributionFromIssue(nextIssueId, null);
 
         return nextIssueId;
     }
@@ -355,12 +355,11 @@ public class GithubHelper {
                                 'APPROVED',
                                 null
                         from indexer_exp.github_issues gi
-                        join indexer_exp.github_accounts ga on ga.id = :contributorId
+                        join indexer_exp.github_accounts ga on ga.id = gi.author_id
                         where gi.id = :issueId
                         on conflict do nothing;
                 """, Map.of("contributionId", contributionId,
-                "issueId", issueId,
-                "contributorId", contributorId));
+                "issueId", issueId));
 
         addGroupedContributionFromContribution(contributionId, contributorId);
         addRepoContributorFromIssue(issueId, contributorId);
@@ -371,6 +370,9 @@ public class GithubHelper {
     }
 
     private void addRepoContributorFromIssue(Long issueId, Long contributorId) {
+        if (contributorId == null)
+            return;
+
         databaseHelper.executeQuery("""
                 insert into indexer_exp.repos_contributors(repo_id, contributor_id, completed_contribution_count, total_contribution_count)
                 select distinct repo_id, :contributorId, case when c.status = 'COMPLETED' THEN 1 ELSE 0 END, 1
@@ -518,10 +520,14 @@ public class GithubHelper {
                 FROM indexer_exp.contributions c
                 WHERE c.id = :contributionId
                 ON CONFLICT DO NOTHING;
-                
-                INSERT INTO indexer_exp.grouped_contribution_contributors (contribution_uuid, contributor_id)
-                VALUES ((select c.contribution_uuid from indexer_exp.contributions c where c.id = :contributionId), :contributorId)
-                ON CONFLICT DO NOTHING;
-                """, Map.of("contributionId", contributionId, "contributorId", contributorId));
+                """, Map.of("contributionId", contributionId));
+
+        if (contributorId != null) {
+            databaseHelper.executeQuery("""
+                    INSERT INTO indexer_exp.grouped_contribution_contributors (contribution_uuid, contributor_id)
+                    VALUES ((select c.contribution_uuid from indexer_exp.contributions c where c.id = :contributionId), :contributorId)
+                    ON CONFLICT DO NOTHING;
+                    """, Map.of("contributionId", contributionId, "contributorId", contributorId));
+        }
     }
 }
