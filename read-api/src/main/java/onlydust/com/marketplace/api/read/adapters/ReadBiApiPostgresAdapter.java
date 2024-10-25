@@ -161,8 +161,9 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     public ResponseEntity<ContributorActivityGraphResponse> getContributorActivityGraph(Long contributorId,
                                                                                         ContributorActivityGraphDataSourceEnum dataSource,
                                                                                         UUID dataSourceProjectId) {
-        final var days = contributorActivityGraphReadRepository.findLastYear(contributorId,
-                dataSource == ContributorActivityGraphDataSourceEnum.GITHUB,
+        final var days = contributorActivityGraphReadRepository.findLastYear(ZonedDateTime.now().minusDays(364),
+                contributorId,
+                dataSource == ContributorActivityGraphDataSourceEnum.ONLYDUST,
                 dataSourceProjectId);
         return ok()
                 .cacheControl(cache.forEverybody(Cache.XL))

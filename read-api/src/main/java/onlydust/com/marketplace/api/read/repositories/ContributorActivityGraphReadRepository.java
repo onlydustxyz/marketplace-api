@@ -4,6 +4,7 @@ import onlydust.com.marketplace.api.read.entities.bi.ContributorActivityGraphDay
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,7 +40,7 @@ public interface ContributorActivityGraphReadRepository extends Repository<Contr
                                                    date_trunc('DAY', now()),
                                                    interval '1 day') as day_timestamp) series)
             
-            SELECT extract('DAY' from allt.day_timestamp)  as day,
+            SELECT extract('DOY' from allt.day_timestamp)  as day,
                    extract('WEEK' from allt.day_timestamp) as week,
                    extract('YEAR' from allt.day_timestamp) as year,
                    coalesce(acs.issue_count, 0)            as issue_count,
@@ -53,7 +54,8 @@ public interface ContributorActivityGraphReadRepository extends Repository<Contr
                                ON allt.day_timestamp = aprs.day_timestamp
             """,
             nativeQuery = true)
-    List<ContributorActivityGraphDayReadEntity> findLastYear(Long contributorId,
+    List<ContributorActivityGraphDayReadEntity> findLastYear(ZonedDateTime fromDate,
+                                                             Long contributorId,
                                                              Boolean onlyOnlyDustData,
                                                              UUID projectId);
 

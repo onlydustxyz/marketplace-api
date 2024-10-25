@@ -12478,9 +12478,8 @@ components:
     ContributorActivityGraphDataSourceEnum:
       type: string
       enum:
-        - GITHUB
+        - ALL
         - ONLYDUST
-        - PROJECT
 
     ContributorActivityGraphResponse:
       type: object
