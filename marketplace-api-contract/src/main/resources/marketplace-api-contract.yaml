@@ -202,6 +202,39 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/bi/contributors/{contributorId}/activity-graph:
+    get:
+      tags:
+        - ReadBi
+      summary: Get contributor activity-graph data
+      operationId: getContributorActivityGraph
+      parameters:
+        - name: contributorId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/GithubUserId'
+        - name: dataSource
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/ContributorActivityGraphDataSourceEnum'
+        - name: dataSourceProjectId
+          in: query
+          required: false
+          description: Required if dataSource is PROJECT
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      responses:
+        "200":
+          description: 'Contributor'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributorActivityGraphResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 
   /api/v1/contributions:
     get:
@@ -12441,3 +12474,49 @@ components:
           $ref: '#/components/schemas/ProjectLinkResponse'
         billingProfileId:
           $ref: '#/components/schemas/BillingProfileId'
+
+    ContributorActivityGraphDataSourceEnum:
+      type: string
+      enum:
+        - GITHUB
+        - ONLYDUST
+        - PROJECT
+
+    ContributorActivityGraphResponse:
+      type: object
+      required:
+        - days
+      properties:
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributorActivityGraphDayResponse'
+
+    ContributorActivityGraphDayResponse:
+      type: object
+      required:
+        - year
+        - week
+        - day
+        - codeReviewCount
+        - issueCount
+        - pullRequestCount
+        - rewardCount
+      properties:
+        year:
+          type: integer
+          example: 2023
+        week:
+          type: integer
+          example: 34
+        day:
+          type: integer
+          example: 362
+        codeReviewCount:
+          type: integer
+        issueCount:
+          type: integer
+        pullRequestCount:
+          type: integer
+        rewardCount:
+          type: integer
