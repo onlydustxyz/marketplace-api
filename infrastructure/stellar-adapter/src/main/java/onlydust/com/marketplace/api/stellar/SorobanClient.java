@@ -47,8 +47,7 @@ public class SorobanClient {
             final var response = server.getTransaction(hash);
             return switch (response.getStatus()) {
                 case NOT_FOUND -> Optional.empty();
-                case SUCCESS -> Optional.of(response);
-                case FAILED -> throw internalServerError("Error while fetching transaction");
+                case FAILED, SUCCESS -> Optional.of(response);
             };
         } catch (ErrorResponse | SorobanRpcErrorResponse e) {
             throw internalServerError("Error while fetching transaction", e);

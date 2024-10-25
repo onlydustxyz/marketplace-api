@@ -35,6 +35,11 @@
             <groupId>onlydust.com.marketplace.kernel</groupId>
             <artifactId>marketplace-kernel</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock-standalone</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

@@ -13,7 +13,9 @@ import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarTransferT
 import org.stellar.sdk.KeyPair;
 import org.stellar.sdk.responses.sorobanrpc.GetTransactionResponse;
 import org.stellar.sdk.scval.Scv;
-import org.stellar.sdk.xdr.OperationType;
+import org.stellar.sdk.xdr.CreateAccountOp;
+import org.stellar.sdk.xdr.PaymentOp;
+import org.stellar.sdk.xdr.Transaction;
 import org.stellar.sdk.xdr.TransactionEnvelope;
 
 import java.math.BigDecimal;
@@ -21,6 +23,7 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
@@ -50,33 +53,59 @@ public class StellarTransactionStorageAdapter implements BlockchainTransactionSt
         };
 
         return Arrays.stream(tx.getOperations())
-                .filter(op -> op.getBody().getDiscriminant() == OperationType.PAYMENT)
-                .map(op -> op.getBody().getPaymentOp())
-                .map(op -> {
-                    final var contractAddress = switch (op.getAsset().getDiscriminant()) {
-                        case ASSET_TYPE_CREDIT_ALPHANUM4, ASSET_TYPE_CREDIT_ALPHANUM12 -> StellarContractAddress.of(horizon.asset(op.getAsset())
-                                .orElseThrow(() -> badRequest("Asset not found"))
-                                .getContractID());
-                        default -> null;
-                    };
-
-                    final Long decimals = contractAddress == null ? 7 : Scv.fromUint32(soroban.call(contractAddress.toString(), "decimals"));
-
-                    return new StellarTransferTransaction(
-                            reference,
-                            Instant.ofEpochSecond(response.getCreatedAt()).atZone(ZoneOffset.UTC),
-                            switch (response.getStatus()) {
-                                case NOT_FOUND -> PENDING;
-                                case SUCCESS -> CONFIRMED;
-                                case FAILED -> FAILED;
-                            },
-                            StellarAccountId.of(KeyPair.fromPublicKey(tx.getSourceAccount().getEd25519().getUint256()).getAccountId()),
-                            StellarAccountId.of(KeyPair.fromPublicKey(op.getDestination().getEd25519().getUint256()).getAccountId()),
-                            BigDecimal.valueOf(op.getAmount().getInt64(), decimals.intValue()),
-                            contractAddress
-                    );
+                .flatMap(op -> switch (op.getBody().getDiscriminant()) {
+                    case CREATE_ACCOUNT -> Stream.of(from(reference, response, op.getBody().getCreateAccountOp(), tx));
+                    case PAYMENT -> Stream.of(from(reference, response, op.getBody().getPaymentOp(), tx));
+                    default -> Stream.empty();
                 })
                 .findFirst()
-                .orElseThrow(() -> badRequest("Transaction %s does not contain any payment operation".formatted(reference)));
+                .orElseThrow(() -> badRequest("Transaction %s does not contain any supported operation".formatted(reference)));
+    }
+
+    private @NonNull StellarTransferTransaction from(@NonNull StellarTransaction.Hash reference,
+                                                     @NonNull GetTransactionResponse response,
+                                                     @NonNull PaymentOp op,
+                                                     @NonNull Transaction tx) {
+        final var contractAddress = switch (op.getAsset().getDiscriminant()) {
+            case ASSET_TYPE_CREDIT_ALPHANUM4, ASSET_TYPE_CREDIT_ALPHANUM12 -> StellarContractAddress.of(horizon.asset(op.getAsset())
+                    .orElseThrow(() -> badRequest("Asset not found"))
+                    .getContractID());
+            default -> null;
+        };
+
+        final Long decimals = contractAddress == null ? 7 : Scv.fromUint32(soroban.call(contractAddress.toString(), "decimals"));
+
+        return new StellarTransferTransaction(
+                reference,
+                Instant.ofEpochSecond(response.getCreatedAt()).atZone(ZoneOffset.UTC),
+                switch (response.getStatus()) {
+                    case NOT_FOUND -> PENDING;
+                    case SUCCESS -> CONFIRMED;
+                    case FAILED -> FAILED;
+                },
+                StellarAccountId.of(KeyPair.fromPublicKey(tx.getSourceAccount().getEd25519().getUint256()).getAccountId()),
+                StellarAccountId.of(KeyPair.fromPublicKey(op.getDestination().getEd25519().getUint256()).getAccountId()),
+                BigDecimal.valueOf(op.getAmount().getInt64(), decimals.intValue()),
+                contractAddress
+        );
+    }
+
+    private @NonNull StellarTransferTransaction from(@NonNull StellarTransaction.Hash reference,
+                                                     @NonNull GetTransactionResponse response,
+                                                     @NonNull CreateAccountOp op,
+                                                     @NonNull Transaction tx) {
+        return new StellarTransferTransaction(
+                reference,
+                Instant.ofEpochSecond(response.getCreatedAt()).atZone(ZoneOffset.UTC),
+                switch (response.getStatus()) {
+                    case NOT_FOUND -> PENDING;
+                    case SUCCESS -> CONFIRMED;
+                    case FAILED -> FAILED;
+                },
+                StellarAccountId.of(KeyPair.fromPublicKey(tx.getSourceAccount().getEd25519().getUint256()).getAccountId()),
+                StellarAccountId.of(KeyPair.fromPublicKey(op.getDestination().getAccountID().getEd25519().getUint256()).getAccountId()),
+                BigDecimal.valueOf(op.getStartingBalance().getInt64(), 7),
+                null
+        );
     }
 }

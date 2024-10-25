@@ -1,0 +1,23 @@
+{
+    "request": {
+        "url": "/",
+        "method": "POST",
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "jsonrpc": "2.0",
+                    "method": "getTransaction",
+                    "params": {
+                        "hash": "01cab5c04cf265b2995a2e5c4e961cad82d38bfb9e950ec3f6e33e5ff28500d8"
+                    }
+                },
+                "ignoreArrayOrder": true,
+                "ignoreExtraElements": true
+            }
+        ]
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-getTransaction-xlm.json"
+    }
+}
