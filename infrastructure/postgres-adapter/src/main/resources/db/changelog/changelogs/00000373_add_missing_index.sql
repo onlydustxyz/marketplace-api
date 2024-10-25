@@ -1,0 +1,1 @@
+create index if not exists bi_p_contributor_global_data_contributed_on_project_ids_idx on bi.p_contributor_global_data using gin (contributed_on_project_ids);

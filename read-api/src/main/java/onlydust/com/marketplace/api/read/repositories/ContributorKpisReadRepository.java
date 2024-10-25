@@ -4,6 +4,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.bi.ContributorKpisReadEntity;
+import org.intellij.lang.annotations.Language;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,7 +34,8 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
         };
     }
 
-    @Query(value = """
+    @Language("PostgreSQL")
+    String SELECT = """
             SELECT -- /// global data /// --
                    d.contributor_id,
                    d.contributor_login,
@@ -100,7 +102,9 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                   case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
                   case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
               ) <= :contributionCountMax)
-            """,
+            """;
+
+    @Query(value = SELECT,
             countQuery = """
                     SELECT count(d.contributor_id)
                     FROM bi.select_contributors(:fromDate, :toDate, :dataSourceIds, :contributorIds, :contributionUuids, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis, :includeApplicants) d
@@ -156,6 +160,47 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                             Integer contributionCountMax,
                                             String[] contributionTypes,
                                             Pageable pageable);
+
+    @Query(value = SELECT + " and d.contributor_id = :contributorId", nativeQuery = true)
+    Optional<ContributorKpisReadEntity> findById(Long contributorId,
+                                                 ZonedDateTime fromDate,
+                                                 ZonedDateTime toDate,
+                                                 ZonedDateTime fromDatePreviousPeriod,
+                                                 ZonedDateTime toDatePreviousPeriod,
+                                                 UUID[] dataSourceIds,
+                                                 @NonNull Boolean showFilteredKpis,
+                                                 String search,
+                                                 Long[] contributorIds,
+                                                 UUID[] contributionUuids,
+                                                 UUID[] projectIds,
+                                                 UUID[] labelProjectIds,
+                                                 String[] projectSlugs,
+                                                 UUID[] categoryIds,
+                                                 UUID[] languageIds,
+                                                 UUID[] ecosystemIds,
+                                                 String[] countryCodes,
+                                                 String[] contributionStatuses,
+                                                 Boolean includeApplicants,
+                                                 BigDecimal totalRewardedUsdAmountMin,
+                                                 BigDecimal totalRewardedUsdAmountEq,
+                                                 BigDecimal totalRewardedUsdAmountMax,
+                                                 Integer rewardCountMin,
+                                                 Integer rewardCountEq,
+                                                 Integer rewardCountMax,
+                                                 Integer contributionCountMin,
+                                                 Integer contributionCountEq,
+                                                 Integer contributionCountMax,
+                                                 String[] contributionTypes);
+
+    default Optional<ContributorKpisReadEntity> findById(Long contributorId) {
+        return findById(contributorId, null, null, null, null, null,
+                false, // showFilteredKpis
+                null,
+                new Long[]{contributorId}, // contributorIds
+                null, null, null, null, null, null, null, null, null,
+                true, // includeApplicants
+                null, null, null, null, null, null, null, null, null, null);
+    }
 
     default Page<ContributorKpisReadEntity> findAll(BiContributorsQueryParams q) {
         final var sanitizedFromDate = q.getFromDate() == null ? null : parseZonedNullable(q.getFromDate()).truncatedTo(ChronoUnit.DAYS);
