@@ -10,6 +10,8 @@ import onlydust.com.marketplace.api.contract.model.Money;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import static java.math.BigDecimal.ONE;
+import static java.math.BigDecimal.ZERO;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.mapCurrency;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.pretty;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
@@ -17,7 +19,7 @@ import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 public interface MoneyMapper {
     static DetailedTotalMoneyTotalPerCurrencyInner toDetailedTotalMoneyTotalPerCurrencyInner(onlydust.com.marketplace.project.domain.view.Money money,
                                                                                              BigDecimal usdTotal) {
-        final var ratio = (usdTotal == null || money.dollarsEquivalent().isEmpty() || usdTotal.compareTo(BigDecimal.ZERO) == 0) ? null :
+        final var ratio = (usdTotal == null || money.dollarsEquivalent().isEmpty() || usdTotal.compareTo(ZERO) == 0) ? null :
                 money.dollarsEquivalent().get().multiply(BigDecimal.valueOf(100)).divide(usdTotal, 0, RoundingMode.HALF_EVEN);
 
         return new DetailedTotalMoneyTotalPerCurrencyInner()
@@ -59,7 +61,7 @@ public interface MoneyMapper {
 
     static ConvertibleMoney toConvertibleMoney(onlydust.com.marketplace.accounting.domain.model.Money money,
                                                onlydust.com.marketplace.accounting.domain.model.Money base) {
-        final var conversionRate = base.getValue().divide(money.getValue(), 2, RoundingMode.HALF_EVEN);
+        final var conversionRate = money.getValue().compareTo(ZERO) == 0 ? ONE : base.getValue().divide(money.getValue(), 2, RoundingMode.HALF_EVEN);
         return new ConvertibleMoney()
                 .amount(money.getValue())
                 .prettyAmount(pretty(money.getValue(), money.getCurrency().decimals(), conversionRate))
