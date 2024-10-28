@@ -201,6 +201,11 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     }
 
     @Override
+    public ResponseEntity<SponsorProgramPageResponse> getProjectPrograms(UUID projectId, Integer pageIndex, Integer pageSize, String search) {
+        return ReadProjectsApi.super.getProjectPrograms(projectId, pageIndex, pageSize, search);
+    }
+
+    @Override
     public ResponseEntity<GithubIssuePageResponse> getProjectPublicIssues(UUID projectId,
                                                                           Integer pageIndex,
                                                                           Integer pageSize,

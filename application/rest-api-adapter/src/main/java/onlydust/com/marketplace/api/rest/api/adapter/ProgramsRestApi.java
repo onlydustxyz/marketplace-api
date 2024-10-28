@@ -58,6 +58,11 @@ public class ProgramsRestApi implements ProgramsApi {
     }
 
     @Override
+    public ResponseEntity<Void> unallocateFundsFromProgram(UUID programId, UnallocateRequest unallocateRequest) {
+        return ProgramsApi.super.unallocateFundsFromProgram(programId, unallocateRequest);
+    }
+
+    @Override
     public ResponseEntity<CreateProgramResponse> createProgram(UUID sponsorId, CreateProgramRequest request) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 

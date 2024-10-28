@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.rest.api.adapter;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.ProjectsApi;
@@ -426,6 +425,11 @@ public class ProjectsRestApi implements ProjectsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         contributionsFacadePort.unassign(ProjectId.of(projectId), authenticatedUser.id(), ContributionUUID.of(contributionUuid), contributorId);
         return noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> ungrantFundsFromProject(UUID projectId, UngrantRequest ungrantRequest) {
+        return ProjectsApi.super.ungrantFundsFromProject(projectId, ungrantRequest);
     }
 
     @Override
