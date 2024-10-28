@@ -19,6 +19,7 @@ public class ERC20ProviderFactory {
             case STARKNET -> starknetProvider;
             case APTOS -> aptosProvider;
             case STELLAR -> stellarProvider;
+            case NEAR -> null;
         };
     }
 }

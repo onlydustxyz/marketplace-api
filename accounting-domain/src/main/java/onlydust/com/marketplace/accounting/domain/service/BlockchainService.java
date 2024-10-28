@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.BlockchainTransaction
 import onlydust.com.marketplace.kernel.model.blockchain.*;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosTransaction;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmTransaction;
+import onlydust.com.marketplace.kernel.model.blockchain.near.NearTransaction;
 import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetTransaction;
 import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarTransaction;
 
@@ -20,6 +21,7 @@ public class BlockchainService implements BlockchainFacadePort {
     private final BlockchainTransactionStoragePort<AptosTransaction, AptosTransaction.Hash> aptosTransactionStoragePort;
     private final BlockchainTransactionStoragePort<StarknetTransaction, StarknetTransaction.Hash> starknetTransactionStoragePort;
     private final BlockchainTransactionStoragePort<StellarTransaction, StellarTransaction.Hash> stellarTransactionStoragePort;
+    private final BlockchainTransactionStoragePort<NearTransaction, NearTransaction.Hash> nearTransactionStoragePort;
 
     @Override
     public Optional<Blockchain.Transaction> getTransaction(Blockchain blockchain, String reference) {
@@ -29,6 +31,7 @@ public class BlockchainService implements BlockchainFacadePort {
             case APTOS -> aptosTransactionStoragePort.get(Aptos.transactionHash(reference)).map(identity());
             case STARKNET -> starknetTransactionStoragePort.get(StarkNet.transactionHash(reference)).map(identity());
             case STELLAR -> stellarTransactionStoragePort.get(Stellar.transactionHash(reference)).map(identity());
+            case NEAR -> nearTransactionStoragePort.get(Near.transactionHash(reference)).map(identity());
         });
     }
 
@@ -40,6 +43,7 @@ public class BlockchainService implements BlockchainFacadePort {
             case APTOS -> Aptos.transactionHash(reference).toString();
             case STARKNET -> StarkNet.transactionHash(reference).toString();
             case STELLAR -> Stellar.transactionHash(reference).toString();
+            case NEAR -> Near.transactionHash(reference).toString();
         });
     }
 }

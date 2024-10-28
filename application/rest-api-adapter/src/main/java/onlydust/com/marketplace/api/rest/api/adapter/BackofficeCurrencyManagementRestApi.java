@@ -50,6 +50,7 @@ public class BackofficeCurrencyManagementRestApi implements BackofficeCurrencyMa
                     case STARKNET -> currencyFacadePort.addERC20Support(blockchain, StarkNet.contractAddress(request.getAddress()));
                     case APTOS -> currencyFacadePort.addERC20Support(blockchain, Aptos.coinType(request.getAddress()));
                     case STELLAR -> currencyFacadePort.addERC20Support(blockchain, Stellar.contractAddress(request.getAddress()));
+                    case NEAR -> throw badRequest("ERC20 are not supported on Near");
                 };
             }
 

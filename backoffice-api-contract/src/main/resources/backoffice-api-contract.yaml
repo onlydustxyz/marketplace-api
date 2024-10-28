@@ -3267,6 +3267,7 @@ components:
         - STARKNET
         - APTOS
         - STELLAR
+        - NEAR
 
     ProjectId:
       type: string
@@ -4525,6 +4526,7 @@ components:
         - STARKNET
         - APTOS
         - STELLAR
+        - NEAR
 
     ContractAddress:
       type: string

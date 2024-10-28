@@ -316,6 +316,7 @@ public interface BackOfficeMapper {
             case OPTIMISM -> Blockchain.OPTIMISM;
             case APTOS -> Blockchain.APTOS;
             case STELLAR -> Blockchain.STELLAR;
+            case NEAR -> Blockchain.NEAR;
         };
     }
 
@@ -326,6 +327,7 @@ public interface BackOfficeMapper {
             case OPTIMISM -> BlockchainContract.OPTIMISM;
             case APTOS -> BlockchainContract.APTOS;
             case STELLAR -> BlockchainContract.STELLAR;
+            case NEAR -> BlockchainContract.NEAR;
         };
     }
 
@@ -369,6 +371,7 @@ public interface BackOfficeMapper {
             case APTOS -> Network.APTOS;
             case STELLAR -> Network.STELLAR;
             case SEPA -> Network.SEPA;
+            case NEAR -> Network.NEAR;
         };
     }
 
@@ -380,6 +383,7 @@ public interface BackOfficeMapper {
             case APTOS -> TransactionNetwork.APTOS;
             case STELLAR -> TransactionNetwork.STELLAR;
             case SEPA -> TransactionNetwork.SEPA;
+            case NEAR -> TransactionNetwork.NEAR;
         };
     }
 

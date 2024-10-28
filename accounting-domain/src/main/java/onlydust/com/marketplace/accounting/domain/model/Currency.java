@@ -240,6 +240,7 @@ public class Currency implements Cloneable {
         public final static String ETH_STR = "ETH";
         public final static String APT_STR = "APT";
         public final static String XLM_STR = "XLM";
+        public final static String NEAR_STR = "NEAR";
         public final static String STRK_STR = "STRK";
         public final static String OP_STR = "OP";
         public final static String USDC_STR = "USDC";
@@ -253,6 +254,7 @@ public class Currency implements Cloneable {
         public final static Code OP = Code.of(OP_STR);
         public final static Code USDC = Code.of(USDC_STR);
         public final static Code XLM = Code.of(XLM_STR);
+        public final static Code NEAR = Code.of(NEAR_STR);
 
         String inner;
 
@@ -266,6 +268,7 @@ public class Currency implements Cloneable {
                 case ETHEREUM, OPTIMISM -> ETH;
                 case STARKNET, APTOS -> null;
                 case STELLAR -> XLM;
+                case NEAR -> NEAR;
             };
         }
     }

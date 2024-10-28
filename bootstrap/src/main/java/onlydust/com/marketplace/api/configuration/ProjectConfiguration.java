@@ -37,6 +37,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Configuration
@@ -344,7 +345,7 @@ public class ProjectConfiguration {
                                                      final AptosTransactionStorageAdapter aptosTransactionStorageAdapter,
                                                      final StellarTransactionStorageAdapter stellarTransactionStorageAdapter) {
         return new BlockchainService(ethereumTransactionStorageAdapter, optimismTransactionStorageAdapter, aptosTransactionStorageAdapter,
-                starknetTransactionStoragePort, stellarTransactionStorageAdapter);
+                starknetTransactionStoragePort, stellarTransactionStorageAdapter, reference -> Optional.empty());
     }
 
     @Bean

@@ -13,6 +13,7 @@ public interface NetworkMapper {
             case APTOS -> Network.APTOS;
             case STARKNET -> Network.STARKNET;
             case STELLAR -> Network.STELLAR;
+            case NEAR -> Network.NEAR;
         };
     }
 }

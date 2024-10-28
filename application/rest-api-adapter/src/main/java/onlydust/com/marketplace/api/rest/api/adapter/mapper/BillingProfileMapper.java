@@ -221,6 +221,7 @@ public interface BillingProfileMapper {
             case APTOS -> NetworkContract.APTOS;
             case STELLAR -> NetworkContract.STELLAR;
             case SEPA -> NetworkContract.SEPA;
+            case NEAR -> NetworkContract.NEAR;
         };
     }
 }
