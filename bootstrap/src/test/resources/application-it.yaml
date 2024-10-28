@@ -34,6 +34,9 @@ infrastructure:
   stellar:
     soroban:
       account-id: GAIYZIEWGAEYIVMX5TMSD43HROWXX5WG35KTL6467P52S477IQQJIUEL
+      environment: MAINNET
+    horizon:
+      environment: MAINNET
   coinmarketcap:
     api-key: CMC_API_KEY
   sumsub:

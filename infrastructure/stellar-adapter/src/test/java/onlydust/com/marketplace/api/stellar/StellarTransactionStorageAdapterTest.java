@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.stellar;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import onlydust.com.marketplace.api.stellar.adapters.StellarTransactionStorageAdapter;
+import onlydust.com.marketplace.kernel.model.Environment;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Stellar;
 import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarTransferTransaction;
@@ -20,15 +21,11 @@ class StellarTransactionStorageAdapterTest {
 
     @BeforeEach
     void setUp() {
-        final var sorobanServerMock = wiremock("soroban", "https://soroban-rpc.mainnet.stellar.gateway.fm");
         final var horizonServerMock = wiremock("horizon", "https://stellar.public-rpc.com/http/stellar_horizon");
 
-        final var sorobanClient = new SorobanClient(new SorobanClient.Properties(sorobanServerMock.baseUrl(),
-                "GAIYZIEWGAEYIVMX5TMSD43HROWXX5WG35KTL6467P52S477IQQJIUEL"));
+        final var horizonClient = new HorizonClient(new HorizonClient.Properties(horizonServerMock.baseUrl(), Environment.MAINNET));
 
-        final var horizonClient = new HorizonClient(new HorizonClient.Properties(horizonServerMock.baseUrl()));
-
-        adapter = new StellarTransactionStorageAdapter(sorobanClient, horizonClient);
+        adapter = new StellarTransactionStorageAdapter(horizonClient);
     }
 
     private WireMockServer wiremock(String name, String url) {

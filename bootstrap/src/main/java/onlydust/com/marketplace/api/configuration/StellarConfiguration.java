@@ -44,7 +44,7 @@ public class StellarConfiguration {
     }
 
     @Bean
-    public StellarTransactionStorageAdapter stellarTransactionStorageAdapter(SorobanClient sorobanClient, HorizonClient horizonClient) {
-        return new StellarTransactionStorageAdapter(sorobanClient, horizonClient);
+    public StellarTransactionStorageAdapter stellarTransactionStorageAdapter(HorizonClient horizonClient) {
+        return new StellarTransactionStorageAdapter(horizonClient);
     }
 }
