@@ -2584,7 +2584,68 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/projects/{projectId}/ungrant:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Projects
+      summary: Return funds to a program
+      operationId: ungrantFundsFromProject
+      description: Return funds to a program
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      requestBody:
+        description: Budget to ungrant
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UngrantRequest'
+      responses:
+        "204":
+          description: 'The funds have been ungranted'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/projects/{projectId}/programs:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadProjects
+      summary: Get project programs
+      operationId: getProjectPrograms
+      description: |
+        Get the list of all programs that sponsored this project. 
+        Only project leaders can access this information.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/searchParam'
+      responses:
+        "200":
+          description: 'Project programs page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SponsorProgramPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  
   /api/v1/projects/{projectId}/stats:
     get:
       tags:
@@ -4622,7 +4683,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-
   /api/v1/programs/{programId}:
     get:
       security:
@@ -5067,6 +5127,36 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/programs/{programId}/unallocate:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Programs
+      summary: Return funds to a sponsor
+      operationId: unallocateFundsFromProgram
+      description: Return funds to a sponsor
+      parameters:
+        - in: path
+          name: programId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProgramId'
+      requestBody:
+        description: Budget to unallocate
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnallocateRequest'
+      responses:
+        "204":
+          description: 'The funds have been unallocated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/sponsors/{sponsorId}/unallocate:
     post:
       security:
@@ -5076,6 +5166,7 @@ paths:
       summary: Unallocate budget from a program
       operationId: unallocateBudgetFromProgram
       description: Unallocate some budget from a program
+      deprecated: true
       parameters:
         - in: path
           name: sponsorId
@@ -10384,6 +10475,20 @@ components:
         currencyId:
           $ref: '#/components/schemas/CurrencyId'
 
+    UnallocateRequest:
+      type: object
+      required:
+        - sponsorId
+        - amount
+        - currencyId
+      properties:
+        sponsorId:
+          $ref: '#/components/schemas/SponsorId'
+        amount:
+          type: number
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
+
     GrantRequest:
       type: object
       required:
@@ -10393,6 +10498,20 @@ components:
       properties:
         projectId:
           $ref: '#/components/schemas/ProjectId'
+        amount:
+          type: number
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
+
+    UngrantRequest:
+      type: object
+      required:
+        - programId
+        - amount
+        - currencyId
+      properties:
+        programId:
+          $ref: '#/components/schemas/ProgramId'
         amount:
           type: number
         currencyId:
