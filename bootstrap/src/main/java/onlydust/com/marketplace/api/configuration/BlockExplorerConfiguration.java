@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.configuration;
 import onlydust.com.marketplace.api.infrastructure.blockexplorer.BlockExplorerProperties;
 import onlydust.com.marketplace.api.infrastructure.blockexplorer.adapters.aptos.AptoScan;
 import onlydust.com.marketplace.api.infrastructure.blockexplorer.adapters.ethereum.EtherScan;
+import onlydust.com.marketplace.api.infrastructure.blockexplorer.adapters.near.NearBlocks;
 import onlydust.com.marketplace.api.infrastructure.blockexplorer.adapters.starknet.StarkScan;
 import onlydust.com.marketplace.api.infrastructure.blockexplorer.adapters.stellar.StellarExpert;
 import onlydust.com.marketplace.kernel.model.blockchain.BlockExplorer;
@@ -48,6 +49,11 @@ public class BlockExplorerConfiguration {
     @Bean
     public BlockExplorer<StellarTransaction.Hash> stellarBlockExplorer(final BlockExplorerProperties blockExplorerProperties) {
         return new StellarExpert(blockExplorerProperties);
+    }
+
+    @Bean
+    public BlockExplorer<NearTransaction.Hash> nearBlockExplorer(final BlockExplorerProperties blockExplorerProperties) {
+        return new NearBlocks(blockExplorerProperties);
     }
 
     @Bean
