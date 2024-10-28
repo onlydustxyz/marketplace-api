@@ -1,0 +1,74 @@
+{
+    "status": {
+        "timestamp": "2024-10-28T14:04:34.299Z",
+        "error_code": 0,
+        "error_message": null,
+        "elapsed": 15,
+        "credit_count": 1,
+        "notice": null
+    },
+    "data": {
+        "NEAR": [
+            {
+                "id": 6535,
+                "name": "NEAR Protocol",
+                "symbol": "NEAR",
+                "category": "coin",
+                "description": "NEAR Protocol (NEAR) is a cryptocurrency launched in 2020. NEAR Protocol has a current supply of 1,217,454,858 with 1,216,903,226 in circulation. The last known price of NEAR Protocol is 4.19651991 USD and is down -0.80 over the last 24 hours. It is currently trading on 459 active market(s) with $180,026,075.03 traded over the last 24 hours. More information can be found at https://near.org/.",
+                "slug": "near-protocol",
+                "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/6535.png",
+                "subreddit": "",
+                "tag-names": [
+                    "Platform",
+                    "AI & Big Data",
+                    "Staking",
+                    "Coinbase Ventures Portfolio",
+                    "Three Arrows Capital Portfolio",
+                    "Arrington XRP Capital Portfolio",
+                    "Coinfund Portfolio",
+                    "Electric Capital Portfolio",
+                    "Fabric Ventures Portfolio",
+                    "Kenetic Capital Portfolio",
+                    "Near Protocol Ecosystem",
+                    "Cross-Chain",
+                    "Injective Ecosystem",
+                    "Circle Ventures Portfolio",
+                    "Layer 1",
+                    "SEC Security Token",
+                    "Alleged SEC Securities",
+                    "Account Abstraction",
+                    "Data Availability"
+                ],
+                "tag-groups": [
+                    "CATEGORY",
+                    "INDUSTRY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "PLATFORM",
+                    "CATEGORY",
+                    "PLATFORM",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY",
+                    "CATEGORY"
+                ],
+                "twitter_username": "NEARProtocol",
+                "is_hidden": 0,
+                "date_launched": "2020-10-14T00:00:00.000Z",
+                "contract_address": [],
+                "self_reported_circulating_supply": null,
+                "self_reported_tags": null,
+                "self_reported_market_cap": null,
+                "infinite_supply": false
+            }
+        ]
+    }
+}
