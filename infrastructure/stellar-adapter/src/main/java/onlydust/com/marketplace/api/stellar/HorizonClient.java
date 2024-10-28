@@ -5,51 +5,45 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.Environment;
 import org.springframework.retry.RetryException;
 import org.springframework.retry.annotation.Retryable;
-import org.stellar.sdk.KeyPair;
+import org.stellar.sdk.Asset;
+import org.stellar.sdk.Network;
 import org.stellar.sdk.Server;
 import org.stellar.sdk.requests.ErrorResponse;
-import org.stellar.sdk.responses.AssetResponse;
-import org.stellar.sdk.xdr.Asset;
+import org.stellar.sdk.responses.operations.OperationResponse;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.util.List;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @Accessors(fluent = true)
 public class HorizonClient {
     private final @NonNull Server server;
+    private final @NonNull Network network;
 
     public HorizonClient(Properties properties) {
         server = new Server(properties.baseUri);
+        network = properties.environment == Environment.MAINNET ? Network.PUBLIC : Network.TESTNET;
     }
 
     @Retryable(retryFor = {RetryException.class})
-    public Optional<AssetResponse> asset(Asset asset) {
+    public List<OperationResponse> payments(String hash) {
         try {
-            final var issuer = KeyPair.fromXdrPublicKey(switch (asset.getDiscriminant()) {
-                case ASSET_TYPE_CREDIT_ALPHANUM4 -> asset.getAlphaNum4().getIssuer().getAccountID();
-                case ASSET_TYPE_CREDIT_ALPHANUM12 -> asset.getAlphaNum12().getIssuer().getAccountID();
-                default -> throw OnlyDustException.internalServerError("Unsupported asset type: %s".formatted(asset.getDiscriminant()));
-            }).getAccountId();
+            return server.payments().forTransaction(hash).execute().getRecords();
+        } catch (ErrorResponse e) {
+            throw internalServerError("Error while fetching transaction", e);
+        } catch (IOException e) {
+            throw new RetryException("Error while fetching transaction", e);
+        }
+    }
 
-            final var code = new String(switch (asset.getDiscriminant()) {
-                case ASSET_TYPE_CREDIT_ALPHANUM4 -> asset.getAlphaNum4().getAssetCode().getAssetCode4();
-                case ASSET_TYPE_CREDIT_ALPHANUM12 -> asset.getAlphaNum12().getAssetCode().getAssetCode12();
-                default -> throw OnlyDustException.internalServerError("Unsupported asset type: %s".formatted(asset.getDiscriminant()));
-            });
-
-            return server.assets()
-                    .assetIssuer(issuer)
-                    .assetCode(code)
-                    .limit(1)
-                    .execute()
-                    .getRecords()
-                    .stream()
-                    .findFirst();
+    @Retryable(retryFor = {RetryException.class})
+    public String contractId(Asset asset) {
+        try {
+            return asset.getContractId(network);
         } catch (ErrorResponse e) {
             throw internalServerError("Error while fetching transaction", e);
         } catch (IOException e) {
@@ -63,5 +57,6 @@ public class HorizonClient {
     @NoArgsConstructor
     public static class Properties {
         String baseUri;
+        Environment environment;
     }
 }

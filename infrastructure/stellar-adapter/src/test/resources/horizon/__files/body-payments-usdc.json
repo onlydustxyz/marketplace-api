@@ -1,0 +1,50 @@
+{
+    "_links": {
+        "self": {
+            "href": "https://horizon.stellar.org/transactions/97157d6c947af69ea379edee2883562cb4b18a7882d366d368b595d899d82835/payments?cursor=\u0026limit=10\u0026order=asc"
+        },
+        "next": {
+            "href": "https://horizon.stellar.org/transactions/97157d6c947af69ea379edee2883562cb4b18a7882d366d368b595d899d82835/payments?cursor=228983716076929025\u0026limit=10\u0026order=asc"
+        },
+        "prev": {
+            "href": "https://horizon.stellar.org/transactions/97157d6c947af69ea379edee2883562cb4b18a7882d366d368b595d899d82835/payments?cursor=228983716076929025\u0026limit=10\u0026order=desc"
+        }
+    },
+    "_embedded": {
+        "records": [
+            {
+                "_links": {
+                    "self": {
+                        "href": "https://horizon.stellar.org/operations/228983716076929025"
+                    },
+                    "transaction": {
+                        "href": "https://horizon.stellar.org/transactions/97157d6c947af69ea379edee2883562cb4b18a7882d366d368b595d899d82835"
+                    },
+                    "effects": {
+                        "href": "https://horizon.stellar.org/operations/228983716076929025/effects"
+                    },
+                    "succeeds": {
+                        "href": "https://horizon.stellar.org/effects?order=desc\u0026cursor=228983716076929025"
+                    },
+                    "precedes": {
+                        "href": "https://horizon.stellar.org/effects?order=asc\u0026cursor=228983716076929025"
+                    }
+                },
+                "id": "228983716076929025",
+                "paging_token": "228983716076929025",
+                "transaction_successful": true,
+                "source_account": "GAIYZIEWGAEYIVMX5TMSD43HROWXX5WG35KTL6467P52S477IQQJIUEL",
+                "type": "payment",
+                "type_i": 1,
+                "created_at": "2024-09-02T14:41:14Z",
+                "transaction_hash": "97157d6c947af69ea379edee2883562cb4b18a7882d366d368b595d899d82835",
+                "asset_type": "credit_alphanum4",
+                "asset_code": "USDC",
+                "asset_issuer": "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN",
+                "from": "GAIYZIEWGAEYIVMX5TMSD43HROWXX5WG35KTL6467P52S477IQQJIUEL",
+                "to": "GD2VXOJ7SJS6GYWT3LIKS5KWBXYTZGIJ5TBLP5TGIKBPPWRALCZMGXEF",
+                "amount": "0.1837502"
+            }
+        ]
+    }
+}

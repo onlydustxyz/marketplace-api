@@ -1,0 +1,10 @@
+{
+    "request": {
+        "url": "/transactions/69e9fe804c4a2416aa3e041c5ed585bfc853a26c3226ff0f8da034b4091b71c2/payments",
+        "method": "GET"
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-payments-account-creation.json"
+    }
+}

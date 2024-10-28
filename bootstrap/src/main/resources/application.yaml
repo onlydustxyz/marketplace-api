@@ -163,9 +163,11 @@ infrastructure:
   stellar:
     horizon:
       base-uri: ${STELLAR_HORIZON_URL}
+      environment: ${BLOCKCHAIN_ENVIRONMENT}
     soroban:
       base-uri: ${STELLAR_SOROBAN_URL}
       account-id: ${STELLAR_ACCOUNT_ID}
+      environment: ${BLOCKCHAIN_ENVIRONMENT}
   posthog:
     base-uri: https://eu.posthog.com
     api-key: ${POSTHOG_API_KEY}

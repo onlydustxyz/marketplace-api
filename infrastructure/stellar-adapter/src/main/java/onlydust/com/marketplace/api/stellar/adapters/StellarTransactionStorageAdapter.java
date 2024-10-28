@@ -5,106 +5,69 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.port.out.BlockchainTransactionStoragePort;
 import onlydust.com.marketplace.api.stellar.HorizonClient;
-import onlydust.com.marketplace.api.stellar.SorobanClient;
+import onlydust.com.marketplace.kernel.model.blockchain.Stellar;
 import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarAccountId;
-import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarContractAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarTransaction;
 import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarTransferTransaction;
-import org.stellar.sdk.KeyPair;
-import org.stellar.sdk.responses.sorobanrpc.GetTransactionResponse;
-import org.stellar.sdk.scval.Scv;
-import org.stellar.sdk.xdr.CreateAccountOp;
-import org.stellar.sdk.xdr.PaymentOp;
-import org.stellar.sdk.xdr.Transaction;
-import org.stellar.sdk.xdr.TransactionEnvelope;
+import org.stellar.sdk.responses.operations.CreateAccountOperationResponse;
+import org.stellar.sdk.responses.operations.OperationResponse;
+import org.stellar.sdk.responses.operations.PaymentOperationResponse;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.util.Arrays;
+import java.time.ZonedDateTime;
 import java.util.Optional;
-import java.util.stream.Stream;
 
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
-import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.Transaction.Status.*;
+import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.Transaction.Status.CONFIRMED;
+import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.Transaction.Status.PENDING;
 
 @AllArgsConstructor
 public class StellarTransactionStorageAdapter implements BlockchainTransactionStoragePort<StellarTransaction, StellarTransaction.Hash> {
-    private final SorobanClient soroban;
     private final HorizonClient horizon;
 
     @Override
     public Optional<StellarTransaction> get(final @NonNull StellarTransaction.Hash reference) {
-        return soroban.transaction(reference.toString())
-                .map(t -> from(reference, t));
+        return horizon.payments(reference.toString()).stream()
+                .findFirst()
+                .map(this::from);
+    }
+
+    private StellarTransaction from(OperationResponse response) {
+        if (response instanceof PaymentOperationResponse operation)
+            return from(operation);
+        if (response instanceof CreateAccountOperationResponse operation)
+            return from(operation);
+
+        throw internalServerError("Operation type %s is not supported".formatted(response.getType()));
     }
 
     @SneakyThrows
-    private @NonNull StellarTransaction from(final @NonNull StellarTransaction.Hash reference,
-                                             final @NonNull GetTransactionResponse response) {
-
-        final var envelope = TransactionEnvelope.fromXdrBase64(Optional.ofNullable(response.getEnvelopeXdr())
-                .orElseThrow(() -> internalServerError("Transaction %s has no envelope".formatted(reference))));
-
-        final var tx = switch (envelope.getDiscriminant()) {
-            case ENVELOPE_TYPE_TX -> envelope.getV1().getTx();
-            default -> throw internalServerError("Transaction %s envelope type is not supported: %s".formatted(reference, envelope.getDiscriminant()));
+    private StellarTransferTransaction from(PaymentOperationResponse op) {
+        final var contractAddress = switch (op.getAsset().getType()) {
+            case "credit_alphanum4", "credit_alphanum12" -> Stellar.contractAddress(horizon.contractId(op.getAsset()));
+            case "native" -> null;
+            default -> throw internalServerError("Asset type %s is not supported".formatted(op.getAsset().getType()));
         };
-
-        return Arrays.stream(tx.getOperations())
-                .flatMap(op -> switch (op.getBody().getDiscriminant()) {
-                    case CREATE_ACCOUNT -> Stream.of(from(reference, response, op.getBody().getCreateAccountOp(), tx));
-                    case PAYMENT -> Stream.of(from(reference, response, op.getBody().getPaymentOp(), tx));
-                    default -> Stream.empty();
-                })
-                .findFirst()
-                .orElseThrow(() -> badRequest("Transaction %s does not contain any supported operation".formatted(reference)));
-    }
-
-    private @NonNull StellarTransferTransaction from(@NonNull StellarTransaction.Hash reference,
-                                                     @NonNull GetTransactionResponse response,
-                                                     @NonNull PaymentOp op,
-                                                     @NonNull Transaction tx) {
-        final var contractAddress = switch (op.getAsset().getDiscriminant()) {
-            case ASSET_TYPE_CREDIT_ALPHANUM4, ASSET_TYPE_CREDIT_ALPHANUM12 -> StellarContractAddress.of(horizon.asset(op.getAsset())
-                    .orElseThrow(() -> badRequest("Asset not found"))
-                    .getContractID());
-            default -> null;
-        };
-
-        final Long decimals = contractAddress == null ? 7 : Scv.fromUint32(soroban.call(contractAddress.toString(), "decimals"));
 
         return new StellarTransferTransaction(
-                reference,
-                Instant.ofEpochSecond(response.getCreatedAt()).atZone(ZoneOffset.UTC),
-                switch (response.getStatus()) {
-                    case NOT_FOUND -> PENDING;
-                    case SUCCESS -> CONFIRMED;
-                    case FAILED -> FAILED;
-                },
-                StellarAccountId.of(KeyPair.fromPublicKey(tx.getSourceAccount().getEd25519().getUint256()).getAccountId()),
-                StellarAccountId.of(KeyPair.fromPublicKey(op.getDestination().getEd25519().getUint256()).getAccountId()),
-                BigDecimal.valueOf(op.getAmount().getInt64(), decimals.intValue()),
+                Stellar.transactionHash(op.getTransactionHash()),
+                ZonedDateTime.parse(op.getCreatedAt()),
+                op.isTransactionSuccessful() ? CONFIRMED : PENDING,
+                StellarAccountId.of(op.getFrom()),
+                StellarAccountId.of(op.getTo()),
+                new BigDecimal(op.getAmount()),
                 contractAddress
         );
     }
 
-    private @NonNull StellarTransferTransaction from(@NonNull StellarTransaction.Hash reference,
-                                                     @NonNull GetTransactionResponse response,
-                                                     @NonNull CreateAccountOp op,
-                                                     @NonNull Transaction tx) {
+    private StellarTransferTransaction from(CreateAccountOperationResponse op) {
         return new StellarTransferTransaction(
-                reference,
-                Instant.ofEpochSecond(response.getCreatedAt()).atZone(ZoneOffset.UTC),
-                switch (response.getStatus()) {
-                    case NOT_FOUND -> PENDING;
-                    case SUCCESS -> CONFIRMED;
-                    case FAILED -> FAILED;
-                },
-                StellarAccountId.of(KeyPair.fromPublicKey(tx.getSourceAccount().getEd25519().getUint256()).getAccountId()),
-                StellarAccountId.of(KeyPair.fromPublicKey(op.getDestination().getAccountID().getEd25519().getUint256()).getAccountId()),
-                BigDecimal.valueOf(op.getStartingBalance().getInt64(), 7),
+                Stellar.transactionHash(op.getTransactionHash()),
+                ZonedDateTime.parse(op.getCreatedAt()),
+                op.isTransactionSuccessful() ? CONFIRMED : PENDING,
+                StellarAccountId.of(op.getSourceAccount()),
+                StellarAccountId.of(op.getAccount()),
+                new BigDecimal(op.getStartingBalance()),
                 null
         );
     }
