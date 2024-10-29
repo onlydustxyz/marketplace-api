@@ -171,6 +171,7 @@ public class Currency implements Cloneable {
             case Code.ETH_STR -> Network.ETHEREUM;
             case Code.APT_STR -> Network.APTOS;
             case Code.XLM_STR -> Network.STELLAR;
+            case Code.NEAR_STR -> Network.NEAR;
             default -> null;
         };
     }

@@ -98,11 +98,15 @@ public class AbstractMarketplaceBackOfficeApiIT {
     @Autowired
     ProgramHelper programHelper;
     @Autowired
+    ProjectHelper projectHelper;
+    @Autowired
     SponsorHelper sponsorHelper;
     @Autowired
     AccountingHelper accountingHelper;
     @Autowired
     DepositHelper depositHelper;
+    @Autowired
+    CurrencyHelper currencyHelper;
 
     @Autowired
     UserRepository userRepository;

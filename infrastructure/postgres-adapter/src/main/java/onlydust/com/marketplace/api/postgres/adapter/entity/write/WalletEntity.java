@@ -140,4 +140,18 @@ public class WalletEntity {
         assert network == NetworkEnumEntity.STELLAR;
         return Stellar.accountId(address);
     }
+
+    public static WalletEntity near(@NonNull BillingProfile.Id billingProfileId, @NonNull String accountId) {
+        return WalletEntity.builder()
+                .billingProfileId(billingProfileId.value())
+                .network(NetworkEnumEntity.NEAR)
+                .address(accountId)
+                .type(WalletTypeEnumEntity.address)
+                .build();
+    }
+
+    public String near() {
+        assert network == NetworkEnumEntity.NEAR;
+        return address;
+    }
 }
