@@ -61,7 +61,7 @@ FROM bi.p_contributor_global_data c
          JOIN bi.p_contributor_application_data cad ON cad.contributor_id = c.contributor_id
 
          LEFT JOIN (select cd.contributor_id,
-                           count(cd.contribution_uuid)                                                               as contribution_count,
+                           count(cd.contribution_uuid) filter ( where cd.contribution_status = 'COMPLETED' )         as contribution_count,
                            coalesce(sum(cd.is_issue) filter ( where cd.contribution_status = 'COMPLETED' ), 0)       as issue_count,
                            coalesce(sum(cd.is_pr) filter ( where cd.contribution_status = 'COMPLETED' ), 0)          as pr_count,
                            coalesce(sum(cd.is_code_review) filter ( where cd.contribution_status = 'COMPLETED' ), 0) as code_review_count,
@@ -213,6 +213,7 @@ FROM bi.p_project_global_data p
                     where cd.timestamp >= fromDate
                       and cd.timestamp < toDate
                       and (not showFilteredKpis or languageIds is null or cd.language_ids && languageIds)
+                      and cd.contribution_status = 'COMPLETED'
                     group by cd.project_id) cd
                    on cd.project_id = p.project_id
 
