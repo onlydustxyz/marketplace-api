@@ -24,11 +24,11 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
             case TOTAL_REWARDED_USD_AMOUNT -> "total_rewarded_usd_amount";
             case ONBOARDED_CONTRIBUTOR_COUNT -> "onboarded_contributor_count";
             case ACTIVE_CONTRIBUTOR_COUNT -> "active_contributor_count";
-            case PR_COUNT -> "pr_count";
-            case ISSUE_COUNT -> "issue_count";
-            case CODE_REVIEW_COUNT -> "code_review_count";
+            case PR_COUNT -> "completed_pr_count";
+            case ISSUE_COUNT -> "completed_issue_count";
+            case CODE_REVIEW_COUNT -> "completed_code_review_count";
             case REWARD_COUNT -> "reward_count";
-            case CONTRIBUTION_COUNT -> "contribution_count";
+            case CONTRIBUTION_COUNT -> "completed_contribution_count";
         };
     }
 
@@ -43,29 +43,29 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                    d.ecosystems,
                    d.programs,
                    d.budget,
-                   d.available_budget_usd                                   as available_budget,
-                   d.percent_spent_budget_usd                               as percent_spent_budget,
+                   d.available_budget_usd                                       as available_budget,
+                   d.percent_spent_budget_usd                                   as percent_spent_budget,
                    -- /// filtered & computed data /// --
-                   coalesce(d.total_granted_usd_amount, 0)                  as total_granted_usd_amount,
-                   coalesce(d.contribution_count, 0)                        as contribution_count,
-                   coalesce(d.issue_count, 0)                               as issue_count,
-                   coalesce(d.pr_count, 0)                                  as pr_count,
-                   coalesce(d.code_review_count, 0)                         as code_review_count,
-                   coalesce(d.reward_count, 0)                              as reward_count,
-                   coalesce(d.total_rewarded_usd_amount, 0)                 as total_rewarded_usd_amount,
-                   coalesce(d.average_reward_usd_amount, 0)                 as average_reward_usd_amount,
-                   coalesce(d.active_contributor_count, 0)                  as active_contributor_count,
-                   coalesce(d.onboarded_contributor_count, 0)               as onboarded_contributor_count,
-                   coalesce(previous_period.total_granted_usd_amount, 0)    as previous_period_total_granted_usd_amount,
-                   coalesce(previous_period.contribution_count, 0)          as previous_period_contribution_count,
-                   coalesce(previous_period.issue_count, 0)                 as previous_period_issue_count,
-                   coalesce(previous_period.pr_count, 0)                    as previous_period_pr_count,
-                   coalesce(previous_period.code_review_count, 0)           as previous_period_code_review_count,
-                   coalesce(previous_period.reward_count, 0)                as previous_period_reward_count,
-                   coalesce(previous_period.total_rewarded_usd_amount, 0)   as previous_period_total_rewarded_usd_amount,
-                   coalesce(previous_period.average_reward_usd_amount, 0)   as previous_period_average_reward_usd_amount,
-                   coalesce(previous_period.active_contributor_count, 0)    as previous_period_active_contributor_count,
-                   coalesce(previous_period.onboarded_contributor_count, 0) as previous_period_onboarded_contributor_count
+                   coalesce(d.total_granted_usd_amount, 0)                      as total_granted_usd_amount,
+                   coalesce(d.completed_contribution_count, 0)                  as completed_contribution_count,
+                   coalesce(d.completed_issue_count, 0)                         as completed_issue_count,
+                   coalesce(d.completed_pr_count, 0)                            as completed_pr_count,
+                   coalesce(d.completed_code_review_count, 0)                   as completed_code_review_count,
+                   coalesce(d.reward_count, 0)                                  as reward_count,
+                   coalesce(d.total_rewarded_usd_amount, 0)                     as total_rewarded_usd_amount,
+                   coalesce(d.average_reward_usd_amount, 0)                     as average_reward_usd_amount,
+                   coalesce(d.active_contributor_count, 0)                      as active_contributor_count,
+                   coalesce(d.onboarded_contributor_count, 0)                   as onboarded_contributor_count,
+                   coalesce(previous_period.total_granted_usd_amount, 0)        as previous_period_total_granted_usd_amount,
+                   coalesce(previous_period.completed_contribution_count, 0)    as previous_period_completed_contribution_count,
+                   coalesce(previous_period.completed_issue_count, 0)           as previous_period_completed_issue_count,
+                   coalesce(previous_period.completed_pr_count, 0)              as previous_period_completed_pr_count,
+                   coalesce(previous_period.completed_code_review_count, 0)     as previous_period_completed_code_review_count,
+                   coalesce(previous_period.reward_count, 0)                    as previous_period_reward_count,
+                   coalesce(previous_period.total_rewarded_usd_amount, 0)       as previous_period_total_rewarded_usd_amount,
+                   coalesce(previous_period.average_reward_usd_amount, 0)       as previous_period_average_reward_usd_amount,
+                   coalesce(previous_period.active_contributor_count, 0)        as previous_period_active_contributor_count,
+                   coalesce(previous_period.onboarded_contributor_count, 0)     as previous_period_onboarded_contributor_count
             
             FROM bi.select_projects(:fromDate, :toDate, :dataSourceIds, :programIds, :projectIds, :projectSlugs, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search, :showFilteredKpis) d
                      LEFT JOIN (
@@ -96,21 +96,21 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
               and (coalesce(:rewardCountMin) is null or d.reward_count >= :rewardCountMin)
               and (coalesce(:rewardCountEq) is null or d.reward_count = :rewardCountEq)
               and (coalesce(:rewardCountMax) is null or d.reward_count <= :rewardCountMax)
-              and (coalesce(:contributionCountMin) is null or (
-                  case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
-                  case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
-                  case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
-              ) >= :contributionCountMin)
-              and (coalesce(:contributionCountEq) is null or (
-                  case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
-                  case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
-                  case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
-              ) = :contributionCountEq)
-              and (coalesce(:contributionCountMax) is null or (
-                  case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
-                  case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
-                  case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
-              ) <= :contributionCountMin)
+              and (coalesce(:completedContributionCountMin) is null or (
+                  case when 'ISSUE' = any(:contributionTypes) then d.completed_issue_count else 0 end +
+                  case when 'PULL_REQUEST' = any(:contributionTypes) then d.completed_pr_count else 0 end +
+                  case when 'CODE_REVIEW' = any(:contributionTypes) then d.completed_code_review_count else 0 end
+              ) >= :completedContributionCountMin)
+              and (coalesce(:completedContributionCountEq) is null or (
+                  case when 'ISSUE' = any(:contributionTypes) then d.completed_issue_count else 0 end +
+                  case when 'PULL_REQUEST' = any(:contributionTypes) then d.completed_pr_count else 0 end +
+                  case when 'CODE_REVIEW' = any(:contributionTypes) then d.completed_code_review_count else 0 end
+              ) = :completedContributionCountEq)
+              and (coalesce(:completedContributionCountMax) is null or (
+                  case when 'ISSUE' = any(:contributionTypes) then d.completed_issue_count else 0 end +
+                  case when 'PULL_REQUEST' = any(:contributionTypes) then d.completed_pr_count else 0 end +
+                  case when 'CODE_REVIEW' = any(:contributionTypes) then d.completed_code_review_count else 0 end
+              ) <= :completedContributionCountMax)
             """,
             countQuery = """
                     SELECT count(d.project_id)
@@ -139,21 +139,21 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                       and (coalesce(:rewardCountMin) is null or d.reward_count >= :rewardCountMin)
                       and (coalesce(:rewardCountEq) is null or d.reward_count = :rewardCountEq)
                       and (coalesce(:rewardCountMax) is null or d.reward_count <= :rewardCountMax)
-                      and (coalesce(:contributionCountMin) is null or (
-                          case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
-                          case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
-                          case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
-                      ) >= :contributionCountMin)
-                      and (coalesce(:contributionCountEq) is null or (
-                          case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
-                          case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
-                          case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
-                      ) = :contributionCountEq)
-                      and (coalesce(:contributionCountMax) is null or (
-                          case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
-                          case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
-                          case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
-                      ) <= :contributionCountMax)
+                      and (coalesce(:completedContributionCountMin) is null or (
+                          case when 'ISSUE' = any(:contributionTypes) then d.completed_issue_count else 0 end +
+                          case when 'PULL_REQUEST' = any(:contributionTypes) then d.completed_pr_count else 0 end +
+                          case when 'CODE_REVIEW' = any(:contributionTypes) then d.completed_code_review_count else 0 end
+                      ) >= :completedContributionCountMin)
+                      and (coalesce(:completedContributionCountEq) is null or (
+                          case when 'ISSUE' = any(:contributionTypes) then d.completed_issue_count else 0 end +
+                          case when 'PULL_REQUEST' = any(:contributionTypes) then d.completed_pr_count else 0 end +
+                          case when 'CODE_REVIEW' = any(:contributionTypes) then d.completed_code_review_count else 0 end
+                      ) = :completedContributionCountEq)
+                      and (coalesce(:completedContributionCountMax) is null or (
+                          case when 'ISSUE' = any(:contributionTypes) then d.completed_issue_count else 0 end +
+                          case when 'PULL_REQUEST' = any(:contributionTypes) then d.completed_pr_count else 0 end +
+                          case when 'CODE_REVIEW' = any(:contributionTypes) then d.completed_code_review_count else 0 end
+                      ) <= :completedContributionCountMax)
                     """,
             nativeQuery = true)
     Page<ProjectKpisReadEntity> findAll(@NonNull ZonedDateTime fromDate,
@@ -194,9 +194,9 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                                         Integer rewardCountMin,
                                         Integer rewardCountEq,
                                         Integer rewardCountMax,
-                                        Integer contributionCountMin,
-                                        Integer contributionCountEq,
-                                        Integer contributionCountMax,
+                                        Integer completedContributionCountMin,
+                                        Integer completedContributionCountEq,
+                                        Integer completedContributionCountMax,
                                         String[] contributionTypes,
                                         Pageable pageable);
 }

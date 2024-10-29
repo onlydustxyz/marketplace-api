@@ -617,3 +617,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000373_add_missing_index.sql
   - include:
       file: db/changelog/changelogs/00000374_add_near_support.sql
+  - include:
+      file: db/changelog/changelogs/00000375_fix_contribution_counters.sql
