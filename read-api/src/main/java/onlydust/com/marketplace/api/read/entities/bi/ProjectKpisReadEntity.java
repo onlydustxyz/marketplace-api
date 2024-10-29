@@ -60,10 +60,10 @@ public class ProjectKpisReadEntity {
     Integer onboardedContributorCount;
     Integer activeContributorCount;
     Integer rewardCount;
-    Integer contributionCount;
-    Integer issueCount;
-    Integer prCount;
-    Integer codeReviewCount;
+    Integer completedContributionCount;
+    Integer completedIssueCount;
+    Integer completedPrCount;
+    Integer completedCodeReviewCount;
 
     BigDecimal previousPeriodTotalGrantedUsdAmount;
     BigDecimal previousPeriodTotalRewardedUsdAmount;
@@ -71,10 +71,10 @@ public class ProjectKpisReadEntity {
     Integer previousPeriodOnboardedContributorCount;
     Integer previousPeriodActiveContributorCount;
     Integer previousPeriodRewardCount;
-    Integer previousPeriodContributionCount;
-    Integer previousPeriodIssueCount;
-    Integer previousPeriodPrCount;
-    Integer previousPeriodCodeReviewCount;
+    Integer previousPeriodCompletedContributionCount;
+    Integer previousPeriodCompletedIssueCount;
+    Integer previousPeriodCompletedPrCount;
+    Integer previousPeriodCompletedCodeReviewCount;
 
     private static DecimalNumberKpi toDecimalNumberKpi(BigDecimal value, BigDecimal valueOfPreviousPeriod) {
         return new DecimalNumberKpi().value(value)
@@ -124,10 +124,10 @@ public class ProjectKpisReadEntity {
                 .onboardedContributorCount(toNumberKpi(onboardedContributorCount, previousPeriodOnboardedContributorCount))
                 .activeContributorCount(toNumberKpi(activeContributorCount, previousPeriodActiveContributorCount))
                 .rewardCount(toNumberKpi(rewardCount, previousPeriodRewardCount))
-                .contributionCount(toNumberKpi(contributionCount, previousPeriodContributionCount))
-                .issueCount(toNumberKpi(issueCount, previousPeriodIssueCount))
-                .prCount(toNumberKpi(prCount, previousPeriodPrCount))
-                .codeReviewCount(toNumberKpi(codeReviewCount, previousPeriodCodeReviewCount))
+                .contributionCount(toNumberKpi(completedContributionCount, previousPeriodCompletedContributionCount))
+                .issueCount(toNumberKpi(completedIssueCount, previousPeriodCompletedIssueCount))
+                .prCount(toNumberKpi(completedPrCount, previousPeriodCompletedPrCount))
+                .codeReviewCount(toNumberKpi(completedCodeReviewCount, previousPeriodCompletedCodeReviewCount))
                 ;
     }
 
@@ -151,10 +151,10 @@ public class ProjectKpisReadEntity {
                 onboardedContributorCount,
                 activeContributorCount,
                 rewardCount,
-                issueCount,
-                prCount,
-                codeReviewCount,
-                contributionCount
+                completedIssueCount,
+                completedPrCount,
+                completedCodeReviewCount,
+                completedContributionCount
         );
     }
 

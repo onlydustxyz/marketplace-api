@@ -53,19 +53,19 @@ public class ContributorKpisReadEntity {
 
     BigDecimal totalRewardedUsdAmount;
     Integer rewardCount;
-    Integer contributionCount;
-    Integer issueCount;
-    Integer prCount;
-    Integer codeReviewCount;
+    Integer completedContributionCount;
+    Integer completedIssueCount;
+    Integer completedPrCount;
+    Integer completedCodeReviewCount;
     Integer inProgressIssueCount;
     Integer pendingApplicationCount;
 
     BigDecimal previousPeriodTotalRewardedUsdAmount;
     Integer previousPeriodRewardCount;
-    Integer previousPeriodContributionCount;
-    Integer previousPeriodIssueCount;
-    Integer previousPeriodPrCount;
-    Integer previousPeriodCodeReviewCount;
+    Integer previousPeriodCompletedContributionCount;
+    Integer previousPeriodCompletedIssueCount;
+    Integer previousPeriodCompletedPrCount;
+    Integer previousPeriodCompletedCodeReviewCount;
     Integer previousPeriodInProgressIssueCount;
     Integer previousPeriodPendingApplicationCount;
 
@@ -104,10 +104,10 @@ public class ContributorKpisReadEntity {
                 .countryCode(contributorCountry == null ? null : Country.fromIso3(contributorCountry).iso2Code())
                 .totalRewardedUsdAmount(toDecimalNumberKpi(prettyUsd(totalRewardedUsdAmount), prettyUsd(previousPeriodTotalRewardedUsdAmount)))
                 .rewardCount(toNumberKpi(rewardCount, previousPeriodRewardCount))
-                .contributionCount(toNumberKpi(contributionCount, previousPeriodContributionCount))
-                .issueCount(toNumberKpi(issueCount, previousPeriodIssueCount))
-                .prCount(toNumberKpi(prCount, previousPeriodPrCount))
-                .codeReviewCount(toNumberKpi(codeReviewCount, previousPeriodCodeReviewCount))
+                .contributionCount(toNumberKpi(completedContributionCount, previousPeriodCompletedContributionCount))
+                .issueCount(toNumberKpi(completedIssueCount, previousPeriodCompletedIssueCount))
+                .prCount(toNumberKpi(completedPrCount, previousPeriodCompletedPrCount))
+                .codeReviewCount(toNumberKpi(completedCodeReviewCount, previousPeriodCompletedCodeReviewCount))
                 .inProgressIssueCount(inProgressIssueCount)
                 .pendingApplicationCount(pendingApplicationCount)
                 .maintainedProjectCount(maintainedProjects == null ? 0 : maintainedProjects.size())
@@ -126,10 +126,10 @@ public class ContributorKpisReadEntity {
                 contributorCountry == null ? null : Country.fromIso3(contributorCountry).iso2Code(),
                 prettyUsd(totalRewardedUsdAmount),
                 rewardCount,
-                issueCount,
-                prCount,
-                codeReviewCount,
-                contributionCount
+                completedIssueCount,
+                completedPrCount,
+                completedCodeReviewCount,
+                completedContributionCount
         );
     }
 
@@ -147,10 +147,10 @@ public class ContributorKpisReadEntity {
                 .countryCode(contributorCountry == null ? null : Country.fromIso3(contributorCountry).iso2Code())
                 .totalRewardedUsdAmount(toDecimalNumberKpi(prettyUsd(totalRewardedUsdAmount), prettyUsd(previousPeriodTotalRewardedUsdAmount)))
                 .rewardCount(toNumberKpi(rewardCount, previousPeriodRewardCount))
-                .contributionCount(toNumberKpi(contributionCount, previousPeriodContributionCount))
-                .issueCount(toNumberKpi(issueCount, previousPeriodIssueCount))
-                .prCount(toNumberKpi(prCount, previousPeriodPrCount))
-                .codeReviewCount(toNumberKpi(codeReviewCount, previousPeriodCodeReviewCount))
+                .contributionCount(toNumberKpi(completedContributionCount, previousPeriodCompletedContributionCount))
+                .issueCount(toNumberKpi(completedIssueCount, previousPeriodCompletedIssueCount))
+                .prCount(toNumberKpi(completedPrCount, previousPeriodCompletedPrCount))
+                .codeReviewCount(toNumberKpi(completedCodeReviewCount, previousPeriodCompletedCodeReviewCount))
                 .inProgressIssueCount(inProgressIssueCount)
                 .pendingApplicationCount(pendingApplicationCount)
                 .maintainedProjectCount(maintainedProjects == null ? 0 : maintainedProjects.size())
