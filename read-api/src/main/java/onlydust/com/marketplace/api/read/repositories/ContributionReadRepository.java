@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.api.read.repositories;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.api.contract.model.ContributionsQueryParams;
 import onlydust.com.marketplace.api.contract.model.ContributionsSortEnum;
+import onlydust.com.marketplace.api.contract.model.DataSourceEnum;
 import onlydust.com.marketplace.api.contract.model.SortDirection;
 import onlydust.com.marketplace.api.read.entities.bi.ContributionReadEntity;
 import org.springframework.data.domain.Page;
@@ -11,7 +13,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
+
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseZonedNullable;
 
 public interface ContributionReadRepository extends Repository<ContributionReadEntity, Long> {
 
@@ -44,7 +50,10 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                      left join project_contributor_labels pcl on coalesce(:projectContributorLabelIds) is not null and pcl.project_id = c.project_id
                      left join contributor_project_contributor_labels cpcl on coalesce(:projectContributorLabelIds) is not null and cpcl.label_id = pcl.id and cpcl.github_user_id = any (ccd.contributor_ids)
                      left join indexer_exp.github_pull_requests_closing_issues ci on ci.issue_id = c.issue_id
-            where (coalesce(:ids) is null or c.contribution_uuid = any (:ids))
+            where (coalesce(:fromDate) is null or c.timestamp >= :fromDate)
+              and (coalesce(:toDate) is null or c.timestamp < :toDate)
+              and (:onlyOnlyDustData is false or c.project_id is not null)
+              and (coalesce(:ids) is null or c.contribution_uuid = any (:ids))
               and (coalesce(:types) is null or c.contribution_type = any (cast(:types as indexer_exp.contribution_type[])))
               and (coalesce(:projectIds) is null or c.project_id = any (:projectIds))
               and (coalesce(:projectSlugs) is null or c.project_slug = any (:projectSlugs))
@@ -53,6 +62,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
               and (coalesce(:contributorIds) is null or ccd.contributor_ids && :contributorIds)
               and (coalesce(:projectContributorLabelIds) is null or cpcl.label_id = any (:projectContributorLabelIds))
               and (coalesce(:rewardIds) is null or rd.reward_ids && :rewardIds)
+              and (coalesce(:languageIds) is null or c.language_ids && :languageIds)
               and (coalesce(:hasBeenRewarded) is null or :hasBeenRewarded = (coalesce(rd.total_rewarded_usd_amount, 0) > 0))
               and (coalesce(:search) is null or c.search ilike '%' || :search || '%' or ccd.search ilike '%' || :search || '%')
               and (coalesce(:showLinkedIssues) is null or :showLinkedIssues = (ci.pull_request_id is not null))
@@ -60,7 +70,10 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                      ccd.contribution_uuid,
                      rd.contribution_uuid
             """, nativeQuery = true)
-    Page<ContributionReadEntity> findAll(UUID[] ids,
+    Page<ContributionReadEntity> findAll(ZonedDateTime fromDate,
+                                         ZonedDateTime toDate,
+                                         @NonNull Boolean onlyOnlyDustData,
+                                         UUID[] ids,
                                          String[] types,
                                          UUID[] projectIds,
                                          String[] projectSlugs,
@@ -69,13 +82,19 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                                          Long[] contributorIds,
                                          UUID[] projectContributorLabelIds,
                                          UUID[] rewardIds,
+                                         UUID[] languageIds,
                                          Boolean hasBeenRewarded,
                                          Boolean showLinkedIssues,
                                          String search,
                                          Pageable pageable);
 
     default Page<ContributionReadEntity> findAll(ContributionsQueryParams q) {
-        return findAll(
+        final var sanitizedFromDate = q.getFromDate() == null ? null : parseZonedNullable(q.getFromDate()).truncatedTo(ChronoUnit.DAYS);
+        final var sanitizedToDate = q.getToDate() == null ? null : parseZonedNullable(q.getToDate()).truncatedTo(ChronoUnit.DAYS).plusDays(1);
+
+        return findAll(sanitizedFromDate,
+                sanitizedToDate,
+                q.getDataSource() == DataSourceEnum.ONLYDUST,
                 q.getIds() == null ? null : q.getIds().toArray(UUID[]::new),
                 q.getTypes() == null ? null : q.getTypes().stream().map(Enum::name).toArray(String[]::new),
                 q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
@@ -85,6 +104,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                 q.getContributorIds() == null ? null : q.getContributorIds().toArray(Long[]::new),
                 q.getProjectContributorLabelIds() == null ? null : q.getProjectContributorLabelIds().toArray(UUID[]::new),
                 q.getRewardIds() == null ? null : q.getRewardIds().toArray(UUID[]::new),
+                q.getLanguageIds() == null ? null : q.getLanguageIds().toArray(UUID[]::new),
                 q.getHasBeenRewarded(),
                 q.getShowLinkedIssues(),
                 q.getSearch(),
