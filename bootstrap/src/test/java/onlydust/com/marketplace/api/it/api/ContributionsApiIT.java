@@ -1,10 +1,7 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.api.contract.model.ContributionActivityPageItemResponse;
-import onlydust.com.marketplace.api.contract.model.ContributionActivityPageResponse;
-import onlydust.com.marketplace.api.contract.model.ContributionActivityStatus;
-import onlydust.com.marketplace.api.contract.model.ContributionType;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
@@ -23,10 +20,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.time.ZonedDateTime;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.Comparator.comparing;
@@ -393,6 +388,22 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .extracting(ContributionActivityPageItemResponse::getUuid)
                 .doesNotContain(UUID.fromString("0446104b-7f0f-3852-8121-74d138bb9920")) // Issue linked to PR below
                 .contains(UUID.fromString("74ecdb48-9e1c-3f54-ab9c-df4dbd2a6ed3")); // PR linked to issue above
+
+        assertContributions(Map.of("languageIds", "1109d0a2-1143-4915-a9c1-69e8be6c1bea"))
+                .extracting(ContributionActivityPageItemResponse::getLanguages)
+                .allMatch(languages -> languages.stream().anyMatch(l -> l.getName().equals("Javascript")));
+
+        assertContributions(Map.of("fromDate", "2022-07-11", "toDate", "2022-07-12"))
+                .extracting(ContributionActivityPageItemResponse::getCreatedAt)
+                .allMatch(d -> d.isAfter(ZonedDateTime.parse("2022-07-11T00:00:00Z")) && d.isBefore(ZonedDateTime.parse("2022-07-13T00:00:00Z")));
+
+        assertContributions(Map.of("dataSource", "ONLYDUST"))
+                .extracting(ContributionActivityPageItemResponse::getProject)
+                .allMatch(Objects::nonNull);
+
+        assertContributions(Map.of("dataSource", "ALL"))
+                .extracting(ContributionActivityPageItemResponse::getProject)
+                .contains((ProjectLinkResponse) null);
     }
 
     private AbstractListAssert<?, ? extends List<? extends ContributionActivityPageItemResponse>, ContributionActivityPageItemResponse> assertContributions(Map<String, String> params) {

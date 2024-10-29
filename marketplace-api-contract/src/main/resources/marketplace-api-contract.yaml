@@ -218,7 +218,7 @@ paths:
           in: query
           required: true
           schema:
-            $ref: '#/components/schemas/ContributorActivityGraphDataSourceEnum'
+            $ref: '#/components/schemas/DataSourceEnum'
         - name: dataSourceProjectId
           in: query
           required: false
@@ -12194,62 +12194,66 @@ components:
         - TYPE
 
     ContributionsQueryParams:
-      required:
-        - pageIndex
-        - pageSize
-      properties:
-        pageIndex:
-          type: integer
-          default: 0
-        pageSize:
-          type: integer
-          default: 5
-        sort:
-          $ref: '#/components/schemas/ContributionsSortEnum'
-        sortDirection:
-          $ref: '#/components/schemas/SortDirection'
-        search:
-          type: string
-        ids:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContributionUuid'
-        types:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContributionType'
-        projectIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectId'
-        projectSlugs:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectSlug'
-        statuses:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContributionActivityStatus'
-        repoIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/GithubRepoId'
-        contributorIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/GithubUserId'
-        projectContributorLabelIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectContributorLabelId'
-        rewardIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/RewardId'
-        hasBeenRewarded:
-          type: boolean
-        showLinkedIssues:
-          type: boolean
+      allOf:
+        - $ref: '#/components/schemas/PaginationQueryParams'
+        - $ref: '#/components/schemas/PeriodQueryParams'
+        - type: object
+          required:
+            - pageIndex
+            - pageSize
+          properties:
+            sort:
+              $ref: '#/components/schemas/ContributionsSortEnum'
+            sortDirection:
+              $ref: '#/components/schemas/SortDirection'
+            dataSource:
+              $ref: '#/components/schemas/DataSourceEnum'
+            search:
+              type: string
+            ids:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContributionUuid'
+            types:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContributionType'
+            projectIds:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectId'
+            projectSlugs:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectSlug'
+            statuses:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContributionActivityStatus'
+            repoIds:
+              type: array
+              items:
+                $ref: '#/components/schemas/GithubRepoId'
+            contributorIds:
+              type: array
+              items:
+                $ref: '#/components/schemas/GithubUserId'
+            languageIds:
+              type: array
+              items:
+                $ref: '#/components/schemas/LanguageId'
+            projectContributorLabelIds:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectContributorLabelId'
+            rewardIds:
+              type: array
+              items:
+                $ref: '#/components/schemas/RewardId'
+            hasBeenRewarded:
+              type: boolean
+            showLinkedIssues:
+              type: boolean
 
     # To rename to ContributionPageResponse when all the marketplace is migrated on the saas
     ContributionActivityPageResponse:
@@ -12484,7 +12488,7 @@ components:
         billingProfileId:
           $ref: '#/components/schemas/BillingProfileId'
 
-    ContributorActivityGraphDataSourceEnum:
+    DataSourceEnum:
       type: string
       enum:
         - ALL
