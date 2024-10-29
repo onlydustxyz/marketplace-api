@@ -27,7 +27,7 @@ public class PositiveAmount extends Amount {
         return new PositiveAmount(BigDecimal.valueOf(value), true);
     }
 
-    public static @NonNull PositiveAmount of(Long value) {
+    public static @NonNull PositiveAmount of(long value) {
         return new PositiveAmount(BigDecimal.valueOf(value), true);
     }
 
