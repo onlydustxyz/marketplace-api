@@ -61,11 +61,11 @@ FROM bi.p_contributor_global_data c
          JOIN bi.p_contributor_application_data cad ON cad.contributor_id = c.contributor_id
 
          LEFT JOIN (select cd.contributor_id,
-                           count(cd.contribution_uuid)                                                           as contribution_count,
-                           coalesce(sum(cd.is_issue), 0)                                                         as issue_count,
-                           coalesce(sum(cd.is_pr), 0)                                                            as pr_count,
-                           coalesce(sum(cd.is_code_review), 0)                                                   as code_review_count,
-                           coalesce(sum(cd.is_issue) filter ( where cd.contribution_status = 'IN_PROGRESS' ), 0) as in_progress_issue_count
+                           count(cd.contribution_uuid)                                                               as contribution_count,
+                           coalesce(sum(cd.is_issue) filter ( where cd.contribution_status = 'COMPLETED' ), 0)       as issue_count,
+                           coalesce(sum(cd.is_pr) filter ( where cd.contribution_status = 'COMPLETED' ), 0)          as pr_count,
+                           coalesce(sum(cd.is_code_review) filter ( where cd.contribution_status = 'COMPLETED' ), 0) as code_review_count,
+                           coalesce(sum(cd.is_issue) filter ( where cd.contribution_status = 'IN_PROGRESS' ), 0)     as in_progress_issue_count
                     from bi.p_per_contributor_contribution_data cd
                     where (fromDate is null or cd.timestamp >= fromDate)
                       and (toDate is null or cd.timestamp < toDate)
