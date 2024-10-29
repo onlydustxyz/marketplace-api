@@ -16,6 +16,7 @@ import org.hibernate.type.SqlTypes;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
@@ -92,6 +93,10 @@ public class ContributorKpisReadEntity {
         return contributor;
     }
 
+    private Optional<Country> contributorCountry() {
+        return Optional.ofNullable(contributorCountry).map(Country::fromIso3);
+    }
+
     public BiContributorsPageItemResponse toDto() {
         return new BiContributorsPageItemResponse()
                 .contributor(pretty(contributor))
@@ -101,7 +106,10 @@ public class ContributorKpisReadEntity {
                 .ecosystems(ecosystems == null ? null : ecosystems.stream().sorted(comparing(EcosystemLinkResponse::getName)).toList())
                 .projectContributorLabels(projectContributorLabels == null ? null :
                         projectContributorLabels.stream().sorted(comparing(ProjectContributorLabelResponse::getName)).toList())
-                .countryCode(contributorCountry == null ? null : Country.fromIso3(contributorCountry).iso2Code())
+                .country(contributorCountry().map(country -> new CountryResponse()
+                                .code(country.iso2Code())
+                                .name(country.display().orElse(null)))
+                        .orElse(null))
                 .totalRewardedUsdAmount(toDecimalNumberKpi(prettyUsd(totalRewardedUsdAmount), prettyUsd(previousPeriodTotalRewardedUsdAmount)))
                 .rewardCount(toNumberKpi(rewardCount, previousPeriodRewardCount))
                 .contributionCount(toNumberKpi(completedContributionCount, previousPeriodCompletedContributionCount))
@@ -134,6 +142,7 @@ public class ContributorKpisReadEntity {
     }
 
     public IssueApplicantsPageItemResponse toIssueApplicant(ApplicationReadEntity application) {
+
         return new IssueApplicantsPageItemResponse()
                 .applicationId(application.id())
                 .appliedAt(application.receivedAt())
@@ -144,7 +153,10 @@ public class ContributorKpisReadEntity {
                 .ecosystems(ecosystems == null ? null : ecosystems.stream().sorted(comparing(EcosystemLinkResponse::getName)).toList())
                 .projectContributorLabels(projectContributorLabels == null ? null :
                         projectContributorLabels.stream().sorted(comparing(ProjectContributorLabelResponse::getName)).toList())
-                .countryCode(contributorCountry == null ? null : Country.fromIso3(contributorCountry).iso2Code())
+                .country(contributorCountry().map(country -> new CountryResponse()
+                                .code(country.iso2Code())
+                                .name(country.display().orElse(null)))
+                        .orElse(null))
                 .totalRewardedUsdAmount(toDecimalNumberKpi(prettyUsd(totalRewardedUsdAmount), prettyUsd(previousPeriodTotalRewardedUsdAmount)))
                 .rewardCount(toNumberKpi(rewardCount, previousPeriodRewardCount))
                 .contributionCount(toNumberKpi(completedContributionCount, previousPeriodCompletedContributionCount))

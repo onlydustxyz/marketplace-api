@@ -7463,9 +7463,12 @@ components:
       type: object
       required:
         - code
+        - name
       properties:
         code:
           $ref: '#/components/schemas/CountryCode'
+        name:
+          type: string
 
     ProjectPageResponse:
       allOf:
@@ -12045,7 +12048,7 @@ components:
         - categories
         - languages
         - ecosystems
-        - countryCode
+        - country
         - totalRewardedUsdAmount
         - rewardCount
         - issueCount
@@ -12078,8 +12081,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectContributorLabelResponse'
-        countryCode:
-          $ref: '#/components/schemas/CountryCode'
+        country:
+          $ref: '#/components/schemas/CountryResponse'
         totalRewardedUsdAmount:
           $ref: '#/components/schemas/DecimalNumberKpi'
         rewardCount:

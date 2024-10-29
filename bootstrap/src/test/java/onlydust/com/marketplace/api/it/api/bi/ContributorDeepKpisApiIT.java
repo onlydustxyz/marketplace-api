@@ -199,7 +199,6 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .is2xxSuccessful()
                     .expectBody()
-                    .consumeWith(System.out::println)
                     .jsonPath("$.contributors[0].projects[0].name").<String>value(name -> assertThat(name).contains("OnlyDust"))
                     .jsonPath("$.contributors[1].projects[0].name").<String>value(name -> assertThat(name).contains("Bridge"))
                     .jsonPath("$.contributors[1].projects[1].name").<String>value(name -> assertThat(name).contains("Madara"))
@@ -236,7 +235,10 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     }
                                   ],
                                   "projectContributorLabels": null,
-                                  "countryCode": "FR",
+                                  "country": {
+                                    "code": "FR",
+                                    "name": "France"
+                                  },
                                   "totalRewardedUsdAmount": {
                                     "value": 1.5,
                                     "trend": "UP"
@@ -291,7 +293,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     }
                                   ],
                                   "projectContributorLabels": null,
-                                  "countryCode": null,
+                                  "country": null,
                                   "totalRewardedUsdAmount": {
                                     "value": 0,
                                     "trend": "STABLE"
@@ -340,7 +342,10 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     }
                                   ],
                                   "projectContributorLabels": null,
-                                  "countryCode": "GB",
+                                  "country": {
+                                    "code": "GB",
+                                    "name": "United Kingdom"
+                                  },
                                   "totalRewardedUsdAmount": {
                                     "value": 0,
                                     "trend": "STABLE"
@@ -391,7 +396,10 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     }
                                   ],
                                   "projectContributorLabels": null,
-                                  "countryCode": "GB",
+                                  "country": {
+                                    "code": "GB",
+                                    "name": "United Kingdom"
+                                  },
                                   "totalRewardedUsdAmount": {
                                     "value": 3.5,
                                     "trend": "UP"
@@ -440,7 +448,10 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     }
                                   ],
                                   "projectContributorLabels": null,
-                                  "countryCode": "MA",
+                                  "country": {
+                                    "code": "MA",
+                                    "name": "Morocco"
+                                  },
                                   "totalRewardedUsdAmount": {
                                     "value": 0,
                                     "trend": "STABLE"
@@ -617,7 +628,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                             .contains("Starknet ecosystem")), true
             );
             test_contributors_stats("countryCodes", "GB",
-                    response -> response.getContributors().forEach(contributor -> assertThat(contributor.getCountryCode())
+                    response -> response.getContributors().forEach(contributor -> assertThat(contributor.getCountry().getCode())
                             .isEqualTo("GB")), true
             );
             test_contributors_stats(Map.of("totalRewardedUsdAmount.lte", "3"),
@@ -723,7 +734,10 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "projectContributorLabels": null,
-                              "countryCode": "FR",
+                              "country": {
+                                "code": "FR",
+                                "name": "France"
+                              },
                               "totalRewardedUsdAmount": {
                                 "value": 1.5,
                                 "trend": "UP"
