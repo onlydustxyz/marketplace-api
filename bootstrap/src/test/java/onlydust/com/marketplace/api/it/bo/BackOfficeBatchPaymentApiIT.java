@@ -987,6 +987,17 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                     "recipient1.near,0.7",
                     "recipient2.near,0.5"
             );
+
+            client.put()
+                    .uri(getApiURI(REWARDS_BATCH_PAYMENTS.formatted(payment.getId())))
+                    .header("Authorization", "Bearer " + camille.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(new BatchPaymentRequest()
+                            .transactionHash("4exboD32LtvFes5xzun372LcebX3oC359W6Um2hw9eoV"))
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful();
         }
     }
 }
