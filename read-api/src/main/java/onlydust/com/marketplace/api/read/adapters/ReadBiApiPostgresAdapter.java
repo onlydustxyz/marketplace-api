@@ -3,10 +3,7 @@ package onlydust.com.marketplace.api.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadBiApi;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.read.entities.bi.AggregatedKpisReadEntity;
-import onlydust.com.marketplace.api.read.entities.bi.ContributorKpisReadEntity;
-import onlydust.com.marketplace.api.read.entities.bi.ProjectKpisReadEntity;
-import onlydust.com.marketplace.api.read.entities.bi.WorldMapKpiReadEntity;
+import onlydust.com.marketplace.api.read.entities.bi.*;
 import onlydust.com.marketplace.api.read.entities.program.BiFinancialMonthlyStatsReadEntity;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.properties.Cache;
@@ -72,6 +69,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final BiFinancialMonthlyStatsReadRepository biFinancialMonthlyStatsReadRepository;
     private final ProjectReadRepository projectReadRepository;
+    private final ContributorActivityGraphReadRepository contributorActivityGraphReadRepository;
 
     private static ZonedDateTime sanitizedDate(String fromDate, ZonedDateTime defaultFromDate) {
         return Optional.ofNullable(DateMapper.parseNullable(fromDate)).map(DateMapper::toZoneDateTime).orElse(defaultFromDate);
@@ -157,6 +155,21 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 .toList();
 
         return ok(new BiContributorsStatsListResponse().stats(mergedStats));
+    }
+
+    @Override
+    public ResponseEntity<ContributorActivityGraphResponse> getContributorActivityGraph(Long contributorId,
+                                                                                        ContributorActivityGraphDataSourceEnum dataSource,
+                                                                                        UUID dataSourceProjectId) {
+        final var days = contributorActivityGraphReadRepository.findLastYear(ZonedDateTime.now().minusDays(364),
+                contributorId,
+                dataSource == ContributorActivityGraphDataSourceEnum.ONLYDUST,
+                dataSourceProjectId);
+        return ok()
+                .cacheControl(cache.forEverybody(Cache.XL))
+                .body(new ContributorActivityGraphResponse().days(days.stream()
+                        .map(ContributorActivityGraphDayReadEntity::toDto)
+                        .toList()));
     }
 
     @Override

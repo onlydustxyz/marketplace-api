@@ -100,8 +100,8 @@ public class GithubHelper {
         return repo;
     }
 
-    public void createPullRequest(GithubRepo repo, UserAuthHelper.AuthenticatedUser contributor) {
-        createPullRequest(repo, contributor, null);
+    public ContributionUUID createPullRequest(GithubRepo repo, UserAuthHelper.AuthenticatedUser contributor) {
+        return createPullRequest(repo, contributor, null);
     }
 
     public ContributionUUID createPullRequest(GithubRepo repo, UserAuthHelper.AuthenticatedUser contributor, List<String> mainFileExtensions) {
