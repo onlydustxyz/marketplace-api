@@ -1,0 +1,28 @@
+{
+    "priority": 1,
+    "request": {
+        "url": "/",
+        "method": "POST",
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "jsonrpc": "2.0",
+                    "method": "tx",
+                    "params": {
+                        "tx_hash": "4exboD32LtvFes5xzun372LcebX3oC359W6Um2hw9eoV",
+                        "wait_until": "NONE"
+                    }
+                },
+                "ignoreArrayOrder": true,
+                "ignoreExtraElements": true
+            }
+        ]
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-tx-transfer-near.json",
+        "headers": {
+            "Content-Type": "application/json"
+        }
+    }
+}

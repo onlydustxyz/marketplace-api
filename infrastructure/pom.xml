@@ -32,6 +32,7 @@
         <module>langchain</module>
         <module>stellar-adapter</module>
         <module>block-explorer</module>
+        <module>near-adapter</module>
     </modules>
 
     <properties>

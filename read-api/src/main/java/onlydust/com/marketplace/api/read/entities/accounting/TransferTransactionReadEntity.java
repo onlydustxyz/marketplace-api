@@ -65,6 +65,7 @@ public class TransferTransactionReadEntity {
                 case STARKNET -> blockExplorer.url(Blockchain.STARKNET, reference);
                 case APTOS -> blockExplorer.url(Blockchain.APTOS, reference);
                 case STELLAR -> blockExplorer.url(Blockchain.STELLAR, reference);
+                case NEAR -> blockExplorer.url(Blockchain.NEAR, reference);
             };
         } catch (OnlyDustException e) {
             LOGGER.error("Error while generating block explorer URL for blockchain %s and reference %s".formatted(blockchain, reference), e);

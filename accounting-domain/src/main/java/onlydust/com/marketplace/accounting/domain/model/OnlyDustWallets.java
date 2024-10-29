@@ -19,6 +19,7 @@ public class OnlyDustWallets {
     String aptos;
     String stellar;
     String sepa;
+    String near;
 
     public Optional<String> get(Network network) {
         return switch (network) {
@@ -28,6 +29,7 @@ public class OnlyDustWallets {
             case APTOS -> Optional.ofNullable(aptos);
             case STELLAR -> Optional.ofNullable(stellar);
             case SEPA -> Optional.ofNullable(sepa);
+            case NEAR -> Optional.ofNullable(near);
         };
     }
 
@@ -38,6 +40,7 @@ public class OnlyDustWallets {
             case STARKNET -> Optional.ofNullable(starknet);
             case APTOS -> Optional.ofNullable(aptos);
             case STELLAR -> Optional.ofNullable(stellar);
+            case NEAR -> Optional.ofNullable(near);
         };
     }
 }

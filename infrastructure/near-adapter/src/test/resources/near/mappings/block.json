@@ -1,0 +1,26 @@
+{
+    "request": {
+        "url": "/",
+        "method": "POST",
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "jsonrpc": "2.0",
+                    "method": "block",
+                    "params": {
+                        "block_id": "CCzukfczq1kJgBLmtPHw3t47EozPvYL2Q4xY2aua7W7Q"
+                    }
+                },
+                "ignoreArrayOrder": true,
+                "ignoreExtraElements": true
+            }
+        ]
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-block.json",
+        "headers": {
+            "Content-Type": "application/json"
+        }
+    }
+}

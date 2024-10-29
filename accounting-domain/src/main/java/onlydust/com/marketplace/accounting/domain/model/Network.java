@@ -10,7 +10,8 @@ public enum Network {
     STARKNET(Currency.Type.CRYPTO, Blockchain.STARKNET),
     APTOS(Currency.Type.CRYPTO, Blockchain.APTOS),
     STELLAR(Currency.Type.CRYPTO, Blockchain.STELLAR),
-    SEPA(Currency.Type.FIAT, null);
+    SEPA(Currency.Type.FIAT, null),
+    NEAR(Currency.Type.CRYPTO, Blockchain.NEAR);
 
     private final Currency.Type type;
     private final Blockchain blockchain;
@@ -38,6 +39,7 @@ public enum Network {
             case STARKNET -> Network.STARKNET;
             case APTOS -> Network.APTOS;
             case STELLAR -> Network.STELLAR;
+            case NEAR -> Network.NEAR;
         };
     }
 }

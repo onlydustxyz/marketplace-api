@@ -116,6 +116,7 @@ public class TransferTransactionEntity {
                     amount,
                     contractAddress != null ? Stellar.contractAddress(contractAddress) : null
             );
+            case NEAR -> throw new UnsupportedOperationException("Not implemented"); // TODO
         };
     }
 }

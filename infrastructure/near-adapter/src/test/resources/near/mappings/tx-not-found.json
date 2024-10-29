@@ -1,0 +1,26 @@
+{
+    "request": {
+        "url": "/",
+        "method": "POST",
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "jsonrpc": "2.0",
+                    "method": "tx",
+                    "params": {
+                        "wait_until": "NONE"
+                    }
+                },
+                "ignoreArrayOrder": true,
+                "ignoreExtraElements": true
+            }
+        ]
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-tx-not-found.json",
+        "headers": {
+            "Content-Type": "application/json"
+        }
+    }
+}

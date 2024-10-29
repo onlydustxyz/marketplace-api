@@ -1,0 +1,16 @@
+{
+    "jsonrpc": "2.0",
+    "id": {{jsonPath request.body '$.id'}},
+    "error": {
+        "name": "HANDLER_ERROR",
+        "cause": {
+            "info": {
+                "requested_transaction_hash": "{{jsonPath request.body '$.params.tx_hash'}}"
+            },
+            "name": "UNKNOWN_TRANSACTION"
+        },
+        "code": -32000,
+        "message": "Server error",
+        "data": "Transaction {{jsonPath request.body '$.params.tx_hash'}} doesn't exist"
+    }
+}

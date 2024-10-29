@@ -988,6 +988,89 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                             }
                             """);
         }
+
+        @Test
+        void should_preview_a_deposit_of_near_on_near() {
+            // Given
+            onlyDustWallets.setNear("onlydust.testnet");
+            currencyHelper.addNativeCryptoSupport(Currency.Code.NEAR);
+            final var depositId = new MutableObject<String>();
+
+            // When
+            client.post()
+                    .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "network": "NEAR",
+                                "transactionReference": "4exboD32LtvFes5xzun372LcebX3oC359W6Um2hw9eoV"
+                            }
+                            """)
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.id").value(depositId::setValue);
+
+            client.get()
+                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(depositId)))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
+                    .json("""
+                            {
+                              "amount": {
+                                "amount": 1.2,
+                                "prettyAmount": 1.2,
+                                "currency": {
+                                  "code": "NEAR",
+                                  "name": "NEAR Protocol",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/6535.png",
+                                  "decimals": 24
+                                },
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
+                              },
+                              "status": "DRAFT",
+                              "currentBalance": {
+                                "amount": 0,
+                                "prettyAmount": 0,
+                                "currency": {
+                                  "code": "NEAR",
+                                  "name": "NEAR Protocol",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/6535.png",
+                                  "decimals": 24
+                                },
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
+                              },
+                              "finalBalance": {
+                                "amount": 1.2,
+                                "prettyAmount": 1.2,
+                                "currency": {
+                                  "code": "NEAR",
+                                  "name": "NEAR Protocol",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/6535.png",
+                                  "decimals": 24
+                                },
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
+                              },
+                              "senderInformation": {
+                                "accountNumber": "abuisset.testnet",
+                                "transactionReference": "4exboD32LtvFes5xzun372LcebX3oC359W6Um2hw9eoV"
+                              },
+                              "billingInformation": null,
+                              "latestBillingInformation": null
+                            }
+                            """);
+        }
     }
 
     @Nested

@@ -59,6 +59,7 @@ public class ERC20Entity {
                     case STARKNET -> StarkNet.contractAddress(address);
                     case APTOS -> Aptos.coinType(address);
                     case STELLAR -> Stellar.contractAddress(address);
+                    case NEAR -> throw new IllegalStateException("ERC20 are not supported on Near");
                 },
                 name,
                 symbol,

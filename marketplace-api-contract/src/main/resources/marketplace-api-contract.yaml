@@ -9985,6 +9985,7 @@ components:
         - APTOS
         - STARKNET
         - STELLAR
+        - NEAR
 
     VatRegulationState:
       type: string

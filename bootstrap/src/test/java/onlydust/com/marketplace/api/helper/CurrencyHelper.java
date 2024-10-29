@@ -52,6 +52,7 @@ public class CurrencyHelper {
     public void addNativeCryptoSupport(Currency.Code code) {
         currencyFacadePort.addNativeCryptocurrencySupport(code, switch (code.toString()) {
             case Currency.Code.XLM_STR -> 7;
+            case Currency.Code.NEAR_STR -> 24;
             default -> throw new IllegalArgumentException("Unsupported currency in tests");
         });
     }

@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.infrastructure.aptosrpc.adapters.AptosTransa
 import onlydust.com.marketplace.api.infrastructure.langchain.adapters.LangchainLLMAdapter;
 import onlydust.com.marketplace.api.infura.adapters.StarknetTransactionStorageAdapter;
 import onlydust.com.marketplace.api.infura.adapters.Web3EvmTransactionStorageAdapter;
+import onlydust.com.marketplace.api.near.adapters.NearTransactionStorageAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
 import onlydust.com.marketplace.api.posthog.adapters.PosthogApiClientAdapter;
@@ -342,9 +343,10 @@ public class ProjectConfiguration {
                                                      final Web3EvmTransactionStorageAdapter optimismTransactionStorageAdapter,
                                                      final StarknetTransactionStorageAdapter starknetTransactionStoragePort,
                                                      final AptosTransactionStorageAdapter aptosTransactionStorageAdapter,
-                                                     final StellarTransactionStorageAdapter stellarTransactionStorageAdapter) {
+                                                     final StellarTransactionStorageAdapter stellarTransactionStorageAdapter,
+                                                     final NearTransactionStorageAdapter nearTransactionStorageAdapter) {
         return new BlockchainService(ethereumTransactionStorageAdapter, optimismTransactionStorageAdapter, aptosTransactionStorageAdapter,
-                starknetTransactionStoragePort, stellarTransactionStorageAdapter);
+                starknetTransactionStoragePort, stellarTransactionStorageAdapter, nearTransactionStorageAdapter);
     }
 
     @Bean

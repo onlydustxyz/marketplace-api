@@ -12,6 +12,7 @@ public interface NetworkMapper {
             case STARKNET -> TransactionNetwork.STARKNET;
             case OPTIMISM -> TransactionNetwork.OPTIMISM;
             case STELLAR -> TransactionNetwork.STELLAR;
+            case NEAR -> TransactionNetwork.NEAR;
         };
     }
 }

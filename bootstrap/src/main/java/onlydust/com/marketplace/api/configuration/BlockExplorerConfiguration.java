@@ -3,12 +3,14 @@ package onlydust.com.marketplace.api.configuration;
 import onlydust.com.marketplace.api.infrastructure.blockexplorer.BlockExplorerProperties;
 import onlydust.com.marketplace.api.infrastructure.blockexplorer.adapters.aptos.AptoScan;
 import onlydust.com.marketplace.api.infrastructure.blockexplorer.adapters.ethereum.EtherScan;
+import onlydust.com.marketplace.api.infrastructure.blockexplorer.adapters.near.NearBlocks;
 import onlydust.com.marketplace.api.infrastructure.blockexplorer.adapters.starknet.StarkScan;
 import onlydust.com.marketplace.api.infrastructure.blockexplorer.adapters.stellar.StellarExpert;
 import onlydust.com.marketplace.kernel.model.blockchain.BlockExplorer;
 import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosTransaction;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmTransaction;
+import onlydust.com.marketplace.kernel.model.blockchain.near.NearTransaction;
 import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetTransaction;
 import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarTransaction;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -50,16 +52,23 @@ public class BlockExplorerConfiguration {
     }
 
     @Bean
+    public BlockExplorer<NearTransaction.Hash> nearBlockExplorer(final BlockExplorerProperties blockExplorerProperties) {
+        return new NearBlocks(blockExplorerProperties);
+    }
+
+    @Bean
     public MetaBlockExplorer blockExplorer(final BlockExplorer<AptosTransaction.Hash> aptosBlockExplorer,
                                            final BlockExplorer<EvmTransaction.Hash> ethereumBlockExplorer,
                                            final BlockExplorer<EvmTransaction.Hash> optimismBlockExplorer,
                                            final BlockExplorer<StarknetTransaction.Hash> starknetBlockExplorer,
-                                           final BlockExplorer<StellarTransaction.Hash> stellarBlockExplorer) {
+                                           final BlockExplorer<StellarTransaction.Hash> stellarBlockExplorer,
+                                           final BlockExplorer<NearTransaction.Hash> nearBlockExplorer) {
         return new MetaBlockExplorer(
                 aptosBlockExplorer,
                 ethereumBlockExplorer,
                 optimismBlockExplorer,
                 starknetBlockExplorer,
-                stellarBlockExplorer);
+                stellarBlockExplorer,
+                nearBlockExplorer);
     }
 }

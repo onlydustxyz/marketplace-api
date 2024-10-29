@@ -52,6 +52,13 @@ public class WireMockInitializer implements ApplicationContextInitializer<Config
                 .register(context);
 
         WiremockServerRegistration.builder()
+                .beanName("nearWireMockServer")
+                .stubLocation("near")
+                .property("infrastructure.near.base-uri")
+                .build()
+                .register(context);
+
+        WiremockServerRegistration.builder()
                 .beanName("coinmarketcapWireMockServer")
                 .stubLocation("coinmarketcap")
                 .property("infrastructure.coinmarketcap.base-uri")

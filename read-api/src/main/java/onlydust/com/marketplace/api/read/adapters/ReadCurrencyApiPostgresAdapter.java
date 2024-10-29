@@ -52,6 +52,7 @@ public class ReadCurrencyApiPostgresAdapter implements ReadCurrencyApi {
                                                     case APTOS -> NetworkContract.APTOS;
                                                     case STELLAR -> NetworkContract.STELLAR;
                                                     case SEPA -> NetworkContract.SEPA;
+                                                    case NEAR -> NetworkContract.NEAR;
                                                 })
                                                 .address(onlyDustWallets.get(n).orElse(null))
                                         )
