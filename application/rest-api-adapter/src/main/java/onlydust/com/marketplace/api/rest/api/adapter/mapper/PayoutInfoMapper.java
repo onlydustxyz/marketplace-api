@@ -14,6 +14,7 @@ public interface PayoutInfoMapper {
                 .optimismAddress(isNull(request.getOptimismAddress()) ? null : Optimism.accountAddress(request.getOptimismAddress()))
                 .starknetAddress(isNull(request.getStarknetAddress()) ? null : StarkNet.accountAddress(request.getStarknetAddress()))
                 .stellarAccountId(isNull(request.getStellarAccountId()) ? null : Stellar.accountId(request.getStellarAccountId()))
+                .nearAccountId(request.getNearAccountId())
                 .ethWallet(isNull(request.getEthWallet()) ? null : Ethereum.wallet(request.getEthWallet()))
                 .bankAccount(isNull(request.getBankAccount()) ? null : new BankAccount(request.getBankAccount().getBic(), request.getBankAccount().getNumber()))
                 .build();

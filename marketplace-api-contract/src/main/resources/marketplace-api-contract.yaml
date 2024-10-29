@@ -6128,6 +6128,10 @@ components:
           $ref: '#/components/schemas/StellarAccountId'
         missingStellarWallet:
           type: boolean
+        nearAccountId:
+          $ref: '#/components/schemas/NearAccountId'
+        missingNearWallet:
+          type: boolean
 
     BillingProfilePayoutInfoRequest:
       type: object
@@ -6156,6 +6160,8 @@ components:
           example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
         stellarAccountId:
           $ref: '#/components/schemas/StellarAccountId'
+        nearAccountId:
+          $ref: '#/components/schemas/NearAccountId'
 
     UserProfileUpdateRequest:
       type: object
@@ -11485,6 +11491,11 @@ components:
       type: string
       description: Stellar account public key, base-32 encoded
       example: GBAIA5U6E3FSRUW55AXACIVGX2QR5JYAS74OWLED3S22EGXVYEHPLGPA
+
+    NearAccountId:
+      type: string
+      description: Near account id
+      example: 4e5c2094fbb0ab0b29b7c9b4bc31ba44ee1e9d292778512348abdbda3fff3dbb
 
     NotificationGlobalBillingProfileReminder:
       type: object

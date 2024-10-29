@@ -57,6 +57,7 @@ public class PayoutInfoReadEntity {
                 .aptosAddress(aptosWallet().map(WalletEntity::getAddress).orElse(null))
                 .starknetAddress(starknetWallet().map(WalletEntity::getAddress).orElse(null))
                 .stellarAccountId(stellarWallet().map(WalletEntity::getAddress).orElse(null))
+                .nearAccountId(nearWallet().map(WalletEntity::getAddress).orElse(null))
                 ;
     }
 
@@ -84,6 +85,10 @@ public class PayoutInfoReadEntity {
         return wallets.stream().filter(wallet -> wallet.getNetwork() == NetworkEnumEntity.STELLAR).findFirst();
     }
 
+    private Optional<WalletEntity> nearWallet() {
+        return wallets.stream().filter(wallet -> wallet.getNetwork() == NetworkEnumEntity.NEAR).findFirst();
+    }
+
     private boolean missingEthWallet() {
         return ethWallet().isEmpty() && billingProfile.missingPayoutInfoRewardsNetworks().contains(NetworkEnumEntity.ETHEREUM);
     }
@@ -104,6 +109,10 @@ public class PayoutInfoReadEntity {
         return stellarWallet().isEmpty() && billingProfile.missingPayoutInfoRewardsNetworks().contains(NetworkEnumEntity.STELLAR);
     }
 
+    private boolean missingNearWallet() {
+        return nearWallet().isEmpty() && billingProfile.missingPayoutInfoRewardsNetworks().contains(NetworkEnumEntity.NEAR);
+    }
+
     private boolean missingBankAccount() {
         return bankAccount().isEmpty() && billingProfile.missingPayoutInfoRewardsNetworks().contains(NetworkEnumEntity.SEPA);
     }
@@ -121,6 +130,8 @@ public class PayoutInfoReadEntity {
                 .missingStarknetWallet(missingStarknetAddress())
                 .stellarAccountId(stellarWallet().map(WalletEntity::getAddress).orElse(null))
                 .missingStellarWallet(missingStellarWallet())
+                .nearAccountId(nearWallet().map(WalletEntity::getAddress).orElse(null))
+                .missingNearWallet(missingNearWallet())
                 .bankAccount(bankAccount().map(BankAccountReadEntity::toBillingProfilePayoutInfoResponseBankAccount).orElse(null))
                 .missingBankAccount(missingBankAccount());
     }
