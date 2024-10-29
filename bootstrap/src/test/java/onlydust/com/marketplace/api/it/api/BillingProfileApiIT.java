@@ -452,7 +452,8 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                             "number": "FR5417569000301995586997O41"
                           },
                           "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798",
-                          "stellarAccountId": "GA6MC3D6BNEFHZBYROFJ67O6TSZ2JZCDH3Y2PFJUUIDOEX26HDBHD4PB"
+                          "stellarAccountId": "GA6MC3D6BNEFHZBYROFJ67O6TSZ2JZCDH3Y2PFJUUIDOEX26HDBHD4PB",
+                          "nearAccountId": "abuisset.near"
                         }
                         """)
                 // Then
@@ -486,7 +487,9 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                           "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798",
                           "missingStarknetWallet": false,
                           "stellarAccountId": "GA6MC3D6BNEFHZBYROFJ67O6TSZ2JZCDH3Y2PFJUUIDOEX26HDBHD4PB",
-                          "missingStellarWallet": false
+                          "missingStellarWallet": false,
+                          "nearAccountId": "abuisset.near",
+                          "missingNearWallet": false
                         }""");
 
         client.put()
@@ -500,7 +503,8 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                           "optimismAddress": "0x72C30FCD1e7bd691Ce206Cd36BbD87C4C7099545",
                           "bankAccount": null,
                           "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798",
-                          "stellarAccountId": null
+                          "stellarAccountId": null,
+                          "nearAccountId": null
                         }
                         """)
                 // Then
@@ -531,7 +535,9 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                           "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798",
                           "missingStarknetWallet": false,
                           "stellarAccountId": null,
-                          "missingStellarWallet": false
+                          "missingStellarWallet": false,
+                          "nearAccountId": null,
+                          "missingNearWallet": false
                         }""");
 
         // When

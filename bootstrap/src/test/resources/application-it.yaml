@@ -88,6 +88,7 @@ infrastructure:
 application:
   onlydust-wallets:
     ethereum: '0xb060429d14266d06a8be63281205668be823604f'
+    near: 'onlydust.testnet'
   web:
     machine-to-machine:
       api-key: "some-api-key"

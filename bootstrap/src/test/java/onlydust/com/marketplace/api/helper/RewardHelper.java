@@ -32,7 +32,29 @@ public class RewardHelper {
                 .build()));
     }
 
+    public RewardId create(ProjectId projectId, UserAuthHelper.AuthenticatedUser lead, GithubUserId recipientId, double amount, Currency.Id currencyId) {
+        return create(projectId, lead, recipientId, amount, currencyId, List.of(RequestRewardCommand.Item.builder()
+                .id("1974448961")
+                .number(77L)
+                .repoId(86943508L)
+                .type(RequestRewardCommand.Item.Type.issue)
+                .build()));
+    }
+
     public RewardId create(ProjectId projectId, UserAuthHelper.AuthenticatedUser lead, GithubUserId recipientId, long amount, Currency.Id currencyId,
+                           List<RequestRewardCommand.Item> rewardItems) {
+        return rewardFacadePort.createReward(UserId.of(lead.user().getId()),
+                RequestRewardCommand.builder()
+                        .amount(BigDecimal.valueOf(amount))
+                        .currencyId(CurrencyView.Id.of(currencyId.value()))
+                        .recipientId(recipientId.value())
+                        .items(rewardItems)
+                        .projectId(projectId)
+                        .build());
+    }
+
+
+    public RewardId create(ProjectId projectId, UserAuthHelper.AuthenticatedUser lead, GithubUserId recipientId, double amount, Currency.Id currencyId,
                            List<RequestRewardCommand.Item> rewardItems) {
         return rewardFacadePort.createReward(UserId.of(lead.user().getId()),
                 RequestRewardCommand.builder()

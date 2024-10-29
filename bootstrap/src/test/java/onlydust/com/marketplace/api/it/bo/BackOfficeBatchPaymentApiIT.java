@@ -1,14 +1,14 @@
 package onlydust.com.marketplace.api.it.bo;
 
 import com.github.javafaker.Faker;
-import onlydust.com.backoffice.api.contract.model.PayRewardRequest;
-import onlydust.com.backoffice.api.contract.model.PostBatchPaymentRequest;
-import onlydust.com.backoffice.api.contract.model.TransactionNetwork;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.Payment;
+import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.helper.AccountingHelper;
+import onlydust.com.marketplace.api.helper.RewardHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
@@ -28,7 +28,9 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.util.Objects.isNull;
@@ -51,11 +53,16 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
     @Autowired
     AccountingHelper accountingHelper;
     @Autowired
+    RewardHelper rewardHelper;
+    @Autowired
     KycRepository kycRepository;
     @Autowired
     KybRepository kybRepository;
     @Autowired
     BackofficeAccountingManagementRestApi backofficeAccountingManagementRestApi;
+    @Autowired
+    OnlyDustWallets onlyDustWallets;
+
     UserAuthHelper.AuthenticatedBackofficeUser camille;
     UserId anthony;
     UserId olivier;
@@ -873,5 +880,124 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                 .exchange()
                 .expectStatus()
                 .isNotFound();
+    }
+
+    @Nested
+    class Near {
+        private static final AtomicBoolean setupDone = new AtomicBoolean();
+
+        List<Invoice.Id> invoiceIds = new ArrayList<>();
+
+        @BeforeEach
+        void setUp() throws IOException {
+            if (setupDone.compareAndExchange(false, true)) return;
+
+            final var near = currencyHelper.addNativeCryptoSupport(Currency.Code.NEAR);
+            currencyHelper.setUsdQuote(near.id(), 4.48);
+
+            final var sponsorLead = userAuthHelper.create();
+            final var sponsor = sponsorHelper.create(sponsorLead);
+
+            onlyDustWallets.setNear("onlydust.testnet");
+            final var deposit = depositHelper.preview(sponsorLead.userId(), sponsor.id(), Network.NEAR, "4exboD32LtvFes5xzun372LcebX3oC359W6Um2hw9eoV");
+            depositHelper.update(sponsorLead.userId(), deposit.id());
+            accountingHelper.approve(deposit.id());
+
+            final var program = programHelper.create(sponsor.id());
+            accountingHelper.allocate(sponsor.id(), program.id(), 1.2, near.id());
+
+            final var projectLead = userAuthHelper.create();
+            final var projectId = projectHelper.create(projectLead).getLeft();
+            accountingHelper.grant(program.id(), projectId, 1.2, near.id());
+
+            final var recipient1 = userAuthHelper.create();
+            final var recipient2 = userAuthHelper.create();
+            final var reward1 = rewardHelper.create(projectId, projectLead, recipient1.githubUserId(), 0.7, near.id());
+            final var reward2 = rewardHelper.create(projectId, projectLead, recipient2.githubUserId(), 0.5, near.id());
+
+            final var billingProfile1 = billingProfileService.createIndividualBillingProfile(recipient1.userId(), "Recipient 1", Set.of(projectId));
+            kycRepository.save(kycRepository.findByBillingProfileId(billingProfile1.id().value())
+                    .orElseThrow()
+                    .firstName(faker.name().firstName())
+                    .address(faker.address().fullAddress())
+                    .country("FRA")
+                    .idDocumentCountryCode("FRA")
+                    .consideredUsPersonQuestionnaire(false)
+                    .verificationStatus(VerificationStatus.VERIFIED));
+            accountingHelper.patchBillingProfile(billingProfile1.id().value(), null, VerificationStatus.VERIFIED);
+            billingProfileService.updatePayoutInfo(billingProfile1.id(), recipient1.userId(),
+                    PayoutInfo.builder()
+                            .nearAccountId("recipient1.near")
+                            .build());
+
+            final var billingProfile2 = billingProfileService.createIndividualBillingProfile(recipient2.userId(), "Recipient 2", Set.of(projectId));
+            kycRepository.save(kycRepository.findByBillingProfileId(billingProfile2.id().value())
+                    .orElseThrow()
+                    .firstName(faker.name().firstName())
+                    .address(faker.address().fullAddress())
+                    .country("FRA")
+                    .idDocumentCountryCode("FRA")
+                    .consideredUsPersonQuestionnaire(false)
+                    .verificationStatus(VerificationStatus.VERIFIED));
+            accountingHelper.patchBillingProfile(billingProfile2.id().value(), null, VerificationStatus.VERIFIED);
+            billingProfileService.updatePayoutInfo(billingProfile2.id(), recipient2.userId(),
+                    PayoutInfo.builder()
+                            .nearAccountId("recipient2.near")
+                            .build());
+
+            invoiceIds.add(newApprovedInvoice(recipient1.userId(), billingProfile1.id(), List.of(reward1)));
+            invoiceIds.add(newApprovedInvoice(recipient2.userId(), billingProfile2.id(), List.of(reward2)));
+        }
+
+        @Test
+        void should_pay_rewards() {
+            final var payments = client.post()
+                    .uri(getApiURI(POST_REWARDS_BATCH_PAYMENTS))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(new PostBatchPaymentRequest()
+                            .invoiceIds(invoiceIds.stream().map(Invoice.Id::value).toList()))
+                    .header("Authorization", "Bearer " + camille.jwt())
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(BatchPaymentsResponse.class)
+                    .returnResult().getResponseBody().getBatchPayments();
+
+            assertThat(payments).hasSize(1);
+            final var payment = payments.get(0);
+
+            assertThat(payment.getRewardCount()).isEqualTo(2);
+            assertThat(payment.getNetwork()).isEqualTo(TransactionNetwork.NEAR);
+            assertThat(payment.getStatus()).isEqualTo(BatchPaymentStatus.TO_PAY);
+
+            final var details = client.get()
+                    .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS_BY_ID.formatted(payment.getId())))
+                    .header("Authorization", "Bearer " + camille.jwt())
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(BatchPaymentDetailsResponse.class)
+                    .returnResult().getResponseBody();
+
+            assertThat(details).isNotNull();
+            assertThat(details.getTotalUsdEquivalent()).isEqualByComparingTo(BigDecimal.valueOf(5.376));
+            assertThat(details.getCsv().split("\\R")).containsExactlyInAnyOrder(
+                    "recipient1.near,0.7",
+                    "recipient2.near,0.5"
+            );
+
+            client.put()
+                    .uri(getApiURI(REWARDS_BATCH_PAYMENTS.formatted(payment.getId())))
+                    .header("Authorization", "Bearer " + camille.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(new BatchPaymentRequest()
+                            .transactionHash("4exboD32LtvFes5xzun372LcebX3oC359W6Um2hw9eoV"))
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful();
+        }
     }
 }

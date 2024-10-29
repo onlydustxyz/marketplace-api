@@ -49,8 +49,8 @@ public class CurrencyHelper {
         });
     }
 
-    public void addNativeCryptoSupport(Currency.Code code) {
-        currencyFacadePort.addNativeCryptocurrencySupport(code, switch (code.toString()) {
+    public Currency addNativeCryptoSupport(Currency.Code code) {
+        return currencyFacadePort.addNativeCryptocurrencySupport(code, switch (code.toString()) {
             case Currency.Code.XLM_STR -> 7;
             case Currency.Code.NEAR_STR -> 24;
             default -> throw new IllegalArgumentException("Unsupported currency in tests");
@@ -58,6 +58,14 @@ public class CurrencyHelper {
     }
 
     public void setQuote(String date, Currency.Id baseCurrencyId, Currency.Id targetCurrencyId, BigDecimal rate) {
-        quoteStorage.save(List.of(new Quote(baseCurrencyId, targetCurrencyId, rate, ZonedDateTime.parse(date).toInstant())));
+        setQuote(ZonedDateTime.parse(date), baseCurrencyId, targetCurrencyId, rate);
+    }
+
+    public void setQuote(ZonedDateTime date, Currency.Id baseCurrencyId, Currency.Id targetCurrencyId, BigDecimal rate) {
+        quoteStorage.save(List.of(new Quote(baseCurrencyId, targetCurrencyId, rate, date.toInstant())));
+    }
+
+    public void setUsdQuote(Currency.Id currencyId, double rate) {
+        setQuote(ZonedDateTime.now(), currencyId, USD, BigDecimal.valueOf(rate));
     }
 }

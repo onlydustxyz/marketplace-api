@@ -57,6 +57,7 @@ public class PayoutInfoEntity {
                 .aptosAddress(wallet(NetworkEnumEntity.APTOS).map(WalletEntity::aptos).orElse(null))
                 .starknetAddress(wallet(NetworkEnumEntity.STARKNET).map(WalletEntity::starknet).orElse(null))
                 .stellarAccountId(wallet(NetworkEnumEntity.STELLAR).map(WalletEntity::stellar).orElse(null))
+                .nearAccountId(wallet(NetworkEnumEntity.NEAR).map(WalletEntity::near).orElse(null))
                 .build();
     }
 
@@ -73,7 +74,8 @@ public class PayoutInfoEntity {
                         payoutInfo.optimismAddress().map(w -> WalletEntity.optimism(billingProfileId, w)).orElse(null),
                         payoutInfo.aptosAddress().map(w -> WalletEntity.aptos(billingProfileId, w)).orElse(null),
                         payoutInfo.starknetAddress().map(w -> WalletEntity.starknet(billingProfileId, w)).orElse(null),
-                        payoutInfo.stellarAccountId().map(w -> WalletEntity.stellar(billingProfileId, w)).orElse(null)
+                        payoutInfo.stellarAccountId().map(w -> WalletEntity.stellar(billingProfileId, w)).orElse(null),
+                        payoutInfo.nearAccountId().map(w -> WalletEntity.near(billingProfileId, w)).orElse(null)
                 ).collect(toSet()))
                 .build();
     }

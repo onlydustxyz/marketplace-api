@@ -20,6 +20,7 @@ public class PayoutInfo {
     AptosAccountAddress aptosAddress;
     StarknetAccountAddress starknetAddress;
     StellarAccountId stellarAccountId;
+    String nearAccountId;
     BankAccount bankAccount;
 
     public Optional<WalletLocator> ethWallet() {
@@ -42,6 +43,10 @@ public class PayoutInfo {
         return Optional.ofNullable(stellarAccountId);
     }
 
+    public Optional<String> nearAccountId() {
+        return Optional.ofNullable(nearAccountId);
+    }
+
     public Optional<BankAccount> bankAccount() {
         return Optional.ofNullable(bankAccount);
     }
@@ -54,6 +59,7 @@ public class PayoutInfo {
         if (aptosAddress != null) wallets.add(new Wallet(Network.APTOS, aptosAddress.toString()));
         if (starknetAddress != null) wallets.add(new Wallet(Network.STARKNET, starknetAddress.toString()));
         if (stellarAccountId != null) wallets.add(new Wallet(Network.STELLAR, stellarAccountId.toString()));
+        if (nearAccountId != null) wallets.add(new Wallet(Network.NEAR, nearAccountId));
 
         return wallets;
     }

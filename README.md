@@ -98,25 +98,26 @@ Optionally, [configure JetBrains to sign commits](https://www.jetbrains.com/help
 
 ## Currency support per blockchain
 
-|       | Ethereum | Optimism | Starknet | Stellar | Aptos |
-|:-----:|:--------:|:--------:|:--------:|:-------:|:-----:|
-|  ETH  |    ✅     |          |          |         |       |
-|  OP   |          |    ✅     |          |         |       |
-| STRK  |    ✅     |          |    ✅     |         |       |
-|  XLM  |          |          |          |    ✅    |       |
-|  APT  |          |          |          |         |   ✅   |
-| USDC  |    ✅     |    ✅     |    ✅     |    ✅    |       |
-| LORDS |    ✅     |          |          |         |       |
-|  WLD  |          |    ✅     |          |         |       |
+|       | Ethereum | Optimism | Starknet | Stellar | Aptos | NEAR |
+|:-----:|:--------:|:--------:|:--------:|:-------:|:-----:|:----:|
+|  ETH  |    ✅     |          |          |         |       |      |
+|  OP   |          |    ✅     |          |         |       |      |
+| STRK  |    ✅     |          |    ✅     |         |       |      |
+|  XLM  |          |          |          |    ✅    |       |      |
+| NEAR  |          |          |          |         |       |  ✅   |
+|  APT  |          |          |          |         |   ✅   |      |
+| USDC  |    ✅     |    ✅     |    ✅     |    ✅    |       |      |
+| LORDS |    ✅     |          |          |         |       |      |
+|  WLD  |          |    ✅     |          |         |       |      |
 
 ## Feature support per blockchain
 
-|                     | Ethereum | Optimism | Starknet | Stellar | Aptos |
-|:-------------------:|:--------:|:--------:|:--------:|:-------:|:-----:|
-| Reward distribution |    ✅     |    ✅     |    ✅     |    ✅    |   ✅   |
-|    ERC20 support    |    ✅     |    ✅     |    ✅     |    ✅    |   ✅   |
-|  Sponsor deposits   |    ✅     |    ✅     |    ✅     |    ✅    |   ✅   |
-| Account validation  |    ✅     |    ✅     |    ✅     |    ✅    |   ✅   |
+|                     | Ethereum | Optimism | Starknet | Stellar | Aptos | NEAR |
+|:-------------------:|:--------:|:--------:|:--------:|:-------:|:-----:|:----:|
+| Reward distribution |    ✅     |    ✅     |    ✅     |    ✅    |   ✅   |  ✅   |
+|    ERC20 support    |    ✅     |    ✅     |    ✅     |    ✅    |   ✅   |  ❌   |
+|  Sponsor deposits   |    ✅     |    ✅     |    ✅     |    ✅    |   ✅   |  ✅   |
+| Account validation  |    ✅     |    ✅     |    ✅     |    ✅    |   ✅   |  ❌   |
 
 ## How to perform a deposit
 

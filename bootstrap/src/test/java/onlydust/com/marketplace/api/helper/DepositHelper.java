@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.helper;
 
 import com.github.dockerjava.zerodep.shaded.org.apache.commons.codec.binary.Base32;
 import com.github.javafaker.Faker;
+import com.syntifi.crypto.key.encdec.Base58;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.accounting.domain.model.Network;
@@ -93,6 +94,7 @@ public class DepositHelper {
     private String randomTransactionReference(Network network) {
         return switch (network) {
             case STELLAR -> faker.random().hex();
+            case NEAR -> Base58.encode(faker.random().hex().getBytes());
             default -> "0x" + faker.random().hex();
         };
     }
@@ -100,7 +102,22 @@ public class DepositHelper {
     private String randomAddress(Network network) {
         return switch (network) {
             case STELLAR -> new Base32().encodeAsString(faker.random().hex().getBytes()).replaceAll("=", "");
+            case NEAR -> faker.internet().slug() + ".near";
             default -> "0x" + faker.random().hex();
         };
+    }
+
+    public void update(UserId userId, Deposit.Id depositId) {
+        accountingFacadePort.submitDeposit(userId, depositId, new Deposit.BillingInformation(
+                faker.lordOfTheRings().location(),
+                faker.address().fullAddress(),
+                faker.country().countryCode3(),
+                String.valueOf(faker.random().nextLong()),
+                faker.finance().bic(),
+                faker.internet().emailAddress(),
+                faker.name().firstName(),
+                faker.name().lastName(),
+                faker.internet().emailAddress()
+        ));
     }
 }

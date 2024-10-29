@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEnt
 import onlydust.com.marketplace.kernel.model.blockchain.*;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosTransferTransaction;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmTransferTransaction;
+import onlydust.com.marketplace.kernel.model.blockchain.near.NearTransferTransaction;
 import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetTransferTransaction;
 import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarTransferTransaction;
 import org.hibernate.annotations.JdbcType;
@@ -116,7 +117,15 @@ public class TransferTransactionEntity {
                     amount,
                     contractAddress != null ? Stellar.contractAddress(contractAddress) : null
             );
-            case NEAR -> throw new UnsupportedOperationException("Not implemented"); // TODO
+            case NEAR -> new NearTransferTransaction(
+                    Near.transactionHash(reference),
+                    timestamp,
+                    Blockchain.Transaction.Status.CONFIRMED,
+                    senderAddress,
+                    recipientAddress,
+                    amount,
+                    contractAddress
+            );
         };
     }
 }

@@ -23,7 +23,11 @@ public class Amount {
         return new Amount(value);
     }
 
-    public static @NonNull Amount of(Long value) {
+    public static @NonNull Amount of(double value) {
+        return new Amount(BigDecimal.valueOf(value));
+    }
+
+    public static @NonNull Amount of(long value) {
         return new Amount(BigDecimal.valueOf(value));
     }
 
