@@ -5,8 +5,8 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.Receipt;
-import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.project.domain.view.ReceiptView;
 import org.hibernate.annotations.Immutable;
@@ -55,7 +55,8 @@ public class ReceiptViewEntity {
                     case OPTIMISM -> Blockchain.OPTIMISM;
                     case STARKNET -> Blockchain.STARKNET;
                     case STELLAR -> Blockchain.STELLAR;
-                    default -> null;
+                    case NEAR -> Blockchain.NEAR;
+                    case SEPA -> null;
                 })
                 .walletAddress(network == NetworkEnumEntity.SEPA ? null : thirdPartyAccountNumber)
                 .iban(network == NetworkEnumEntity.SEPA ? thirdPartyAccountNumber : null)
