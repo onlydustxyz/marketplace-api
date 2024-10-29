@@ -20,7 +20,8 @@ public interface ContributorFacadePort {
                                                                   int maxInternalContributorCountToTriggerExternalSearch,
                                                                   int maxInternalContributorCountToReturn,
                                                                   boolean externalSearchOnly,
-                                                                  boolean internalSearchOnly);
+                                                                  boolean internalSearchOnly,
+                                                                  Boolean isRegistered);
 
     Page<ContributionView> contributions(Optional<Long> callerGithubUserId,
                                          ContributionView.Filters filters,

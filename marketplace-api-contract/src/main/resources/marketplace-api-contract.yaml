@@ -1564,6 +1564,14 @@ paths:
             Default value is false.
           schema:
             type: boolean
+        - in: query
+          name: isRegistered
+          description: |
+            If true, only registered users will be returned.
+            If false, only non-registered users will be returned.
+            If not provided, all users will be returned.
+          schema:
+            type: boolean
       responses:
         "200":
           description: 'List of contributors'

@@ -1,11 +1,15 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.api.contract.model.ContributorResponse;
+import onlydust.com.marketplace.api.contract.model.ContributorSearchResponse;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 
 import java.util.Map;
 import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TagProject
 public class ContributorSearchIT extends AbstractMarketplaceApiIT {
@@ -184,5 +188,39 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                 .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, "login", login))
                 .exchange()
                 .expectStatus().isUnauthorized();
+    }
+
+    @Test
+    void should_filter_by_registration_status() {
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
+
+        {
+            final var response = client.get()
+                    .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("isRegistered", "true",
+                            "login", login)))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                    .exchange()
+                    .expectStatus().is2xxSuccessful()
+                    .expectBody(ContributorSearchResponse.class).returnResult().getResponseBody();
+
+            assertThat(response).isNotNull();
+            assertThat(response.getInternalContributors()).isNotEmpty().extracting(ContributorResponse::getIsRegistered).containsOnly(true);
+            assertThat(response.getExternalContributors()).isEmpty();
+        }
+
+        {
+            final var response = client.get()
+                    .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("isRegistered", "false",
+                            "login", login,
+                            "maxInternalContributorCountToTriggerExternalSearch", "20")))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                    .exchange()
+                    .expectStatus().is2xxSuccessful()
+                    .expectBody(ContributorSearchResponse.class).returnResult().getResponseBody();
+
+            assertThat(response).isNotNull();
+            assertThat(response.getInternalContributors()).isNotEmpty().extracting(ContributorResponse::getIsRegistered).containsOnly(false);
+            assertThat(response.getExternalContributors()).isNotEmpty().extracting(ContributorResponse::getIsRegistered).containsOnly(false);
+        }
     }
 }

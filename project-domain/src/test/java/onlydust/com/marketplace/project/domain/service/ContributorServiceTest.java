@@ -47,9 +47,9 @@ public class ContributorServiceTest {
 
         // When
         when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(projectRepoIds);
-        when(userStoragePort.searchContributorsByLogin(allRepoIds, login, 100)).thenReturn(internalContributors);
+        when(userStoragePort.searchContributorsByLogin(allRepoIds, login, 100, null)).thenReturn(internalContributors);
         final var contributors = contributorService.searchContributors(projectId, repoIds, login, 5, 100,
-                false, false);
+                false, false, null);
 
         // Then
         verify(githubSearchPort, never()).searchUsersByLogin(anyString());
@@ -57,7 +57,6 @@ public class ContributorServiceTest {
         assertThat(contributors.getLeft()).containsExactlyElementsOf(internalContributors);
         assertThat(contributors.getRight()).isEmpty();
     }
-
 
     @Test
     void should_complete_with_external_contributors_if_not_enough() {
@@ -79,7 +78,7 @@ public class ContributorServiceTest {
 
         // When
         when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(projectRepoIds);
-        when(userStoragePort.searchContributorsByLogin(allRepoIds, login, 100)).thenReturn(internalContributors);
+        when(userStoragePort.searchContributorsByLogin(allRepoIds, login, 100, null)).thenReturn(internalContributors);
         when(githubSearchPort.searchUsersByLogin(login)).thenReturn(externalContributors.stream().map(Contributor::getId).toList());
         externalContributors.forEach(
                 contributor -> when(userStoragePort.getRegisteredUserByGithubId(contributor.getId().githubUserId()))
@@ -91,7 +90,7 @@ public class ContributorServiceTest {
                                 .build()) :
                                 Optional.empty()));
         final var contributors = contributorService.searchContributors(projectId, repoIds, login, 5, 100,
-                false, false);
+                false, false, null);
 
         // Then
         assertThat(contributors.getLeft()).containsExactlyElementsOf(internalContributors);
@@ -114,9 +113,9 @@ public class ContributorServiceTest {
         );
 
         // When
-        when(userStoragePort.searchContributorsByLogin(repoIds, login, 100)).thenReturn(internalContributors);
+        when(userStoragePort.searchContributorsByLogin(repoIds, login, 100, null)).thenReturn(internalContributors);
         final var contributors = contributorService.searchContributors(null, repoIds, login, 5, 100,
-                false, false);
+                false, false, null);
 
         // Then
         verify(githubSearchPort, never()).searchUsersByLogin(anyString());
@@ -139,9 +138,9 @@ public class ContributorServiceTest {
 
         // When
         when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(projectRepoIds);
-        when(userStoragePort.searchContributorsByLogin(projectRepoIds, login, 100)).thenReturn(internalContributors);
+        when(userStoragePort.searchContributorsByLogin(projectRepoIds, login, 100, null)).thenReturn(internalContributors);
         final var contributors = contributorService.searchContributors(projectId, null, login, 5, 100,
-                false, false);
+                false, false, null);
 
         // Then
         verify(githubSearchPort, never()).searchUsersByLogin(anyString());
@@ -162,9 +161,9 @@ public class ContributorServiceTest {
         );
 
         // When
-        when(userStoragePort.searchContributorsByLogin(eq(Set.of()), eq(null), eq(100))).thenReturn(internalContributors);
+        when(userStoragePort.searchContributorsByLogin(eq(Set.of()), eq(null), eq(100), eq(null))).thenReturn(internalContributors);
         final var contributors = contributorService.searchContributors(null, null, null, 5, 100,
-                false, false);
+                false, false, null);
 
         // Then
         verify(githubSearchPort, never()).searchUsersByLogin(anyString());
@@ -198,10 +197,10 @@ public class ContributorServiceTest {
                                 .build()) :
                                 Optional.empty()));
         final var contributors = contributorService.searchContributors(null, null, login, 0, 0,
-                true, false);
+                true, false, null);
 
         // Then
-        verify(userStoragePort, never()).searchContributorsByLogin(anySet(), anyString(), anyInt());
+        verify(userStoragePort, never()).searchContributorsByLogin(anySet(), anyString(), anyInt(), anyBoolean());
         verify(projectStoragePort, never()).getProjectRepoIds(any(ProjectId.class));
         assertThat(contributors.getLeft()).isEmpty();
         assertThat(contributors.getRight().stream().map(c -> c.getId().githubUserId()).toList())
@@ -209,7 +208,6 @@ public class ContributorServiceTest {
         assertThat(contributors.getRight().stream().map(Contributor::getIsRegistered).toList())
                 .containsExactlyElementsOf(externalContributors.stream().map(Contributor::getIsRegistered).toList());
     }
-
 
     @Test
     void should_work_with_internalSearchOnly() {
@@ -223,12 +221,77 @@ public class ContributorServiceTest {
 
         // When
         when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(projectRepoIds);
-        when(userStoragePort.searchContributorsByLogin(allRepoIds, login, 100)).thenReturn(internalContributors);
+        when(userStoragePort.searchContributorsByLogin(allRepoIds, login, 100, null)).thenReturn(internalContributors);
         final var contributors = contributorService.searchContributors(projectId, repoIds, login, 5, 100,
-                false, true);
+                false, true, null);
 
         // Then
         assertThat(contributors.getLeft()).containsExactlyElementsOf(internalContributors);
         assertThat(contributors.getRight()).isEmpty();
+    }
+
+    @Test
+    void should_return_only_registered_users() {
+        // Given
+        final String login = faker.name().username();
+        final List<Contributor> internalContributors = List.of(
+                contributorFaker.contributor(),
+                contributorFaker.contributor(),
+                contributorFaker.contributor()
+        );
+
+        // When
+        when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(projectRepoIds);
+        when(userStoragePort.searchContributorsByLogin(allRepoIds, login, 100, true)).thenReturn(internalContributors);
+        final var contributors = contributorService.searchContributors(projectId, repoIds, login, 5, 100,
+                false, false, true);
+
+        // Then
+        assertThat(contributors.getLeft()).containsExactlyElementsOf(internalContributors);
+        assertThat(contributors.getRight()).isEmpty();
+        verify(githubSearchPort, never()).searchUsersByLogin(anyString());
+    }
+
+    @Test
+    void should_return_only_non_registered_users() {
+        // Given
+        final String login = faker.name().username();
+        final List<Contributor> internalContributors = List.of(
+                contributorFaker.contributor(),
+                contributorFaker.contributor(),
+                contributorFaker.contributor()
+        );
+
+        final List<Contributor> externalContributors = List.of(
+                contributorFaker.contributor(),
+                contributorFaker.contributor(),
+                contributorFaker.contributor(),
+                contributorFaker.contributor(),
+                contributorFaker.contributor()
+        );
+
+        // When
+        when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(projectRepoIds);
+        when(userStoragePort.searchContributorsByLogin(allRepoIds, login, 100, false)).thenReturn(internalContributors);
+        when(githubSearchPort.searchUsersByLogin(login)).thenReturn(externalContributors.stream().map(Contributor::getId).toList());
+        externalContributors.forEach(
+                contributor -> when(userStoragePort.getRegisteredUserByGithubId(contributor.getId().githubUserId()))
+                        .thenReturn(contributor.getIsRegistered() ? Optional.of(AuthenticatedUser.builder()
+                                .githubUserId(contributor.getId().githubUserId())
+                                .login(contributor.getId().login())
+                                .avatarUrl(contributor.getId().avatarUrl())
+                                .email(contributor.getId().email())
+                                .build()) :
+                                Optional.empty()));
+
+        final var contributors = contributorService.searchContributors(projectId, repoIds, login, 5, 100,
+                false, false, false);
+
+        // Then
+        assertThat(contributors.getLeft()).containsExactlyElementsOf(internalContributors);
+        assertThat(contributors.getRight().stream().map(c -> c.getId().githubUserId()).toList())
+                .containsExactlyElementsOf(externalContributors.stream().map(c -> c.getId().githubUserId()).toList());
+        assertThat(contributors.getRight().stream().map(Contributor::getIsRegistered).toList())
+                .containsExactlyElementsOf(externalContributors.stream().map(Contributor::getIsRegistered).toList());
     }
 }

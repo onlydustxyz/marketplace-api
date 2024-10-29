@@ -56,6 +56,7 @@ public class CustomContributorRepository {
                        join indexer_exp.github_repos gr on gr.id = rc.repo_id and gr.visibility = 'PUBLIC'
                        where rc.repo_id in :reposIds and rc.contributor_id = ga.id)
                 AND ga.login ilike '%' || :login ||'%'
+                AND (coalesce(:isRegistered) is null or u.github_user_id is not null = :isRegistered)
             ORDER BY ga.login
             LIMIT :limit
             """;
@@ -72,6 +73,7 @@ public class CustomContributorRepository {
                 LEFT JOIN iam.users u on u.github_user_id = ga.id
             WHERE
                 ga.login ilike '%' || :login ||'%'
+                AND (coalesce(:isRegistered) is null or u.github_user_id is not null = :isRegistered)
             ORDER BY ga.login
             LIMIT :limit
             """;
@@ -100,19 +102,21 @@ public class CustomContributorRepository {
         return ((Number) query.getSingleResult()).intValue();
     }
 
-    public List<ContributorQueryEntity> findReposContributorsByLogin(Set<Long> reposIds, String login, int limit) {
+    public List<ContributorQueryEntity> findReposContributorsByLogin(Set<Long> reposIds, String login, int limit, Boolean isRegistered) {
         return entityManager
                 .createNativeQuery(FIND_REPOS_CONTRIBUTORS, ContributorQueryEntity.class)
                 .setParameter("reposIds", reposIds)
                 .setParameter("login", login != null ? login : "")
+                .setParameter("isRegistered", isRegistered)
                 .setParameter("limit", limit)
                 .getResultList();
     }
 
-    public List<ContributorQueryEntity> findAllContributorsByLogin(String login, int limit) {
+    public List<ContributorQueryEntity> findAllContributorsByLogin(String login, int limit, Boolean isRegistered) {
         return entityManager
                 .createNativeQuery(FIND_ALL_CONTRIBUTORS, ContributorQueryEntity.class)
                 .setParameter("login", login != null ? login : "")
+                .setParameter("isRegistered", isRegistered)
                 .setParameter("limit", limit)
                 .getResultList();
     }
