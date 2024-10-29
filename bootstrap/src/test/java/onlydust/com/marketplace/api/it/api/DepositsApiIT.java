@@ -1026,46 +1026,48 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                     .json("""
                             {
                               "amount": {
-                                "amount": 1.20000,
+                                "amount": 1.2,
                                 "prettyAmount": 1.2,
                                 "currency": {
                                   "code": "NEAR",
-                                  "name": "Near",
-                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/512.png",
-                                  "decimals": 7
+                                  "name": "NEAR Protocol",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/6535.png",
+                                  "decimals": 24
                                 },
                                 "usdEquivalent": null,
                                 "usdConversionRate": null
                               },
+                              "status": "DRAFT",
                               "currentBalance": {
                                 "amount": 0,
                                 "prettyAmount": 0,
-                                 "currency": {
+                                "currency": {
                                   "code": "NEAR",
-                                  "name": "Near",
-                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/512.png",
-                                  "decimals": 7
+                                  "name": "NEAR Protocol",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/6535.png",
+                                  "decimals": 24
                                 },
                                 "usdEquivalent": null,
                                 "usdConversionRate": null
                               },
                               "finalBalance": {
-                                "amount": 1.20000,
+                                "amount": 1.2,
                                 "prettyAmount": 1.2,
-                                 "currency": {
+                                "currency": {
                                   "code": "NEAR",
-                                  "name": "Near",
-                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/512.png",
-                                  "decimals": 7
+                                  "name": "NEAR Protocol",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/6535.png",
+                                  "decimals": 24
                                 },
                                 "usdEquivalent": null,
                                 "usdConversionRate": null
                               },
                               "senderInformation": {
-                                "accountNumber": "abuisset.near",
+                                "accountNumber": "abuisset.testnet",
                                 "transactionReference": "4exboD32LtvFes5xzun372LcebX3oC359W6Um2hw9eoV"
                               },
-                              "billingInformation": null
+                              "billingInformation": null,
+                              "latestBillingInformation": null
                             }
                             """);
         }

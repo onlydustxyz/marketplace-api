@@ -161,6 +161,8 @@ infrastructure:
     base-uri: ${STARKNET_RPC_URL}
     blockchain: starknet
     private-key: ${ETHEREUM_PRIVATE_KEY}
+  near:
+    base-uri: ${NEAR_RPC_URL}
   stellar:
     horizon:
       base-uri: ${STELLAR_HORIZON_URL}
