@@ -37,7 +37,7 @@ public interface UserStoragePort {
 
     Page<RewardItemView> findRewardItemsPageById(UUID rewardId, int pageIndex, int pageSize);
 
-    List<Contributor> searchContributorsByLogin(Set<Long> reposIds, String login, int maxContributorCountToReturn);
+    List<Contributor> searchContributorsByLogin(Set<Long> reposIds, String login, int maxContributorCountToReturn, Boolean isRegistered);
 
     void saveProjectLead(UserId userId, ProjectId projectId);
 

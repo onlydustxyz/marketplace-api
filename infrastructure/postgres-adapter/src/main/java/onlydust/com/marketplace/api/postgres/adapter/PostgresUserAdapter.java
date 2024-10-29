@@ -183,12 +183,12 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     @Override
     @Transactional(readOnly = true)
     public List<Contributor> searchContributorsByLogin(Set<Long> reposIds, String login,
-                                                       int maxContributorCountToReturn) {
+                                                       int maxContributorCountToReturn, Boolean isRegistered) {
         List<ContributorQueryEntity> contributors;
         if (reposIds == null || reposIds.isEmpty()) {
-            contributors = customContributorRepository.findAllContributorsByLogin(login, maxContributorCountToReturn);
+            contributors = customContributorRepository.findAllContributorsByLogin(login, maxContributorCountToReturn, isRegistered);
         } else {
-            contributors = customContributorRepository.findReposContributorsByLogin(reposIds, login, maxContributorCountToReturn);
+            contributors = customContributorRepository.findReposContributorsByLogin(reposIds, login, maxContributorCountToReturn, isRegistered);
         }
 
         return contributors.stream()

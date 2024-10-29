@@ -17,6 +17,8 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
+import static java.lang.Boolean.TRUE;
+
 @AllArgsConstructor
 public class ContributorService implements ContributorFacadePort {
     private static final int MAX_INTERNAL_CONTRIBUTOR_COUNT_TO_RETURN = 200;
@@ -32,14 +34,15 @@ public class ContributorService implements ContributorFacadePort {
                                                                          int maxInternalContributorCountToTriggerExternalSearch,
                                                                          int maxInternalContributorCountToReturn,
                                                                          boolean externalSearchOnly,
-                                                                         boolean internalSearchOnly) {
+                                                                         boolean internalSearchOnly,
+                                                                         Boolean isRegistered) {
 
         maxInternalContributorCountToReturn = Math.min(maxInternalContributorCountToReturn, MAX_INTERNAL_CONTRIBUTOR_COUNT_TO_RETURN);
 
         final List<Contributor> internalContributors = externalSearchOnly ? List.of() :
-                searchInternalContributors(projectId, repoIds, login, maxInternalContributorCountToReturn);
+                searchInternalContributors(projectId, repoIds, login, maxInternalContributorCountToReturn, isRegistered);
 
-        final List<Contributor> externalContributors = internalSearchOnly ? List.of() :
+        final List<Contributor> externalContributors = (internalSearchOnly || TRUE.equals(isRegistered)) ? List.of() :
                 (externalSearchOnly || internalContributors.size() < maxInternalContributorCountToTriggerExternalSearch) &&
                 login != null && !login.isEmpty() ?
                         getExternalContributors(login) : List.of();
@@ -79,13 +82,13 @@ public class ContributorService implements ContributorFacadePort {
     }
 
     private List<Contributor> searchInternalContributors(ProjectId projectId, Set<Long> repoIds, String login,
-                                                         int maxInternalContributorCountToReturn) {
+                                                         int maxInternalContributorCountToReturn, Boolean isRegistered) {
         final Set<Long> searchInRepoIds = repoIds != null ? new HashSet<>(repoIds) : new HashSet<>();
         if (projectId != null) {
             searchInRepoIds.addAll(projectStorage.getProjectRepoIds(projectId));
         }
 
-        return userStoragePort.searchContributorsByLogin(searchInRepoIds, login, maxInternalContributorCountToReturn);
+        return userStoragePort.searchContributorsByLogin(searchInRepoIds, login, maxInternalContributorCountToReturn, isRegistered);
     }
 
     private List<Contributor> getExternalContributors(String login) {
