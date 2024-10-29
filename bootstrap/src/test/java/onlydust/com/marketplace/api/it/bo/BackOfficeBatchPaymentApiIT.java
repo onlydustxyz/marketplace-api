@@ -28,6 +28,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -969,6 +970,23 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
             assertThat(payment.getRewardCount()).isEqualTo(2);
             assertThat(payment.getNetwork()).isEqualTo(TransactionNetwork.NEAR);
             assertThat(payment.getStatus()).isEqualTo(BatchPaymentStatus.TO_PAY);
+
+            final var details = client.get()
+                    .uri(getApiURI(GET_REWARDS_BATCH_PAYMENTS_BY_ID.formatted(payment.getId())))
+                    .header("Authorization", "Bearer " + camille.jwt())
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(BatchPaymentDetailsResponse.class)
+                    .returnResult().getResponseBody();
+
+            assertThat(details).isNotNull();
+            assertThat(details.getTotalUsdEquivalent()).isEqualByComparingTo(BigDecimal.valueOf(5.376));
+            assertThat(details.getCsv().split("\\R")).containsExactlyInAnyOrder(
+                    "recipient1.near,0.7",
+                    "recipient2.near,0.5"
+            );
         }
     }
 }

@@ -74,11 +74,18 @@ public class PaymentService implements PaymentPort {
         payments.forEach(payment -> {
             final Map<RewardId, Wallet> wallets = walletsPerRewardForNetwork(rewardInvoices, payment.network());
             final var rewards = payment.rewards().stream().sorted(Comparator.comparing(r -> r.id().value())).toList();
-            payment.csv(PaymentExporter.csv(rewards, wallets, rewardInvoices));
+            payment.csv(paymentExporter(payment.network()).csv(rewards, wallets, rewardInvoices));
         });
 
         accountingRewardStoragePort.saveAll(payments);
         return payments;
+    }
+
+    private PaymentExporter paymentExporter(Network network) {
+        return switch (network) {
+            case NEAR -> new NearPaymentExporter();
+            default -> new DefaultPaymentExporter();
+        };
     }
 
     @Override
