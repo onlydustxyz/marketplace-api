@@ -620,4 +620,4 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000375_fix_contribution_counters.sql
   - include:
-      file: db/changelog/changelogs/00000376_add_index.sql
+      file: db/changelog/changelogs/00000376_improve_select_contributors_for_activity_status.sql
