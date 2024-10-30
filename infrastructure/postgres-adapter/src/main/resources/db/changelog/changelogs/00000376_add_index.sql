@@ -21,6 +21,7 @@ DROP FUNCTION bi.select_contributors(fromDate timestamptz,
 
 CREATE FUNCTION bi.select_contributors(fromDate timestamptz,
                                        toDate timestamptz,
+                                       onlyDustContributionsOnly boolean,
                                        dataSourceIds uuid[],
                                        contributorIds bigint[],
                                        contributedTo uuid[],
@@ -36,54 +37,60 @@ CREATE FUNCTION bi.select_contributors(fromDate timestamptz,
                                        includeApplicants boolean)
     RETURNS TABLE
             (
-                contributor_id                  bigint,
-                contributor_login               text,
-                contributor_country             text,
-                contributor                     jsonb,
-                first_project_name              text,
-                projects                        jsonb,
-                categories                      jsonb,
-                languages                       jsonb,
-                ecosystems                      jsonb,
-                maintained_projects             jsonb,
-                total_rewarded_usd_amount       numeric,
-                reward_count                    bigint,
-                completed_issue_count           bigint,
-                completed_pr_count              bigint,
-                completed_code_review_count     bigint,
-                completed_contribution_count    bigint,
-                od_completed_contribution_count bigint,
-                in_progress_issue_count         bigint,
-                pending_application_count       bigint
+                contributor_id                          bigint,
+                contributor_login                       text,
+                contributor_country                     text,
+                contributor                             jsonb,
+                first_project_name                      text,
+                projects                                jsonb,
+                categories                              jsonb,
+                languages                               jsonb,
+                ecosystems                              jsonb,
+                maintained_projects                     jsonb,
+                total_rewarded_usd_amount               numeric,
+                reward_count                            bigint,
+                contribution_count                      bigint,
+                completed_issue_count                   bigint,
+                completed_pr_count                      bigint,
+                completed_code_review_count             bigint,
+                completed_contribution_count            bigint,
+                od_completed_contribution_count         bigint,
+                in_progress_issue_count                 bigint,
+                includes_first_contribution_on_onlydust boolean,
+                pending_application_count               bigint
             )
     STABLE
     PARALLEL SAFE
 AS
 $$
-SELECT c.contributor_id                        as contributor_id,
-       c.contributor_login                     as contributor_login,
-       c.contributor_country                   as contributor_country,
-       c.contributor                           as contributor,
-       c.first_project_name                    as first_project_name,
-       c.projects                              as projects,
-       c.categories                            as categories,
-       c.languages                             as languages,
-       c.ecosystems                            as ecosystems,
-       c.maintained_projects                   as maintained_projects,
-       sum(rd.total_rewarded_usd_amount)       as total_rewarded_usd_amount,
-       sum(rd.reward_count)                    as reward_count,
-       sum(cd.completed_issue_count)           as completed_issue_count,
-       sum(cd.completed_pr_count)              as completed_pr_count,
-       sum(cd.completed_code_review_count)     as completed_code_review_count,
-       sum(cd.completed_contribution_count)    as completed_contribution_count,
-       sum(cd.od_completed_contribution_count) as od_completed_contribution_count,
-       sum(cd.in_progress_issue_count)         as in_progress_issue_count,
-       sum(ad.pending_application_count)       as pending_application_count
+SELECT c.contributor_id                                                     as contributor_id,
+       c.contributor_login                                                  as contributor_login,
+       c.contributor_country                                                as contributor_country,
+       c.contributor                                                        as contributor,
+       c.first_project_name                                                 as first_project_name,
+       c.projects                                                           as projects,
+       c.categories                                                         as categories,
+       c.languages                                                          as languages,
+       c.ecosystems                                                         as ecosystems,
+       c.maintained_projects                                                as maintained_projects,
+       sum(rd.total_rewarded_usd_amount)                                    as total_rewarded_usd_amount,
+       sum(rd.reward_count)                                                 as reward_count,
+       sum(cd.contribution_count)                                           as contribution_count,
+       sum(cd.completed_issue_count)                                        as completed_issue_count,
+       sum(cd.completed_pr_count)                                           as completed_pr_count,
+       sum(cd.completed_code_review_count)                                  as completed_code_review_count,
+       sum(cd.completed_contribution_count)                                 as completed_contribution_count,
+       sum(cd.od_completed_contribution_count)                              as od_completed_contribution_count,
+       sum(cd.in_progress_issue_count)                                      as in_progress_issue_count,
+       coalesce(bool_or(cd.includes_first_contribution_on_onlydust), false) as includes_first_contribution_on_onlydust,
+       sum(ad.pending_application_count)                                    as pending_application_count
 FROM bi.p_contributor_global_data c
          JOIN bi.p_contributor_reward_data crd ON crd.contributor_id = c.contributor_id
          JOIN bi.p_contributor_application_data cad ON cad.contributor_id = c.contributor_id
 
          LEFT JOIN (select cd.contributor_id,
+                           count(cd.contribution_uuid)                                                               as contribution_count,
+                           bool_or(cd.is_first_contribution_on_onlydust)                                             as includes_first_contribution_on_onlydust,
                            count(cd.contribution_uuid) filter ( where cd.contribution_status = 'COMPLETED' )         as completed_contribution_count,
                            count(cd.contribution_uuid)
                            filter ( where cd.contribution_status = 'COMPLETED' and cd.project_id is not null )       as od_completed_contribution_count,
@@ -94,6 +101,7 @@ FROM bi.p_contributor_global_data c
                     from bi.p_per_contributor_contribution_data cd
                     where (fromDate is null or cd.timestamp >= fromDate)
                       and (toDate is null or cd.timestamp < toDate)
+                      and (onlyDustContributionsOnly is false or cd.project_id is not null)
                       and (dataSourceIds is null or cd.project_id = any (dataSourceIds) or
                            cd.program_ids && dataSourceIds or cd.ecosystem_ids && dataSourceIds)
                       and (contributionStatuses is null or cd.contribution_status = any (contributionStatuses))
@@ -153,9 +161,6 @@ WHERE (dataSourceIds is null or
                                        from bi.p_per_contributor_contribution_data cd
                                        where cd.contributor_id = c.contributor_id
                                          and cd.contribution_uuid = any (contributedTo)))
-  and (cd.contributor_id is not null or rd.contributor_id is not null or ad.contributor_id is not null)
-GROUP BY c.contributor_id, c.contributor_login, c.contributor, c.first_project_name,
-         c.projects, c.ecosystems,
-         c.languages, c.categories, c.contributor_country;
+GROUP BY c.contributor_id;
 $$
     LANGUAGE SQL;

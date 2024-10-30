@@ -147,7 +147,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             final var issueId2 = at("2021-01-01T00:00:04Z", () -> githubHelper.createIssue(marketplace_frontend.getId(), CurrentDateProvider.now(),
                     null, "OPEN", mehdi));
             at("2021-01-01T02:00:04Z", () -> applicationHelper.create(onlyDust, GithubIssue.Id.of(issueId2), james.githubUserId())); // SHELVED
-            githubHelper.assignIssueToContributor(issueId2, mehdi.user().getGithubUserId());
+            at("2021-01-01T00:00:04Z", () -> githubHelper.assignIssueToContributor(issueId2, mehdi.user().getGithubUserId()));
 
             at("2021-01-01T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi, List.of("ts")));
             at("2021-01-01T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden, List.of("ts")));
@@ -216,6 +216,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "contributor": {
                                     "login": "antho"
                                   },
+                                  "activityStatus": "NEW",
                                   "categories": [
                                     {
                                       "slug": "defi"
@@ -271,6 +272,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "contributor": {
                                     "login": "emma"
                                   },
+                                  "activityStatus": "NEW",
                                   "categories": [
                                     {
                                       "slug": "gaming"
@@ -326,6 +328,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "contributor": {
                                     "login": "hayden"
                                   },
+                                  "activityStatus": "NEW",
                                   "categories": [
                                     {
                                       "slug": "defi"
@@ -378,6 +381,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "contributor": {
                                     "login": "james"
                                   },
+                                  "activityStatus": "INACTIVE",
                                   "categories": [
                                     {
                                       "slug": "gaming"
@@ -432,6 +436,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "contributor": {
                                     "login": "mehdi"
                                   },
+                                  "activityStatus": "NEW",
                                   "categories": [
                                     {
                                       "slug": "defi"
@@ -483,6 +488,52 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                               ]
                             }
                             """);
+        }
+
+        @Test
+        public void should_get_contributors_activity_status() {
+            test_contributors_activity_status("2021-01-01", "2021-01-01", Map.of(
+                    "antho", ContributorActivityStatus.NEW
+            ));
+            test_contributors_activity_status("2021-01-02", "2021-01-02", Map.of(
+                    "antho", ContributorActivityStatus.ACTIVE
+            ));
+            test_contributors_activity_status("2021-01-03", "2021-01-03", Map.of(
+                    "antho", ContributorActivityStatus.CHURNED
+            ));
+            test_contributors_activity_status("2021-01-04", "2021-01-04", Map.of(
+                    "antho", ContributorActivityStatus.INACTIVE
+            ));
+            test_contributors_activity_status("2021-02-01", "2021-02-01", Map.of(
+                    "antho", ContributorActivityStatus.REACTIVATED
+            ));
+        }
+
+        private void test_contributors_activity_status(String fromDate, String toDate, Map<String, ContributorActivityStatus> expectedStatusPerLogin) {
+            final var queryParams = new HashMap<String, String>();
+            queryParams.put("pageIndex", "0");
+            queryParams.put("pageSize", "100");
+            queryParams.put("fromDate", fromDate);
+            queryParams.put("toDate", toDate);
+            queryParams.put("dataSourceIds", allProgramOrEcosystemIds);
+            final var response = client.get()
+                    .uri(getApiURI(BI_CONTRIBUTORS, queryParams))
+                    .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(caller).jwt())
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(BiContributorsPageResponse.class).returnResult().getResponseBody();
+            assertThat(response.getContributors()).isNotEmpty();
+            expectedStatusPerLogin.forEach((login, expectedStatus) -> {
+                if (expectedStatus == ContributorActivityStatus.INACTIVE) {
+                    assertThat(response.getContributors().stream().filter(c -> login.equals(c.getContributor().getLogin())).findFirst())
+                            .isEmpty();
+                    return;
+                }
+                final var contributor =
+                        response.getContributors().stream().filter(c -> login.equals(c.getContributor().getLogin())).findFirst().orElseThrow();
+                assertThat(contributor.getActivityStatus()).isEqualTo(expectedStatus);
+            });
         }
 
         @Test

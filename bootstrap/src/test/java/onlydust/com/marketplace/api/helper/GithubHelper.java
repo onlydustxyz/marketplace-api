@@ -324,12 +324,16 @@ public class GithubHelper {
 
     private void createContributionFromIssue(Long issueId, Long contributorId) {
         final var contributionId = faker.random().hex();
+        final Map<String, Object> params = new HashMap<>();
+        params.put("contributionId", contributionId);
+        params.put("contributorId", contributorId);
+        params.put("issueId", issueId);
         databaseHelper.executeQuery("""
                       insert into indexer_exp.contributions(id, contribution_uuid, repo_id, contributor_id, type, status, issue_id, created_at, updated_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
                         select  :contributionId,
                                 gi.contribution_uuid,
                                 gi.repo_id,
-                                ga.id,
+                                :contributorId,
                                 'ISSUE',
                                 case when gi.status = 'OPEN' then cast('IN_PROGRESS' as indexer_exp.contribution_status) else 'COMPLETED' end,
                                 gi.id,
@@ -357,9 +361,8 @@ public class GithubHelper {
                         from indexer_exp.github_issues gi
                         join indexer_exp.github_accounts ga on ga.id = gi.author_id
                         where gi.id = :issueId
-                        on conflict do nothing;
-                """, Map.of("contributionId", contributionId,
-                "issueId", issueId));
+                        on conflict (id) do update set contributor_id = :contributorId
+                """, params);
 
         addGroupedContributionFromContribution(contributionId, contributorId);
         addRepoContributorFromIssue(issueId, contributorId);
