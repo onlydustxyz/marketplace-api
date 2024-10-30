@@ -166,7 +166,7 @@ public class ContributorActivityGraphApiIT extends AbstractMarketplaceApiIT {
                     3, new ExpectedDay(0, 2, 0, 1),
                     4, new ExpectedDay(0, 0, 0, 1)
             ));
-            test_activity_graph(antho.githubUserId().value(), Map.of("dataSource", "ONLYDUST", "dataSourceProjectId", onlyDust.toString()), Map.of(
+            test_activity_graph(antho.githubUserId().value(), Map.of("dataSource", "ONLYDUST", "dataSourceProjectIds", onlyDust.toString()), Map.of(
                     1, new ExpectedDay(0, 1, 0, 0),
                     2, new ExpectedDay(1, 1, 1, 1),
                     3, new ExpectedDay(0, 2, 0, 0),

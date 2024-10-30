@@ -21,7 +21,7 @@ public interface ContributorActivityGraphReadRepository extends Repository<Contr
                       where d.day_timestamp >= date_trunc('DAY', cast(:fromDate as timestamptz))
                         and d.contributor_id = :contributorId
                         and (:onlyOnlyDustData is false or d.project_id is not null)
-                        and (coalesce(:projectId) is null or d.project_id = :projectId)
+                        and (coalesce(:projectIds) is null or d.project_id in (:projectIds))
                       group by 1),
             
                  aggregated_project_rewards_stats AS
@@ -31,7 +31,7 @@ public interface ContributorActivityGraphReadRepository extends Repository<Contr
                       where d.day_timestamp >= date_trunc('DAY', cast(:fromDate as timestamptz))
                         and d.contributor_id = :contributorId
                         and (:onlyOnlyDustData is false or d.project_id is not null)
-                        and (coalesce(:projectId) is null or d.project_id = :projectId)
+                        and (coalesce(:projectIds) is null or d.project_id in (:projectIds))
                       group by 1),
             
                  all_timestamps_to_return AS
@@ -57,6 +57,6 @@ public interface ContributorActivityGraphReadRepository extends Repository<Contr
     List<ContributorActivityGraphDayReadEntity> findLastYear(ZonedDateTime fromDate,
                                                              Long contributorId,
                                                              Boolean onlyOnlyDustData,
-                                                             UUID projectId);
+                                                             List<UUID> projectIds);
 
 }

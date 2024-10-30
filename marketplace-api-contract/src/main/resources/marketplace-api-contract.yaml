@@ -219,12 +219,13 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/DataSourceEnum'
-        - name: dataSourceProjectId
+        - name: dataSourceProjectIds
           in: query
           required: false
-          description: Required if dataSource is PROJECT
           schema:
-            $ref: '#/components/schemas/ProjectId'
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectId'
       responses:
         "200":
           description: 'Contributor'
