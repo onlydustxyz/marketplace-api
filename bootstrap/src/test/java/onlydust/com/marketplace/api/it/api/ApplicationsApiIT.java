@@ -1042,7 +1042,10 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "projectContributorLabels": null,
-                              "countryCode": "FR",
+                              "country": {
+                                "code": "FR",
+                                "name": "France"
+                              },
                               "totalRewardedUsdAmount": {
                                 "value": 2692632.50,
                                 "trend": "UP"
@@ -1185,7 +1188,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                   "name": "Some label"
                                 }
                               ],
-                              "countryCode": null,
+                              "country": null,
                               "totalRewardedUsdAmount": {
                                 "value": 6060.00,
                                 "trend": "UP"
@@ -1285,7 +1288,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "projectContributorLabels": null,
-                              "countryCode": null,
+                              "country": null,
                               "totalRewardedUsdAmount": {
                                 "value": 85057.50,
                                 "trend": "UP"
@@ -1484,7 +1487,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "projectContributorLabels": null,
-                              "countryCode": null,
+                              "country": null,
                               "totalRewardedUsdAmount": {
                                 "value": 20855.02,
                                 "trend": "UP"

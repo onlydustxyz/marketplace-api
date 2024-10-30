@@ -39,13 +39,16 @@ public class CountriesApiIT extends AbstractMarketplaceApiIT {
                         {
                           "countries": [
                             {
-                              "code": "FR"
+                              "code": "FR",
+                              "name": "France"
                             },
                             {
-                              "code": "GB"
+                              "code": "GB",
+                              "name": "United Kingdom"
                             },
                             {
-                              "code": "US"
+                              "code": "US",
+                              "name": "United States"
                             }
                           ]
                         }
@@ -66,7 +69,8 @@ public class CountriesApiIT extends AbstractMarketplaceApiIT {
                         {
                           "countries": [
                             {
-                              "code": "FR"
+                              "code": "FR",
+                              "name": "France"
                             }
                           ]
                         }

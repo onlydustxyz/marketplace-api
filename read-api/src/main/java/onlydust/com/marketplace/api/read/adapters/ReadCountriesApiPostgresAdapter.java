@@ -32,7 +32,9 @@ public class ReadCountriesApiPostgresAdapter implements ReadCountriesApi {
                 .stream()
                 .map(CountryReadEntity::country)
                 .filter(c -> c.display().orElse(c.iso3Code()).toLowerCase().contains(Optional.ofNullable(search).orElse("").toLowerCase()))
-                .map(c -> new CountryResponse().code(c.iso2Code()))
+                .map(c -> new CountryResponse()
+                        .name(c.display().orElse(null))
+                        .code(c.iso2Code()))
                 .toList();
 
         return ok()
