@@ -36,6 +36,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                          c.languages                                                            as languages,
                          c.ecosystems                                                           as ecosystems,
                          c.maintained_projects                                                  as maintained_projects,
+                         c.first_project_name                                                   as first_project_name,
                          -- /// filtered & computed data /// --
                          (select jsonb_agg(jsonb_build_object('id', pcl.id, 'slug', pcl.slug, 'name', pcl.name))
                           from contributor_project_contributor_labels cpcl
@@ -72,7 +73,8 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                c.categories          as categories,
                                c.languages           as languages,
                                c.ecosystems          as ecosystems,
-                               c.maintained_projects as maintained_projects
+                               c.maintained_projects as maintained_projects,
+                               c.first_project_name  as first_project_name
                         FROM bi.p_contributor_global_data c
                                  JOIN bi.p_contributor_reward_data crd ON crd.contributor_id = c.contributor_id
                                  JOIN bi.p_contributor_application_data cad ON cad.contributor_id = c.contributor_id
@@ -211,6 +213,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                            c.languages,
                            c.ecosystems,
                            c.maintained_projects,
+                           c.first_project_name,
                            activity_status.value) d
             """;
 
