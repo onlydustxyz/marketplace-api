@@ -8259,6 +8259,15 @@ components:
         - DONE
         - ARCHIVED
 
+    ContributorActivityStatus:
+      type: string
+      enum:
+        - NEW
+        - REACTIVATED
+        - CHURNED
+        - ACTIVE
+        - INACTIVE
+
     GithubStatus:
       type: string
       enum:
@@ -11948,6 +11957,8 @@ components:
     ContributorsQueryParams:
       type: object
       properties:
+        dataSource:
+          $ref: '#/components/schemas/DataSourceEnum'
         search:
           type: string
         searchByLogin:
@@ -11993,6 +12004,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ContributionStatus'
+        activityStatuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributorActivityStatus'
         totalRewardedUsdAmount:
           $ref: '#/components/schemas/DecimalNumberKpiFilter'
         rewardCount:
@@ -12102,6 +12117,8 @@ components:
           type: integer
         pendingApplicationCount:
           type: integer
+        activityStatus:
+          $ref: '#/components/schemas/ContributorActivityStatus'
 
     ContributorOverviewResponse:
       allOf:
