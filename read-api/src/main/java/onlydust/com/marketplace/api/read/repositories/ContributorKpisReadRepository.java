@@ -27,16 +27,16 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
     @Language("PostgreSQL")
     String SELECT = """
             SELECT * -- wrap the query in a subquery to let Hibernate paginate
-            FROM (SELECT c.contributor_id                                                       as contributor_id,
-                         c.contributor_login                                                    as contributor_login,
-                         c.contributor_country                                                  as contributor_country,
-                         c.contributor                                                          as contributor,
-                         c.projects                                                             as projects,
-                         c.categories                                                           as categories,
-                         c.languages                                                            as languages,
-                         c.ecosystems                                                           as ecosystems,
-                         c.maintained_projects                                                  as maintained_projects,
-                         c.first_project_name                                                   as first_project_name,
+            FROM (SELECT c.contributor_id                                                          as contributor_id,
+                         c.contributor_login                                                       as contributor_login,
+                         c.contributor_country                                                     as contributor_country,
+                         c.contributor                                                             as contributor,
+                         c.projects                                                                as projects,
+                         c.categories                                                              as categories,
+                         c.languages                                                               as languages,
+                         c.ecosystems                                                              as ecosystems,
+                         c.maintained_projects                                                     as maintained_projects,
+                         c.first_project_name                                                      as first_project_name,
                          -- /// filtered & computed data /// --
                          (select jsonb_agg(jsonb_build_object('id', pcl.id, 'slug', pcl.slug, 'name', pcl.name))
                           from contributor_project_contributor_labels cpcl
@@ -46,51 +46,27 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                             and (coalesce(:projectIds) is null or p.id = any (:projectIds))
                             and (coalesce(:labelProjectIds) is null or p.id = any (:labelProjectIds))
                             and (coalesce(:projectSlugs) is null or p.slug = any (:projectSlugs))) as project_contributor_labels,
-                         coalesce(sum(rd.total_rewarded_usd_amount), 0)                         as total_rewarded_usd_amount,
-                         coalesce(sum(rd.reward_count), 0)                                      as reward_count,
-                         coalesce(sum(cd.completed_contribution_count), 0)                      as completed_contribution_count,
-                         coalesce(sum(cd.completed_issue_count), 0)                             as completed_issue_count,
-                         coalesce(sum(cd.completed_pr_count), 0)                                as completed_pr_count,
-                         coalesce(sum(cd.completed_code_review_count), 0)                       as completed_code_review_count,
-                         coalesce(sum(cd.in_progress_issue_count), 0)                           as in_progress_issue_count,
-                         coalesce(sum(ad.pending_application_count), 0)                         as pending_application_count,
-                         coalesce(sum(rd.previous_period_total_rewarded_usd_amount), 0)         as previous_period_total_rewarded_usd_amount,
-                         coalesce(sum(rd.previous_period_reward_count), 0)                      as previous_period_reward_count,
-                         coalesce(sum(cd.previous_period_completed_contribution_count), 0)      as previous_period_completed_contribution_count,
-                         coalesce(sum(cd.previous_period_completed_issue_count), 0)             as previous_period_completed_issue_count,
-                         coalesce(sum(cd.previous_period_completed_pr_count), 0)                as previous_period_completed_pr_count,
-                         coalesce(sum(cd.previous_period_completed_code_review_count), 0)       as previous_period_completed_code_review_count,
-                         coalesce(sum(cd.previous_period_in_progress_issue_count), 0)           as previous_period_in_progress_issue_count,
-                         coalesce(sum(ad.previous_period_pending_application_count), 0)         as previous_period_pending_application_count,
-                         activity_status.value                                                  as activity_status
+                         coalesce(sum(rd.total_rewarded_usd_amount), 0)                            as total_rewarded_usd_amount,
+                         coalesce(sum(rd.reward_count), 0)                                         as reward_count,
+                         coalesce(sum(cd.completed_contribution_count), 0)                         as completed_contribution_count,
+                         coalesce(sum(cd.completed_issue_count), 0)                                as completed_issue_count,
+                         coalesce(sum(cd.completed_pr_count), 0)                                   as completed_pr_count,
+                         coalesce(sum(cd.completed_code_review_count), 0)                          as completed_code_review_count,
+                         coalesce(sum(cd.in_progress_issue_count), 0)                              as in_progress_issue_count,
+                         coalesce(sum(ad.pending_application_count), 0)                            as pending_application_count,
+                         coalesce(sum(rd.previous_period_total_rewarded_usd_amount), 0)            as previous_period_total_rewarded_usd_amount,
+                         coalesce(sum(rd.previous_period_reward_count), 0)                         as previous_period_reward_count,
+                         coalesce(sum(cd.previous_period_completed_contribution_count), 0)         as previous_period_completed_contribution_count,
+                         coalesce(sum(cd.previous_period_completed_issue_count), 0)                as previous_period_completed_issue_count,
+                         coalesce(sum(cd.previous_period_completed_pr_count), 0)                   as previous_period_completed_pr_count,
+                         coalesce(sum(cd.previous_period_completed_code_review_count), 0)          as previous_period_completed_code_review_count,
+                         coalesce(sum(cd.previous_period_in_progress_issue_count), 0)              as previous_period_in_progress_issue_count,
+                         coalesce(sum(ad.previous_period_pending_application_count), 0)            as previous_period_pending_application_count,
+                         activity_status.value                                                     as activity_status
             
-                  FROM (SELECT -- /// global data /// --
-                               c.contributor_id      as contributor_id,
-                               c.contributor_login   as contributor_login,
-                               c.contributor_country as contributor_country,
-                               c.contributor         as contributor,
-                               c.projects            as projects,
-                               c.categories          as categories,
-                               c.languages           as languages,
-                               c.ecosystems          as ecosystems,
-                               c.maintained_projects as maintained_projects,
-                               c.first_project_name  as first_project_name
-                        FROM bi.p_contributor_global_data c
-                                 JOIN bi.p_contributor_reward_data crd ON crd.contributor_id = c.contributor_id
-                                 JOIN bi.p_contributor_application_data cad ON cad.contributor_id = c.contributor_id
-                        WHERE (coalesce(:dataSourceIds) is null or
-                               c.contributed_on_project_ids && :dataSourceIds or
-                               cad.applied_on_project_ids && :dataSourceIds or
-                               c.program_ids && :dataSourceIds or
-                               c.ecosystem_ids && :dataSourceIds)
-                          and (coalesce(:contributorIds) is null or c.contributor_id = any (:contributorIds))
-                          and (coalesce(:projectIds) is null or c.contributed_on_project_ids && :projectIds or (:includeApplicants and cad.applied_on_project_ids && :projectIds))
-                          and (coalesce(:projectSlugs) is null or c.contributed_on_project_slugs && cast(:projectSlugs as text[]) or (:includeApplicants and cad.applied_on_project_slugs && cast(:projectSlugs as text[])))
-                          and (coalesce(:ecosystemIds) is null or c.ecosystem_ids && :ecosystemIds)
-                          and (coalesce(:categoryIds) is null or c.project_category_ids && :categoryIds)
-                          and (coalesce(:languageIds) is null or c.language_ids && :languageIds)
-                          and (coalesce(:countryCodes) is null or c.contributor_country = any (:countryCodes))
-                          and (coalesce(:searchQuery) is null or c.search ilike '%' || :searchQuery || '%' or crd.search ilike '%' || :searchQuery || '%')) c
+                  FROM bi.p_contributor_global_data c
+                           JOIN bi.p_contributor_reward_data crd ON crd.contributor_id = c.contributor_id
+                           JOIN bi.p_contributor_application_data cad ON cad.contributor_id = c.contributor_id
             
                            LEFT JOIN (select cd.contributor_id                                                                                                                             as contributor_id,
                                              bool_or(cd.contribution_uuid in (:contributedTo))                                                                                             as contributed_to,
@@ -177,7 +153,20 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                                                else 'INACTIVE' end as contributor_activity_status) as value) activity_status ON true
             
             
-                  WHERE (activity_status.value != 'INACTIVE' or cd.contribution_count > 0 or rd.reward_count > 0 or ad.pending_application_count > 0)
+                  WHERE (coalesce(:dataSourceIds) is null or
+                         c.contributed_on_project_ids && :dataSourceIds or
+                         cad.applied_on_project_ids && :dataSourceIds or
+                         c.program_ids && :dataSourceIds or
+                         c.ecosystem_ids && :dataSourceIds)
+                    and (coalesce(:contributorIds) is null or c.contributor_id = any (:contributorIds))
+                    and (coalesce(:projectIds) is null or c.contributed_on_project_ids && :projectIds or (:includeApplicants and cad.applied_on_project_ids && :projectIds))
+                    and (coalesce(:projectSlugs) is null or c.contributed_on_project_slugs && cast(:projectSlugs as text[]) or (:includeApplicants and cad.applied_on_project_slugs && cast(:projectSlugs as text[])))
+                    and (coalesce(:ecosystemIds) is null or c.ecosystem_ids && :ecosystemIds)
+                    and (coalesce(:categoryIds) is null or c.project_category_ids && :categoryIds)
+                    and (coalesce(:languageIds) is null or c.language_ids && :languageIds)
+                    and (coalesce(:countryCodes) is null or c.contributor_country = any (:countryCodes))
+                    and (coalesce(:searchQuery) is null or c.search ilike '%' || :searchQuery || '%' or crd.search ilike '%' || :searchQuery || '%')
+                    and (activity_status.value != 'INACTIVE' or cd.contribution_count > 0 or rd.reward_count > 0 or ad.pending_application_count > 0)
                     and (coalesce(:totalRewardedUsdAmountMin) is null or rd.total_rewarded_usd_amount >= :totalRewardedUsdAmountMin)
                     and (coalesce(:totalRewardedUsdAmountEq) is null or rd.total_rewarded_usd_amount = :totalRewardedUsdAmountEq)
                     and (coalesce(:totalRewardedUsdAmountMax) is null or rd.total_rewarded_usd_amount <= :totalRewardedUsdAmountMax)
@@ -233,24 +222,9 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
             countQuery = """
                     SELECT count(*)
                     
-                    FROM (SELECT -- /// global data /// --
-                                 c.contributor_id      as contributor_id
-                          FROM bi.p_contributor_global_data c
-                                   JOIN bi.p_contributor_reward_data crd ON crd.contributor_id = c.contributor_id
-                                   JOIN bi.p_contributor_application_data cad ON cad.contributor_id = c.contributor_id
-                          WHERE (coalesce(:dataSourceIds) is null or
-                                 c.contributed_on_project_ids && :dataSourceIds or
-                                 cad.applied_on_project_ids && :dataSourceIds or
-                                 c.program_ids && :dataSourceIds or
-                                 c.ecosystem_ids && :dataSourceIds)
-                            and (coalesce(:contributorIds) is null or c.contributor_id = any (:contributorIds))
-                            and (coalesce(:projectIds) is null or c.contributed_on_project_ids && :projectIds or (:includeApplicants and cad.applied_on_project_ids && :projectIds))
-                            and (coalesce(:projectSlugs) is null or c.contributed_on_project_slugs && cast(:projectSlugs as text[]) or (:includeApplicants and cad.applied_on_project_slugs && cast(:projectSlugs as text[])))
-                            and (coalesce(:ecosystemIds) is null or c.ecosystem_ids && :ecosystemIds)
-                            and (coalesce(:categoryIds) is null or c.project_category_ids && :categoryIds)
-                            and (coalesce(:languageIds) is null or c.language_ids && :languageIds)
-                            and (coalesce(:countryCodes) is null or c.contributor_country = any (:countryCodes))
-                            and (coalesce(:searchQuery) is null or c.search ilike '%' || :searchQuery || '%' or crd.search ilike '%' || :searchQuery || '%')) c
+                    FROM bi.p_contributor_global_data c
+                             JOIN bi.p_contributor_reward_data crd ON crd.contributor_id = c.contributor_id
+                             JOIN bi.p_contributor_application_data cad ON cad.contributor_id = c.contributor_id
                     
                              LEFT JOIN (select cd.contributor_id                                                                                                                             as contributor_id,
                                                bool_or(cd.contribution_uuid in (:contributedTo))                                                                                             as contributed_to,
@@ -337,7 +311,20 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                                                  else 'INACTIVE' end as contributor_activity_status) as value) activity_status ON true
                     
                     
-                    WHERE (activity_status.value != 'INACTIVE' or cd.contribution_count > 0 or rd.reward_count > 0 or ad.pending_application_count > 0)
+                    WHERE (coalesce(:dataSourceIds) is null or
+                           c.contributed_on_project_ids && :dataSourceIds or
+                           cad.applied_on_project_ids && :dataSourceIds or
+                           c.program_ids && :dataSourceIds or
+                           c.ecosystem_ids && :dataSourceIds)
+                      and (coalesce(:contributorIds) is null or c.contributor_id = any (:contributorIds))
+                      and (coalesce(:projectIds) is null or c.contributed_on_project_ids && :projectIds or (:includeApplicants and cad.applied_on_project_ids && :projectIds))
+                      and (coalesce(:projectSlugs) is null or c.contributed_on_project_slugs && cast(:projectSlugs as text[]) or (:includeApplicants and cad.applied_on_project_slugs && cast(:projectSlugs as text[])))
+                      and (coalesce(:ecosystemIds) is null or c.ecosystem_ids && :ecosystemIds)
+                      and (coalesce(:categoryIds) is null or c.project_category_ids && :categoryIds)
+                      and (coalesce(:languageIds) is null or c.language_ids && :languageIds)
+                      and (coalesce(:countryCodes) is null or c.contributor_country = any (:countryCodes))
+                      and (coalesce(:searchQuery) is null or c.search ilike '%' || :searchQuery || '%' or crd.search ilike '%' || :searchQuery || '%')
+                      and (activity_status.value != 'INACTIVE' or cd.contribution_count > 0 or rd.reward_count > 0 or ad.pending_application_count > 0)
                       and (coalesce(:totalRewardedUsdAmountMin) is null or rd.total_rewarded_usd_amount >= :totalRewardedUsdAmountMin)
                       and (coalesce(:totalRewardedUsdAmountEq) is null or rd.total_rewarded_usd_amount = :totalRewardedUsdAmountEq)
                       and (coalesce(:totalRewardedUsdAmountMax) is null or rd.total_rewarded_usd_amount <= :totalRewardedUsdAmountMax)
@@ -365,6 +352,15 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                       and (coalesce(:contributedTo) is null or cd.contributed_to is true)
                       and (coalesce(:activityStatuses) is null or activity_status.value = any (cast(:activityStatuses as contributor_activity_status[])))
                     GROUP BY c.contributor_id,
+                             c.contributor_login,
+                             c.contributor_country,
+                             c.contributor,
+                             c.projects,
+                             c.categories,
+                             c.languages,
+                             c.ecosystems,
+                             c.maintained_projects,
+                             c.first_project_name,
                              activity_status.value
                     """,
             nativeQuery = true)

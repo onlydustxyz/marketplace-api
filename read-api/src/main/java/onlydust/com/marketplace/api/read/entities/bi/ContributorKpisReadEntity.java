@@ -132,6 +132,33 @@ public class ContributorKpisReadEntity {
                 ;
     }
 
+    public BiContributorResponse toDtoSingle() {
+        return new BiContributorResponse()
+                .contributor(pretty(contributor))
+                .activityStatus(activityStatus)
+                .projects(projects == null ? null : projects.stream().sorted(comparing(ProjectLinkResponse::getName)).toList())
+                .categories(categories == null ? null : categories.stream().sorted(comparing(ProjectCategoryResponse::getName)).toList())
+                .languages(languages == null ? null : languages.stream().sorted(comparing(LanguageResponse::getName)).toList())
+                .ecosystems(ecosystems == null ? null : ecosystems.stream().sorted(comparing(EcosystemLinkResponse::getName)).toList())
+                .projectContributorLabels(projectContributorLabels == null ? null :
+                        projectContributorLabels.stream().sorted(comparing(ProjectContributorLabelResponse::getName)).toList())
+                .country(contributorCountry().map(country -> new CountryResponse()
+                                .code(country.iso2Code())
+                                .name(country.display().orElse(null)))
+                        .orElse(null))
+                .totalRewardedUsdAmount(toDecimalNumberKpi(prettyUsd(totalRewardedUsdAmount), prettyUsd(previousPeriodTotalRewardedUsdAmount)))
+                .rewardCount(toNumberKpi(rewardCount, previousPeriodRewardCount))
+                .contributionCount(toNumberKpi(completedContributionCount, previousPeriodCompletedContributionCount))
+                .issueCount(toNumberKpi(completedIssueCount, previousPeriodCompletedIssueCount))
+                .prCount(toNumberKpi(completedPrCount, previousPeriodCompletedPrCount))
+                .codeReviewCount(toNumberKpi(completedCodeReviewCount, previousPeriodCompletedCodeReviewCount))
+                .inProgressIssueCount(inProgressIssueCount)
+                .pendingApplicationCount(pendingApplicationCount)
+                .maintainedProjectCount(maintainedProjects == null ? 0 : maintainedProjects.size())
+                .repos(null) //TODO: implement
+                ;
+    }
+
     public void toCsv(CSVPrinter csv) throws IOException {
         csv.printRecord(
                 contributor.getLogin(),
