@@ -741,8 +741,26 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
 
         @Test
         public void should_get_contributors_stats_ordered() {
-            test_contributors_stats(Map.of("sort", "PR_COUNT", "sortDirection", "ASC"),
+            test_contributors_stats(Map.of("sort", ContributorKpiSortEnum.PR_COUNT.name(), "sortDirection", "ASC"),
                     response -> assertThat(response.getContributors()).isSortedAccordingTo(comparing(c -> c.getPrCount().getValue())), true
+            );
+            test_contributors_stats(Map.of("sort", ContributorKpiSortEnum.CODE_REVIEW_COUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getContributors()).isSortedAccordingTo(comparing(c -> c.getCodeReviewCount().getValue())), true
+            );
+            test_contributors_stats(Map.of("sort", ContributorKpiSortEnum.ISSUE_COUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getContributors()).isSortedAccordingTo(comparing(c -> c.getIssueCount().getValue())), true
+            );
+            test_contributors_stats(Map.of("sort", ContributorKpiSortEnum.CONTRIBUTION_COUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getContributors()).isSortedAccordingTo(comparing(c -> c.getContributionCount().getValue())), true
+            );
+            test_contributors_stats(Map.of("sort", ContributorKpiSortEnum.TOTAL_REWARDED_USD_AMOUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getContributors()).isSortedAccordingTo(comparing(c -> c.getTotalRewardedUsdAmount().getValue())), true
+            );
+            test_contributors_stats(Map.of("sort", ContributorKpiSortEnum.CONTRIBUTOR_LOGIN.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getContributors()).isSortedAccordingTo(comparing(c -> c.getContributor().getLogin())), true
+            );
+            test_contributors_stats(Map.of("sort", ContributorKpiSortEnum.PROJECT_NAME.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getContributors()).isNotEmpty(), true
             );
         }
 
