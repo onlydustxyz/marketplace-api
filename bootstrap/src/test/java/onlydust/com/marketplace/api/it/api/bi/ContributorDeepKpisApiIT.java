@@ -28,6 +28,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
+import static onlydust.com.marketplace.api.contract.model.ContributorActivityStatus.INACTIVE;
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -502,7 +503,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     "antho", ContributorActivityStatus.CHURNED
             ));
             test_contributors_activity_status("2021-01-04", "2021-01-04", Map.of(
-                    "antho", ContributorActivityStatus.INACTIVE
+                    "antho", INACTIVE
             ));
             test_contributors_activity_status("2021-02-01", "2021-02-01", Map.of(
                     "antho", ContributorActivityStatus.REACTIVATED
@@ -525,14 +526,16 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .expectBody(BiContributorsPageResponse.class).returnResult().getResponseBody();
             assertThat(response.getContributors()).isNotEmpty();
             expectedStatusPerLogin.forEach((login, expectedStatus) -> {
-                if (expectedStatus == ContributorActivityStatus.INACTIVE) {
-                    assertThat(response.getContributors().stream().filter(c -> login.equals(c.getContributor().getLogin())).findFirst())
-                            .isEmpty();
+                final var contributor = response.getContributors().stream().filter(c -> login.equals(c.getContributor().getLogin())).findFirst();
+                if (expectedStatus == INACTIVE) {
+                    assertThat(contributor.isEmpty()
+                               || contributor.get().getContributionCount().getValue() > 0
+                               || contributor.get().getRewardCount().getValue() > 0
+                               || contributor.get().getPendingApplicationCount() > 0).isTrue();
                     return;
                 }
-                final var contributor =
-                        response.getContributors().stream().filter(c -> login.equals(c.getContributor().getLogin())).findFirst().orElseThrow();
-                assertThat(contributor.getActivityStatus()).isEqualTo(expectedStatus);
+                assertThat(contributor).isNotEmpty();
+                assertThat(contributor.get().getActivityStatus()).isEqualTo(expectedStatus);
             });
         }
 
@@ -730,6 +733,10 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> assertThat(response.getContributors())
                             .extracting(c -> c.getContributor().getLogin())
                             .containsExactlyInAnyOrder("antho", "hayden", "mehdi", "james"), true);
+            test_contributors_stats("activityStatuses", "INACTIVE",
+                    response -> response.getContributors().forEach(contributor -> assertThat(contributor.getActivityStatus())
+                            .isEqualTo(INACTIVE)), true
+            );
         }
 
         @Test
