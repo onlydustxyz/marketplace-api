@@ -109,6 +109,18 @@ public class GithubHelper {
         return repo;
     }
 
+    public void addRepoLanguage(Long repoId, String language, Long lineCount) {
+        databaseHelper.executeQuery("""
+                insert into indexer_exp.github_repo_languages(repo_id, language, line_count)
+                values(:repoId, :language, :lineCount)
+                on conflict do nothing;
+                """, Map.of(
+                "repoId", repoId,
+                "language", language,
+                "lineCount", lineCount
+        ));
+    }
+
     public ContributionUUID createPullRequest(GithubRepo repo, UserAuthHelper.AuthenticatedUser contributor) {
         return createPullRequest(repo, contributor, null);
     }

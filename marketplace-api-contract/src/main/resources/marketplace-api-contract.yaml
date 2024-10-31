@@ -7872,6 +7872,10 @@ components:
               type: integer
               description: Number of contributions in this repo made by the contributor
               example: 15
+            topGithubLanguages:
+              type: array
+              items:
+                type: string
 
     CreateRewardResponse:
       type: object

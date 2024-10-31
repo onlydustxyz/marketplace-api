@@ -123,6 +123,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             at("2021-01-05T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, onlyDust, 25, ETH));
 
             final var marketplace_api = githubHelper.createRepo("marketplace-api 93749", onlyDust);
+            githubHelper.addRepoLanguage(marketplace_api.getId(), "Java", 1000L);
+            githubHelper.addRepoLanguage(marketplace_api.getId(), "Kotlin", 400L);
             final var marketplace_frontend = githubHelper.createRepo(onlyDust);
 
             final var bridge = projectHelper.create(mehdi, "Bridge", List.of(universe, starknet, ethereum)).getLeft();
@@ -797,11 +799,15 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                               "repos": [
                                 {
                                   "name": "marketplace-api 93749",
-                                  "contributorContributionCount": 3
+                                  "contributorContributionCount": 3,
+                                  "topGithubLanguages": [
+                                      "Java", "Kotlin"
+                                  ]
                                 },
                                 {
                                   "name": "madara-contracts 128334",
-                                  "contributorContributionCount": 1
+                                  "contributorContributionCount": 1,
+                                  "topGithubLanguages": []
                                 }
                               ],
                               "categories": [

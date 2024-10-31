@@ -48,23 +48,30 @@ public interface ContributorReadRepository extends Repository<ContributorReadEnt
                                        coalesce(sum(cd_per_repo.completed_code_review_count), 0)  as completed_code_review_count,
                                        coalesce(sum(cd_per_repo.in_progress_issue_count), 0)      as in_progress_issue_count
                                 from (select cd.contributor_id                                                                 as contributor_id,
-                                             jsonb_build_object('id', gr.id,
-                                                                'owner', gr.owner_login,
-                                                                'name', gr.name,
-                                                                'description', gr.description,
-                                                                'htmlUrl', gr.html_url,
-                                                                'stars', gr.stars_count,
-                                                                'forkCount', gr.forks_count,
-                                                                'contributorContributionCount', count(cd.contribution_uuid))   as repo,
+                                             (select jsonb_build_object('id', gr.id,
+                                                                        'owner', gr.owner_login,
+                                                                        'name', gr.name,
+                                                                        'description', gr.description,
+                                                                        'htmlUrl', gr.html_url,
+                                                                        'stars', gr.stars_count,
+                                                                        'forkCount', gr.forks_count,
+                                                                        'contributorContributionCount', count(cd.contribution_uuid),
+                                                                        'topGithubLanguages', coalesce((select jsonb_agg(to_jsonb(l.name))
+                                                                                                        from (select grl.language as name
+                                                                                                              from indexer_exp.github_repo_languages grl
+                                                                                                              where grl.repo_id = gr.id
+                                                                                                              order by grl.line_count desc
+                                                                                                              limit 3) l), cast('[]' as jsonb))) as repo
+                                              from indexer_exp.github_repos gr
+                                              where gr.id = cd.repo_id)                                                        as repo,
                                              count(cd.contribution_uuid) filter ( where cd.contribution_status = 'COMPLETED' ) as completed_contribution_count,
                                              sum(cd.is_issue) filter ( where cd.contribution_status = 'COMPLETED' )            as completed_issue_count,
                                              sum(cd.is_pr) filter ( where cd.contribution_status = 'COMPLETED' )               as completed_pr_count,
                                              sum(cd.is_code_review) filter ( where cd.contribution_status = 'COMPLETED' )      as completed_code_review_count,
                                              sum(cd.is_issue) filter ( where cd.contribution_status = 'IN_PROGRESS' )          as in_progress_issue_count
                                       from bi.p_per_contributor_contribution_data cd
-                                               left join indexer_exp.github_repos gr on cd.repo_id = gr.id
                                       where (:onlyDustContributionsOnly is false or cd.project_id is not null)
-                                      group by cd.contributor_id, cd.repo_id, gr.id) cd_per_repo
+                                      group by cd.contributor_id, cd.repo_id) cd_per_repo
                                 group by cd_per_repo.contributor_id) cd on cd.contributor_id = c.contributor_id
             
                      LEFT JOIN (select rd.contributor_id,
