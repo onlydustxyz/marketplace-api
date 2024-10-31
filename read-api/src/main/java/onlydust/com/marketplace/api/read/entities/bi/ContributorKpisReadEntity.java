@@ -79,7 +79,7 @@ public class ContributorKpisReadEntity {
     Integer previousPeriodInProgressIssueCount;
     Integer previousPeriodPendingApplicationCount;
 
-    private static DecimalNumberKpi toDecimalNumberKpi(BigDecimal value, BigDecimal valueOfPreviousPeriod) {
+    public static DecimalNumberKpi toDecimalNumberKpi(BigDecimal value, BigDecimal valueOfPreviousPeriod) {
         return new DecimalNumberKpi().value(value)
                 .trend(valueOfPreviousPeriod == null ? null :
                         valueOfPreviousPeriod.compareTo(value) < 0 ? Trend.UP :
@@ -87,7 +87,7 @@ public class ContributorKpisReadEntity {
                                         Trend.STABLE);
     }
 
-    private static NumberKpi toNumberKpi(Integer value, Integer valueOfPreviousPeriod) {
+    public static NumberKpi toNumberKpi(Integer value, Integer valueOfPreviousPeriod) {
         return new NumberKpi().value(value)
                 .trend(valueOfPreviousPeriod == null ? null :
                         valueOfPreviousPeriod.compareTo(value) < 0 ? Trend.UP :
@@ -95,7 +95,7 @@ public class ContributorKpisReadEntity {
                                         Trend.STABLE);
     }
 
-    private ContributorOverviewResponse pretty(ContributorOverviewResponse contributor) {
+    public static ContributorOverviewResponse pretty(ContributorOverviewResponse contributor) {
         if (contributor.getGlobalRankPercentile() != null)
             contributor.globalRankPercentile(prettyRankPercentile(contributor.getGlobalRankPercentile()));
 

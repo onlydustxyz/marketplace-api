@@ -64,9 +64,24 @@ public class GithubHelper {
     }
 
     public GithubRepo createRepo() {
+        return createRepo(faker.rickAndMorty().character());
+    }
+
+    public GithubRepo createRepo(final @NonNull ProjectId projectId) {
+        final var repo = createRepo();
+        projectHelper.addRepo(projectId, repo.getId());
+        return repo;
+    }
+
+    public GithubRepo createRepo(final @NonNull String name, final @NonNull ProjectId projectId) {
+        final var repo = createRepo(name);
+        projectHelper.addRepo(projectId, repo.getId());
+        return repo;
+    }
+
+    public GithubRepo createRepo(final @NonNull String name) {
         final var owner = createAccount();
 
-        final var name = faker.rickAndMorty().character();
         final var repo = GithubRepo.builder()
                 .id(faker.random().nextLong())
                 .owner(owner.getLogin())
@@ -94,10 +109,16 @@ public class GithubHelper {
         return repo;
     }
 
-    public GithubRepo createRepo(final @NonNull ProjectId projectId) {
-        final var repo = createRepo();
-        projectHelper.addRepo(projectId, repo.getId());
-        return repo;
+    public void addRepoLanguage(Long repoId, String language, Long lineCount) {
+        databaseHelper.executeQuery("""
+                insert into indexer_exp.github_repo_languages(repo_id, language, line_count)
+                values(:repoId, :language, :lineCount)
+                on conflict do nothing;
+                """, Map.of(
+                "repoId", repoId,
+                "language", language,
+                "lineCount", lineCount
+        ));
     }
 
     public ContributionUUID createPullRequest(GithubRepo repo, UserAuthHelper.AuthenticatedUser contributor) {

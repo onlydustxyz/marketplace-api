@@ -198,7 +198,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BiContributorsPageItemResponse'
+                $ref: '#/components/schemas/BiContributorResponse'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -7852,6 +7852,31 @@ components:
               type: boolean
               description: Is the repo authorized in the Github app?
 
+    ContributorGithubRepoResponse:
+      allOf:
+        - $ref: '#/components/schemas/ShortGithubRepoResponse'
+        - type: object
+          required:
+            - stars
+            - forkCount
+          properties:
+            stars:
+              type: integer
+              description: Number of stars on Github
+              example: 625
+            forkCount:
+              type: integer
+              description: Fork count on Github
+              example: 3
+            contributorContributionCount:
+              type: integer
+              description: Number of contributions in this repo made by the contributor
+              example: 15
+            topGithubLanguages:
+              type: array
+              items:
+                type: string
+
     CreateRewardResponse:
       type: object
       required:
@@ -12119,6 +12144,18 @@ components:
           type: integer
         activityStatus:
           $ref: '#/components/schemas/ContributorActivityStatus'
+
+    BiContributorResponse:
+      allOf:
+        - $ref: '#/components/schemas/BiContributorsPageItemResponse'
+        - type: object
+          required:
+            - repos
+          properties:
+            repos:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContributorGithubRepoResponse'
 
     ContributorOverviewResponse:
       allOf:
