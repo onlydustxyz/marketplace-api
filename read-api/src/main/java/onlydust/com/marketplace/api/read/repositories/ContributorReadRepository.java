@@ -26,6 +26,7 @@ public interface ContributorReadRepository extends Repository<ContributorReadEnt
                              join project_contributor_labels pcl on pcl.id = cpcl.label_id
                              join projects p on p.id = pcl.project_id
                     where cpcl.github_user_id = c.contributor_id)    as project_contributor_labels,
+                   cd.repos                                          as repos,
                    coalesce(sum(rd.total_rewarded_usd_amount), 0)    as total_rewarded_usd_amount,
                    coalesce(sum(rd.reward_count), 0)                 as reward_count,
                    coalesce(sum(cd.completed_contribution_count), 0) as completed_contribution_count,
@@ -39,18 +40,32 @@ public interface ContributorReadRepository extends Repository<ContributorReadEnt
                      JOIN bi.p_contributor_reward_data crd ON crd.contributor_id = c.contributor_id
                      JOIN bi.p_contributor_application_data cad ON cad.contributor_id = c.contributor_id
             
-                     LEFT JOIN (select cd.contributor_id                                                                                               as contributor_id,
-            
-                                       count(cd.contribution_uuid)                                                                                     as contribution_count,
-                                       count(cd.contribution_uuid) filter ( where cd.contribution_status = 'COMPLETED' )                               as completed_contribution_count,
-                                       count(cd.contribution_uuid) filter ( where cd.contribution_status = 'COMPLETED' and cd.project_id is not null ) as od_completed_contribution_count,
-                                       coalesce(sum(cd.is_issue) filter ( where cd.contribution_status = 'COMPLETED' ), 0)                             as completed_issue_count,
-                                       coalesce(sum(cd.is_pr) filter ( where cd.contribution_status = 'COMPLETED' ), 0)                                as completed_pr_count,
-                                       coalesce(sum(cd.is_code_review) filter ( where cd.contribution_status = 'COMPLETED' ), 0)                       as completed_code_review_count,
-                                       coalesce(sum(cd.is_issue) filter ( where cd.contribution_status = 'IN_PROGRESS' ), 0)                           as in_progress_issue_count
-                                from bi.p_per_contributor_contribution_data cd
-                                where (:onlyDustContributionsOnly is false or cd.project_id is not null)
-                                group by cd.contributor_id) cd on cd.contributor_id = c.contributor_id
+                     LEFT JOIN (select cd_per_repo.contributor_id                                 as contributor_id,
+                                       jsonb_agg(cd_per_repo.repo)                                as repos,
+                                       coalesce(sum(cd_per_repo.completed_contribution_count), 0) as completed_contribution_count,
+                                       coalesce(sum(cd_per_repo.completed_issue_count), 0)        as completed_issue_count,
+                                       coalesce(sum(cd_per_repo.completed_pr_count), 0)           as completed_pr_count,
+                                       coalesce(sum(cd_per_repo.completed_code_review_count), 0)  as completed_code_review_count,
+                                       coalesce(sum(cd_per_repo.in_progress_issue_count), 0)      as in_progress_issue_count
+                                from (select cd.contributor_id                                                                 as contributor_id,
+                                             jsonb_build_object('id', gr.id,
+                                                                'owner', gr.owner_login,
+                                                                'name', gr.name,
+                                                                'description', gr.description,
+                                                                'htmlUrl', gr.html_url,
+                                                                'stars', gr.stars_count,
+                                                                'forkCount', gr.forks_count,
+                                                                'contributorContributionCount', count(cd.contribution_uuid))   as repo,
+                                             count(cd.contribution_uuid) filter ( where cd.contribution_status = 'COMPLETED' ) as completed_contribution_count,
+                                             sum(cd.is_issue) filter ( where cd.contribution_status = 'COMPLETED' )            as completed_issue_count,
+                                             sum(cd.is_pr) filter ( where cd.contribution_status = 'COMPLETED' )               as completed_pr_count,
+                                             sum(cd.is_code_review) filter ( where cd.contribution_status = 'COMPLETED' )      as completed_code_review_count,
+                                             sum(cd.is_issue) filter ( where cd.contribution_status = 'IN_PROGRESS' )          as in_progress_issue_count
+                                      from bi.p_per_contributor_contribution_data cd
+                                               left join indexer_exp.github_repos gr on cd.repo_id = gr.id
+                                      where (:onlyDustContributionsOnly is false or cd.project_id is not null)
+                                      group by cd.contributor_id, cd.repo_id, gr.id) cd_per_repo
+                                group by cd_per_repo.contributor_id) cd on cd.contributor_id = c.contributor_id
             
                      LEFT JOIN (select rd.contributor_id,
                                        count(rd.reward_id)             as reward_count,
@@ -63,7 +78,6 @@ public interface ContributorReadRepository extends Repository<ContributorReadEnt
                                 from bi.p_application_data ad
                                 group by ad.contributor_id) ad on ad.contributor_id = c.contributor_id
             
-            
             WHERE c.contributor_id = :contributorId
             GROUP BY c.contributor_id,
                      c.contributor_login,
@@ -74,7 +88,8 @@ public interface ContributorReadRepository extends Repository<ContributorReadEnt
                      c.languages,
                      c.ecosystems,
                      c.maintained_projects,
-                     c.first_project_name
+                     c.first_project_name,
+                     cd.repos
             """
             , nativeQuery = true)
     Optional<ContributorReadEntity> findById(@NonNull Long contributorId,

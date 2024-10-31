@@ -81,7 +81,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
         final var contributor = contributorReadRepository.findById(contributorId, false);
         return ok()
                 .cacheControl(cache.forEverybody(Cache.S))
-                .body(contributor.map(ContributorReadEntity::toDtoSingle)
+                .body(contributor.map(ContributorReadEntity::toDto)
                         .orElseThrow(() -> notFound("Contributor with id %d not found".formatted(contributorId))));
     }
 

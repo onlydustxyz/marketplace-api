@@ -46,6 +46,8 @@ public class ContributorReadEntity {
     List<ProjectContributorLabelResponse> projectContributorLabels;
     @JdbcTypeCode(SqlTypes.JSON)
     List<ProjectLinkResponse> maintainedProjects;
+    @JdbcTypeCode(SqlTypes.JSON)
+    List<ContributorGithubRepoResponse> repos;
     String contributorCountry;
 
     BigDecimal totalRewardedUsdAmount;
@@ -61,7 +63,7 @@ public class ContributorReadEntity {
         return Optional.ofNullable(contributorCountry).map(Country::fromIso3);
     }
 
-    public BiContributorResponse toDtoSingle() {
+    public BiContributorResponse toDto() {
         return new BiContributorResponse()
                 .contributor(pretty(contributor))
                 .projects(projects == null ? null : projects.stream().sorted(comparing(ProjectLinkResponse::getName)).toList())
@@ -83,7 +85,7 @@ public class ContributorReadEntity {
                 .inProgressIssueCount(inProgressIssueCount)
                 .pendingApplicationCount(pendingApplicationCount)
                 .maintainedProjectCount(maintainedProjects == null ? 0 : maintainedProjects.size())
-                .repos(null) //TODO: implement
-                ;
+                .repos(repos == null ? List.of() :
+                        repos.stream().sorted(comparing(ContributorGithubRepoResponse::getContributorContributionCount).reversed()).toList());
     }
 }

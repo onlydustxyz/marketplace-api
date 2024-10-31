@@ -122,7 +122,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(nethermind, onlyDust, 100, STRK));
             at("2021-01-05T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, onlyDust, 25, ETH));
 
-            final var marketplace_api = githubHelper.createRepo(onlyDust);
+            final var marketplace_api = githubHelper.createRepo("marketplace-api 93749", onlyDust);
             final var marketplace_frontend = githubHelper.createRepo(onlyDust);
 
             final var bridge = projectHelper.create(mehdi, "Bridge", List.of(universe, starknet, ethereum)).getLeft();
@@ -136,7 +136,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             madara = projectHelper.create(hayden, "Madara", List.of(universe, starknet)).getLeft();
             at("2021-01-06T00:00:00Z", () -> accountingHelper.grant(explorationTeam, madara, 120, STRK));
 
-            final var madara_contracts = githubHelper.createRepo(madara);
+            final var madara_contracts = githubHelper.createRepo("madara-contracts 128334", madara);
             final var madara_app = githubHelper.createRepo(madara);
 
 
@@ -172,6 +172,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             at("2021-02-21T00:00:08Z", () -> githubHelper.createPullRequest(bridge_frontend, james));
             at("2021-02-28T00:00:08Z", () -> githubHelper.createPullRequest(bridge_api, james));
 
+            at("2024-01-01T00:00:00Z", () -> githubHelper.createPullRequest(madara_contracts, antho, List.of("rs")));
+
             projectFacadePort.refreshStats();
             // BI regarding the following commands should be refreshed in real-time
 
@@ -200,7 +202,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .is2xxSuccessful()
                     .expectBody()
-                    .jsonPath("$.contributors[0].projects[0].name").<String>value(name -> assertThat(name).contains("OnlyDust"))
+                    .jsonPath("$.contributors[0].projects[0].name").<String>value(name -> assertThat(name).contains("Madara"))
+                    .jsonPath("$.contributors[0].projects[1].name").<String>value(name -> assertThat(name).contains("OnlyDust"))
                     .jsonPath("$.contributors[1].projects[0].name").<String>value(name -> assertThat(name).contains("Bridge"))
                     .jsonPath("$.contributors[1].projects[1].name").<String>value(name -> assertThat(name).contains("Madara"))
                     .jsonPath("$.contributors[2].projects[0].name").<String>value(name -> assertThat(name).contains("OnlyDust"))
@@ -232,6 +235,9 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     }
                                   ],
                                   "ecosystems": [
+                                    {
+                                      "slug": "starknet-ecosystem"
+                                    },
                                     {
                                       "slug": "universe-ecosystem"
                                     }
@@ -788,6 +794,16 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                 "globalRankPercentile": null,
                                 "globalRankCategory": "F"
                               },
+                              "repos": [
+                                {
+                                  "name": "marketplace-api 93749",
+                                  "contributorContributionCount": 3
+                                },
+                                {
+                                  "name": "madara-contracts 128334",
+                                  "contributorContributionCount": 1
+                                }
+                              ],
                               "categories": [
                                 {
                                   "slug": "defi",
@@ -805,6 +821,9 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "ecosystems": [
+                                {
+                                  "name": "Starknet ecosystem"
+                                },
                                 {
                                   "name": "Universe ecosystem"
                                 }
@@ -827,7 +846,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                 "trend": "STABLE"
                               },
                               "prCount": {
-                                "value": 3,
+                                "value": 4,
                                 "trend": "STABLE"
                               },
                               "codeReviewCount": {
@@ -835,7 +854,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                 "trend": "STABLE"
                               },
                               "contributionCount": {
-                                "value": 3,
+                                "value": 4,
                                 "trend": "STABLE"
                               },
                               "maintainedProjectCount": 0,

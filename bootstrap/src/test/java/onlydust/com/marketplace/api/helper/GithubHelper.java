@@ -64,9 +64,24 @@ public class GithubHelper {
     }
 
     public GithubRepo createRepo() {
+        return createRepo(faker.rickAndMorty().character());
+    }
+
+    public GithubRepo createRepo(final @NonNull ProjectId projectId) {
+        final var repo = createRepo();
+        projectHelper.addRepo(projectId, repo.getId());
+        return repo;
+    }
+
+    public GithubRepo createRepo(final @NonNull String name, final @NonNull ProjectId projectId) {
+        final var repo = createRepo(name);
+        projectHelper.addRepo(projectId, repo.getId());
+        return repo;
+    }
+
+    public GithubRepo createRepo(final @NonNull String name) {
         final var owner = createAccount();
 
-        final var name = faker.rickAndMorty().character();
         final var repo = GithubRepo.builder()
                 .id(faker.random().nextLong())
                 .owner(owner.getLogin())
@@ -91,12 +106,6 @@ public class GithubHelper {
                 "ownerLogin", owner.getLogin()
         ));
 
-        return repo;
-    }
-
-    public GithubRepo createRepo(final @NonNull ProjectId projectId) {
-        final var repo = createRepo();
-        projectHelper.addRepo(projectId, repo.getId());
         return repo;
     }
 
