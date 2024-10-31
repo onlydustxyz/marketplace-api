@@ -816,11 +816,11 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                               },
                               "totalRewardedUsdAmount": {
                                 "value": 1.5,
-                                "trend": "UP"
+                                "trend": "STABLE"
                               },
                               "rewardCount": {
                                 "value": 2,
-                                "trend": "UP"
+                                "trend": "STABLE"
                               },
                               "issueCount": {
                                 "value": 0,
@@ -828,7 +828,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                               },
                               "prCount": {
                                 "value": 3,
-                                "trend": "UP"
+                                "trend": "STABLE"
                               },
                               "codeReviewCount": {
                                 "value": 0,
@@ -836,7 +836,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                               },
                               "contributionCount": {
                                 "value": 3,
-                                "trend": "UP"
+                                "trend": "STABLE"
                               },
                               "maintainedProjectCount": 0,
                               "inProgressIssueCount": 0,

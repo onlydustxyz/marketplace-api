@@ -79,7 +79,7 @@ public class ContributorKpisReadEntity {
     Integer previousPeriodInProgressIssueCount;
     Integer previousPeriodPendingApplicationCount;
 
-    private static DecimalNumberKpi toDecimalNumberKpi(BigDecimal value, BigDecimal valueOfPreviousPeriod) {
+    public static DecimalNumberKpi toDecimalNumberKpi(BigDecimal value, BigDecimal valueOfPreviousPeriod) {
         return new DecimalNumberKpi().value(value)
                 .trend(valueOfPreviousPeriod == null ? null :
                         valueOfPreviousPeriod.compareTo(value) < 0 ? Trend.UP :
@@ -87,7 +87,7 @@ public class ContributorKpisReadEntity {
                                         Trend.STABLE);
     }
 
-    private static NumberKpi toNumberKpi(Integer value, Integer valueOfPreviousPeriod) {
+    public static NumberKpi toNumberKpi(Integer value, Integer valueOfPreviousPeriod) {
         return new NumberKpi().value(value)
                 .trend(valueOfPreviousPeriod == null ? null :
                         valueOfPreviousPeriod.compareTo(value) < 0 ? Trend.UP :
@@ -95,7 +95,7 @@ public class ContributorKpisReadEntity {
                                         Trend.STABLE);
     }
 
-    private ContributorOverviewResponse pretty(ContributorOverviewResponse contributor) {
+    public static ContributorOverviewResponse pretty(ContributorOverviewResponse contributor) {
         if (contributor.getGlobalRankPercentile() != null)
             contributor.globalRankPercentile(prettyRankPercentile(contributor.getGlobalRankPercentile()));
 
@@ -129,33 +129,6 @@ public class ContributorKpisReadEntity {
                 .inProgressIssueCount(inProgressIssueCount)
                 .pendingApplicationCount(pendingApplicationCount)
                 .maintainedProjectCount(maintainedProjects == null ? 0 : maintainedProjects.size())
-                ;
-    }
-
-    public BiContributorResponse toDtoSingle() {
-        return new BiContributorResponse()
-                .contributor(pretty(contributor))
-                .activityStatus(activityStatus)
-                .projects(projects == null ? null : projects.stream().sorted(comparing(ProjectLinkResponse::getName)).toList())
-                .categories(categories == null ? null : categories.stream().sorted(comparing(ProjectCategoryResponse::getName)).toList())
-                .languages(languages == null ? null : languages.stream().sorted(comparing(LanguageResponse::getName)).toList())
-                .ecosystems(ecosystems == null ? null : ecosystems.stream().sorted(comparing(EcosystemLinkResponse::getName)).toList())
-                .projectContributorLabels(projectContributorLabels == null ? null :
-                        projectContributorLabels.stream().sorted(comparing(ProjectContributorLabelResponse::getName)).toList())
-                .country(contributorCountry().map(country -> new CountryResponse()
-                                .code(country.iso2Code())
-                                .name(country.display().orElse(null)))
-                        .orElse(null))
-                .totalRewardedUsdAmount(toDecimalNumberKpi(prettyUsd(totalRewardedUsdAmount), prettyUsd(previousPeriodTotalRewardedUsdAmount)))
-                .rewardCount(toNumberKpi(rewardCount, previousPeriodRewardCount))
-                .contributionCount(toNumberKpi(completedContributionCount, previousPeriodCompletedContributionCount))
-                .issueCount(toNumberKpi(completedIssueCount, previousPeriodCompletedIssueCount))
-                .prCount(toNumberKpi(completedPrCount, previousPeriodCompletedPrCount))
-                .codeReviewCount(toNumberKpi(completedCodeReviewCount, previousPeriodCompletedCodeReviewCount))
-                .inProgressIssueCount(inProgressIssueCount)
-                .pendingApplicationCount(pendingApplicationCount)
-                .maintainedProjectCount(maintainedProjects == null ? 0 : maintainedProjects.size())
-                .repos(null) //TODO: implement
                 ;
     }
 

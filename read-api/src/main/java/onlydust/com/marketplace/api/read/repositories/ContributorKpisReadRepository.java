@@ -395,50 +395,6 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                             String[] activityStatuses,
                                             Pageable pageable);
 
-    @Query(value = SELECT + " where d.contributor_id = :contributorId", nativeQuery = true)
-    Optional<ContributorKpisReadEntity> findById(Long contributorId,
-                                                 ZonedDateTime fromDate,
-                                                 ZonedDateTime toDate,
-                                                 ZonedDateTime fromDatePreviousPeriod,
-                                                 @NonNull Boolean onlyDustContributionsOnly,
-                                                 UUID[] dataSourceIds,
-                                                 @NonNull Boolean filteredKpis,
-                                                 String searchQuery,
-                                                 Long[] contributorIds,
-                                                 List<UUID> contributedTo,
-                                                 UUID[] projectIds,
-                                                 UUID[] labelProjectIds,
-                                                 String[] projectSlugs,
-                                                 UUID[] categoryIds,
-                                                 UUID[] languageIds,
-                                                 UUID[] ecosystemIds,
-                                                 String[] countryCodes,
-                                                 String[] contributionStatuses,
-                                                 Boolean includeApplicants,
-                                                 BigDecimal totalRewardedUsdAmountMin,
-                                                 BigDecimal totalRewardedUsdAmountEq,
-                                                 BigDecimal totalRewardedUsdAmountMax,
-                                                 Integer rewardCountMin,
-                                                 Integer rewardCountEq,
-                                                 Integer rewardCountMax,
-                                                 Integer completedContributionCountMin,
-                                                 Integer completedContributionCountEq,
-                                                 Integer completedContributionCountMax,
-                                                 List<String> contributionTypes,
-                                                 String[] activityStatuses);
-
-    default Optional<ContributorKpisReadEntity> findById(Long contributorId) {
-        return findById(contributorId, DEFAULT_FROM_DATE, ZonedDateTime.now(), DEFAULT_FROM_DATE,
-                false, // onlyDustContributionsOnly
-                null,
-                false, // filteredKpis
-                null,
-                new Long[]{contributorId}, // contributorIds
-                null, null, null, null, null, null, null, null, null,
-                true, // includeApplicants
-                null, null, null, null, null, null, null, null, null, null, null);
-    }
-
     default Page<ContributorKpisReadEntity> findAll(BiContributorsQueryParams q) {
         final var sanitizedFromDate = q.getFromDate() == null ? DEFAULT_FROM_DATE : parseZonedNullable(q.getFromDate()).truncatedTo(ChronoUnit.DAYS);
         final var sanitizedToDate = q.getToDate() == null ? ZonedDateTime.now() : parseZonedNullable(q.getToDate()).truncatedTo(ChronoUnit.DAYS).plusDays(1);
