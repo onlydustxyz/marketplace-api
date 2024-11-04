@@ -2,28 +2,32 @@ package onlydust.com.marketplace.api.it.bo;
 
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
-import onlydust.com.marketplace.user.domain.model.BackofficeUser;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
 import java.util.Map;
 
 @TagBO
 public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
     UserAuthHelper.AuthenticatedBackofficeUser mehdi;
 
-    @BeforeEach
-    void setUp() {
-        mehdi = userAuthHelper.authenticateBackofficeUser("pixelfact.company@gmail.com", List.of(BackofficeUser.Role.BO_READER));
+    @Test
+    @Order(21)
+    void should_reject_invoice_download_if_wrong_token() {
+
+        client.get()
+                .uri(getApiURI(EXTERNAL_GET_CONTRIBUTORS_BI, Map.of("contributorLogins", "AnthonyBuisset,enitrat", "token", "INVALID_TOKEN")))
+                .exchange()
+                // Then
+                .expectStatus()
+                .isUnauthorized();
     }
 
     @Test
     void should_return_contributors_bi_data() {
         // When
         client.get()
-                .uri(getApiURI(GET_CONTRIBUTORS_BI, Map.of("contributorLogins", "AnthonyBuisset,enitrat")))
-                .header("Authorization", "Bearer " + mehdi.jwt())
+                .uri(getApiURI(EXTERNAL_GET_CONTRIBUTORS_BI, Map.of("contributorLogins", "AnthonyBuisset,enitrat", "token", "BO_TOKEN")))
                 // Then
                 .exchange()
                 .expectStatus()

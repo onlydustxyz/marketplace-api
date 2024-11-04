@@ -2725,7 +2725,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/bi/contributors:
+  /bo/v1/external/bi/contributors:
     get:
       security:
         - bearerAuth: [ ]
