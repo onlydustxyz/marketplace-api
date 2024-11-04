@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
 import jakarta.persistence.*;
 import lombok.*;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Contact;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -40,6 +41,15 @@ public class ContactInformationEntity {
                 .contact(contact)
                 .visibility(isPublic ? Contact.Visibility.PUBLIC : Contact.Visibility.PRIVATE)
                 .channel(channel)
+                .build();
+    }
+
+    public static ContactInformationEntity fromDomain(UserId userId, Contact contact) {
+        return ContactInformationEntity.builder()
+                .userId(userId.value())
+                .channel(contact.getChannel())
+                .contact(contact.getContact())
+                .isPublic(contact.getVisibility() == Contact.Visibility.PUBLIC)
                 .build();
     }
 
