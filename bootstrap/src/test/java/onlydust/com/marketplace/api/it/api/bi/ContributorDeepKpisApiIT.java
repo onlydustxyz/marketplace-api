@@ -6,11 +6,11 @@ import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagBI;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
@@ -38,8 +38,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     ProjectFacadePort projectFacadePort;
-    @Autowired
-    ApplicationRepository applicationRepository;
 
     @Nested
     class ActiveContributors {
@@ -84,6 +82,17 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
 
             antho = userAuthHelper.create("antho");
             billingProfileHelper.verify(antho, Country.fromIso3("FRA"));
+            userProfileHelper.addContact(antho.userId(), Contact.builder()
+                    .channel(Contact.Channel.TELEGRAM)
+                    .contact("t.me/antho")
+                    .visibility(Contact.Visibility.PUBLIC)
+                    .build());
+            userProfileHelper.addContact(antho.userId(), Contact.builder()
+                    .channel(Contact.Channel.WHATSAPP)
+                    .contact("wa/antho")
+                    .visibility(Contact.Visibility.PRIVATE)
+                    .build());
+
             pierre = userAuthHelper.create("pierre");
             mehdi = userAuthHelper.create("mehdi");
             billingProfileHelper.verify(mehdi, Country.fromIso3("MAR"));
@@ -788,7 +797,13 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                               "contributor": {
                                 "bio": null,
                                 "signedUpOnGithubAt": null,
-                                "contacts": null,
+                                "contacts": [
+                                  {
+                                    "channel": "TELEGRAM",
+                                    "contact": "t.me/antho",
+                                    "visibility": "public"
+                                  }
+                                ],
                                 "login": "antho",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/antho",
                                 "isRegistered": true,

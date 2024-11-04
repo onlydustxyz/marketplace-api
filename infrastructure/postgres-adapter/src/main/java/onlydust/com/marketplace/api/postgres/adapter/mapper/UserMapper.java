@@ -74,15 +74,7 @@ public interface UserMapper {
     }
 
     static Set<ContactInformationEntity> mapContactInformationsToEntity(UserId userId, List<Contact> contacts) {
-        return isNull(contacts) ? null : contacts.stream().map(contact -> ContactInformationEntity.builder()
-                .userId(userId.value())
-                .channel(contact.getChannel())
-                .contact(contact.getContact())
-                .isPublic(switch (contact.getVisibility()) {
-                    case PRIVATE -> false;
-                    case PUBLIC -> true;
-                })
-                .build()
-        ).collect(Collectors.toSet());
+        return isNull(contacts) ? null : contacts.stream()
+                .map(contact -> ContactInformationEntity.fromDomain(userId, contact)).collect(Collectors.toSet());
     }
 }

@@ -844,17 +844,17 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                   {
                                     "channel": "TELEGRAM",
                                     "contact": "https://t.me/abuisset",
-                                    "visibility": null
+                                    "visibility": "public"
                                   },
                                   {
                                     "channel": "TWITTER",
                                     "contact": "https://twitter.com/abuisset",
-                                    "visibility": null
+                                    "visibility": "public"
                                   },
                                   {
                                     "channel": "DISCORD",
                                     "contact": "antho",
-                                    "visibility": null
+                                    "visibility": "public"
                                   }
                                 ],
                                 "githubUserId": 43467246,
@@ -1069,12 +1069,16 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                               "contributionCount": {
                                 "value": 435,
                                 "trend": "UP"
-                              }
+                              },
+                              "maintainedProjectCount": 2,
+                              "inProgressIssueCount": 0,
+                              "pendingApplicationCount": 0,
+                              "activityStatus": null
                             },
                             {
                               "contributor": {
                                 "bio": "Je me lève très tôt et mange à midi pile, n'en déplaise aux grincheux",
-                                "contacts": null,
+                                "contacts": [],
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
@@ -1212,31 +1216,30 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                               "contributionCount": {
                                 "value": 265,
                                 "trend": "UP"
-                              }
+                              },
+                              "maintainedProjectCount": 1,
+                              "inProgressIssueCount": 0,
+                              "pendingApplicationCount": 0,
+                              "activityStatus": null
                             },
                             {
                               "contributor": {
                                 "bio": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
                                 "contacts": [
                                   {
-                                    "channel": "TELEGRAM",
-                                    "contact": "https://t.me/gregoirecharles",
-                                    "visibility": null
-                                  },
-                                  {
                                     "channel": "WHATSAPP",
                                     "contact": "+33683744020",
-                                    "visibility": null
+                                    "visibility": "public"
                                   },
                                   {
                                     "channel": "TWITTER",
                                     "contact": "https://twitter.com/gregcha",
-                                    "visibility": null
+                                    "visibility": "public"
                                   },
                                   {
                                     "channel": "LINKEDIN",
                                     "contact": "https://www.linkedin.com/in/gregoirecharles",
-                                    "visibility": null
+                                    "visibility": "public"
                                   }
                                 ],
                                 "githubUserId": 8642470,
@@ -1312,23 +1315,16 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                               "contributionCount": {
                                 "value": 5,
                                 "trend": "UP"
-                              }
+                              },
+                              "maintainedProjectCount": 12,
+                              "inProgressIssueCount": 0,
+                              "pendingApplicationCount": 0,
+                              "activityStatus": null
                             },
                             {
                               "contributor": {
                                 "bio": "totot",
-                                "contacts": [
-                                  {
-                                    "channel": "TWITTER",
-                                    "contact": "https://twitter.com/fuxeto",
-                                    "visibility": null
-                                  },
-                                  {
-                                    "channel": "TELEGRAM",
-                                    "contact": "https://t.me/ofux",
-                                    "visibility": null
-                                  }
-                                ],
+                                "contacts": [],
                                 "githubUserId": 595505,
                                 "login": "ofux",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
@@ -1511,7 +1507,11 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                               "contributionCount": {
                                 "value": 275,
                                 "trend": "UP"
-                              }
+                              },
+                              "maintainedProjectCount": 3,
+                              "inProgressIssueCount": 0,
+                              "pendingApplicationCount": 0,
+                              "activityStatus": null
                             }
                           ]
                         }

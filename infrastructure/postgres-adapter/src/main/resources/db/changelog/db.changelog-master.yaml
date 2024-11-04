@@ -623,3 +623,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000376_improve_select_contributors_for_activity_status.sql
   - include:
       file: db/changelog/changelogs/00000377_add_index.sql
+  - include:
+      file: db/changelog/changelogs/00000378_remove_contacts_from_projection.sql

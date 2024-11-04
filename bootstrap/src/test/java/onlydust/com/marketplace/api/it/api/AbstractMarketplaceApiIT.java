@@ -296,6 +296,8 @@ public class AbstractMarketplaceApiIT {
     @Autowired
     protected ApplicationHelper applicationHelper;
     @Autowired
+    protected UserProfileHelper userProfileHelper;
+    @Autowired
     OutboxConsumerJob indexerOutboxJob;
     @Autowired
     OutboxConsumerJob trackingOutboxJob;

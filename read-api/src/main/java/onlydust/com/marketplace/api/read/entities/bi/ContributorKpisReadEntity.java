@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
+import static onlydust.com.marketplace.api.contract.model.ContactInformation.VisibilityEnum.PUBLIC;
 import static onlydust.com.marketplace.api.read.entities.user.PublicUserProfileResponseV2Entity.prettyRankPercentile;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
@@ -98,6 +99,9 @@ public class ContributorKpisReadEntity {
     public static ContributorOverviewResponse pretty(ContributorOverviewResponse contributor) {
         if (contributor.getGlobalRankPercentile() != null)
             contributor.globalRankPercentile(prettyRankPercentile(contributor.getGlobalRankPercentile()));
+
+        contributor.contacts(contributor.getContacts() == null ? List.of()
+                : contributor.getContacts().stream().filter(c -> c.getVisibility() == PUBLIC).toList());
 
         return contributor;
     }
