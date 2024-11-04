@@ -62,7 +62,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                          coalesce(sum(cd.previous_period_completed_code_review_count), 0)          as previous_period_completed_code_review_count,
                          coalesce(sum(cd.previous_period_in_progress_issue_count), 0)              as previous_period_in_progress_issue_count,
                          coalesce(sum(ad.previous_period_pending_application_count), 0)            as previous_period_pending_application_count,
-                         activity_status.value                                                     as activity_status
+                         engagement_status.value                                                   as engagement_status
             
                   FROM bi.p_contributor_global_data c
                            JOIN bi.p_contributor_reward_data crd ON crd.contributor_id = c.contributor_id
@@ -150,7 +150,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                                                     not coalesce(cd.includes_first_contribution_on_onlydust, false) and
                                                                     coalesce(cd.od_completed_contribution_count, 0) > 0
                                                                    then 'REACTIVATED'
-                                                               else 'INACTIVE' end as contributor_activity_status) as value) activity_status ON true
+                                                               else 'INACTIVE' end as engagement_status) as value) engagement_status ON true
             
             
                   WHERE (coalesce(:dataSourceIds) is null or
@@ -166,7 +166,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                     and (coalesce(:languageIds) is null or c.language_ids && :languageIds)
                     and (coalesce(:countryCodes) is null or c.contributor_country = any (:countryCodes))
                     and (coalesce(:searchQuery) is null or c.search ilike '%' || :searchQuery || '%' or crd.search ilike '%' || :searchQuery || '%')
-                    and (activity_status.value != 'INACTIVE' or cd.contribution_count > 0 or rd.reward_count > 0 or ad.pending_application_count > 0)
+                    and (engagement_status.value != 'INACTIVE' or cd.contribution_count > 0 or rd.reward_count > 0 or ad.pending_application_count > 0)
                     and (coalesce(:totalRewardedUsdAmountMin) is null or rd.total_rewarded_usd_amount >= :totalRewardedUsdAmountMin)
                     and (coalesce(:totalRewardedUsdAmountEq) is null or rd.total_rewarded_usd_amount = :totalRewardedUsdAmountEq)
                     and (coalesce(:totalRewardedUsdAmountMax) is null or rd.total_rewarded_usd_amount <= :totalRewardedUsdAmountMax)
@@ -192,7 +192,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                              case when 'CODE_REVIEW' in (:contributionTypes) then cd.completed_code_review_count else 0 end
                              ) <= :completedContributionCountMax)
                     and (coalesce(:contributedTo) is null or cd.contributed_to is true)
-                    and (coalesce(:activityStatuses) is null or activity_status.value = any (cast(:activityStatuses as contributor_activity_status[])))
+                    and (coalesce(:engagementStatuses) is null or engagement_status.value = any (cast(:engagementStatuses as engagement_status[])))
                   GROUP BY c.contributor_id,
                            c.contributor_login,
                            c.contributor_country,
@@ -203,7 +203,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                            c.ecosystems,
                            c.maintained_projects,
                            c.first_project_name,
-                           activity_status.value) d
+                           engagement_status.value) d
             """;
 
     static String getSortProperty(ContributorKpiSortEnum sort) {
@@ -308,7 +308,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                                                       not coalesce(cd.includes_first_contribution_on_onlydust, false) and
                                                                       coalesce(cd.od_completed_contribution_count, 0) > 0
                                                                      then 'REACTIVATED'
-                                                                 else 'INACTIVE' end as contributor_activity_status) as value) activity_status ON true
+                                                                 else 'INACTIVE' end as engagement_status) as value) engagement_status ON true
                     
                     
                     WHERE (coalesce(:dataSourceIds) is null or
@@ -324,7 +324,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                       and (coalesce(:languageIds) is null or c.language_ids && :languageIds)
                       and (coalesce(:countryCodes) is null or c.contributor_country = any (:countryCodes))
                       and (coalesce(:searchQuery) is null or c.search ilike '%' || :searchQuery || '%' or crd.search ilike '%' || :searchQuery || '%')
-                      and (activity_status.value != 'INACTIVE' or cd.contribution_count > 0 or rd.reward_count > 0 or ad.pending_application_count > 0)
+                      and (engagement_status.value != 'INACTIVE' or cd.contribution_count > 0 or rd.reward_count > 0 or ad.pending_application_count > 0)
                       and (coalesce(:totalRewardedUsdAmountMin) is null or rd.total_rewarded_usd_amount >= :totalRewardedUsdAmountMin)
                       and (coalesce(:totalRewardedUsdAmountEq) is null or rd.total_rewarded_usd_amount = :totalRewardedUsdAmountEq)
                       and (coalesce(:totalRewardedUsdAmountMax) is null or rd.total_rewarded_usd_amount <= :totalRewardedUsdAmountMax)
@@ -350,7 +350,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                case when 'CODE_REVIEW' in (:contributionTypes) then cd.completed_code_review_count else 0 end
                                ) <= :completedContributionCountMax)
                       and (coalesce(:contributedTo) is null or cd.contributed_to is true)
-                      and (coalesce(:activityStatuses) is null or activity_status.value = any (cast(:activityStatuses as contributor_activity_status[])))
+                      and (coalesce(:engagementStatuses) is null or engagement_status.value = any (cast(:engagementStatuses as engagement_status[])))
                     GROUP BY c.contributor_id,
                              c.contributor_login,
                              c.contributor_country,
@@ -361,7 +361,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                              c.ecosystems,
                              c.maintained_projects,
                              c.first_project_name,
-                             activity_status.value
+                             engagement_status.value
                     """,
             nativeQuery = true)
     Page<ContributorKpisReadEntity> findAll(ZonedDateTime fromDate,
@@ -392,7 +392,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                             Integer completedContributionCountEq,
                                             Integer completedContributionCountMax,
                                             List<String> contributionTypes,
-                                            String[] activityStatuses,
+                                            String[] engagementStatuses,
                                             Pageable pageable);
 
     default Page<ContributorKpisReadEntity> findAll(BiContributorsQueryParams q) {
@@ -430,7 +430,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                 Optional.ofNullable(q.getContributionCount()).map(ContributorsQueryParamsContributionCount::getEq).orElse(null),
                 Optional.ofNullable(q.getContributionCount()).map(ContributorsQueryParamsContributionCount::getLte).orElse(null),
                 q.getContributionCount() == null ? null : q.getContributionCount().getTypes().stream().map(Enum::name).toList(),
-                q.getActivityStatuses() == null ? null : q.getActivityStatuses().stream().map(Enum::name).toArray(String[]::new),
+                q.getEngagementStatuses() == null ? null : q.getEngagementStatuses().stream().map(Enum::name).toArray(String[]::new),
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
                         ContributorKpisReadRepository.getSortProperty(q.getSort())))
         );

@@ -625,3 +625,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000377_add_index.sql
   - include:
       file: db/changelog/changelogs/00000378_remove_contacts_from_projection.sql
+  - include:
+      file: db/changelog/changelogs/00000379_refactor_select_projects_with_engagement_status.sql
