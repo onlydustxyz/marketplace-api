@@ -179,6 +179,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String GET_SEARCH_USERS = "/bo/v1/search/users";
     protected static final String GET_SEARCH_USERS_CSV = "/bo/v1/search/users/csv";
     protected static final String GET_USERS_BY_ID = "/bo/v1/users/%s";
+    protected static final String EXTERNAL_GET_CONTRIBUTORS_BI = "/bo/v1/external/bi/contributors";
     protected static final String GET_PROJECTS = "/bo/v1/projects";
     protected static final String PROJECTS_REWARDS = "/api/v1/projects/%s/rewards";
     protected static final String GET_PROJECT_LEAD_INVITATIONS = "/bo/v1/project-lead-invitations";

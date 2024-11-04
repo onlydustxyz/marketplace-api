@@ -2725,6 +2725,39 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/external/bi/contributors:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeBiRead
+      summary: Get contributors BI data
+      operationId: getBOBiContributors
+      description: |
+        Get contributors BI data
+      parameters:
+        - in: query
+          name: contributorLogins
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: 'Contributors BI data'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BOBiContributorListResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
+
+
 components:
   securitySchemes:
     bearerAuth:
@@ -4198,6 +4231,53 @@ components:
               $ref: '#/components/schemas/UserId'
             name:
               type: string
+
+    ContributorResponse:
+      allOf:
+        - $ref: '#/components/schemas/GithubUserResponse'
+        - type: object
+          required:
+            - isRegistered
+          properties:
+            isRegistered:
+              type: boolean
+              description: True if the user is registered on OnlyDust
+            id:
+              $ref: '#/components/schemas/UserId'
+
+    ContributorOverviewResponse:
+      allOf:
+        - $ref: '#/components/schemas/ContributorResponse'
+      type: object
+      required:
+        - globalRank
+        - globalRankPercentile
+        - signedUpOnGithubAt
+      properties:
+        globalRank:
+          type: integer
+          description: User rank on OnlyDust (the lower, the better)
+          example: 42
+        globalRankPercentile:
+          type: number
+          description: User rank percentile between 0 and 100 on OnlyDust (the lower, the better)
+          example: 10
+        bio:
+          type: string
+          description: User bio as in Github profile
+          example: Contributing to awesome open source projects.
+        signedUpOnGithubAt:
+          type: string
+          format: date-time
+          description: When the user signed up on Github
+        signedUpAt:
+          type: string
+          format: date-time
+          description: When the user signed up on OnlyDust
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactInformation'
 
     BillingProfileType:
       type: string
@@ -5763,3 +5843,232 @@ components:
       type: string
       description: Near account id
       example: 4e5c2094fbb0ab0b29b7c9b4bc31ba44ee1e9d292778512348abdbda3fff3dbb
+
+    BOBiContributorListResponse:
+      type: object
+      required:
+        - contributors
+      properties:
+        contributors:
+          type: array
+          items:
+            $ref: '#/components/schemas/BOBiContributorListItemResponse'
+
+    BOBiContributorListItemResponse:
+      type: object
+      required:
+        - id
+        - login
+      properties:
+        id:
+          $ref: '#/components/schemas/GithubUserId'
+        login:
+          type: string
+          description: GitHub handle of the contributor
+        telegram:
+          type: string
+          description: Telegram of the contributor
+        maintainedProjectCount:
+          type: integer
+          description: Number of projects the contributor is maintaining
+        contributor:
+          $ref: '#/components/schemas/ContributorOverviewResponse'
+        globalData:
+          $ref: '#/components/schemas/BOBiContributorGlobalData'
+        perProjectData:
+          type: array
+          items:
+            $ref: '#/components/schemas/BOBiContributorProjectData'
+
+
+    BOBiContributorGlobalData:
+      type: object
+      properties:
+        languages:
+          type: array
+          items:
+            type: string
+          description: List of languages used by the contributor
+        ecosystems:
+          type: array
+          items:
+            type: string
+          description: List of ecosystems the contributor is associated with
+        categories:
+          type: array
+          items:
+            type: string
+        completedContributionCount:
+          type: integer
+          description: Total number of completed contributions
+        completedIssueCount:
+          type: integer
+          description: Total number of completed issues
+        completedPrCount:
+          type: integer
+          description: Total number of completed pull requests
+        completedCodeReviewCount:
+          type: integer
+          description: Total number of completed code reviews
+        odCompletedContributionCount:
+          type: integer
+          description: Total number of open development (OD) completed contributions
+        odCompletedIssueCount:
+          type: integer
+          description: Total number of OD completed issues
+        odCompletedPrCount:
+          type: integer
+          description: Total number of OD completed pull requests
+        odCompletedCodeReviewCount:
+          type: integer
+          description: Total number of OD completed code reviews
+        inProgressIssueCount:
+          type: integer
+          description: Number of issues currently in progress
+        odInProgressIssueCount:
+          type: integer
+          description: Number of OD issues currently in progress
+        last1MonthCompletedPrCount:
+          type: integer
+          description: Number of pull requests completed in the last month
+        last1MonthOdCompletedPrCount:
+          type: integer
+          description: Number of OD pull requests completed in the last month
+        last3MonthCompletedPrCount:
+          type: integer
+          description: Number of pull requests completed in the last 3 months
+        last3MonthOdCompletedPrCount:
+          type: integer
+          description: Number of OD pull requests completed in the last 3 months
+        lastContributionDate:
+          type: string
+          format: date
+          description: Date of the last contribution to the project
+        lastOdContributionDate:
+          type: string
+          format: date
+          description: Date of the last OD contribution to the project
+        lastPrDate:
+          type: string
+          format: date
+          description: Date of the last pull request
+        lastOdPrDate:
+          type: string
+          format: date
+          description: Date of the last OD pull request
+        applicationsPending:
+          type: integer
+          description: Number of applications pending
+        totalApplications:
+          type: integer
+          description: Total number of applications
+        rewardCount:
+          type: integer
+          description: Number of rewards distributed
+        rewardedUsdTotal:
+          type: number
+          format: float
+          description: Total USD amount rewarded for contributions to the project
+
+    BOBiContributorProjectData:
+      type: object
+      required:
+        - projectId
+        - projectLink
+        - projectSlug
+      properties:
+        projectId:
+          type: string
+          description: Unique identifier of the project
+        projectName:
+          type: string
+          description: Name of the project
+        projectSlug:
+          type: string
+          description: Slug or URL-friendly name for the project
+        languages:
+          type: array
+          items:
+            type: string
+          description: List of languages used in the project
+        ecosystems:
+          type: array
+          items:
+            type: string
+          description: List of ecosystems the project is associated with
+        categories:
+          type: array
+          items:
+            type: string
+          description: Categories the project falls under
+        completedContributionCount:
+          type: integer
+          description: Total number of completed contributions for the project
+        completedIssueCount:
+          type: integer
+          description: Total number of completed issues for the project
+        completedPrCount:
+          type: integer
+          description: Total number of completed pull requests for the project
+        completedCodeReviewCount:
+          type: integer
+          description: Total number of completed code reviews for the project
+        odCompletedContributionCount:
+          type: integer
+          description: Total number of open development (OD) completed contributions
+        odCompletedIssueCount:
+          type: integer
+          description: Total number of OD completed issues
+        odCompletedPrCount:
+          type: integer
+          description: Total number of OD completed pull requests
+        odCompletedCodeReviewCount:
+          type: integer
+          description: Total number of OD completed code reviews
+        inProgressIssueCount:
+          type: integer
+          description: Number of issues currently in progress for the project
+        odInProgressIssueCount:
+          type: integer
+          description: Number of OD issues currently in progress
+        last1MonthCompletedPrCount:
+          type: integer
+          description: Number of pull requests completed in the last month
+        last1MonthOdCompletedPrCount:
+          type: integer
+          description: Number of OD pull requests completed in the last month
+        last3MonthCompletedPrCount:
+          type: integer
+          description: Number of pull requests completed in the last 3 months
+        last3MonthOdCompletedPrCount:
+          type: integer
+          description: Number of OD pull requests completed in the last 3 months
+        lastContributionDate:
+          type: string
+          format: date
+          description: Date of the last contribution to the project
+        lastOdContributionDate:
+          type: string
+          format: date
+          description: Date of the last OD contribution to the project
+        lastPrDate:
+          type: string
+          format: date
+          description: Date of the last pull request for the project
+        lastOdPrDate:
+          type: string
+          format: date
+          description: Date of the last OD pull request for the project
+        applicationsPending:
+          type: integer
+          description: Number of applications pending for the project
+        totalApplications:
+          type: integer
+          description: Total number of applications for the project
+        rewardCount:
+          type: integer
+          description: Number of rewards distributed for the project
+        rewardedUsdTotal:
+          type: number
+          format: float
+          description: Total USD amount rewarded for contributions to the project
