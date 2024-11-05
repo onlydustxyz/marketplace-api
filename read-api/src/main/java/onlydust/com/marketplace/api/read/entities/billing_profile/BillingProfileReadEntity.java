@@ -135,19 +135,6 @@ public class BillingProfileReadEntity {
                 ;
     }
 
-    public UserSearchBillingProfile toUserSearch() {
-        final var kyc = kyc();
-        final var kyb = kyb();
-        return new UserSearchBillingProfile()
-                .id(id)
-                .name(name)
-                .type(type)
-                .status(verificationStatus)
-                .kyb(kyb == null ? null : kyb.toUserSearch())
-                .kyc(kyc == null ? null : kyc.toUserSearch())
-                ;
-    }
-
     public ShortBillingProfileResponse toShortResponse(Long callerGithubUserId) {
         final var stats = stats();
         final var caller = users.stream().filter(u -> u.githubUserId().equals(callerGithubUserId)).findFirst();
