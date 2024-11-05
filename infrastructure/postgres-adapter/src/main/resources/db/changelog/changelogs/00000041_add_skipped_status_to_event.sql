@@ -1,1 +1,0 @@
-ALTER TYPE outbox_event_status ADD VALUE 'SKIPPED';
