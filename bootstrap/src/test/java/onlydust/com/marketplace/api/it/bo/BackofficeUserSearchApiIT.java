@@ -113,7 +113,8 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
             starknet.forEach(r -> assertThat(r.getContributionCount()).isGreaterThan(50));
         });
 
-        users = searchUsers("ecosystem1.name==Starknet and ecosystem1.contributionCount>50 and ecosystem5.name=ilike=aztec and ecosystem5.rank<200").getUsers();
+        users = searchUsers("ecosystem1.name==Starknet and ecosystem1.contributionCount>50 and ecosystem5.name=ilike=aztec and ecosystem5.rank<200")
+                .getUsers();
         assertThat(users).isNotEmpty();
         users.forEach(user -> {
             final var starknet = user.getEcosystem().stream().filter(l -> l.getName().equals("Starknet")).toList();
@@ -126,11 +127,26 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
 
         users = searchUsers("billingProfile.verificationStatus==NOT_STARTED and billingProfile.type==SELF_EMPLOYED").getUsers();
         assertThat(users).isNotEmpty();
-        assertThat(users).allMatch(user -> user.getBillingProfile().stream().anyMatch(bp -> bp.getStatus() == VerificationStatus.NOT_STARTED && bp.getType() == BillingProfileType.SELF_EMPLOYED));
+        assertThat(users).allMatch(user -> user.getBillingProfile().stream().anyMatch(bp -> bp.getStatus() == VerificationStatus.NOT_STARTED && bp.getType
+                () == BillingProfileType.SELF_EMPLOYED));
 
         users = searchUsers("billingProfile.kyb.country==FRA").getUsers();
         assertThat(users).isNotEmpty();
-        assertThat(users).allMatch(user -> user.getBillingProfile().stream().anyMatch(bp -> bp.getKyb() != null && bp.getKyb().getCountryCode().equals("FRA")));
+        assertThat(users).allMatch(user -> user.getBillingProfile().stream().anyMatch(bp -> bp.getKyb() != null && bp.getKyb().getCountryCode().equals
+                ("FRA")));
+
+        users = searchUsers("billingProfile.kyc.country==FRA").getUsers();
+        assertThat(users).isNotEmpty();
+        assertThat(users).allMatch(user -> user.getBillingProfile().stream().anyMatch(bp -> bp.getKyc() != null && bp.getKyc().getCountryCode().equals
+                ("FRA")));
+
+        users = searchUsers("billingProfile.kyc.id==7aadc53b-d146-4322-8ae2-1ee0083255b3").getUsers();
+        assertThat(users).isNotEmpty();
+        assertThat(users).allMatch(user -> user.getBillingProfile().stream().anyMatch(bp -> bp.getKyc() != null && bp.getKyc().getLastName().equals("BUISSET")));
+
+        users = searchUsers("billingProfile.kyc.lastName==BUISSET").getUsers();
+        assertThat(users).isNotEmpty();
+        assertThat(users).allMatch(user -> user.getBillingProfile().stream().anyMatch(bp -> bp.getKyc() != null && bp.getKyc().getLastName().equals("BUISSET")));
     }
 
     @Test
