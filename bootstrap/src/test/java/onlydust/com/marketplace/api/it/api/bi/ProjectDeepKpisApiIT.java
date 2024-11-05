@@ -745,8 +745,48 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
 
         @Test
         public void should_get_projects_stats_ordered() {
-            test_projects_stats(Map.of("sort", "PR_COUNT", "sortDirection", "ASC"),
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.PROJECT_NAME.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getProject().getName())), true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.ACTIVE_CONTRIBUTOR_COUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getActiveContributorCount().getValue())),
+                    true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.PERCENT_USED_BUDGET.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getPercentUsedBudget())), true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.TOTAL_GRANTED_USD_AMOUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getTotalGrantedUsdAmount().getValue())), true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.AVERAGE_REWARD_USD_AMOUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getAverageRewardUsdAmount().getValue())),
+                    true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.TOTAL_REWARDED_USD_AMOUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getTotalRewardedUsdAmount().getValue())),
+                    true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.ONBOARDED_CONTRIBUTOR_COUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getOnboardedContributorCount().getValue())), true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.ACTIVE_CONTRIBUTOR_COUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getActiveContributorCount().getValue())),
+                    true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.REWARD_COUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getRewardCount().getValue())), true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.ISSUE_COUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getIssueCount().getValue())), true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.PR_COUNT.name(), "sortDirection", "ASC"),
                     response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getPrCount().getValue())), true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.CODE_REVIEW_COUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getCodeReviewCount().getValue())), true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.CONTRIBUTION_COUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getContributionCount().getValue())), true
             );
         }
     }
