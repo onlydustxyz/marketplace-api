@@ -8284,7 +8284,7 @@ components:
         - DONE
         - ARCHIVED
 
-    ContributorActivityStatus:
+    EngagementStatus:
       type: string
       enum:
         - NEW
@@ -11834,6 +11834,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EcosystemId'
+        engagementStatuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/EngagementStatus'
         availableBudgetUsdAmount:
           $ref: '#/components/schemas/DecimalNumberKpiFilter'
         percentUsedBudget:
@@ -11916,6 +11920,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProgramLinkResponse'
+        engagementStatus:
+          $ref: '#/components/schemas/EngagementStatus'
         availableBudget:
           $ref: '#/components/schemas/DetailedTotalMoney'
         percentUsedBudget:
@@ -12029,10 +12035,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ContributionStatus'
-        activityStatuses:
+        engagementStatuses:
           type: array
           items:
-            $ref: '#/components/schemas/ContributorActivityStatus'
+            $ref: '#/components/schemas/EngagementStatus'
         totalRewardedUsdAmount:
           $ref: '#/components/schemas/DecimalNumberKpiFilter'
         rewardCount:
@@ -12142,8 +12148,8 @@ components:
           type: integer
         pendingApplicationCount:
           type: integer
-        activityStatus:
-          $ref: '#/components/schemas/ContributorActivityStatus'
+        engagementStatus:
+          $ref: '#/components/schemas/EngagementStatus'
 
     BiContributorResponse:
       allOf:

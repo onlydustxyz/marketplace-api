@@ -298,7 +298,6 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 sanitizedFromDate,
                 sanitizedToDate,
                 fromDateOfPreviousPeriod,
-                sanitizedFromDate,
                 getFilteredDataSourceIds(q.getDataSourceIds()).toArray(UUID[]::new),
                 q.getShowFilteredKpis(),
                 q.getSearch(),
@@ -337,6 +336,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 Optional.ofNullable(q.getContributionCount()).map(BiProjectsQueryParamsContributionCount::getEq).orElse(null),
                 Optional.ofNullable(q.getContributionCount()).map(BiProjectsQueryParamsContributionCount::getLte).orElse(null),
                 q.getContributionCount() == null ? null : q.getContributionCount().getTypes().stream().map(Enum::name).toArray(String[]::new),
+                q.getEngagementStatuses() == null ? null : q.getEngagementStatuses().stream().map(Enum::name).toArray(String[]::new),
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
                         ProjectKpisReadRepository.getSortProperty(q.getSort())))
         );

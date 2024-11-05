@@ -60,7 +60,7 @@ public class ContributorKpisReadEntity {
     @NonNull
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    ContributorActivityStatus activityStatus;
+    EngagementStatus engagementStatus;
 
     BigDecimal totalRewardedUsdAmount;
     Integer rewardCount;
@@ -113,7 +113,7 @@ public class ContributorKpisReadEntity {
     public BiContributorsPageItemResponse toDto() {
         return new BiContributorsPageItemResponse()
                 .contributor(pretty(contributor))
-                .activityStatus(activityStatus)
+                .engagementStatus(engagementStatus)
                 .projects(projects == null ? null : projects.stream().sorted(comparing(ProjectLinkResponse::getName)).toList())
                 .categories(categories == null ? null : categories.stream().sorted(comparing(ProjectCategoryResponse::getName)).toList())
                 .languages(languages == null ? null : languages.stream().sorted(comparing(LanguageResponse::getName)).toList())

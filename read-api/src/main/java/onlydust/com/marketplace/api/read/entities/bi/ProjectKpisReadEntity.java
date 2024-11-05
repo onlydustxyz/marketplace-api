@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.read.entities.bi;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -8,7 +10,9 @@ import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.*;
 import org.apache.commons.csv.CSVPrinter;
 import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
 import java.io.IOException;
@@ -53,6 +57,11 @@ public class ProjectKpisReadEntity {
     Budget budget;
     BigDecimal availableBudget;
     BigDecimal percentSpentBudget;
+
+    @NonNull
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    EngagementStatus engagementStatus;
 
     BigDecimal totalGrantedUsdAmount;
     BigDecimal totalRewardedUsdAmount;
@@ -128,6 +137,7 @@ public class ProjectKpisReadEntity {
                 .issueCount(toNumberKpi(completedIssueCount, previousPeriodCompletedIssueCount))
                 .prCount(toNumberKpi(completedPrCount, previousPeriodCompletedPrCount))
                 .codeReviewCount(toNumberKpi(completedCodeReviewCount, previousPeriodCompletedCodeReviewCount))
+                .engagementStatus(engagementStatus)
                 ;
     }
 

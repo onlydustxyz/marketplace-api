@@ -28,7 +28,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
-import static onlydust.com.marketplace.api.contract.model.ContributorActivityStatus.INACTIVE;
+import static onlydust.com.marketplace.api.contract.model.EngagementStatus.INACTIVE;
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -231,7 +231,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "contributor": {
                                     "login": "antho"
                                   },
-                                  "activityStatus": "NEW",
+                                  "engagementStatus": "NEW",
                                   "categories": [
                                     {
                                       "slug": "defi"
@@ -290,7 +290,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "contributor": {
                                     "login": "emma"
                                   },
-                                  "activityStatus": "NEW",
+                                  "engagementStatus": "NEW",
                                   "categories": [
                                     {
                                       "slug": "gaming"
@@ -346,7 +346,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "contributor": {
                                     "login": "hayden"
                                   },
-                                  "activityStatus": "NEW",
+                                  "engagementStatus": "NEW",
                                   "categories": [
                                     {
                                       "slug": "defi"
@@ -399,7 +399,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "contributor": {
                                     "login": "james"
                                   },
-                                  "activityStatus": "INACTIVE",
+                                  "engagementStatus": "INACTIVE",
                                   "categories": [
                                     {
                                       "slug": "gaming"
@@ -454,7 +454,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "contributor": {
                                     "login": "mehdi"
                                   },
-                                  "activityStatus": "NEW",
+                                  "engagementStatus": "NEW",
                                   "categories": [
                                     {
                                       "slug": "defi"
@@ -511,23 +511,23 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
         @Test
         public void should_get_contributors_activity_status() {
             test_contributors_activity_status("2021-01-01", "2021-01-01", Map.of(
-                    "antho", ContributorActivityStatus.NEW
+                    "antho", EngagementStatus.NEW
             ));
             test_contributors_activity_status("2021-01-02", "2021-01-02", Map.of(
-                    "antho", ContributorActivityStatus.ACTIVE
+                    "antho", EngagementStatus.ACTIVE
             ));
             test_contributors_activity_status("2021-01-03", "2021-01-03", Map.of(
-                    "antho", ContributorActivityStatus.CHURNED
+                    "antho", EngagementStatus.CHURNED
             ));
             test_contributors_activity_status("2021-01-04", "2021-01-04", Map.of(
                     "antho", INACTIVE
             ));
             test_contributors_activity_status("2021-02-01", "2021-02-01", Map.of(
-                    "antho", ContributorActivityStatus.REACTIVATED
+                    "antho", EngagementStatus.REACTIVATED
             ));
         }
 
-        private void test_contributors_activity_status(String fromDate, String toDate, Map<String, ContributorActivityStatus> expectedStatusPerLogin) {
+        private void test_contributors_activity_status(String fromDate, String toDate, Map<String, EngagementStatus> expectedStatusPerLogin) {
             final var queryParams = new HashMap<String, String>();
             queryParams.put("pageIndex", "0");
             queryParams.put("pageSize", "100");
@@ -552,7 +552,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     return;
                 }
                 assertThat(contributor).isNotEmpty();
-                assertThat(contributor.get().getActivityStatus()).isEqualTo(expectedStatus);
+                assertThat(contributor.get().getEngagementStatus()).isEqualTo(expectedStatus);
             });
         }
 
@@ -750,8 +750,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> assertThat(response.getContributors())
                             .extracting(c -> c.getContributor().getLogin())
                             .containsExactlyInAnyOrder("antho", "hayden", "mehdi", "james"), true);
-            test_contributors_stats("activityStatuses", "INACTIVE",
-                    response -> response.getContributors().forEach(contributor -> assertThat(contributor.getActivityStatus())
+            test_contributors_stats("engagementStatuses", "INACTIVE",
+                    response -> response.getContributors().forEach(contributor -> assertThat(contributor.getEngagementStatus())
                             .isEqualTo(INACTIVE)), true
             );
         }

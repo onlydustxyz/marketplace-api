@@ -22,6 +22,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import static onlydust.com.marketplace.api.contract.model.EngagementStatus.INACTIVE;
+import static onlydust.com.marketplace.api.contract.model.EngagementStatus.NEW;
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -165,6 +167,54 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
         }
 
         @Test
+        public void should_get_projects_activity_status() {
+            test_projects_activity_status("2021-01-01", "2021-01-01", Map.of(
+                    onlyDustId, EngagementStatus.NEW
+            ));
+            test_projects_activity_status("2021-01-02", "2021-01-02", Map.of(
+                    onlyDustId, EngagementStatus.ACTIVE
+            ));
+            test_projects_activity_status("2021-01-06", "2021-01-06", Map.of(
+                    onlyDustId, EngagementStatus.CHURNED
+            ));
+            test_projects_activity_status("2021-01-07", "2021-01-07", Map.of(
+                    onlyDustId, INACTIVE
+            ));
+            test_projects_activity_status("2021-02-01", "2021-02-01", Map.of(
+                    onlyDustId, EngagementStatus.REACTIVATED
+            ));
+        }
+
+        private void test_projects_activity_status(String fromDate, String toDate, Map<ProjectId, EngagementStatus> expectedStatusPerProject) {
+            final var queryParams = new HashMap<String, String>();
+            queryParams.put("pageIndex", "0");
+            queryParams.put("pageSize", "100");
+            queryParams.put("fromDate", fromDate);
+            queryParams.put("toDate", toDate);
+            queryParams.put("dataSourceIds", allProgramOrEcosystemIds);
+            final var response = client.get()
+                    .uri(getApiURI(BI_PROJECTS, queryParams))
+                    .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(caller).jwt())
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(BiProjectsPageResponse.class).returnResult().getResponseBody();
+            assertThat(response.getProjects()).isNotEmpty();
+            expectedStatusPerProject.forEach((projectId, expectedStatus) -> {
+                final var project = response.getProjects().stream().filter(p -> projectId.value().equals(p.getProject().getId())).findFirst();
+                if (expectedStatus == INACTIVE) {
+                    assertThat(project.isEmpty()
+                               || project.get().getContributionCount().getValue() > 0
+                               || project.get().getRewardCount().getValue() > 0
+                               || project.get().getTotalGrantedUsdAmount().getValue().doubleValue() > 0).isTrue();
+                    return;
+                }
+                assertThat(project).isNotEmpty();
+                assertThat(project.get().getEngagementStatus()).isEqualTo(expectedStatus);
+            });
+        }
+
+        @Test
         public void should_get_projects_stats_between_dates() {
             // When
             client.get()
@@ -225,6 +275,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                       "name": "Starkware Exploration Team"
                                     }
                                   ],
+                                  "engagementStatus": "NEW",
                                   "availableBudget": {
                                     "totalUsdEquivalent": 3002.50,
                                     "totalPerCurrency": [
@@ -321,6 +372,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                       "name": "Starkware Exploration Team"
                                     }
                                   ],
+                                  "engagementStatus": "INACTIVE",
                                   "availableBudget": {
                                     "totalUsdEquivalent": 27.50,
                                     "totalPerCurrency": [
@@ -421,6 +473,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                       "name": "Nethermind"
                                     }
                                   ],
+                                  "engagementStatus": "NEW",
                                   "availableBudget": {
                                     "totalUsdEquivalent": 96.25,
                                     "totalPerCurrency": [
@@ -491,10 +544,10 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "value": 1,
                                     "trend": "UP"
                                   },
-                                 "contributionCount": {
-                                   "value": 8,
-                                   "trend": "UP"
-                                 }
+                                  "contributionCount": {
+                                    "value": 8,
+                                    "trend": "UP"
+                                  }
                                 }
                               ]
                             }
@@ -684,12 +737,56 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                             .extracting(NumberKpi::getValue)
                             .contains(4), true
             );
+            test_projects_stats(Map.of("engagementStatuses", "NEW"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getEngagementStatus())
+                            .isEqualTo(NEW)), true
+            );
         }
 
         @Test
         public void should_get_projects_stats_ordered() {
-            test_projects_stats(Map.of("sort", "PR_COUNT", "sortDirection", "ASC"),
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.PROJECT_NAME.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getProject().getName())), true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.ACTIVE_CONTRIBUTOR_COUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getActiveContributorCount().getValue())),
+                    true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.PERCENT_USED_BUDGET.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getPercentUsedBudget())), true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.TOTAL_GRANTED_USD_AMOUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getTotalGrantedUsdAmount().getValue())), true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.AVERAGE_REWARD_USD_AMOUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getAverageRewardUsdAmount().getValue())),
+                    true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.TOTAL_REWARDED_USD_AMOUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getTotalRewardedUsdAmount().getValue())),
+                    true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.ONBOARDED_CONTRIBUTOR_COUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getOnboardedContributorCount().getValue())), true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.ACTIVE_CONTRIBUTOR_COUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getActiveContributorCount().getValue())),
+                    true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.REWARD_COUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getRewardCount().getValue())), true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.ISSUE_COUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getIssueCount().getValue())), true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.PR_COUNT.name(), "sortDirection", "ASC"),
                     response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getPrCount().getValue())), true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.CODE_REVIEW_COUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getCodeReviewCount().getValue())), true
+            );
+            test_projects_stats(Map.of("sort", ProjectKpiSortEnum.CONTRIBUTION_COUNT.name(), "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getContributionCount().getValue())), true
             );
         }
     }
