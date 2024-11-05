@@ -1,1 +1,0 @@
-create unique index on accounting.billing_profiles_users (user_id, billing_profile_id, role);
