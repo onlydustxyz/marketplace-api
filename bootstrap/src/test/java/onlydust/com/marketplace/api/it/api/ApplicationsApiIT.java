@@ -1073,7 +1073,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                               "maintainedProjectCount": 2,
                               "inProgressIssueCount": 0,
                               "pendingApplicationCount": 0,
-                              "activityStatus": null
+                              "engagementStatus": null
                             },
                             {
                               "contributor": {
@@ -1220,7 +1220,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                               "maintainedProjectCount": 1,
                               "inProgressIssueCount": 0,
                               "pendingApplicationCount": 0,
-                              "activityStatus": null
+                              "engagementStatus": null
                             },
                             {
                               "contributor": {
@@ -1319,7 +1319,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                               "maintainedProjectCount": 12,
                               "inProgressIssueCount": 0,
                               "pendingApplicationCount": 0,
-                              "activityStatus": null
+                              "engagementStatus": null
                             },
                             {
                               "contributor": {
@@ -1511,7 +1511,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                               "maintainedProjectCount": 3,
                               "inProgressIssueCount": 0,
                               "pendingApplicationCount": 0,
-                              "activityStatus": null
+                              "engagementStatus": null
                             }
                           ]
                         }
