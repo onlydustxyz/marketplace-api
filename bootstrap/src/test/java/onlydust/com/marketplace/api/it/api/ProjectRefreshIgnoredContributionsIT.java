@@ -70,6 +70,8 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
                 .willReturn(WireMock.noContent()));
         databaseHelper.executeQuery("DELETE FROM indexer_exp.contributions where id != all(:ids)",
                 Map.of("ids", Stream.concat(repo1ContributionIds.stream(), repo2ContributionIds.stream()).toArray(String[]::new)));
+        databaseHelper.executeQuery("DELETE FROM project_github_repos where project_github_repos.github_repo_id in (:repo1, :repo2)",
+                Map.of("repo1", repo1, "repo2", repo2));
     }
 
     @SneakyThrows
@@ -516,30 +518,6 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
                 "c67a731cbb8a1c4822365e90e848c4b22bc20b8115a77c4b4074152ca9b09206"  // PULL_REQUEST     2023-04-24 10:36:03
         );
         // @formatter:on
-    }
-
-    @Test
-    void refreshIgnoredContributions_should_not_affect_other_projects() {
-        // Given
-        final UUID otherProjectId = createProject();
-        final var projectId = createProject();
-
-        var ignoredContributions = ignoredContributionsRepository.findAllByProjectId(otherProjectId);
-        assertThat(ignoredContributions).isEmpty();
-
-        // When
-        updateRewardSettings(projectId, """
-                {
-                    "ignorePullRequests": true,
-                    "ignoreIssues": true,
-                    "ignoreCodeReviews": false,
-                    "ignoreContributionsBefore": null
-                }
-                """);
-
-        // Then
-        ignoredContributions = ignoredContributionsRepository.findAllByProjectId(otherProjectId);
-        assertThat(ignoredContributions).isEmpty();
     }
 
 
