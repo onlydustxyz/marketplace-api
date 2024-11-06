@@ -50,4 +50,11 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, UUID>, J
             where gc.contribution_uuid = :contributionUuid
             """)
     List<UUID> findProjectIdsLinkedToContributionUuid(UUID contributionUuid);
+
+    @Query(nativeQuery = true, value = """
+            select distinct pgr.github_repo_id
+            from project_github_repos pgr
+            where pgr.github_repo_id in :repoIds and (coalesce(:projectId) is null or pgr.project_id != :projectId)
+            """)
+    List<Long> findReposLinkedToAnotherProject(List<Long> repoIds, UUID projectId);
 }

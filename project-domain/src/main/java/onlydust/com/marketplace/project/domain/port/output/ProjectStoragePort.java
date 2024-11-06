@@ -87,4 +87,6 @@ public interface ProjectStoragePort {
     void refreshStats();
 
     List<ProjectId> getProjectIdsLinkedToContributionUuid(ContributionUUID contributionUUID);
+
+    List<Long> getReposLinkedToAnotherProject(List<Long> githubRepoIds, Optional<ProjectId> id);
 }

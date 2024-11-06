@@ -59,6 +59,8 @@ public class ProjectService implements ProjectFacadePort {
         if (projectStoragePort.getProjectIdBySlug(slug).isPresent())
             throw badRequest("Project with slug '%s' already exists".formatted(slug));
 
+        checkLinkedRepos(command.getGithubRepoIds(), Optional.empty());
+
         if (nonNull(command.getGithubUserIdsAsProjectLeadersToInvite()))
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
 
@@ -103,6 +105,7 @@ public class ProjectService implements ProjectFacadePort {
         if (projectStoragePort.getProjectIdBySlug(slug).stream().anyMatch(id -> !id.equals(command.getId()))) {
             throw badRequest("Project with slug '%s' already exists".formatted(slug));
         }
+        checkLinkedRepos(command.getGithubRepoIds(), Optional.of(command.getId()));
         checkProjectLeadersToKeep(command);
 
         if (command.getGithubUserIdsAsProjectLeadersToInvite() != null) {
@@ -144,6 +147,15 @@ public class ProjectService implements ProjectFacadePort {
                 projectObserverPort.onProjectCategorySuggested(categorySuggestion, projectLeadId));
 
         return Pair.of(command.getId(), slug);
+    }
+
+    private void checkLinkedRepos(List<Long> githubRepoIds, Optional<ProjectId> projectId) {
+        if (githubRepoIds != null) {
+            final var alreadyLinkedRepos = projectStoragePort.getReposLinkedToAnotherProject(githubRepoIds, projectId);
+            if (!alreadyLinkedRepos.isEmpty()) {
+                throw badRequest("Cannot link repos (%s) because they are already linked to other projects".formatted(alreadyLinkedRepos));
+            }
+        }
     }
 
     private void checkProjectLeadersToKeep(UpdateProjectCommand command) {

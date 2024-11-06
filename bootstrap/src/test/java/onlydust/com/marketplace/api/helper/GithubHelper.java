@@ -81,29 +81,36 @@ public class GithubHelper {
 
     public GithubRepo createRepo(final @NonNull String name) {
         final var owner = createAccount();
+        return createRepo(name, owner.getLogin());
+    }
+
+    public GithubRepo createRepo(final @NonNull String name, final String ownerLogin) {
 
         final var repo = GithubRepo.builder()
                 .id(faker.random().nextLong())
-                .owner(owner.getLogin())
+                .owner(ownerLogin)
                 .name(name)
                 .description(faker.lorem().paragraph())
                 .forksCount(faker.random().nextLong(100))
                 .starsCount(faker.random().nextLong(100))
-                .htmlUrl("https://github.com/%s/%s".formatted(owner.getLogin(), name))
+                .htmlUrl("https://github.com/%s/%s".formatted(ownerLogin, name))
                 .build();
+
+        final Long ownerId = databaseHelper.executeReadQuery("select id from indexer_exp.github_accounts where login = :ownerLogin", Map.of("ownerLogin",
+                ownerLogin));
 
         databaseHelper.executeQuery("""
                 insert into indexer_exp.github_repos(id, owner_id, name, html_url, updated_at, description, stars_count, forks_count, has_issues, parent_id, owner_login, visibility)
                 values(:id, :ownerId, :name, :htmlUrl, now(), :description, :starsCount, :forksCount, false, null, :ownerLogin, 'PUBLIC');
                 """, Map.of(
                 "id", repo.getId(),
-                "ownerId", owner.getId(),
+                "ownerId", ownerId,
                 "name", repo.getName(),
                 "htmlUrl", repo.getHtmlUrl(),
                 "description", repo.getDescription(),
                 "starsCount", repo.getStarsCount(),
                 "forksCount", repo.getForksCount(),
-                "ownerLogin", owner.getLogin()
+                "ownerLogin", ownerLogin
         ));
 
         return repo;

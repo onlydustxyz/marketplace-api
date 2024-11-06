@@ -511,4 +511,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 .map(ProjectId::of)
                 .toList();
     }
+
+    @Override
+    public List<Long> getReposLinkedToAnotherProject(List<Long> githubRepoIds, Optional<ProjectId> id) {
+        return projectRepository.findReposLinkedToAnotherProject(githubRepoIds, id.map(ProjectId::value).orElse(null));
+    }
 }

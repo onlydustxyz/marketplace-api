@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.ContributorProje
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.port.input.ProjectCategoryFacadePort;
@@ -20,6 +21,7 @@ import org.springframework.http.MediaType;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.lang.String.format;
@@ -34,11 +36,16 @@ import static org.mockito.Mockito.verify;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
+    private static final AtomicBoolean setupDone = new AtomicBoolean();
     private static UUID projectId;
     private static UUID projectId2;
     private static ProjectCategory gameCategory;
     private static ProjectCategory tutorialCategory;
     private static ProjectCategory cryptoCategory;
+    private static GithubRepo repo1;
+    private static GithubRepo repo2;
+    private static GithubRepo repo3;
+
 
     @Autowired
     ContributorProjectContributorLabelRepository contributorProjectContributorLabelRepository;
@@ -83,6 +90,15 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.responseDefinition().withStatus(500)));
+
+        if (setupDone.compareAndExchange(false, true)) return;
+
+        repo1 = githubHelper.createRepo("repo1", "onlydustxyz");
+        repo2 = githubHelper.createRepo("repo2", "od-mocks");
+        repo3 = githubHelper.createRepo("repo3", "onlydustxyz");
+        gameCategory = projectCategoryFacadePort.createCategory("Game", "Games are fun", "game", null);
+        tutorialCategory = projectCategoryFacadePort.createCategory("Tutorial", "I love learning", "tuto", null);
+        cryptoCategory = projectCategoryFacadePort.createCategory("Crypto", "Crypto is cool", "crypto", null);
     }
 
     @SneakyThrows
@@ -90,16 +106,13 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     @Order(1)
     public void should_create_a_new_project() {
         // Given
-        gameCategory = projectCategoryFacadePort.createCategory("Game", "Games are fun", "game", null);
-        tutorialCategory = projectCategoryFacadePort.createCategory("Tutorial", "I love learning", "tuto", null);
-        cryptoCategory = projectCategoryFacadePort.createCategory("Crypto", "Crypto is cool", "crypto", null);
         indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
                 .withRequestBody(WireMock.equalToJson("""
                         {
-                          "linkedRepoIds": [498695724, 602953043],
+                          "linkedRepoIds": [%d, %d],
                           "unlinkedRepoIds": []
                         }
-                        """, true, false))
+                        """.formatted(repo1.getId(), repo2.getId()), true, false))
                 .willReturn(WireMock.noContent()));
         final var user = userAuthHelper.authenticatePierre();
 
@@ -124,7 +137,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                             595505, 43467246, 5160414
                           ],
                           "githubRepoIds": [
-                            498695724, 602953043
+                            %d, %d
                           ],
                           "logoUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                           "ecosystemIds" : ["b599313c-a074-440f-af04-a466529ab2e7","99b6c284-f9bb-4f89-8ce7-03771465ef8e"],
@@ -132,7 +145,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           "categorySuggestions": ["finance"],
                           "contributorLabels": [{"name": "l1"}, {"name": "l2"}]
                         }
-                        """.formatted(gameCategory.id(), tutorialCategory.id()))
+                        """.formatted(repo1.getId(), repo2.getId(), gameCategory.id(), tutorialCategory.id()))
                 .exchange()
                 // Then
                 .expectStatus()
@@ -175,14 +188,13 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.organizations[0].login").isEqualTo("onlydustxyz")
                 .jsonPath("$.organizations[0].installationId").isEqualTo(44741576)
                 .jsonPath("$.organizations[0].repos.length()").isEqualTo(1)
-                .jsonPath("$.organizations[0].repos[0].name").isEqualTo("marketplace-frontend")
-                .jsonPath("$.organizations[0].repos[0].description").isEqualTo("Contributions marketplace backend " +
-                                                                               "services")
+                .jsonPath("$.organizations[0].repos[0].name").isEqualTo("repo1")
+                .jsonPath("$.organizations[0].repos[0].description").isNotEmpty()
                 .jsonPath("$.organizations[1].login").isEqualTo("od-mocks")
                 .jsonPath("$.organizations[1].installationId").isEqualTo(null)
                 .jsonPath("$.organizations[1].repos.length()").isEqualTo(1)
-                .jsonPath("$.organizations[1].repos[0].name").isEqualTo("cool-repo-A")
-                .jsonPath("$.organizations[1].repos[0].description").isEqualTo("This is repo A for our e2e tests")
+                .jsonPath("$.organizations[1].repos[0].name").isEqualTo("repo2")
+                .jsonPath("$.organizations[1].repos[0].description").isNotEmpty()
                 .jsonPath("$.rewardSettings.ignorePullRequests").isEqualTo(false)
                 .jsonPath("$.rewardSettings.ignoreIssues").isEqualTo(false)
                 .jsonPath("$.rewardSettings.ignoreCodeReviews").isEqualTo(false)
@@ -201,6 +213,41 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
         final var entity = projectRepository.findById(projectId).orElseThrow();
         assertThat(entity.isBotNotifyExternalApplications()).isTrue();
+    }
+
+    @SneakyThrows
+    @Test
+    @Order(2)
+    public void should_fail_to_create_a_new_project_when_repos_belong_to_other_projects() {
+        // Given
+        final var user = userAuthHelper.authenticatePierre();
+
+        // When
+        client.post()
+                .uri(getApiURI(PROJECTS_POST))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Another super Project with same repo",
+                          "shortDescription": "This is a super project",
+                          "longDescription": "This is a super awesome project with a nice description",
+                          "isLookingForContributors": true,
+                          "inviteGithubUserIdsAsProjectLeads": [
+                            595505
+                          ],
+                          "githubRepoIds": [
+                            498695724
+                          ],
+                          "logoUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is4xxClientError()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("Cannot link repos ([498695724]) because they are already linked to other projects");
     }
 
     @SneakyThrows
@@ -255,8 +302,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
     @SneakyThrows
     @Test
-    @Order(10)
-    public void should_update_the_project() {
+    @Order(9)
+    public void should_fail_to_update_the_project_when_repos_belong_to_other_projects() {
         // Given
         indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
                 .withRequestBody(WireMock.equalToJson("""
@@ -321,6 +368,79 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
+                .is4xxClientError()
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("Cannot link repos ([452047076, 498695724]) because they are already linked to other projects");
+    }
+
+    @SneakyThrows
+    @Test
+    @Order(10)
+    public void should_update_the_project() {
+        // Given
+        indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
+                .withRequestBody(WireMock.equalToJson("""
+                        {
+                          "linkedRepoIds": [452047076],
+                          "unlinkedRepoIds": [602953043]
+                        }
+                        """, true, false))
+                .willReturn(WireMock.noContent()));
+        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/16590657"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/43467246"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+        final var user = userAuthHelper.authenticatePierre();
+
+        // And When
+        client.put()
+                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Updated Project",
+                          "shortDescription": "This is a super updated project",
+                          "longDescription": "This is a super awesome updated project with a nice description",
+                          "moreInfos": [
+                            {
+                              "url": "https://t.me/foobar/updated",
+                              "value": "foobar-updated"
+                            },
+                            {
+                              "url": "https://foobar.com",
+                              "value": "foobar-updated2"
+                            }
+                          ],
+                          "isLookingForContributors": false,
+                          "inviteGithubUserIdsAsProjectLeads": [
+                            16590657, 43467246
+                          ],
+                          "projectLeadsToKeep": [
+                            "e461c019-ba23-4671-9b6c-3a5a18748af9"
+                          ],
+                          "githubRepoIds": [
+                            %d, %d
+                          ],
+                          "logoUrl": "https://avatars.githubusercontent.com/u/yyyyyyyyyyyy",
+                          "rewardSettings": {
+                            "ignorePullRequests": false,
+                            "ignoreIssues": true,
+                            "ignoreCodeReviews": true,
+                            "ignoreContributionsBefore": "2021-01-01T00:00:00Z"
+                          },
+                          "ecosystemIds": ["99b6c284-f9bb-4f89-8ce7-03771465ef8e","6ab7fa6c-c418-4997-9c5f-55fb021a8e5c"],
+                          "categoryIds": ["%s"],
+                          "categorySuggestions": ["defi"]
+                        }
+                        """.formatted(repo1.getId(), repo3.getId(), cryptoCategory.id()))
+                .exchange()
+                // Then
+                .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.projectId").isEqualTo(projectId.toString())
@@ -340,10 +460,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withRequestBody(equalToJson("""
                         {
-                          "linkedRepoIds": [452047076],
-                          "unlinkedRepoIds": [602953043]
+                          "linkedRepoIds": [%d],
+                          "unlinkedRepoIds": [%d]
                         }
-                        """))
+                        """.formatted(repo3.getId(), repo2.getId())))
         );
         verify(slackApiAdapter).onProjectCategorySuggested("defi", user.userId());
 
@@ -631,13 +751,14 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     @Order(30)
     void should_create_project_without_more_infos() {
         // Given
+        final var otherRepo = githubHelper.createRepo();
         indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
                 .withRequestBody(WireMock.equalToJson("""
                         {
-                          "linkedRepoIds": [498695724, 602953043],
+                          "linkedRepoIds": [%d],
                           "unlinkedRepoIds": []
                         }
-                        """, true, false))
+                        """.formatted(otherRepo.getId()), true, false))
                 .willReturn(WireMock.noContent()));
         indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/595505"))
                 .withHeader("Content-Type", equalTo("application/json"))
@@ -663,11 +784,11 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                             595505, 43467246
                           ],
                           "githubRepoIds": [
-                            498695724, 602953043
+                            %d
                           ],
                           "logoUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
                         }
-                        """)
+                        """.formatted(otherRepo.getId()))
                 .exchange()
                 // Then
                 .expectStatus()
@@ -698,10 +819,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withRequestBody(equalToJson("""
                         {
-                          "linkedRepoIds": [602953043,498695724],
+                          "linkedRepoIds": [%d],
                           "unlinkedRepoIds": []
                         }
-                        """))
+                        """.formatted(otherRepo.getId())))
         );
     }
 
@@ -758,6 +879,36 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.name").isEqualTo("Updated Project")
                 .jsonPath("$.shortDescription").isEqualTo("This is a super updated project")
                 .jsonPath("$.longDescription").isEqualTo("This is a super awesome updated project with a nice description");
+    }
+
+    @SneakyThrows
+    @Test
+    @Order(40)
+    public void should_create_a_new_project_with_same_contributor_labels() {
+
+        // When
+        client.post()
+                .uri(getApiURI(PROJECTS_POST))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticatePierre().jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Some projects with same labels",
+                          "shortDescription": "Testing",
+                          "longDescription": "Labeles",
+                          "isLookingForContributors": false,
+                          "inviteGithubUserIdsAsProjectLeads": [
+                            595505
+                          ],
+                          "logoUrl": "https://foo.bar",
+                          "ecosystemIds" : ["b599313c-a074-440f-af04-a466529ab2e7"],
+                          "contributorLabels": [{"name": "l1"}, {"name": "l2"}]
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
     }
 
     @SneakyThrows
@@ -965,13 +1116,11 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.invitedLeaders[0].login").isEqualTo("PierreOucif")
                 .jsonPath("$.invitedLeaders[1].login").isEqualTo("AnthonyBuisset")
 
-                .jsonPath("$.organizations.length()").isEqualTo(2)
-                .jsonPath("$.organizations[0].login").isEqualTo("gregcha")
-                .jsonPath("$.organizations[0].repos.length()").isEqualTo(1)
-                .jsonPath("$.organizations[0].repos[0].name").isEqualTo("bretzel-site")
-                .jsonPath("$.organizations[1].login").isEqualTo("onlydustxyz")
-                .jsonPath("$.organizations[1].repos.length()").isEqualTo(1)
-                .jsonPath("$.organizations[1].repos[0].name").isEqualTo("marketplace-frontend")
+                .jsonPath("$.organizations.length()").isEqualTo(1)
+                .jsonPath("$.organizations[0].login").isEqualTo("onlydustxyz")
+                .jsonPath("$.organizations[0].repos.length()").isEqualTo(2)
+                .jsonPath("$.organizations[0].repos[0].name").value(v -> assertThat(v).isIn("repo1", "repo3"))
+                .jsonPath("$.organizations[0].repos[1].name").value(v -> assertThat(v).isIn("repo1", "repo3"))
 
                 .jsonPath("$.rewardSettings.ignorePullRequests").isEqualTo(false)
                 .jsonPath("$.rewardSettings.ignoreIssues").isEqualTo(true)
