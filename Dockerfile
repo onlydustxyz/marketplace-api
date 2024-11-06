@@ -2,5 +2,7 @@ FROM --platform=linux/amd64 openjdk:17-alpine
 
 WORKDIR webapp/
 ADD bootstrap/target/marketplace-api.jar webapp/marketplace-api.jar
+ADD docker-start-api.sh webapp/docker-start-api.sh
+RUN chmod +x webapp/docker-start-api.sh
 
-CMD java -Dspring.profiles.active=api -jar webapp/marketplace-api.jar
+CMD webapp/docker-start-api.sh
