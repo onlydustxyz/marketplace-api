@@ -44,6 +44,7 @@ FROM (select c.contribution_uuid                                                
                          else 'DONE'::activity_status
                          end
                  end                                                                                                  as activity_status,
+             c.github_comments_count                                                                                  as github_comment_count,
              array_agg(distinct l.id) filter ( where l.id is not null )                                               as language_ids,
              array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null )                         as ecosystem_ids,
              array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )                             as program_ids,

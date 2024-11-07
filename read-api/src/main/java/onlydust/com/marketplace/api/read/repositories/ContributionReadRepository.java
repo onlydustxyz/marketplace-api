@@ -42,6 +42,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                    ccd.applicants                            as applicants,
                    c.languages                               as languages,
                    c.linked_issues                           as linked_issues,
+                   c.github_comment_count                    as github_comment_count,
                    coalesce(rd.total_rewarded_usd_amount, 0) as total_rewarded_usd_amount,
                    rd.reward_ids                             as reward_ids
             from bi.p_contribution_data c

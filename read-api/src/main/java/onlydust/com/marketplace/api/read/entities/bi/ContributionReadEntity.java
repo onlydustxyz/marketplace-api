@@ -65,6 +65,8 @@ public class ContributionReadEntity {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     ContributionActivityStatus activityStatus;
 
+    Integer githubCommentCount;
+
     @JdbcTypeCode(SqlTypes.JSON)
     ProjectLinkResponse project;
 
@@ -72,7 +74,7 @@ public class ContributionReadEntity {
     List<DatedGithubUserResponse> contributors;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    List<DatedGithubUserResponse> applicants;
+    List<ApplicantResponse> applicants;
 
     @JdbcTypeCode(SqlTypes.JSON)
     List<LanguageResponse> languages;
@@ -105,6 +107,7 @@ public class ContributionReadEntity {
                 .applicants(applicants)
                 .languages(languages)
                 .linkedIssues(linkedIssues)
+                .githubCommentCount(githubCommentCount)
                 .totalRewardedUsdAmount(totalRewardedUsdAmount)
                 ;
     }
