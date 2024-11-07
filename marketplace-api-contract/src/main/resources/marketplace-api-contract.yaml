@@ -8461,7 +8461,7 @@ components:
         - githubTitle
         - githubHtmlUrl
       properties:
-        uuid:
+        contributionUuid:
           $ref: '#/components/schemas/ContributionUuid'
         type:
           $ref: '#/components/schemas/ContributionType'

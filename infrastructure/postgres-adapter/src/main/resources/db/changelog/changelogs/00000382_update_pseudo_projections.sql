@@ -77,6 +77,7 @@ FROM (select c.contribution_uuid                                                
                                                    'bannerUrl', l.banner_url)) filter ( where l.id is not null )      as languages,
 
              jsonb_agg(distinct jsonb_build_object('type', 'ISSUE',
+                                                   'contributionUuid', i.contribution_uuid,
                                                    'githubId', i.id,
                                                    'githubNumber', i.number,
                                                    'githubStatus', i.status,
@@ -127,3 +128,5 @@ FROM (select c.contribution_uuid                                                
                cr.pull_request_id,
                gr.id,
                agc.contribution_uuid) v;
+
+call refresh_pseudo_projection('bi', 'contribution_data', 'contribution_uuid');
