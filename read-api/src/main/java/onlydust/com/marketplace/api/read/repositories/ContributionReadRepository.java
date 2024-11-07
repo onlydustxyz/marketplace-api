@@ -15,6 +15,7 @@ import org.springframework.data.repository.Repository;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseZonedNullable;
@@ -22,35 +23,37 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.pa
 public interface ContributionReadRepository extends Repository<ContributionReadEntity, Long> {
 
     @Query(value = """
-            select c.contribution_uuid                       as contribution_uuid,
-                   c.contribution_type                       as contribution_type,
-                   c.github_id                               as github_id,
-                   c.github_repo                             as github_repo,
-                   ccd.github_author                         as github_author,
-                   c.github_number                           as github_number,
-                   c.github_status                           as github_status,
-                   c.github_title                            as github_title,
-                   c.github_html_url                         as github_html_url,
-                   c.github_body                             as github_body,
-                   c.github_labels                           as github_labels,
-                   c.updated_at                              as last_updated_at,
-                   c.created_at                              as created_at,
-                   c.completed_at                            as completed_at,
-                   c.activity_status                         as activity_status,
-                   c.project                                 as project,
-                   ccd.contributors                          as contributors,
-                   ccd.applicants                            as applicants,
-                   c.languages                               as languages,
-                   c.linked_issues                           as linked_issues,
-                   c.github_comment_count                    as github_comment_count,
-                   coalesce(rd.total_rewarded_usd_amount, 0) as total_rewarded_usd_amount,
-                   rd.reward_ids                             as reward_ids
+            select c.contribution_uuid                         as contribution_uuid,
+                   c.contribution_type                         as contribution_type,
+                   c.github_id                                 as github_id,
+                   c.github_repo                               as github_repo,
+                   ccd.github_author                           as github_author,
+                   c.github_number                             as github_number,
+                   c.github_status                             as github_status,
+                   c.github_title                              as github_title,
+                   c.github_html_url                           as github_html_url,
+                   c.github_body                               as github_body,
+                   c.github_labels                             as github_labels,
+                   c.updated_at                                as last_updated_at,
+                   c.created_at                                as created_at,
+                   c.completed_at                              as completed_at,
+                   c.activity_status                           as activity_status,
+                   c.project                                   as project,
+                   ccd.contributors                            as contributors,
+                   ccd.applicants                              as applicants,
+                   c.languages                                 as languages,
+                   c.linked_issues                             as linked_issues,
+                   c.github_comment_count                      as github_comment_count,
+                   coalesce(rd.total_rewarded_usd_amount, 0)   as total_rewarded_usd_amount,
+                   sum(coalesce(rsd.amount_usd_equivalent, 0)) as filtered_for_recipient_total_rewarded_usd_amount
             from bi.p_contribution_data c
                      join bi.p_contribution_contributors_data ccd on c.contribution_uuid = ccd.contribution_uuid
                      left join bi.p_contribution_reward_data rd on rd.contribution_uuid = c.contribution_uuid
                      left join project_contributor_labels pcl on coalesce(:projectContributorLabelIds) is not null and pcl.project_id = c.project_id
                      left join contributor_project_contributor_labels cpcl on coalesce(:projectContributorLabelIds) is not null and cpcl.label_id = pcl.id and cpcl.github_user_id = any (ccd.contributor_ids)
                      left join indexer_exp.github_pull_requests_closing_issues ci on ci.issue_id = c.issue_id
+                     left join rewards r on coalesce(:recipientIdForFilteredRewardKpis) is not null and r.id = any (rd.reward_ids) and r.recipient_id = :recipientIdForFilteredRewardKpis
+                     left join accounting.reward_status_data rsd on coalesce(:recipientIdForFilteredRewardKpis) is not null and r.id = rsd.reward_id
             where (coalesce(:fromDate) is null or c.timestamp >= :fromDate)
               and (coalesce(:toDate) is null or c.timestamp < :toDate)
               and (:onlyOnlyDustData is false or c.project_id is not null)
@@ -87,9 +90,10 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                                          Boolean hasBeenRewarded,
                                          Boolean showLinkedIssues,
                                          String search,
+                                         Long recipientIdForFilteredRewardKpis,
                                          Pageable pageable);
 
-    default Page<ContributionReadEntity> findAll(ContributionsQueryParams q) {
+    default Page<ContributionReadEntity> findAll(ContributionsQueryParams q, Optional<Long> recipientIdForFilteredRewardKpis) {
         final var sanitizedFromDate = q.getFromDate() == null ? null : parseZonedNullable(q.getFromDate()).truncatedTo(ChronoUnit.DAYS);
         final var sanitizedToDate = q.getToDate() == null ? null : parseZonedNullable(q.getToDate()).truncatedTo(ChronoUnit.DAYS).plusDays(1);
 
@@ -109,6 +113,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                 q.getHasBeenRewarded(),
                 q.getShowLinkedIssues(),
                 q.getSearch(),
+                recipientIdForFilteredRewardKpis.orElse(null),
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC :
                         Sort.Direction.ASC, getSortProperty(q.getSort()))));
     }

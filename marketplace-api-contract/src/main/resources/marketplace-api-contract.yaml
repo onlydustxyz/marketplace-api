@@ -12396,6 +12396,8 @@ components:
                 $ref: '#/components/schemas/ContributionShortLinkResponse'
             totalRewardedUsdAmount:
               type: number
+            callerTotalRewardedUsdAmount:
+              type: number
             githubCommentCount:
               type: integer
 

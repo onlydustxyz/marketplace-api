@@ -3,9 +3,10 @@ package onlydust.com.marketplace.api.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadContributionsApi;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.read.entities.bi.ContributionReadEntity;
 import onlydust.com.marketplace.api.read.properties.Cache;
 import onlydust.com.marketplace.api.read.repositories.ContributionReadRepository;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
+import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,21 +28,23 @@ import static org.springframework.http.ResponseEntity.ok;
 @Profile("api")
 public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi {
     private final Cache cache;
+    private final AuthenticatedAppUserService authenticatedAppUserService;
     private final ContributionReadRepository contributionReadRepository;
 
     @Override
     public ResponseEntity<ContributionActivityPageItemResponse> getContributionById(UUID contributionUuid) {
+        final var authenticatedUser = authenticatedAppUserService.tryGetAuthenticatedUser();
         final var page = contributionReadRepository.findAll(new ContributionsQueryParams()
                 .pageIndex(0)
                 .pageSize(1)
-                .ids(List.of(contributionUuid)));
+                .ids(List.of(contributionUuid)), authenticatedUser.map(GithubUserIdentity::githubUserId));
 
         final var contribution = page.stream().findFirst()
                 .orElseThrow(() -> notFound("Contribution %s not found".formatted(contributionUuid)));
 
         return ok()
-                .cacheControl(cache.forEverybody(XS))
-                .body(contribution.toDto());
+                .cacheControl(cache.whenAnonymous(authenticatedUser, XS))
+                .body(contribution.toDto(authenticatedUser));
     }
 
     @Override
@@ -70,12 +73,13 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
 
     @Override
     public ResponseEntity<ContributionActivityPageResponse> getContributions(ContributionsQueryParams q) {
-        final var page = contributionReadRepository.findAll(q);
+        final var authenticatedUser = authenticatedAppUserService.tryGetAuthenticatedUser();
+        final var page = contributionReadRepository.findAll(q, authenticatedUser.map(GithubUserIdentity::githubUserId));
 
         return ok()
-                .cacheControl(cache.forEverybody(XS))
+                .cacheControl(cache.whenAnonymous(authenticatedUser, XS))
                 .body(new ContributionActivityPageResponse()
-                        .contributions(page.stream().map(ContributionReadEntity::toDto).toList())
+                        .contributions(page.stream().map(c -> c.toDto(authenticatedUser)).toList())
                         .hasMore(hasMore(q.getPageIndex(), page.getTotalPages()))
                         .nextPageIndex(nextPageIndex(q.getPageIndex(), page.getTotalPages()))
                         .totalItemNumber((int) page.getTotalElements())

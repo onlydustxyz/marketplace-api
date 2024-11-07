@@ -8,6 +8,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -17,6 +18,7 @@ import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -68,6 +70,7 @@ public class ContributionReadEntity {
     Integer githubCommentCount;
 
     @JdbcTypeCode(SqlTypes.JSON)
+    @NonNull
     ProjectLinkResponse project;
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -82,10 +85,10 @@ public class ContributionReadEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     List<ContributionShortLinkResponse> linkedIssues;
 
-    @JdbcTypeCode(SqlTypes.JSON)
     BigDecimal totalRewardedUsdAmount;
+    BigDecimal filteredForRecipientTotalRewardedUsdAmount;
 
-    public ContributionActivityPageItemResponse toDto() {
+    public ContributionActivityPageItemResponse toDto(Optional<AuthenticatedUser> caller) {
         return new ContributionActivityPageItemResponse()
                 .uuid(contributionUuid)
                 .type(contributionType)
@@ -108,7 +111,8 @@ public class ContributionReadEntity {
                 .languages(languages)
                 .linkedIssues(linkedIssues)
                 .githubCommentCount(githubCommentCount)
-                .totalRewardedUsdAmount(totalRewardedUsdAmount)
+                .totalRewardedUsdAmount(caller.filter(u -> u.projectsLed().contains(project.getId())).map(u -> totalRewardedUsdAmount).orElse(null))
+                .callerTotalRewardedUsdAmount(caller.map(u -> filteredForRecipientTotalRewardedUsdAmount).orElse(null))
                 ;
     }
 }
