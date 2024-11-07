@@ -1,10 +1,7 @@
 -- call create_pseudo_projection('bi', 'contribution_data', $$...$$);
 create or replace view bi.v_contribution_data as
 SELECT v.*, md5(v::text) as hash
-FROM (with ranked_project_github_repos_relationship AS (SELECT *,
-                                                               row_number() OVER (PARTITION BY github_repo_id ORDER BY project_id) as row_number
-                                                        FROM project_github_repos)
-      select c.contribution_uuid                                                                                      as contribution_uuid,
+FROM (select c.contribution_uuid                                                                                      as contribution_uuid,
              c.repo_id                                                                                                as repo_id,
              p.id                                                                                                     as project_id,
              p.slug                                                                                                   as project_slug,
@@ -95,7 +92,7 @@ FROM (with ranked_project_github_repos_relationship AS (SELECT *,
              )                                                                                                        as search
       from indexer_exp.grouped_contributions c
                left join indexer_exp.github_repos gr on gr.id = c.repo_id
-               left join ranked_project_github_repos_relationship pgr on pgr.github_repo_id = c.repo_id and pgr.row_number = 1
+               left join project_github_repos pgr on pgr.github_repo_id = c.repo_id
                left join projects p on p.id = pgr.project_id
                left join language_file_extensions lfe on lfe.extension = any (c.main_file_extensions)
                left join languages l on l.id = lfe.language_id
