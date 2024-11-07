@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.api.contract.model.ContributionType;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
@@ -7,10 +8,7 @@ import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.RewardId;
-import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.model.ProjectContributorLabel;
-import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
-import onlydust.com.marketplace.project.domain.model.UpdatePullRequestCommand;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.ProjectContributorLabelFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.PullRequestFacadePort;
 import org.assertj.core.api.AbstractListAssert;
@@ -39,6 +37,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     static UserAuthHelper.AuthenticatedUser recipient;
     static ProjectId kaaper = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
     static RewardId rewardId;
+    static Application application;
 
     @Autowired
     ProjectContributorLabelFacadePort projectContributorLabelFacadePort;
@@ -80,7 +79,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                         .type(RequestRewardCommand.Item.Type.issue)
                         .build()));
 
-        at("2024-10-23T09:30:40.738086Z", () -> applicationHelper.create(kaaper, GithubIssue.Id.of(1300430041L), olivier.githubUserId()));
+        application = at("2024-10-23T09:30:40.738086Z", () -> applicationHelper.create(kaaper, GithubIssue.Id.of(1300430041L), olivier.githubUserId()));
     }
 
     @Test
@@ -188,7 +187,8 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "linkedIssues": null,
-                          "totalRewardedUsdAmount": null
+                          "totalRewardedUsdAmount": null,
+                          "githubCommentCount": 1
                         }
                         """);
     }
@@ -203,6 +203,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isOk()
                 .expectBody()
+                .jsonPath("$.applicants[0].applicationId").isEqualTo(application.id().toString())
                 .json("""
                         {
                           "uuid": "0f8d789f-fbbd-3171-ad03-9b2b6f8d9174",
