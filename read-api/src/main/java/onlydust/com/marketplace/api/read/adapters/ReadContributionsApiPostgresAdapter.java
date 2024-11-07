@@ -6,7 +6,6 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.properties.Cache;
 import onlydust.com.marketplace.api.read.repositories.ContributionReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
-import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +36,7 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
         final var page = contributionReadRepository.findAll(new ContributionsQueryParams()
                 .pageIndex(0)
                 .pageSize(1)
-                .ids(List.of(contributionUuid)), authenticatedUser.map(GithubUserIdentity::githubUserId));
+                .ids(List.of(contributionUuid)));
 
         final var contribution = page.stream().findFirst()
                 .orElseThrow(() -> notFound("Contribution %s not found".formatted(contributionUuid)));
@@ -74,7 +73,7 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
     @Override
     public ResponseEntity<ContributionActivityPageResponse> getContributions(ContributionsQueryParams q) {
         final var authenticatedUser = authenticatedAppUserService.tryGetAuthenticatedUser();
-        final var page = contributionReadRepository.findAll(q, authenticatedUser.map(GithubUserIdentity::githubUserId));
+        final var page = contributionReadRepository.findAll(q);
 
         return ok()
                 .cacheControl(cache.whenAnonymous(authenticatedUser, XS))

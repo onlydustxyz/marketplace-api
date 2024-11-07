@@ -1,11 +1,12 @@
 package onlydust.com.marketplace.api.it.api;
 
-import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.CurrencyHelper;
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.ProjectContributorLabel;
 import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -33,6 +35,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     private static final AtomicBoolean setupDone = new AtomicBoolean();
     static ProjectContributorLabel ogLabel;
+    static UserAuthHelper.AuthenticatedUser projectLead;
+    static UserAuthHelper.AuthenticatedUser recipient;
+    static ProjectId kaaper = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
+    static RewardId rewardId;
 
     @Autowired
     ProjectContributorLabelFacadePort projectContributorLabelFacadePort;
@@ -43,14 +49,30 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     void setup() {
         if (setupDone.compareAndExchange(false, true)) return;
 
-        final var kaaper = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
         final var olivier = userAuthHelper.authenticateOlivier();
-        final var projectLead = userAuthHelper.authenticateAntho();
+        recipient = userAuthHelper.authenticatePierre();
+        projectLead = userAuthHelper.authenticateAntho();
         ogLabel = projectContributorLabelFacadePort.createLabel(projectLead.userId(), kaaper, "OG");
         projectContributorLabelFacadePort.updateLabelsOfContributors(projectLead.userId(), kaaper,
                 Map.of(olivier.user().getGithubUserId(), List.of(ogLabel.id())));
 
-        rewardHelper.create(kaaper, projectLead, GithubUserId.of(1814312), 123, CurrencyHelper.USDC, List.of(
+        rewardId = rewardHelper.create(kaaper, projectLead, recipient.githubUserId(), 123, CurrencyHelper.USDC, List.of(
+                RequestRewardCommand.Item.builder()
+                        .id("1300430041")
+                        .number(68L)
+                        .repoId(498695724L)
+                        .type(RequestRewardCommand.Item.Type.issue)
+                        .build()));
+
+        rewardHelper.create(kaaper, projectLead, recipient.githubUserId(), 20, CurrencyHelper.USDC, List.of(
+                RequestRewardCommand.Item.builder()
+                        .id("1300430041")
+                        .number(68L)
+                        .repoId(498695724L)
+                        .type(RequestRewardCommand.Item.Type.issue)
+                        .build()));
+
+        rewardHelper.create(kaaper, projectLead, projectLead.githubUserId(), 1000, CurrencyHelper.USDC, List.of(
                 RequestRewardCommand.Item.builder()
                         .id("1300430041")
                         .number(68L)
@@ -59,6 +81,50 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                         .build()));
 
         at("2024-10-23T09:30:40.738086Z", () -> applicationHelper.create(kaaper, GithubIssue.Id.of(1300430041L), olivier.githubUserId()));
+    }
+
+    @Test
+    void should_get_total_rewarded_amount_as_maintainer_and_callerTotalRewardedUsdAmount_as_recipient() {
+        // When
+        client.get()
+                .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("0f8d789f-fbbd-3171-ad03-9b2b6f8d9174")))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + projectLead.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "uuid": "0f8d789f-fbbd-3171-ad03-9b2b6f8d9174",
+                          "type": "ISSUE",
+                          "githubNumber": 68,
+                          "totalRewardedUsdAmount": 1154.43,
+                          "callerTotalRewardedUsdAmount": 1010.0
+                        }
+                        """);
+    }
+
+    @Test
+    void should_get_callerTotalRewardedUsdAmount_as_recipient() {
+        // When
+        client.get()
+                .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("0f8d789f-fbbd-3171-ad03-9b2b6f8d9174")))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + recipient.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "uuid": "0f8d789f-fbbd-3171-ad03-9b2b6f8d9174",
+                          "type": "ISSUE",
+                          "githubNumber": 68,
+                          "totalRewardedUsdAmount": null,
+                          "callerTotalRewardedUsdAmount": 144.43
+                        }
+                        """);
     }
 
     @Test
@@ -122,7 +188,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "linkedIssues": null,
-                          "totalRewardedUsdAmount": 0
+                          "totalRewardedUsdAmount": null
                         }
                         """);
     }
@@ -213,7 +279,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                           ],
                           "languages": null,
                           "linkedIssues": null,
-                          "totalRewardedUsdAmount": 124.23
+                          "totalRewardedUsdAmount": null
                         }
                         """);
     }
@@ -311,7 +377,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                               "applicants": null,
                               "languages": null,
                               "linkedIssues": null,
-                              "totalRewardedUsdAmount": 0
+                              "totalRewardedUsdAmount": null
                             }
                           ]
                         }
@@ -364,11 +430,11 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .extracting(ContributionActivityPageItemResponse::getContributors)
                 .allMatch(contributors -> contributors.stream().anyMatch(c -> c.getLogin().equals("AnthonyBuisset")));
 
-        assertContributions(Map.of("hasBeenRewarded", "true"))
+        assertContributions(Map.of("hasBeenRewarded", "true", "projectIds", kaaper.toString()))
                 .extracting(ContributionActivityPageItemResponse::getTotalRewardedUsdAmount)
                 .allMatch(a -> a.compareTo(BigDecimal.ZERO) > 0);
 
-        assertContributions(Map.of("hasBeenRewarded", "false"))
+        assertContributions(Map.of("hasBeenRewarded", "false", "projectIds", kaaper.toString()))
                 .extracting(ContributionActivityPageItemResponse::getTotalRewardedUsdAmount)
                 .allMatch(a -> a.compareTo(BigDecimal.ZERO) == 0);
 
@@ -376,7 +442,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .extracting(ContributionActivityPageItemResponse::getContributors)
                 .allMatch(contributors -> contributors.stream().anyMatch(c -> c.getLogin().equals("ofux")));
 
-        assertContributions(Map.of("rewardIds", "0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf"))
+        assertContributions(Map.of("rewardIds", rewardId.toString()))
                 .extracting(ContributionActivityPageItemResponse::getTotalRewardedUsdAmount)
                 .allMatch(a -> a.compareTo(BigDecimal.ZERO) > 0);
 
@@ -413,6 +479,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
 
         final var contributions = client.get()
                 .uri(getApiURI(CONTRIBUTIONS, q))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + projectLead.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()

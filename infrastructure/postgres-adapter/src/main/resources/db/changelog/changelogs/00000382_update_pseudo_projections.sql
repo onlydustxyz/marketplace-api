@@ -157,20 +157,28 @@ create unique index on bi.p_contribution_data (project_id, contribution_type, co
 
 
 call create_pseudo_projection('bi', 'contribution_reward_data', $$
-select cd.contribution_uuid                    as contribution_uuid,
-       cd.project_id                           as project_id,
-       cd.repo_id                              as repo_id,
-       array_agg(ri.reward_id)                 as reward_ids,
-       sum(round(rd.amount_usd_equivalent, 2)) as total_rewarded_usd_amount
-from bi.p_contribution_data cd
-         join reward_items ri on ri.contribution_uuid = cd.contribution_uuid
-         join accounting.reward_status_data rd on rd.reward_id = ri.reward_id
-group by cd.contribution_uuid, cd.project_id, cd.repo_id
+select per_recipient.contribution_uuid                                                                     as contribution_uuid,
+       per_recipient.repo_id                                                                               as repo_id,
+       array_uniq_cat_agg(per_recipient.reward_ids)                                                        as reward_ids,
+       sum(per_recipient.total_rewarded_usd_amount)                                                        as total_rewarded_usd_amount,
+       jsonb_agg(jsonb_build_object('recipientId', per_recipient.recipient_id,
+                                    'rewardIds', per_recipient.reward_ids,
+                                    'totalRewardedUsdAmount', per_recipient.total_rewarded_usd_amount))    as per_recipient
+from (select c.contribution_uuid                     as contribution_uuid,
+             c.repo_id                               as repo_id,
+             r.recipient_id                          as recipient_id,
+             array_agg(ri.reward_id)                 as reward_ids,
+             sum(round(rd.amount_usd_equivalent, 2)) as total_rewarded_usd_amount
+      from indexer_exp.grouped_contributions c
+               join reward_items ri on ri.contribution_uuid = c.contribution_uuid
+               join rewards r on r.id = ri.reward_id
+               join accounting.reward_status_data rd on rd.reward_id = ri.reward_id
+      group by c.contribution_uuid, c.repo_id, r.recipient_id) as per_recipient
+group by per_recipient.contribution_uuid, per_recipient.repo_id
 $$, 'contribution_uuid');
 
 create unique index on bi.p_contribution_reward_data (contribution_uuid, total_rewarded_usd_amount);
 create unique index on bi.p_contribution_reward_data (repo_id, contribution_uuid);
-create unique index on bi.p_contribution_reward_data (project_id, contribution_uuid);
 create index on bi.p_contribution_reward_data using gin (reward_ids);
 
 

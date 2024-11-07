@@ -38,6 +38,8 @@ public class ContributionReadEntity {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     ContributionType contributionType;
 
+    UUID projectId;
+
     String githubId;
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -70,7 +72,6 @@ public class ContributionReadEntity {
     Integer githubCommentCount;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @NonNull
     ProjectLinkResponse project;
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -86,7 +87,8 @@ public class ContributionReadEntity {
     List<ContributionShortLinkResponse> linkedIssues;
 
     BigDecimal totalRewardedUsdAmount;
-    BigDecimal filteredForRecipientTotalRewardedUsdAmount;
+    @JdbcTypeCode(SqlTypes.JSON)
+    List<RewardedPerRecipient> rewardedPerRecipients;
 
     public ContributionActivityPageItemResponse toDto(Optional<AuthenticatedUser> caller) {
         return new ContributionActivityPageItemResponse()
@@ -111,8 +113,13 @@ public class ContributionReadEntity {
                 .languages(languages)
                 .linkedIssues(linkedIssues)
                 .githubCommentCount(githubCommentCount)
-                .totalRewardedUsdAmount(caller.filter(u -> u.projectsLed().contains(project.getId())).map(u -> totalRewardedUsdAmount).orElse(null))
-                .callerTotalRewardedUsdAmount(caller.map(u -> filteredForRecipientTotalRewardedUsdAmount).orElse(null))
+                .totalRewardedUsdAmount(projectId == null ? null :
+                        caller.filter(u -> u.projectsLed().contains(projectId)).map(u -> totalRewardedUsdAmount).orElse(null))
+                .callerTotalRewardedUsdAmount(rewardedPerRecipients == null ? null :
+                        caller.flatMap(u -> rewardedPerRecipients.stream().filter(rpr -> rpr.recipientId().equals(u.githubUserId())).map(RewardedPerRecipient::totalRewardedUsdAmount).findFirst()).orElse(null))
                 ;
+    }
+
+    public record RewardedPerRecipient(Long recipientId, BigDecimal totalRewardedUsdAmount) {
     }
 }
