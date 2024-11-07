@@ -629,3 +629,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000379_refactor_select_projects_with_engagement_status.sql
   - include:
       file: db/changelog/changelogs/00000380_fix_project_contributor_labels_uniqueness.sql
+  - include:
+      file: db/changelog/changelogs/00000381_add_unique_contraint_on_project_github_repos.sql
