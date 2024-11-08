@@ -180,7 +180,6 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "projectName": "Pizzeria Yoshi !",
                                   "projectSlug": "pizzeria-yoshi-",
                                   "languages": [
-                                    "Javascript",
                                     "Typescript",
                                     "Solidity",
                                     "Python",
@@ -316,7 +315,6 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                     "Javascript",
                                     "Typescript",
                                     "Rust",
-                                    "Python",
                                     "Cairo"
                                   ],
                                   "ecosystems": null,
@@ -447,8 +445,7 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "languages": [
                                     "Javascript",
                                     "Typescript",
-                                    "Rust",
-                                    "Python"
+                                    "Rust"
                                   ],
                                   "ecosystems": [
                                     "Starknet",
@@ -539,7 +536,6 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "languages": [
                                     "Typescript",
                                     "Rust",
-                                    "Solidity",
                                     "Cairo"
                                   ],
                                   "ecosystems": null,
@@ -575,7 +571,6 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                     "Javascript",
                                     "Typescript",
                                     "Rust",
-                                    "Python",
                                     "Cairo"
                                   ],
                                   "ecosystems": null,
