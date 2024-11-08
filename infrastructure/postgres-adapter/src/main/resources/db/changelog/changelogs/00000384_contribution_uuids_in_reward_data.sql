@@ -19,7 +19,7 @@ select r.id                                                                     
        r.currency_id                                                                                    as currency_id,
        array_agg(distinct ri.contribution_uuid) filter ( where ri.contribution_uuid is not null )       as contribution_uuids,
        (jsonb_agg(distinct jsonb_build_object('id', receipts.id,
-                                              'createdAt', receipts.created_at,
+                                              'createdAt', receipts.created_at::timestamptz,
                                               'network', receipts.network::text,
                                               'thirdPartyName', receipts.third_party_name,
                                               'thirdPartyAccountNumber', receipts.third_party_account_number,

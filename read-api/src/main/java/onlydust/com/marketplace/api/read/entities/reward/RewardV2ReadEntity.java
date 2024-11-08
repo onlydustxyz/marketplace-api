@@ -24,7 +24,6 @@ import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -137,14 +136,13 @@ public class RewardV2ReadEntity {
         };
     }
 
-    public static class Receipt {
-        UUID id;
-        Date createdAt;
-        @Enumerated(EnumType.STRING)
-        NetworkEnumEntity network;
-        String thirdPartyName;
-        String thirdPartyAccountNumber;
-        String transactionReference;
+    public record Receipt(
+            UUID id,
+            ZonedDateTime createdAt,
+            NetworkEnumEntity network,
+            String thirdPartyName,
+            String thirdPartyAccountNumber,
+            String transactionReference) {
 
         public Blockchain blockchain() {
             return switch (network) {
