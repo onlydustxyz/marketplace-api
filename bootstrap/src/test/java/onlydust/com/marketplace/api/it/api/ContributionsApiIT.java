@@ -4,6 +4,7 @@ import onlydust.com.marketplace.api.contract.model.ContributionType;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProjectId;
@@ -43,6 +44,8 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     ProjectContributorLabelFacadePort projectContributorLabelFacadePort;
     @Autowired
     PullRequestFacadePort pullRequestFacadePort;
+    @Autowired
+    PostgresBiProjectorAdapter postgresBiProjectorAdapter;
 
     @BeforeEach
     void setup() {
@@ -54,6 +57,9 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         ogLabel = projectContributorLabelFacadePort.createLabel(projectLead.userId(), kaaper, "OG");
         projectContributorLabelFacadePort.updateLabelsOfContributors(projectLead.userId(), kaaper,
                 Map.of(olivier.user().getGithubUserId(), List.of(ogLabel.id())));
+        githubHelper.addClosingIssue(43506983L, 1966796364L);
+        postgresBiProjectorAdapter.onContributionsChanged(ContributionUUID.of(UUID.fromString("0f8d789f-fbbd-3171-ad03-9b2b6f8d9174")));
+        postgresBiProjectorAdapter.onContributionsChanged(ContributionUUID.of(UUID.fromString("f4db1d9b-4e1d-300c-9277-8d05824c804e")));
 
         rewardId = rewardHelper.create(kaaper, projectLead, recipient.githubUserId(), 123, CurrencyHelper.USDC, List.of(
                 RequestRewardCommand.Item.builder()
@@ -173,7 +179,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                               "githubUserId": 1814312,
                               "login": "krzkaczor",
                               "avatarUrl": "https://avatars.githubusercontent.com/u/1814312?v=4",
-                              "since": "2024-10-17T12:03:10.967909Z"
+                              "since": "2024-10-17T14:03:10.967909Z"
                             }
                           ],
                           "applicants": null,
@@ -186,7 +192,16 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                             }
                           ],
-                          "linkedIssues": null,
+                          "linkedIssues": [
+                            {
+                              "contributionUuid": "4782d22d-be45-3253-a3b4-5688045632f7",
+                              "type": "ISSUE",
+                              "githubNumber": 49,
+                              "githubStatus": "COMPLETED",
+                              "githubTitle": "/* ... */ notation",
+                              "githubHtmlUrl": "https://github.com/IonicaBizau/node-cobol/issues/49"
+                            }
+                          ],
                           "totalRewardedUsdAmount": null,
                           "githubCommentCount": 1
                         }
