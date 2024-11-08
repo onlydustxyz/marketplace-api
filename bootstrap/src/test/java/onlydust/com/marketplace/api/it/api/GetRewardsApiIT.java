@@ -2,6 +2,8 @@ package onlydust.com.marketplace.api.it.api;
 
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Country;
+import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.api.contract.model.RewardPageResponse;
@@ -20,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -51,6 +54,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
     private static ProjectId madara;
     private static BillingProfile anthoBillingProfile;
     private static BillingProfile pierreBillingProfile;
+    private static UUID invoiceId = UUID.randomUUID();
 
     @AfterAll
     @SneakyThrows
@@ -126,8 +130,13 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                         .type(RequestRewardCommand.Item.Type.issue)
                         .build()
         )));
-        at("2024-06-01T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, antho.githubUserId(), 2, ETH));
-        at("2024-06-01T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, james.githubUserId(), 3, ETH));
+        at("2024-06-01T00:01:00Z", () -> {
+            final var rewardId = rewardHelper.create(onlyDust, pierre, antho.githubUserId(), 2, ETH);
+            accountingHelper.addInvoice(rewardId.value(), invoiceId, Date.from(ZonedDateTime.parse("2024-06-02T00:00:00Z").toInstant()));
+            accountingHelper.setPaid(rewardId.value(), Date.from(ZonedDateTime.parse("2024-06-03T00:00:00Z").toInstant()),
+                    new Payment.Reference(ZonedDateTime.parse("2024-06-03T00:00:00Z"), Network.ETHEREUM, "0x123", "Antho", "antho.eth"));
+        });
+        at("2024-06-01T00:02:00Z", () -> rewardHelper.create(onlyDust, pierre, james.githubUserId(), 3, ETH));
 
         at("2024-06-03T00:00:00Z", () -> rewardHelper.create(madara, hayden, antho.githubUserId(), 4, ETH));
         at("2024-06-10T00:00:00Z", () -> rewardHelper.create(madara, hayden, pierre.githubUserId(), 5, ETH));
@@ -148,6 +157,12 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(HttpStatus.OK)
                 .expectBody()
+                .jsonPath("$.rewards[0].billingProfileId").isEqualTo(pierreBillingProfile.id().toString())
+                .jsonPath("$.rewards[1].billingProfileId").isEqualTo(pierreBillingProfile.id().toString())
+                .jsonPath("$.rewards[2].billingProfileId").isEqualTo(null)
+                .jsonPath("$.rewards[3].billingProfileId").isEqualTo(anthoBillingProfile.id().toString())
+                .jsonPath("$.rewards[4].billingProfileId").isEqualTo(anthoBillingProfile.id().toString())
+                .jsonPath("$.rewards[3].invoiceId").isEqualTo(invoiceId.toString())
                 .json("""
                         {
                           "totalPageNumber": 1,
@@ -178,7 +193,13 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               },
                               "requestedAt": "2024-06-10T00:00:00Z",
                               "processedAt": null,
-                              "unlockDate": null
+                              "unlockDate": null,
+                              "invoiceId": null,
+                              "transactionReference": null,
+                              "transactionReferenceLink": null,
+                              "items": [
+                                "052b4d04-401d-3ed3-97d0-e278d950ce4e"
+                              ]
                             },
                             {
                               "amount": {
@@ -203,7 +224,45 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               },
                               "requestedAt": "2024-06-03T00:00:00Z",
                               "processedAt": null,
-                              "unlockDate": null
+                              "unlockDate": null,
+                              "invoiceId": null,
+                              "transactionReference": null,
+                              "transactionReferenceLink": null,
+                              "items": [
+                                "052b4d04-401d-3ed3-97d0-e278d950ce4e"
+                              ]
+                            },
+                            {
+                              "amount": {
+                                "amount": 3,
+                                "prettyAmount": 3,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 5345.94,
+                                "usdConversionRate": 1781.98
+                              },
+                              "status": "PENDING_CONTRIBUTOR",
+                              "from": {
+                                "login": "pierre"
+                              },
+                              "to": {
+                                "login": "james"
+                              },
+                              "requestedAt": "2024-06-01T00:02:00Z",
+                              "processedAt": null,
+                              "unlockDate": null,
+                              "billingProfileId": null,
+                              "invoiceId": null,
+                              "transactionReference": null,
+                              "transactionReferenceLink": null,
+                              "items": [
+                                "052b4d04-401d-3ed3-97d0-e278d950ce4e"
+                              ]
                             },
                             {
                               "amount": {
@@ -219,16 +278,21 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "usdEquivalent": 3563.96,
                                 "usdConversionRate": 1781.98
                               },
-                              "status": "PENDING_CONTRIBUTOR",
+                              "status": "COMPLETE",
                               "from": {
                                 "login": "pierre"
                               },
                               "to": {
                                 "login": "antho"
                               },
-                              "requestedAt": "2024-06-01T00:00:00Z",
-                              "processedAt": null,
-                              "unlockDate": null
+                              "requestedAt": "2024-06-01T00:01:00Z",
+                              "processedAt": "2024-06-03T00:00:00Z",
+                              "unlockDate": null,
+                              "transactionReference": "0x123",
+                              "transactionReferenceLink": "https://etherscan.io/tx/0x0123",
+                              "items": [
+                                "052b4d04-401d-3ed3-97d0-e278d950ce4e"
+                              ]
                             },
                             {
                               "amount": {
@@ -253,32 +317,13 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               },
                               "requestedAt": "2024-06-01T00:00:00Z",
                               "processedAt": null,
-                              "unlockDate": null
-                            },
-                            {
-                              "amount": {
-                                "amount": 3,
-                                "prettyAmount": 3,
-                                "currency": {
-                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                                  "code": "ETH",
-                                  "name": "Ether",
-                                  "logoUrl": null,
-                                  "decimals": 18
-                                },
-                                "usdEquivalent": 5345.94,
-                                "usdConversionRate": 1781.98
-                              },
-                              "status": "PENDING_CONTRIBUTOR",
-                              "from": {
-                                "login": "pierre"
-                              },
-                              "to": {
-                                "login": "james"
-                              },
-                              "requestedAt": "2024-06-01T00:00:00Z",
-                              "processedAt": null,
-                              "unlockDate": null
+                              "unlockDate": null,
+                              "invoiceId": null,
+                              "transactionReference": null,
+                              "transactionReferenceLink": null,
+                              "items": [
+                                "f9360345-3145-33f0-a9b0-cbaa3ba78a4e"
+                              ]
                             }
                           ]
                         }
@@ -300,6 +345,8 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(HttpStatus.OK)
                 .expectBody()
+                .jsonPath("$.rewards[0].billingProfileId").isEqualTo(pierreBillingProfile.id().toString())
+                .jsonPath("$.rewards[1].billingProfileId").isEqualTo(pierreBillingProfile.id().toString())
                 .json("""
                         {
                           "totalPageNumber": 1,
@@ -307,31 +354,6 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                           "hasMore": false,
                           "nextPageIndex": 0,
                           "rewards": [
-                            {
-                              "amount": {
-                                "amount": 5,
-                                "prettyAmount": 5,
-                                "currency": {
-                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                                  "code": "ETH",
-                                  "name": "Ether",
-                                  "logoUrl": null,
-                                  "decimals": 18
-                                },
-                                "usdEquivalent": 8909.90,
-                                "usdConversionRate": 1781.98
-                              },
-                              "status": "LOCKED",
-                              "from": {
-                                "login": "hayden"
-                              },
-                              "to": {
-                                "login": "pierre"
-                              },
-                              "requestedAt": "2024-06-10T00:00:00Z",
-                              "processedAt": null,
-                              "unlockDate": null
-                            },
                             {
                               "amount": {
                                 "amount": 4,
@@ -355,7 +377,43 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               },
                               "requestedAt": "2024-06-03T00:00:00Z",
                               "processedAt": null,
-                              "unlockDate": null
+                              "unlockDate": null,
+                              "invoiceId": null,
+                              "transactionReference": null,
+                              "transactionReferenceLink": null,
+                              "items": [
+                                "052b4d04-401d-3ed3-97d0-e278d950ce4e"
+                              ]
+                            },{
+                              "amount": {
+                                "amount": 5,
+                                "prettyAmount": 5,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 8909.90,
+                                "usdConversionRate": 1781.98
+                              },
+                              "status": "LOCKED",
+                              "from": {
+                                "login": "hayden"
+                              },
+                              "to": {
+                                "login": "pierre"
+                              },
+                              "requestedAt": "2024-06-10T00:00:00Z",
+                              "processedAt": null,
+                              "unlockDate": null,
+                              "invoiceId": null,
+                              "transactionReference": null,
+                              "transactionReferenceLink": null,
+                              "items": [
+                                "052b4d04-401d-3ed3-97d0-e278d950ce4e"
+                              ]
                             }
                           ]
                         }

@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.contract.model.RewardPageResponse;
 import onlydust.com.marketplace.api.read.repositories.RewardReadV2Repository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -28,6 +29,7 @@ import static org.springframework.http.ResponseEntity.ok;
 public class ReadRewardsPostgresAdapter implements ReadRewardsApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final RewardReadV2Repository rewardReadV2Repository;
+    private final MetaBlockExplorer blockExplorer;
 
     @Override
     public ResponseEntity<RewardPageResponse> getRewards(PageableRewardsQueryParams q) {
@@ -53,7 +55,7 @@ public class ReadRewardsPostgresAdapter implements ReadRewardsApi {
         );
 
         return ok(new RewardPageResponse()
-                .rewards(page.stream().map(r -> r.toDto(authenticatedUser)).toList())
+                .rewards(page.stream().map(r -> r.toDto(authenticatedUser, blockExplorer)).toList())
                 .hasMore(hasMore(q.getPageIndex(), page.getTotalPages()))
                 .nextPageIndex(nextPageIndex(q.getPageIndex(), page.getTotalPages()))
                 .totalItemNumber((int) page.getTotalElements())

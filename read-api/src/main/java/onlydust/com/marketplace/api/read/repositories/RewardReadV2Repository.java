@@ -41,11 +41,15 @@ public interface RewardReadV2Repository extends JpaRepository<RewardV2ReadEntity
                    r.paid_at                                 as processed_at,
                    r.unlock_date                             as unlock_date,
                    r.usd_conversion_rate                     as usd_conversion_rate,
-                   r.amount_usd_equivalent                   as amount_usd_equivalent
+                   r.amount_usd_equivalent                   as amount_usd_equivalent,
+                   r.invoice_id                              as invoice_id,
+                   rd.contribution_uuids                     as contribution_uuids,
+                   rd.receipt                                as receipt
             from accounting.reward_statuses r
                      join iam.all_indexed_users requestor on r.requestor_id = requestor.user_id
                      join iam.all_indexed_users recipient on r.recipient_id = recipient.github_user_id
                      join projects p on p.id = r.project_id
+                     left join bi.p_reward_data rd on r.reward_id = rd.reward_id
             
             where (:includeProjectLeds and cast(:dataSourceProjectLedIds as uuid[]) is not null and r.project_id = any (cast(:dataSourceProjectLedIds as uuid[]))
                 or :includeBillingProfileAdministrated and cast(:dataSourceBillingProfileIds as uuid[]) is not null and r.billing_profile_id = any (cast(:dataSourceBillingProfileIds as uuid[]))

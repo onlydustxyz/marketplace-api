@@ -3,17 +3,20 @@ package onlydust.com.marketplace.api.helper;
 import com.github.javafaker.Faker;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.json.InvoiceInnerData;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ReceiptEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
@@ -28,10 +31,7 @@ import java.math.RoundingMode;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class AccountingHelper {
@@ -62,6 +62,8 @@ public class AccountingHelper {
     QuoteStorage quoteStorage;
     @Autowired
     AccountingFacadePort accountingFacadePort;
+    @Autowired
+    PostgresBiProjectorAdapter biProjectorAdapter;
 
     public CurrencyEntity strk() {
         return currencyRepository.findByCode("STRK").orElseThrow();
@@ -88,6 +90,7 @@ public class AccountingHelper {
     }
 
     @SneakyThrows
+    @Transactional
     public void patchReward(@NonNull String id, Number amount, String currencyCode, Number usdAmount, String invoiceReceivedAt, String paidAt) {
         final var rewardEntity = rewardRepository.findById(UUID.fromString(id)).orElseThrow();
         final var rewardStatus = rewardStatusRepository.findById(rewardEntity.id()).orElseThrow();
@@ -126,11 +129,58 @@ public class AccountingHelper {
 
     @SneakyThrows
     @Transactional
+    public void addInvoice(@NonNull UUID rewardId, @NonNull UUID invoiceId, @NonNull Date invoiceReceivedAt) {
+        final var rewardEntity = rewardRepository.findById(rewardId).orElseThrow();
+        final var rewardStatus = rewardStatusRepository.findById(rewardId).orElseThrow();
+
+        final var invoiceEntity = fakeInvoice(invoiceId, List.of(rewardEntity.id()));
+        rewardEntity.invoice(invoiceEntity);
+        rewardStatus.invoiceReceivedAt(invoiceReceivedAt);
+
+        rewardRepository.save(rewardEntity);
+        rewardStatusRepository.save(rewardStatus);
+    }
+
+    @SneakyThrows
+    @Transactional
+    public void setPaid(@NonNull UUID rewardId, @NonNull Date paidAt, @NonNull Payment.Reference transactionReference) {
+        final var rewardEntity = rewardRepository.findById(rewardId).orElseThrow();
+        final var rewardStatus = rewardStatusRepository.findById(rewardId).orElseThrow();
+
+        rewardStatus.paidAt(paidAt);
+        rewardEntity.receipts().add(ReceiptEntity.of(Receipt.of(RewardId.of(rewardId), transactionReference)));
+
+        rewardRepository.save(rewardEntity);
+        rewardStatusRepository.save(rewardStatus);
+        biProjectorAdapter.onRewardPaid(RewardId.of(rewardId));
+    }
+
+    @SneakyThrows
+    @Transactional
     public InvoiceEntity fakeInvoice(UUID id, List<UUID> rewardIds) {
         final var firstName = faker.name().firstName();
         final var lastName = faker.name().lastName();
 
         final var rewards = invoiceRewardRepository.findAll(rewardIds);
+        final var innerData = new InvoiceInnerData(
+                ZonedDateTime.now().plusDays(9),
+                BigDecimal.ZERO,
+                new Invoice.BillingProfileSnapshot(
+                        BillingProfile.Id.random(),
+                        BillingProfile.Type.INDIVIDUAL,
+                        new Invoice.BillingProfileSnapshot.KycSnapshot(
+                                firstName,
+                                lastName,
+                                faker.address().fullAddress(),
+                                faker.address().countryCode(),
+                                false
+                        ),
+                        null,
+                        null,
+                        List.of(new Wallet(Network.ETHEREUM, "vitalik.eth"))
+                ),
+                null
+        );
 
         return new InvoiceEntity(
                 id,
@@ -144,25 +194,7 @@ public class AccountingHelper {
                 new URL("https://s3.storage.com/invoice.pdf"),
                 null,
                 null,
-                new InvoiceInnerData(
-                        ZonedDateTime.now().plusDays(9),
-                        BigDecimal.ZERO,
-                        new Invoice.BillingProfileSnapshot(
-                                BillingProfile.Id.random(),
-                                BillingProfile.Type.INDIVIDUAL,
-                                new Invoice.BillingProfileSnapshot.KycSnapshot(
-                                        firstName,
-                                        lastName,
-                                        faker.address().fullAddress(),
-                                        faker.address().countryCode(),
-                                        false
-                                ),
-                                null,
-                                null,
-                                List.of(new Wallet(Network.ETHEREUM, "vitalik.eth"))
-                        ),
-                        rewards
-                )
+                innerData
         );
     }
 

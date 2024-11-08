@@ -8,10 +8,13 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
 import onlydust.com.marketplace.api.read.entities.currency.CurrencyReadEntity;
 import onlydust.com.marketplace.kernel.mapper.AmountMapper;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
+import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -21,6 +24,7 @@ import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -66,7 +70,15 @@ public class RewardV2ReadEntity {
     BigDecimal amountUsdEquivalent;
     BigDecimal usdConversionRate;
 
-    public RewardPageItemResponse toDto(AuthenticatedUser caller) {
+    UUID invoiceId;
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    UUID[] contributionUuids;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    Receipt receipt;
+
+
+    public RewardPageItemResponse toDto(final AuthenticatedUser caller, final MetaBlockExplorer blockExplorer) {
         return new RewardPageItemResponse()
                 .id(id)
                 .status(statusAsUser(caller))
@@ -77,7 +89,12 @@ public class RewardV2ReadEntity {
                 .processedAt(processedAt)
                 .unlockDate(unlockDate)
                 .billingProfileId(billingProfileId)
-                .project(project);
+                .project(project)
+                .invoiceId(invoiceId)
+                .items(contributionUuids == null ? List.of() : List.of(contributionUuids))
+                .transactionReference(receipt == null ? null : receipt.transactionReference)
+                .transactionReferenceLink(receipt == null ? null : blockExplorer.url(receipt.blockchain(), receipt.transactionReference))
+                ;
     }
 
     private Money amount() {
@@ -117,5 +134,26 @@ public class RewardV2ReadEntity {
             case PENDING_SIGNUP -> RewardStatusContract.PENDING_SIGNUP;
             case PROCESSING -> RewardStatusContract.PROCESSING;
         };
+    }
+
+    public record Receipt(
+            UUID id,
+            ZonedDateTime createdAt,
+            NetworkEnumEntity network,
+            String thirdPartyName,
+            String thirdPartyAccountNumber,
+            String transactionReference) {
+
+        public Blockchain blockchain() {
+            return switch (network) {
+                case ETHEREUM -> Blockchain.ETHEREUM;
+                case APTOS -> Blockchain.APTOS;
+                case OPTIMISM -> Blockchain.OPTIMISM;
+                case STARKNET -> Blockchain.STARKNET;
+                case STELLAR -> Blockchain.STELLAR;
+                case NEAR -> Blockchain.NEAR;
+                case SEPA -> null;
+            };
+        }
     }
 }

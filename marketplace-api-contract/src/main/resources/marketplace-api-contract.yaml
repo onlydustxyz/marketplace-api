@@ -4259,8 +4259,7 @@ paths:
           name: invoiceId
           required: true
           schema:
-            type: string
-            format: uuid
+            $ref: '#/components/schemas/InvoiceId'
         - in: query
           name: fileName
           required: false
@@ -4291,8 +4290,7 @@ paths:
           name: invoiceId
           required: true
           schema:
-            type: string
-            format: uuid
+            $ref: '#/components/schemas/InvoiceId'
       responses:
         "200":
           description: 'Pdf as blob'
@@ -5983,6 +5981,11 @@ components:
       format: uuid
       description: Billing profile ID
 
+    InvoiceId:
+      type: string
+      format: uuid
+      description: Invoice ID
+
     GithubInstallationId:
       type: integer
       format: int64
@@ -6008,6 +6011,11 @@ components:
       type: string
       format: uuid
       description: Notification ID
+
+    TransactionReference:
+      type: string
+      description: The transaction reference
+      example: 0x1234567890abcdef
 
     Money:
       type: object
@@ -6922,9 +6930,7 @@ components:
         network:
           $ref: '#/components/schemas/NetworkContract'
         transactionReference:
-          type: string
-          description: The transaction reference
-          example: 0x1234567890abcdef
+          $ref: '#/components/schemas/TransactionReference'
 
     DepositResponse:
       type: object
@@ -6981,8 +6987,7 @@ components:
           type: string
           description: The account number of the sender
         transactionReference:
-          type: string
-          description: The transaction reference
+          $ref: '#/components/schemas/TransactionReference'
 
     DepositBillingInformation:
       type: object
@@ -9451,7 +9456,7 @@ components:
         ens:
           type: string
         transactionReference:
-          type: string
+          $ref: '#/components/schemas/TransactionReference'
         transactionReferenceLink:
           type: string
           format: uri
@@ -12579,6 +12584,17 @@ components:
           $ref: '#/components/schemas/ProjectLinkResponse'
         billingProfileId:
           $ref: '#/components/schemas/BillingProfileId'
+        invoiceId:
+          $ref: '#/components/schemas/InvoiceId'
+        transactionReference:
+          $ref: '#/components/schemas/TransactionReference'
+        transactionReferenceLink:
+          type: string
+          format: uri
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributionUuid'
 
     DataSourceEnum:
       type: string
