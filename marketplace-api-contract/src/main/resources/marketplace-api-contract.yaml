@@ -12588,6 +12588,9 @@ components:
           $ref: '#/components/schemas/InvoiceId'
         transactionReference:
           $ref: '#/components/schemas/TransactionReference'
+        transactionReferenceLink:
+          type: string
+          format: uri
         items:
           type: array
           items:

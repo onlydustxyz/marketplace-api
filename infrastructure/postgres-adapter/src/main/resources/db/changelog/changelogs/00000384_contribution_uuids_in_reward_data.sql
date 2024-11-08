@@ -16,6 +16,13 @@ select r.id                                                                     
        r.amount                                                                                         as amount,
        r.currency_id                                                                                    as currency_id,
        array_agg(distinct ri.contribution_uuid) filter ( where ri.contribution_uuid is not null )       as contribution_uuids,
+       (jsonb_agg(distinct jsonb_build_object('id', receipts.id,
+                                              'createdAt', receipts.created_at,
+                                              'network', receipts.network::text,
+                                              'thirdPartyName', receipts.third_party_name,
+                                              'thirdPartyAccountNumber', receipts.third_party_account_number,
+                                              'transactionReference', receipts.transaction_reference))
+        filter ( where receipts.transaction_reference is not null ))[0]                                 as receipt,
        array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null )                 as ecosystem_ids,
        array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )                     as program_ids,
        array_agg(distinct lfe.language_id) filter ( where lfe.language_id is not null )                 as language_ids,
@@ -34,6 +41,8 @@ from rewards r
                                                   c.github_number = ri.number and
                                                   c.type::text::contribution_type = ri.type
          left join language_file_extensions lfe on lfe.extension = any (c.main_file_extensions)
+         left join accounting.rewards_receipts rr on rr.reward_id = r.id
+         left join accounting.receipts receipts on receipts.id = rr.receipt_id
 group by r.id,
          r.requested_at,
          r.recipient_id,
