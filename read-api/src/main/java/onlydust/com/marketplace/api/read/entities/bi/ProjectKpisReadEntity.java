@@ -101,6 +101,10 @@ public class ProjectKpisReadEntity {
                                         Trend.STABLE);
     }
 
+    private static BigDecimal coalescePrettyUsd(BigDecimal value) {
+        return value == null ? ZERO : prettyUsd(value);
+    }
+
     public BiProjectsPageItemResponse toDto() {
         return new BiProjectsPageItemResponse()
                 .project(project)
@@ -110,8 +114,8 @@ public class ProjectKpisReadEntity {
                 .ecosystems(ecosystems == null ? null : ecosystems.stream().sorted(Comparator.comparing(EcosystemLinkResponse::getName)).toList())
                 .programs(programs == null ? null : programs.stream().sorted(Comparator.comparing(ProgramLinkResponse::getName)).toList())
                 .availableBudget(new DetailedTotalMoney()
-                        .totalUsdEquivalent(availableBudget)
-                        .totalPerCurrency(budget == null || budget.availableBudgetPerCurrency == null ? null :
+                        .totalUsdEquivalent(coalescePrettyUsd(availableBudget))
+                        .totalPerCurrency(budget == null || budget.availableBudgetPerCurrency == null ? List.of() :
                                 budget.availableBudgetPerCurrency.stream()
                                         .map(a -> {
                                                     final var conversionRate = (a.usdAmount == null || a.amount.compareTo(ZERO) == 0) ? ONE :
