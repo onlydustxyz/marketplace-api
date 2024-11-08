@@ -633,3 +633,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000381_add_unique_contraint_on_project_github_repos.sql
   - include:
       file: db/changelog/changelogs/00000382_update_pseudo_projections.sql
+  - include:
+      file: db/changelog/changelogs/00000383_add_index.sql
