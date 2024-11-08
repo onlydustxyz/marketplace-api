@@ -8454,12 +8454,15 @@ components:
     ContributionShortLinkResponse:
       type: object
       required:
+        - uuid
         - type
         - githubStatus
         - githubNumber
         - githubTitle
         - githubHtmlUrl
       properties:
+        contributionUuid:
+          $ref: '#/components/schemas/ContributionUuid'
         type:
           $ref: '#/components/schemas/ContributionType'
         githubNumber:
@@ -12381,7 +12384,7 @@ components:
             applicants:
               type: array
               items:
-                $ref: '#/components/schemas/DatedGithubUserResponse'
+                $ref: '#/components/schemas/ApplicantResponse'
             languages:
               type: array
               items:
@@ -12393,6 +12396,20 @@ components:
                 $ref: '#/components/schemas/ContributionShortLinkResponse'
             totalRewardedUsdAmount:
               type: number
+            callerTotalRewardedUsdAmount:
+              type: number
+            githubCommentCount:
+              type: integer
+
+    ApplicantResponse:
+      allOf:
+        - $ref: '#/components/schemas/DatedGithubUserResponse'
+        - type: object
+          required:
+            - applicationId
+          properties:
+            applicationId:
+              $ref: '#/components/schemas/ProjectApplicationId'
 
     ContributionEventListResponse:
       type: object

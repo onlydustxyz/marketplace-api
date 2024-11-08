@@ -1,15 +1,15 @@
 package onlydust.com.marketplace.api.it.api;
 
-import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
+import onlydust.com.marketplace.api.contract.model.ContributionType;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.CurrencyHelper;
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.model.ProjectContributorLabel;
-import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
-import onlydust.com.marketplace.project.domain.model.UpdatePullRequestCommand;
+import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.ProjectContributorLabelFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.PullRequestFacadePort;
 import org.assertj.core.api.AbstractListAssert;
@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -33,24 +34,34 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     private static final AtomicBoolean setupDone = new AtomicBoolean();
     static ProjectContributorLabel ogLabel;
+    static UserAuthHelper.AuthenticatedUser projectLead;
+    static UserAuthHelper.AuthenticatedUser recipient;
+    static ProjectId kaaper = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
+    static RewardId rewardId;
+    static Application application;
 
     @Autowired
     ProjectContributorLabelFacadePort projectContributorLabelFacadePort;
     @Autowired
     PullRequestFacadePort pullRequestFacadePort;
+    @Autowired
+    PostgresBiProjectorAdapter postgresBiProjectorAdapter;
 
     @BeforeEach
     void setup() {
         if (setupDone.compareAndExchange(false, true)) return;
 
-        final var kaaper = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
         final var olivier = userAuthHelper.authenticateOlivier();
-        final var projectLead = userAuthHelper.authenticateAntho();
+        recipient = userAuthHelper.authenticatePierre();
+        projectLead = userAuthHelper.authenticateAntho();
         ogLabel = projectContributorLabelFacadePort.createLabel(projectLead.userId(), kaaper, "OG");
         projectContributorLabelFacadePort.updateLabelsOfContributors(projectLead.userId(), kaaper,
                 Map.of(olivier.user().getGithubUserId(), List.of(ogLabel.id())));
+        githubHelper.addClosingIssue(43506983L, 1966796364L);
+        postgresBiProjectorAdapter.onContributionsChanged(ContributionUUID.of(UUID.fromString("0f8d789f-fbbd-3171-ad03-9b2b6f8d9174")));
+        postgresBiProjectorAdapter.onContributionsChanged(ContributionUUID.of(UUID.fromString("f4db1d9b-4e1d-300c-9277-8d05824c804e")));
 
-        rewardHelper.create(kaaper, projectLead, GithubUserId.of(1814312), 123, CurrencyHelper.USDC, List.of(
+        rewardId = rewardHelper.create(kaaper, projectLead, recipient.githubUserId(), 123, CurrencyHelper.USDC, List.of(
                 RequestRewardCommand.Item.builder()
                         .id("1300430041")
                         .number(68L)
@@ -58,7 +69,67 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                         .type(RequestRewardCommand.Item.Type.issue)
                         .build()));
 
-        at("2024-10-23T09:30:40.738086Z", () -> applicationHelper.create(kaaper, GithubIssue.Id.of(1300430041L), olivier.githubUserId()));
+        rewardHelper.create(kaaper, projectLead, recipient.githubUserId(), 20, CurrencyHelper.USDC, List.of(
+                RequestRewardCommand.Item.builder()
+                        .id("1300430041")
+                        .number(68L)
+                        .repoId(498695724L)
+                        .type(RequestRewardCommand.Item.Type.issue)
+                        .build()));
+
+        rewardHelper.create(kaaper, projectLead, projectLead.githubUserId(), 1000, CurrencyHelper.USDC, List.of(
+                RequestRewardCommand.Item.builder()
+                        .id("1300430041")
+                        .number(68L)
+                        .repoId(498695724L)
+                        .type(RequestRewardCommand.Item.Type.issue)
+                        .build()));
+
+        application = at("2024-10-23T09:30:40.738086Z", () -> applicationHelper.create(kaaper, GithubIssue.Id.of(1300430041L), olivier.githubUserId()));
+    }
+
+    @Test
+    void should_get_total_rewarded_amount_as_maintainer_and_callerTotalRewardedUsdAmount_as_recipient() {
+        // When
+        client.get()
+                .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("0f8d789f-fbbd-3171-ad03-9b2b6f8d9174")))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + projectLead.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "uuid": "0f8d789f-fbbd-3171-ad03-9b2b6f8d9174",
+                          "type": "ISSUE",
+                          "githubNumber": 68,
+                          "totalRewardedUsdAmount": 1154.43,
+                          "callerTotalRewardedUsdAmount": 1010.0
+                        }
+                        """);
+    }
+
+    @Test
+    void should_get_callerTotalRewardedUsdAmount_as_recipient() {
+        // When
+        client.get()
+                .uri(getApiURI(CONTRIBUTIONS_BY_ID.formatted("0f8d789f-fbbd-3171-ad03-9b2b6f8d9174")))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + recipient.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "uuid": "0f8d789f-fbbd-3171-ad03-9b2b6f8d9174",
+                          "type": "ISSUE",
+                          "githubNumber": 68,
+                          "totalRewardedUsdAmount": null,
+                          "callerTotalRewardedUsdAmount": 144.43
+                        }
+                        """);
     }
 
     @Test
@@ -108,7 +179,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                               "githubUserId": 1814312,
                               "login": "krzkaczor",
                               "avatarUrl": "https://avatars.githubusercontent.com/u/1814312?v=4",
-                              "since": "2024-10-17T12:03:10.967909Z"
+                              "since": "2024-10-17T14:03:10.967909Z"
                             }
                           ],
                           "applicants": null,
@@ -121,8 +192,18 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                             }
                           ],
-                          "linkedIssues": null,
-                          "totalRewardedUsdAmount": 0
+                          "linkedIssues": [
+                            {
+                              "contributionUuid": "4782d22d-be45-3253-a3b4-5688045632f7",
+                              "type": "ISSUE",
+                              "githubNumber": 49,
+                              "githubStatus": "COMPLETED",
+                              "githubTitle": "/* ... */ notation",
+                              "githubHtmlUrl": "https://github.com/IonicaBizau/node-cobol/issues/49"
+                            }
+                          ],
+                          "totalRewardedUsdAmount": null,
+                          "githubCommentCount": 1
                         }
                         """);
     }
@@ -137,6 +218,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isOk()
                 .expectBody()
+                .jsonPath("$.applicants[0].applicationId").isEqualTo(application.id().toString())
                 .json("""
                         {
                           "uuid": "0f8d789f-fbbd-3171-ad03-9b2b6f8d9174",
@@ -213,7 +295,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                           ],
                           "languages": null,
                           "linkedIssues": null,
-                          "totalRewardedUsdAmount": 124.23
+                          "totalRewardedUsdAmount": null
                         }
                         """);
     }
@@ -311,7 +393,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                               "applicants": null,
                               "languages": null,
                               "linkedIssues": null,
-                              "totalRewardedUsdAmount": 0
+                              "totalRewardedUsdAmount": null
                             }
                           ]
                         }
@@ -364,11 +446,11 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .extracting(ContributionActivityPageItemResponse::getContributors)
                 .allMatch(contributors -> contributors.stream().anyMatch(c -> c.getLogin().equals("AnthonyBuisset")));
 
-        assertContributions(Map.of("hasBeenRewarded", "true"))
+        assertContributions(Map.of("hasBeenRewarded", "true", "projectIds", kaaper.toString()))
                 .extracting(ContributionActivityPageItemResponse::getTotalRewardedUsdAmount)
                 .allMatch(a -> a.compareTo(BigDecimal.ZERO) > 0);
 
-        assertContributions(Map.of("hasBeenRewarded", "false"))
+        assertContributions(Map.of("hasBeenRewarded", "false", "projectIds", kaaper.toString()))
                 .extracting(ContributionActivityPageItemResponse::getTotalRewardedUsdAmount)
                 .allMatch(a -> a.compareTo(BigDecimal.ZERO) == 0);
 
@@ -376,7 +458,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .extracting(ContributionActivityPageItemResponse::getContributors)
                 .allMatch(contributors -> contributors.stream().anyMatch(c -> c.getLogin().equals("ofux")));
 
-        assertContributions(Map.of("rewardIds", "0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf"))
+        assertContributions(Map.of("rewardIds", rewardId.toString()))
                 .extracting(ContributionActivityPageItemResponse::getTotalRewardedUsdAmount)
                 .allMatch(a -> a.compareTo(BigDecimal.ZERO) > 0);
 
@@ -413,6 +495,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
 
         final var contributions = client.get()
                 .uri(getApiURI(CONTRIBUTIONS, q))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + projectLead.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()

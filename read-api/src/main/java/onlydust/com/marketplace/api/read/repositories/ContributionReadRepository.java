@@ -24,6 +24,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
     @Query(value = """
             select c.contribution_uuid                       as contribution_uuid,
                    c.contribution_type                       as contribution_type,
+                   c.project_id                              as project_id,
                    c.github_id                               as github_id,
                    c.github_repo                             as github_repo,
                    ccd.github_author                         as github_author,
@@ -42,8 +43,9 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                    ccd.applicants                            as applicants,
                    c.languages                               as languages,
                    c.linked_issues                           as linked_issues,
+                   c.github_comment_count                    as github_comment_count,
                    coalesce(rd.total_rewarded_usd_amount, 0) as total_rewarded_usd_amount,
-                   rd.reward_ids                             as reward_ids
+                   rd.per_recipient                          as rewarded_per_recipients
             from bi.p_contribution_data c
                      join bi.p_contribution_contributors_data ccd on c.contribution_uuid = ccd.contribution_uuid
                      left join bi.p_contribution_reward_data rd on rd.contribution_uuid = c.contribution_uuid

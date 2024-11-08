@@ -8,6 +8,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -17,6 +18,7 @@ import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -35,6 +37,8 @@ public class ContributionReadEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     ContributionType contributionType;
+
+    UUID projectId;
 
     String githubId;
 
@@ -65,6 +69,8 @@ public class ContributionReadEntity {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     ContributionActivityStatus activityStatus;
 
+    Integer githubCommentCount;
+
     @JdbcTypeCode(SqlTypes.JSON)
     ProjectLinkResponse project;
 
@@ -72,7 +78,7 @@ public class ContributionReadEntity {
     List<DatedGithubUserResponse> contributors;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    List<DatedGithubUserResponse> applicants;
+    List<ApplicantResponse> applicants;
 
     @JdbcTypeCode(SqlTypes.JSON)
     List<LanguageResponse> languages;
@@ -80,10 +86,11 @@ public class ContributionReadEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     List<ContributionShortLinkResponse> linkedIssues;
 
-    @JdbcTypeCode(SqlTypes.JSON)
     BigDecimal totalRewardedUsdAmount;
+    @JdbcTypeCode(SqlTypes.JSON)
+    List<RewardedPerRecipient> rewardedPerRecipients;
 
-    public ContributionActivityPageItemResponse toDto() {
+    public ContributionActivityPageItemResponse toDto(Optional<AuthenticatedUser> caller) {
         return new ContributionActivityPageItemResponse()
                 .uuid(contributionUuid)
                 .type(contributionType)
@@ -105,7 +112,14 @@ public class ContributionReadEntity {
                 .applicants(applicants)
                 .languages(languages)
                 .linkedIssues(linkedIssues)
-                .totalRewardedUsdAmount(totalRewardedUsdAmount)
+                .githubCommentCount(githubCommentCount)
+                .totalRewardedUsdAmount(projectId == null ? null :
+                        caller.filter(u -> u.projectsLed().contains(projectId)).map(u -> totalRewardedUsdAmount).orElse(null))
+                .callerTotalRewardedUsdAmount(rewardedPerRecipients == null ? null :
+                        caller.flatMap(u -> rewardedPerRecipients.stream().filter(rpr -> rpr.recipientId().equals(u.githubUserId())).map(RewardedPerRecipient::totalRewardedUsdAmount).findFirst()).orElse(null))
                 ;
+    }
+
+    public record RewardedPerRecipient(Long recipientId, BigDecimal totalRewardedUsdAmount) {
     }
 }

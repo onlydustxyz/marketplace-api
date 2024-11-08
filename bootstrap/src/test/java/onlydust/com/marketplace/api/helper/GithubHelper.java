@@ -193,6 +193,17 @@ public class GithubHelper {
         return contributionUuid;
     }
 
+    public void addClosingIssue(Long prId, Long issueId) {
+        databaseHelper.executeQuery("""
+                insert into indexer_exp.github_pull_requests_closing_issues(pull_request_id, issue_id)
+                values(:prId, :issueId)
+                on conflict do nothing;
+                """, Map.of(
+                "prId", prId,
+                "issueId", issueId
+        ));
+    }
+
     public Long createIssue(GithubRepo repo, UserAuthHelper.AuthenticatedUser author) {
         return createIssue(repo.getId(), CurrentDateProvider.now(), CurrentDateProvider.now().plusDays(1), "COMPLETED", author);
     }
