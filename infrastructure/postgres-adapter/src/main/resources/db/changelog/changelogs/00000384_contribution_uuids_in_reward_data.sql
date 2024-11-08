@@ -1,29 +1,26 @@
 call drop_pseudo_projection('bi', 'reward_data');
 
 call create_pseudo_projection('bi', 'reward_data', $$
-select r.id                                                       as reward_id,
-       r.requested_at                                             as timestamp,
-       date_trunc('day', r.requested_at)                          as day_timestamp,
-       date_trunc('week', r.requested_at)                         as week_timestamp,
-       date_trunc('month', r.requested_at)                        as month_timestamp,
-       date_trunc('quarter', r.requested_at)                      as quarter_timestamp,
-       date_trunc('year', r.requested_at)                         as year_timestamp,
-       r.recipient_id                                             as contributor_id,
-       r.requestor_id                                             as requestor_id,
-       r.project_id                                               as project_id,
-       p.slug                                                     as project_slug,
-       rsd.amount_usd_equivalent                                  as usd_amount,
-       r.amount                                                   as amount,
-       r.currency_id                                              as currency_id,
-       array_agg(distinct pe.ecosystem_id)
-       filter ( where pe.ecosystem_id is not null )               as ecosystem_ids,
-       array_agg(distinct pp.program_id)
-       filter ( where pp.program_id is not null )                 as program_ids,
-       array_agg(distinct lfe.language_id)
-       filter ( where lfe.language_id is not null )               as language_ids,
-       array_agg(distinct ppc.project_category_id)
-       filter ( where ppc.project_category_id is not null )       as project_category_ids,
-       string_agg(currencies.name || ' ' || currencies.code, ' ') as search
+select r.id                                                                                             as reward_id,
+       r.requested_at                                                                                   as timestamp,
+       date_trunc('day', r.requested_at)                                                                as day_timestamp,
+       date_trunc('week', r.requested_at)                                                               as week_timestamp,
+       date_trunc('month', r.requested_at)                                                              as month_timestamp,
+       date_trunc('quarter', r.requested_at)                                                            as quarter_timestamp,
+       date_trunc('year', r.requested_at)                                                               as year_timestamp,
+       r.recipient_id                                                                                   as contributor_id,
+       r.requestor_id                                                                                   as requestor_id,
+       r.project_id                                                                                     as project_id,
+       p.slug                                                                                           as project_slug,
+       rsd.amount_usd_equivalent                                                                        as usd_amount,
+       r.amount                                                                                         as amount,
+       r.currency_id                                                                                    as currency_id,
+       array_agg(distinct ri.contribution_uuid) filter ( where ri.contribution_uuid is not null )       as contribution_uuids,
+       array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null )                 as ecosystem_ids,
+       array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )                     as program_ids,
+       array_agg(distinct lfe.language_id) filter ( where lfe.language_id is not null )                 as language_ids,
+       array_agg(distinct ppc.project_category_id) filter ( where ppc.project_category_id is not null ) as project_category_ids,
+       string_agg(currencies.name || ' ' || currencies.code, ' ')                                       as search
 from rewards r
          join accounting.reward_status_data rsd ON rsd.reward_id = r.id
          join projects p on p.id = r.project_id
@@ -45,7 +42,7 @@ group by r.id,
          r.amount,
          r.currency_id,
          p.slug
-    $$, 'reward_id');
+$$, 'reward_id');
 
 create index p_reward_data_contributor_id_project_id_index on bi.p_reward_data (contributor_id, project_id);
 create unique index p_reward_data_contributor_id_reward_id_usd_amount_uindex on bi.p_reward_data (contributor_id, reward_id, usd_amount);
