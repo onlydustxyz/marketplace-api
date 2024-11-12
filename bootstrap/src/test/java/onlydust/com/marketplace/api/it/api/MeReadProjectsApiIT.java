@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.it.api;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
 import onlydust.com.marketplace.api.contract.model.DetailedTotalMoney;
-import onlydust.com.marketplace.api.contract.model.MyProjectsPageResponse;
+import onlydust.com.marketplace.api.contract.model.MyProjectsAsMaintainerPageResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.kernel.model.ProgramId;
@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Set;
@@ -40,7 +39,7 @@ public class MeReadProjectsApiIT extends AbstractMarketplaceApiIT {
         void should_get_my_projects_with_no_result() {
             // When
             client.get()
-                    .uri(getApiURI(ME_PROJECTS))
+                    .uri(getApiURI(ME_AS_MAINTAINER_PROJECTS))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                     .exchange()
                     // Then
@@ -72,13 +71,13 @@ public class MeReadProjectsApiIT extends AbstractMarketplaceApiIT {
         void should_get_my_projects() {
             // When
             final var response = client.get()
-                    .uri(getApiURI(ME_PROJECTS))
+                    .uri(getApiURI(ME_AS_MAINTAINER_PROJECTS))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                     .exchange()
                     // Then
                     .expectStatus()
-                    .isEqualTo(HttpStatus.PARTIAL_CONTENT)
-                    .expectBody(MyProjectsPageResponse.class)
+                    .is2xxSuccessful()
+                    .expectBody(MyProjectsAsMaintainerPageResponse.class)
                     .returnResult().getResponseBody();
 
             assertThat(response).isNotNull();
@@ -150,7 +149,7 @@ public class MeReadProjectsApiIT extends AbstractMarketplaceApiIT {
         void should_get_my_projects() {
             // When
             client.get()
-                    .uri(getApiURI(ME_PROJECTS))
+                    .uri(getApiURI(ME_AS_MAINTAINER_PROJECTS))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                     .exchange()
                     // Then

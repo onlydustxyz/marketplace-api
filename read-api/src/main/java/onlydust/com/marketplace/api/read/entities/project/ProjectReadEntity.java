@@ -316,8 +316,8 @@ public class ProjectReadEntity {
                 .logoUrl(logoUrl);
     }
 
-    public MyProjectsPageItemResponse toMyProjectsPageItemResponse() {
-        return new MyProjectsPageItemResponse()
+    public MyProjectsAsMaintainerPageItemResponse toMyProjectsPageItemResponse() {
+        return new MyProjectsAsMaintainerPageItemResponse()
                 .id(id)
                 .slug(slug)
                 .name(name)
