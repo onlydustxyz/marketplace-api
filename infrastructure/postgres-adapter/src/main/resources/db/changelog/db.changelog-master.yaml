@@ -6,11 +6,7 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000002_init_iam_schema.sql
   - include:
-      file: db/changelog/changelogs/00000003_init_indexer_outbox_schema.sql
-  - include:
       file: db/changelog/changelogs/00000004_init_public_schema.sql
-  - include:
-      file: db/changelog/changelogs/00000005_init_indexer_exp_schema.sql
   - include:
       file: db/changelog/changelogs/00000006_init_accounting_schema.sql
   - include:
