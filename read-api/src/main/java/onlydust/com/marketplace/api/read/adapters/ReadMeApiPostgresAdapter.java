@@ -202,12 +202,12 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     }
 
     @Override
-    public ResponseEntity<MyProjectsPageResponse> getMyProjects(Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<MyProjectsAsMaintainerPageResponse> getMyProjects(Integer pageIndex, Integer pageSize) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var page = projectReadRepository.findAllByLead(authenticatedUser.id().value(),
                 PageRequest.of(sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), Sort.by("name").ascending()));
 
-        final var response = new MyProjectsPageResponse()
+        final var response = new MyProjectsAsMaintainerPageResponse()
                 .projects(page.getContent().stream().map(ProjectReadEntity::toMyProjectsPageItemResponse).toList())
                 .hasMore(hasMore(pageIndex, page.getTotalPages()))
                 .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()))

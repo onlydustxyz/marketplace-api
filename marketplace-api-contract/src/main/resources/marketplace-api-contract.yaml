@@ -452,6 +452,56 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/as-maintainer/projects:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadMe
+      summary: Get projects I'm leading
+      operationId: getMyProjectsAsMaintainer
+      description: |
+        Get the list of projects the user is leading
+      parameters:
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+      responses:
+        "200":
+          description: 'Projects'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyProjectsAsMaintainerPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/me/as-contributor/projects:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadMe
+      summary: Get projects I contributed to
+      operationId: getMyProjectsAsContributor
+      description: |
+        Get the list of projects the user contributed to
+      parameters:
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+      responses:
+        "200":
+          description: 'Projects'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyProjectsAsContributorPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/me/banners/{bannerId}:
     delete:
       security:
@@ -715,6 +765,7 @@ paths:
 
   /api/v1/me/projects:
     get:
+      deprecated: true
       security:
         - bearerAuth: [ ]
       tags:
@@ -732,7 +783,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MyProjectsPageResponse'
+                $ref: '#/components/schemas/MyProjectsAsMaintainerPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -7068,7 +7119,7 @@ components:
             totalRewarded:
               $ref: '#/components/schemas/DetailedTotalMoney'
 
-    MyProjectsPageResponse:
+    MyProjectsAsMaintainerPageResponse:
       allOf:
         - $ref: '#/components/schemas/PageResponse'
         - type: object
@@ -7078,9 +7129,9 @@ components:
             projects:
               type: array
               items:
-                $ref: '#/components/schemas/MyProjectsPageItemResponse'
+                $ref: '#/components/schemas/MyProjectsAsMaintainerPageItemResponse'
 
-    MyProjectsPageItemResponse:
+    MyProjectsAsMaintainerPageItemResponse:
       allOf:
         - $ref: '#/components/schemas/ProjectShortResponse'
         - type: object
@@ -7103,6 +7154,50 @@ components:
               $ref: '#/components/schemas/DetailedTotalMoney'
             totalRewarded:
               $ref: '#/components/schemas/DetailedTotalMoney'
+
+    MyProjectsAsContributorPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - projects
+          properties:
+            projects:
+              type: array
+              items:
+                $ref: '#/components/schemas/MyProjectsAsContributorPageItemResponse'
+
+    MyProjectsAsContributorPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProjectShortResponse'
+        - type: object
+          required:
+            - leads
+            - contributorCount
+            - totalAvailable
+            - totalGranted
+            - totalRewarded
+          properties:
+            leads:
+              type: array
+              items:
+                $ref: '#/components/schemas/RegisteredUserResponse'
+            repos:
+              type: array
+              items:
+                $ref: '#/components/schemas/ShortGithubRepoResponse'
+            goodFirstIssueIds:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContributionUuid'
+            contributorCount:
+              type: integer
+            contributionCount:
+              type: integer
+            rewardedUsdAmount:
+              type: number
+            billingProfile:
+              $ref: '#/components/schemas/ShortBillingProfileResponse'
 
     SponsorProgramPageResponse:
       allOf:
@@ -8684,6 +8779,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ShortBillingProfileResponse'
+
     ShortBillingProfileResponse:
       type: object
       required:

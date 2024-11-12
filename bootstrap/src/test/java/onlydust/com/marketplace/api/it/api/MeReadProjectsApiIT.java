@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.it.api;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
 import onlydust.com.marketplace.api.contract.model.DetailedTotalMoney;
-import onlydust.com.marketplace.api.contract.model.MyProjectsPageResponse;
+import onlydust.com.marketplace.api.contract.model.MyProjectsAsMaintainerPageResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.kernel.model.ProgramId;
@@ -78,7 +78,7 @@ public class MeReadProjectsApiIT extends AbstractMarketplaceApiIT {
                     // Then
                     .expectStatus()
                     .isEqualTo(HttpStatus.PARTIAL_CONTENT)
-                    .expectBody(MyProjectsPageResponse.class)
+                    .expectBody(MyProjectsAsMaintainerPageResponse.class)
                     .returnResult().getResponseBody();
 
             assertThat(response).isNotNull();
