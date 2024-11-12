@@ -40,7 +40,7 @@ public class MeReadProjectsApiIT extends AbstractMarketplaceApiIT {
         void should_get_my_projects_with_no_result() {
             // When
             client.get()
-                    .uri(getApiURI(ME_PROJECTS))
+                    .uri(getApiURI(ME_AS_MAINTAINER_PROJECTS))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                     .exchange()
                     // Then
@@ -72,7 +72,7 @@ public class MeReadProjectsApiIT extends AbstractMarketplaceApiIT {
         void should_get_my_projects() {
             // When
             final var response = client.get()
-                    .uri(getApiURI(ME_PROJECTS))
+                    .uri(getApiURI(ME_AS_MAINTAINER_PROJECTS))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                     .exchange()
                     // Then
@@ -150,7 +150,7 @@ public class MeReadProjectsApiIT extends AbstractMarketplaceApiIT {
         void should_get_my_projects() {
             // When
             client.get()
-                    .uri(getApiURI(ME_PROJECTS))
+                    .uri(getApiURI(ME_AS_MAINTAINER_PROJECTS))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                     .exchange()
                     // Then

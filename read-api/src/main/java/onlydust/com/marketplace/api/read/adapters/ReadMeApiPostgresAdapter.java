@@ -66,6 +66,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     private final ProgramReadRepository programReadRepository;
     private final ProjectReadRepository projectReadRepository;
     private final HackathonReadRepository hackathonReadRepository;
+    private final ProjectsAsContributorRepository projectsAsContributorRepository;
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -203,6 +204,11 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
 
     @Override
     public ResponseEntity<MyProjectsAsMaintainerPageResponse> getMyProjects(Integer pageIndex, Integer pageSize) {
+        return getMyProjectsAsMaintainer(pageIndex, pageSize);
+    }
+
+    @Override
+    public ResponseEntity<MyProjectsAsMaintainerPageResponse> getMyProjectsAsMaintainer(Integer pageIndex, Integer pageSize) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var page = projectReadRepository.findAllByLead(authenticatedUser.id().value(),
                 PageRequest.of(sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), Sort.by("name").ascending()));
@@ -214,7 +220,23 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages());
 
-        return response.getHasMore() ? status(HttpStatus.PARTIAL_CONTENT).body(response) : ok(response);
+        return ok(response);
+    }
+
+    @Override
+    public ResponseEntity<MyProjectsAsContributorPageResponse> getMyProjectsAsContributor(Integer pageIndex, Integer pageSize) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var page = projectsAsContributorRepository.findAll(authenticatedUser.githubUserId(),
+                PageRequest.of(sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), Sort.by("name").ascending()));
+
+        final var response = new MyProjectsAsContributorPageResponse()
+                .projects(page.getContent().stream().map(e -> e.toDto(authenticatedUser.githubUserId())).toList())
+                .hasMore(hasMore(pageIndex, page.getTotalPages()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()))
+                .totalItemNumber((int) page.getTotalElements())
+                .totalPageNumber(page.getTotalPages());
+
+        return ok(response);
     }
 
     @Override

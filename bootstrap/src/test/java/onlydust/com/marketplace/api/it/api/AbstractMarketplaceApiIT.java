@@ -73,7 +73,8 @@ public class AbstractMarketplaceApiIT {
     protected static final String BANNER = "/api/v1/banner";
     protected static final String ME_BANNER = "/api/v1/me/banners/%s";
     protected static final String ME_PROGRAMS = "/api/v1/me/programs";
-    protected static final String ME_PROJECTS = "/api/v1/me/projects";
+    protected static final String ME_AS_MAINTAINER_PROJECTS = "/api/v1/me/as-maintainer/projects";
+    protected static final String ME_AS_CONTRIBUTOR_PROJECTS = "/api/v1/me/as-contributor/projects";
     protected static final String BILLING_PROFILE_INVOICE_PREVIEW = "/api/v1/billing-profiles/%s/invoice-preview";
     protected static final String BILLING_PROFILE_INVOICES = "/api/v1/billing-profiles/%s/invoices";
     protected static final String BILLING_PROFILE_INVOICE = "/api/v1/billing-profiles/%s/invoices/%s";
