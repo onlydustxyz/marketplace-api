@@ -6,7 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmplo
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
-import onlydust.com.marketplace.api.suites.tags.TagBI;
+import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
@@ -29,7 +29,7 @@ import static onlydust.com.marketplace.api.helper.DateHelper.at;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@TagBI
+@TagMe
 public class MeProjectsAsContributorApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     ProjectFacadePort projectFacadePort;

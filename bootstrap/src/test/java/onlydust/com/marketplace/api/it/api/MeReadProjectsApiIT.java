@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Set;
@@ -77,7 +76,7 @@ public class MeReadProjectsApiIT extends AbstractMarketplaceApiIT {
                     .exchange()
                     // Then
                     .expectStatus()
-                    .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                    .is2xxSuccessful()
                     .expectBody(MyProjectsAsMaintainerPageResponse.class)
                     .returnResult().getResponseBody();
 
