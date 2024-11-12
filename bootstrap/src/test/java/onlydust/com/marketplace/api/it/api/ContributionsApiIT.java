@@ -486,6 +486,11 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         assertContributions(Map.of("dataSource", "ALL"))
                 .extracting(ContributionActivityPageItemResponse::getProject)
                 .contains((ProjectLinkResponse) null);
+
+        assertContributions(Map.of("applicantIds", "595505"))
+                .extracting(ContributionActivityPageItemResponse::getApplicants)
+                .allMatch(applicants -> applicants.stream().anyMatch(c -> c.getLogin().equals("ofux")));
+
     }
 
     private AbstractListAssert<?, ? extends List<? extends ContributionActivityPageItemResponse>, ContributionActivityPageItemResponse> assertContributions(Map<String, String> params) {
