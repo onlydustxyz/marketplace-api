@@ -62,6 +62,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
               and (coalesce(:statuses) is null or c.activity_status = any (cast(:statuses as activity_status[])))
               and (coalesce(:repoIds) is null or c.repo_id = any (:repoIds))
               and (coalesce(:contributorIds) is null or ccd.contributor_ids && :contributorIds)
+              and (coalesce(:applicantIds) is null or ccd.applicant_ids && :applicantIds)
               and (coalesce(:projectContributorLabelIds) is null or cpcl.label_id = any (:projectContributorLabelIds))
               and (coalesce(:rewardIds) is null or rd.reward_ids && :rewardIds)
               and (coalesce(:languageIds) is null or c.language_ids && :languageIds)
@@ -82,6 +83,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                                          String[] statuses,
                                          Long[] repoIds,
                                          Long[] contributorIds,
+                                         Long[] applicantIds,
                                          UUID[] projectContributorLabelIds,
                                          UUID[] rewardIds,
                                          UUID[] languageIds,
@@ -104,6 +106,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                 q.getStatuses() == null ? null : q.getStatuses().stream().map(Enum::name).toArray(String[]::new),
                 q.getRepoIds() == null ? null : q.getRepoIds().toArray(Long[]::new),
                 q.getContributorIds() == null ? null : q.getContributorIds().toArray(Long[]::new),
+                q.getApplicantIds() == null ? null : q.getApplicantIds().toArray(Long[]::new),
                 q.getProjectContributorLabelIds() == null ? null : q.getProjectContributorLabelIds().toArray(UUID[]::new),
                 q.getRewardIds() == null ? null : q.getRewardIds().toArray(UUID[]::new),
                 q.getLanguageIds() == null ? null : q.getLanguageIds().toArray(UUID[]::new),

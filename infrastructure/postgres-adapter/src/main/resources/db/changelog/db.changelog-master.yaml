@@ -637,3 +637,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000383_add_index.sql
   - include:
       file: db/changelog/changelogs/00000384_contribution_uuids_in_reward_data.sql
+  - include:
+      file: db/changelog/changelogs/00000385_add_index.sql

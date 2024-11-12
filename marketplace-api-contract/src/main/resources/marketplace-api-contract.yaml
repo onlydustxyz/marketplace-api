@@ -12321,6 +12321,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/GithubUserId'
+            applicantIds:
+              type: array
+              items:
+                $ref: '#/components/schemas/GithubUserId'
             languageIds:
               type: array
               items:
