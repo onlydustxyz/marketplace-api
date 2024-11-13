@@ -58,6 +58,9 @@ public class BiFinancialMonthlyStatsReadEntity implements ProgramTransactionStat
     BigDecimal totalRewarded;
 
     @NonNull
+    BigDecimal totalPaid;
+
+    @NonNull
     Integer transactionCount;
 
     public static List<BiFinancialsStatsResponse> toDto(List<BiFinancialMonthlyStatsReadEntity> result, boolean showEmpty, SortDirection sortDirection) {
@@ -76,6 +79,7 @@ public class BiFinancialMonthlyStatsReadEntity implements ProgramTransactionStat
                             .totalAllocated(BigDecimal.ZERO)
                             .totalGranted(BigDecimal.ZERO)
                             .totalRewarded(BigDecimal.ZERO)
+                            .totalPaid(BigDecimal.ZERO)
                             .transactionCount(0)
                             .build());
                 }
@@ -86,6 +90,7 @@ public class BiFinancialMonthlyStatsReadEntity implements ProgramTransactionStat
                     .totalAllocated(DetailedTotalMoneyMapper.map(stats, BiFinancialMonthlyStatsReadEntity::totalAllocated))
                     .totalGranted(DetailedTotalMoneyMapper.map(stats, BiFinancialMonthlyStatsReadEntity::totalGranted))
                     .totalRewarded(DetailedTotalMoneyMapper.map(stats, BiFinancialMonthlyStatsReadEntity::totalRewarded))
+                    .totalPaid(DetailedTotalMoneyMapper.map(stats, BiFinancialMonthlyStatsReadEntity::totalPaid))
                     .transactionCount(stats.stream().mapToInt(BiFinancialMonthlyStatsReadEntity::transactionCount).sum()));
         });
 

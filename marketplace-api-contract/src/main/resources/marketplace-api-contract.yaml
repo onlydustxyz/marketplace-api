@@ -7289,6 +7289,7 @@ components:
         - totalAllocated
         - totalGranted
         - totalRewarded
+        - totalPaid
         - transactionCount
       properties:
         date:
@@ -7302,6 +7303,8 @@ components:
         totalGranted:
           $ref: '#/components/schemas/DetailedTotalMoney'
         totalRewarded:
+          $ref: '#/components/schemas/DetailedTotalMoney'
+        totalPaid:
           $ref: '#/components/schemas/DetailedTotalMoney'
         transactionCount:
           type: integer
