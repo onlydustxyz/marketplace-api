@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.read.repositories;
 
 import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.api.read.entities.program.BiFinancialMonthlyStatsReadEntity;
 import org.intellij.lang.annotations.Language;
 
@@ -55,7 +56,7 @@ public class BiFinancialMonthlyStatsReadRepository {
                                           and tx.timestamp >= d.date
                                           and tx.timestamp < d.date + interval '1 month'
                                           and tx.type in ('DEPOSIT', 'WITHDRAW', 'TRANSFER', 'REFUND')
-                                          and (coalesce(:types) is null or (
+                                          and (
                                             ('DEPOSITED' in (:types) and tx.type = 'DEPOSIT' and tx.deposit_status != 'DRAFT') or
                                             ('ALLOCATED' in (:types) and tx.type = 'TRANSFER' and tx.program_id is not null and tx.project_id is null) or
                                             ('UNALLOCATED' in (:types) and tx.type = 'REFUND' and tx.program_id is not null and tx.project_id is null) or
@@ -63,7 +64,7 @@ public class BiFinancialMonthlyStatsReadRepository {
                                             ('UNGRANTED' in (:types) and tx.type = 'REFUND' and tx.project_id is not null and tx.reward_id is null) or
                                             ('REWARDED' in (:types) and tx.type = 'TRANSFER' and tx.reward_id is not null and tx.payment_id is null) or
                                             ('PAID' in (:types) and tx.type = 'TRANSFER' and tx.payment_id is not null)
-                                            ))
+                                            )
                                           and (cast(:search as text) is null or (concat(s.name, ' ', pgm.name, ' ', p.name, ' ', rr.login) ilike '%' || :search || '%'))
                                           and (cast(:searchProjectsAndRecipients as text) is null or (concat(p.name, ' ', rr.login) ilike '%' || :searchProjectsAndRecipients || '%'))
                                         group by 1, 2) tx
@@ -79,8 +80,9 @@ public class BiFinancialMonthlyStatsReadRepository {
                                                            ZonedDateTime fromDate,
                                                            ZonedDateTime toDate,
                                                            String search,
-                                                           List<String> types) {
-        final var result = groupBy.findAll(entityManager, id, recipientId, fromDate, toDate, search, types);
+                                                           @NonNull List<String> types) {
+        final var result = groupBy.findAll(entityManager, id, recipientId, fromDate, toDate, search,
+                types.isEmpty() ? List.of("no-type") : types);
         return result.stream().dropWhile(s -> fromDate == null && s.currencyId() == null).toList();
     }
 

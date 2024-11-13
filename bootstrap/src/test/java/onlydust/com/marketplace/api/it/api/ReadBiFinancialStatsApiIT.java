@@ -1022,7 +1022,7 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
         }
 
         @ParameterizedTest
-        @EnumSource(value = FinancialTransactionType.class, names = {"REWARDED", "PAID"})
+        @EnumSource(value = FinancialTransactionType.class, names = {"REWARDED", "PAID", "DEPOSITED"})
         void should_get_recipient_bi_financial_stats_filtered_by_types(FinancialTransactionType type) {
             // When
             final var stats = client.get()
@@ -1038,6 +1038,7 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isOk()
                     .expectBody(BiFinancialsStatsListResponse.class)
+                    .consumeWith(System.out::println)
                     .returnResult().getResponseBody().getStats();
 
             switch (type) {
@@ -1049,6 +1050,7 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                     assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.AUGUST).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
                     assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.SEPTEMBER).findFirst().orElseThrow().getTransactionCount()).isEqualTo(0);
                 }
+                case DEPOSITED -> stats.forEach(s -> assertThat(s.getTransactionCount()).isEqualTo(0));
             }
         }
 

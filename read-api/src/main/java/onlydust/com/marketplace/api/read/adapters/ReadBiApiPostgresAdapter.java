@@ -396,6 +396,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
             case PROJECT_ID -> List.of(GRANTED, UNGRANTED, REWARDED);
             case RECIPIENT_ID -> List.of(REWARDED, PAID);
         };
+        final var sanitizedTypes = types == null ? allTypes : allTypes.stream().filter(types::contains).toList();
 
         final var result = biFinancialMonthlyStatsReadRepository.findAll(id,
                 recipientId,
@@ -403,7 +404,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 toZoneDateTime(DateMapper.parseNullable(fromDate)),
                 toZoneDateTime(DateMapper.parseNullable(toDate)),
                 search,
-                Optional.ofNullable(types).orElse(allTypes).stream().map(FinancialTransactionType::name).toList());
+                sanitizedTypes.stream().map(FinancialTransactionType::name).toList());
 
         return ok(new BiFinancialsStatsListResponse().stats(BiFinancialMonthlyStatsReadEntity.toDto(result, !FALSE.equals(showEmpty), sortDirection)));
     }
