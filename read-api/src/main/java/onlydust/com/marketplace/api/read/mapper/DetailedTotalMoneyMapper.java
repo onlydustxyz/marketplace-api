@@ -19,6 +19,7 @@ public interface DetailedTotalMoneyMapper {
             return null;
 
         final var usdTotal = stats.stream()
+                .filter(s -> s.currency() != null)
                 .map(s -> s.usdAmount(amountSupplier.apply(s)))
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal::add)
@@ -26,8 +27,10 @@ public interface DetailedTotalMoneyMapper {
 
         return new DetailedTotalMoney()
                 .totalPerCurrency(stats.stream()
+                        .filter(s -> s.currency() != null)
                         .sorted(comparing(c -> c.currency().name()))
                         .map(s -> s.toMoney(amountSupplier.apply(s), usdTotal))
+                        .filter(Objects::nonNull)
                         .sorted(comparing(DetailedTotalMoneyTotalPerCurrencyInner::getUsdEquivalent, nullsLast(naturalOrder())).reversed())
                         .toList())
                 .totalUsdEquivalent(prettyUsd(usdTotal));

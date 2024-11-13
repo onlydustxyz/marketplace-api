@@ -7,7 +7,6 @@ import onlydust.com.marketplace.api.read.entities.accounting.AllTransactionReadE
 import onlydust.com.marketplace.api.read.entities.accounting.DepositReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.BiFinancialMonthlyStatsReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
-import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
@@ -28,14 +27,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static java.lang.Boolean.FALSE;
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
@@ -171,32 +167,15 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
             throw unauthorized("User %s is not authorized to access sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
         final var allTypes = List.of(FinancialTransactionType.DEPOSITED, FinancialTransactionType.ALLOCATED, FinancialTransactionType.UNALLOCATED);
-        final var stats = biFinancialMonthlyStatsReadRepository.findAll(sponsorId,
-                        BiFinancialMonthlyStatsReadRepository.IdGrouping.SPONSOR_ID,
-                        toZoneDateTime(DateMapper.parseNullable(fromDate)),
-                        toZoneDateTime(DateMapper.parseNullable(toDate)),
-                        search,
-                        Optional.ofNullable(types).orElse(allTypes).stream().map(FinancialTransactionType::name).toList())
-                .stream()
-                .collect(groupingBy(BiFinancialMonthlyStatsReadEntity::date));
+        final var result = biFinancialMonthlyStatsReadRepository.findAll(sponsorId,
+                null,
+                BiFinancialMonthlyStatsReadRepository.IdGrouping.SPONSOR_ID,
+                toZoneDateTime(DateMapper.parseNullable(fromDate)),
+                toZoneDateTime(DateMapper.parseNullable(toDate)),
+                search,
+                Optional.ofNullable(types).orElse(allTypes).stream().map(FinancialTransactionType::name).toList());
 
-        final var comparison = switch (sort) {
-            default -> comparing(BiFinancialsStatsResponse::getDate);
-        };
-
-        final var response = new BiFinancialsStatsListResponse()
-                .stats(stats.entrySet().stream().map(e -> new BiFinancialsStatsResponse()
-                                .date(e.getKey().toInstant().atZone(ZoneOffset.UTC).toLocalDate())
-                                .totalDeposited(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalDeposited))
-                                .totalAllocated(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalAllocated))
-                                .totalGranted(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalGranted))
-                                .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalRewarded))
-                                .transactionCount(e.getValue().stream().mapToInt(BiFinancialMonthlyStatsReadEntity::transactionCount).sum()))
-                        .filter(r -> !FALSE.equals(showEmpty) || r.getTransactionCount() > 0)
-                        .sorted(sortDirection == SortDirection.ASC ? comparison : comparison.reversed())
-                        .toList());
-
-        return ok(response);
+        return ok(new BiFinancialsStatsListResponse().stats(BiFinancialMonthlyStatsReadEntity.toDto(result, !FALSE.equals(showEmpty), sortDirection)));
     }
 
     @Override
