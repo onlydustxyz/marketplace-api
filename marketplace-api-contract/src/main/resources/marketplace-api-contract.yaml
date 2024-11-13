@@ -369,6 +369,38 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/rewards/{rewardId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadRewards
+      summary: Get reward
+      operationId: getReward
+      description: |
+        Get reward
+      parameters:
+        - name: rewardId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/RewardId'
+      responses:
+        "200":
+          description: 'Reward'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardPageItemResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 
   /api/v1/version:
     get:
