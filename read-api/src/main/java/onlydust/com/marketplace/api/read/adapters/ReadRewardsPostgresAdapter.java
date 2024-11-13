@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadRewardsApi;
 import onlydust.com.marketplace.api.contract.model.PageableRewardsQueryParams;
+import onlydust.com.marketplace.api.contract.model.RewardPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.RewardPageResponse;
 import onlydust.com.marketplace.api.read.repositories.RewardReadV2Repository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.model.AuthenticatedUser.BillingProfileMembership.Role.ADMIN;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
@@ -39,6 +41,7 @@ public class ReadRewardsPostgresAdapter implements ReadRewardsApi {
                 q.getIncludeProjectLeds(),
                 q.getIncludeBillingProfileAdministrated(),
                 q.getIncludeAsRecipient(),
+                null,
                 authenticatedUser.projectsLed() == null ? null : authenticatedUser.projectsLed().toArray(UUID[]::new),
                 authenticatedUser.billingProfiles() == null ? null :
                         authenticatedUser.billingProfiles().stream()
@@ -62,5 +65,32 @@ public class ReadRewardsPostgresAdapter implements ReadRewardsApi {
                 .totalPageNumber(page.getTotalPages()));
     }
 
+    @Override
+    public ResponseEntity<RewardPageItemResponse> getReward(UUID rewardId) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
+        final var page = rewardReadV2Repository.findAll(
+                true,
+                true,
+                true,
+                rewardId,
+                authenticatedUser.projectsLed() == null ? null : authenticatedUser.projectsLed().toArray(UUID[]::new),
+                authenticatedUser.billingProfiles() == null ? null :
+                        authenticatedUser.billingProfiles().stream()
+                                .filter(bp -> bp.role() == ADMIN)
+                                .map(AuthenticatedUser.BillingProfileMembership::billingProfileId)
+                                .toArray(UUID[]::new),
+                authenticatedUser.githubUserId(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                PageRequest.of(0, 1)
+        );
+
+        final var reward = page.getContent().stream().findFirst().orElseThrow(() -> notFound("Reward %s not found".formatted(rewardId)));
+
+        return ok(reward.toDto(authenticatedUser, blockExplorer));
+    }
 }

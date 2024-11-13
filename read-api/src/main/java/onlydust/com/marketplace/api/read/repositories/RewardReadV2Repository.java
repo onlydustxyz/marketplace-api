@@ -54,6 +54,7 @@ public interface RewardReadV2Repository extends JpaRepository<RewardV2ReadEntity
             where (:includeProjectLeds and cast(:dataSourceProjectLedIds as uuid[]) is not null and r.project_id = any (cast(:dataSourceProjectLedIds as uuid[]))
                 or :includeBillingProfileAdministrated and cast(:dataSourceBillingProfileIds as uuid[]) is not null and r.billing_profile_id = any (cast(:dataSourceBillingProfileIds as uuid[]))
                 or :includeAsRecipient and r.recipient_id = :dataSourceRecipientId)
+              and (:rewardId is null or r.reward_id = :rewardId)
               and (cast(:statuses as accounting.reward_status[]) is null or r.status = any (cast(:statuses as accounting.reward_status[])))
               and (cast(:projectIds as uuid[]) is null or r.project_id = any (cast(:projectIds as uuid[])))
               and (cast(:billingProfileIds as uuid[]) is null or r.billing_profile_id = any (cast(:billingProfileIds as uuid[])))
@@ -63,6 +64,7 @@ public interface RewardReadV2Repository extends JpaRepository<RewardV2ReadEntity
     Page<RewardV2ReadEntity> findAll(boolean includeProjectLeds,
                                      boolean includeBillingProfileAdministrated,
                                      boolean includeAsRecipient,
+                                     UUID rewardId,
                                      UUID[] dataSourceProjectLedIds,
                                      UUID[] dataSourceBillingProfileIds,
                                      Long dataSourceRecipientId,

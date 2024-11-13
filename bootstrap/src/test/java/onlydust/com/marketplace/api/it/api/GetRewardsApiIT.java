@@ -12,6 +12,7 @@ import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetAccountAddress;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
@@ -55,6 +56,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
     private static BillingProfile anthoBillingProfile;
     private static BillingProfile pierreBillingProfile;
     private static UUID invoiceId = UUID.randomUUID();
+    private static RewardId rewardId;
 
     @AfterAll
     @SneakyThrows
@@ -131,7 +133,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                         .build()
         )));
         at("2024-06-01T00:01:00Z", () -> {
-            final var rewardId = rewardHelper.create(onlyDust, pierre, antho.githubUserId(), 2, ETH);
+            rewardId = rewardHelper.create(onlyDust, pierre, antho.githubUserId(), 2, ETH);
             accountingHelper.addInvoice(rewardId.value(), invoiceId, Date.from(ZonedDateTime.parse("2024-06-02T00:00:00Z").toInstant()));
             accountingHelper.setPaid(rewardId.value(), Date.from(ZonedDateTime.parse("2024-06-03T00:00:00Z").toInstant()),
                     new Payment.Reference(ZonedDateTime.parse("2024-06-03T00:00:00Z"), Network.ETHEREUM, "0x123", "Antho", "antho.eth"));
@@ -469,6 +471,52 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                     assertThat(reward.getAmount().getCurrency().getCode()).isEqualTo("STRK");
                 }), true
         );
+    }
+
+
+    @Test
+    void should_get_reward_by_id() {
+        // When
+        client.get()
+                .uri(getApiURI(String.format(GET_REWARDS_BY_ID.formatted(rewardId.toString()))))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isEqualTo(HttpStatus.OK)
+                .expectBody()
+                .json("""
+                        {
+                          "amount": {
+                            "amount": 2,
+                            "prettyAmount": 2,
+                            "currency": {
+                              "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                              "code": "ETH",
+                              "name": "Ether",
+                              "logoUrl": null,
+                              "decimals": 18
+                            },
+                            "usdEquivalent": 3563.96,
+                            "usdConversionRate": 1781.98
+                          },
+                          "status": "COMPLETE",
+                          "from": {
+                            "login": "pierre"
+                          },
+                          "to": {
+                            "login": "antho"
+                          },
+                          "requestedAt": "2024-06-01T00:01:00Z",
+                          "processedAt": "2024-06-03T00:00:00Z",
+                          "unlockDate": null,
+                          "transactionReference": "0x123",
+                          "transactionReferenceLink": "https://etherscan.io/tx/0x0123",
+                          "items": [
+                            "052b4d04-401d-3ed3-97d0-e278d950ce4e"
+                          ]
+                        }
+                        """);
     }
 
 }
