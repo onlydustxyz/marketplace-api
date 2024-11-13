@@ -5,7 +5,6 @@ import onlydust.com.marketplace.api.contract.ReadBiApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.bi.*;
 import onlydust.com.marketplace.api.read.entities.program.BiFinancialMonthlyStatsReadEntity;
-import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.properties.Cache;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
@@ -28,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -40,7 +38,6 @@ import java.util.stream.Stream;
 
 import static java.lang.Boolean.FALSE;
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.api.contract.model.FinancialTransactionType.*;
 import static onlydust.com.marketplace.api.read.repositories.BiFinancialMonthlyStatsReadRepository.IdGrouping.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseZonedNullable;
@@ -350,22 +347,27 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                                                                               UUID programId,
                                                                               UUID projectId,
                                                                               String projectSlug,
+                                                                              Long recipientId,
                                                                               List<FinancialTransactionType> types,
                                                                               Boolean showEmpty,
                                                                               FinancialTransactionStatsSort sort,
                                                                               SortDirection sortDirection) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (sponsorId == null && programId == null && projectId == null && projectSlug == null)
+        if (sponsorId == null && programId == null && projectId == null && projectSlug == null && recipientId == null)
             throw badRequest("At least one of sponsorId, programId or projectId or projectSlug must be provided");
 
-        final var idGrouping = sponsorId != null ? SPONSOR_ID : programId != null ? PROGRAM_ID : PROJECT_ID;
+        final var idGrouping = sponsorId != null ? SPONSOR_ID
+                : programId != null ? PROGRAM_ID
+                : (projectId != null || projectSlug != null) ? PROJECT_ID
+                : RECIPIENT_ID;
 
         final var id = switch (idGrouping) {
             case SPONSOR_ID -> sponsorId;
             case PROGRAM_ID -> programId;
             case PROJECT_ID -> Optional.ofNullable(projectId).orElseGet(() -> projectReadRepository.findBySlug(projectSlug)
                     .orElseThrow(() -> notFound("Project with slug %s not found".formatted(projectSlug))).id());
+            case RECIPIENT_ID -> null;
         };
 
         switch (idGrouping) {
@@ -382,39 +384,28 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 if (!permissionService.isUserProjectLead(ProjectId.of(id), authenticatedUser.id()))
                     throw unauthorized("User %s is not authorized to access project %s".formatted(authenticatedUser.id(), id));
             }
+            case RECIPIENT_ID -> {
+                if (!recipientId.equals(authenticatedUser.githubUserId()))
+                    throw unauthorized("User %s is not authorized to access rewards of recipient %s".formatted(authenticatedUser.id(), recipientId));
+            }
         }
 
         final var allTypes = switch (idGrouping) {
             case SPONSOR_ID -> List.of(DEPOSITED, ALLOCATED, UNALLOCATED);
             case PROGRAM_ID -> List.of(ALLOCATED, UNALLOCATED, GRANTED, UNGRANTED);
             case PROJECT_ID -> List.of(GRANTED, UNGRANTED, REWARDED);
+            case RECIPIENT_ID -> List.of(REWARDED, PAID);
         };
+        final var sanitizedTypes = types == null ? allTypes : allTypes.stream().filter(types::contains).toList();
 
-        final var stats = biFinancialMonthlyStatsReadRepository.findAll(id,
-                        idGrouping,
-                        toZoneDateTime(DateMapper.parseNullable(fromDate)),
-                        toZoneDateTime(DateMapper.parseNullable(toDate)),
-                        search,
-                        Optional.ofNullable(types).orElse(allTypes).stream().map(FinancialTransactionType::name).toList())
-                .stream()
-                .collect(groupingBy(BiFinancialMonthlyStatsReadEntity::date));
+        final var result = biFinancialMonthlyStatsReadRepository.findAll(id,
+                recipientId,
+                idGrouping,
+                toZoneDateTime(DateMapper.parseNullable(fromDate)),
+                toZoneDateTime(DateMapper.parseNullable(toDate)),
+                search,
+                sanitizedTypes.stream().map(FinancialTransactionType::name).toList());
 
-        final var comparison = switch (sort) {
-            default -> comparing(BiFinancialsStatsResponse::getDate);
-        };
-
-        final var response = new BiFinancialsStatsListResponse()
-                .stats(stats.entrySet().stream().map(e -> new BiFinancialsStatsResponse()
-                                .date(e.getKey().toInstant().atZone(ZoneOffset.UTC).toLocalDate())
-                                .totalDeposited(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalDeposited))
-                                .totalAllocated(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalAllocated))
-                                .totalGranted(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalGranted))
-                                .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalRewarded))
-                                .transactionCount(e.getValue().stream().mapToInt(BiFinancialMonthlyStatsReadEntity::transactionCount).sum()))
-                        .filter(r -> !FALSE.equals(showEmpty) || r.getTransactionCount() > 0)
-                        .sorted(sortDirection == SortDirection.ASC ? comparison : comparison.reversed())
-                        .toList());
-
-        return ok(response);
+        return ok(new BiFinancialsStatsListResponse().stats(BiFinancialMonthlyStatsReadEntity.toDto(result, !FALSE.equals(showEmpty), sortDirection)));
     }
 }

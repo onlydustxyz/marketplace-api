@@ -83,6 +83,10 @@ paths:
           schema:
             $ref: '#/components/schemas/ProjectSlug'
         - in: query
+          name: recipientId
+          schema:
+            $ref: '#/components/schemas/GithubUserId'
+        - in: query
           name: types
           description: Transaction types filter
           schema:
@@ -7285,6 +7289,7 @@ components:
         - totalAllocated
         - totalGranted
         - totalRewarded
+        - totalPaid
         - transactionCount
       properties:
         date:
@@ -7298,6 +7303,8 @@ components:
         totalGranted:
           $ref: '#/components/schemas/DetailedTotalMoney'
         totalRewarded:
+          $ref: '#/components/schemas/DetailedTotalMoney'
+        totalPaid:
           $ref: '#/components/schemas/DetailedTotalMoney'
         transactionCount:
           type: integer
@@ -10627,6 +10634,7 @@ components:
         - GRANTED
         - UNGRANTED
         - REWARDED
+        - PAID
 
     SponsorDepositTransactionStatus:
       type: string

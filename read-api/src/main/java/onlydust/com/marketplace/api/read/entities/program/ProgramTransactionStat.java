@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.read.entities.program;
 
-import lombok.NonNull;
 import onlydust.com.marketplace.api.contract.model.DetailedTotalMoneyTotalPerCurrencyInner;
 import onlydust.com.marketplace.api.read.entities.currency.CurrencyReadEntity;
 import org.springframework.lang.Nullable;
@@ -13,10 +12,12 @@ import static onlydust.com.marketplace.kernel.mapper.AmountMapper.pretty;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
 public interface ProgramTransactionStat {
-    @NonNull
     CurrencyReadEntity currency();
 
-    default DetailedTotalMoneyTotalPerCurrencyInner toMoney(BigDecimal amount, BigDecimal usdTotal) {
+    default @Nullable DetailedTotalMoneyTotalPerCurrencyInner toMoney(BigDecimal amount, BigDecimal usdTotal) {
+        if (currency() == null)
+            return null;
+
         final var usdQuote = currency().latestUsdQuote() == null ? null : currency().latestUsdQuote().getPrice();
         final var usdAmount = usdAmount(amount);
         final var ratio = (usdTotal == null || usdAmount == null || usdTotal.compareTo(ZERO) == 0) ? null :
@@ -32,6 +33,6 @@ public interface ProgramTransactionStat {
     }
 
     default @Nullable BigDecimal usdAmount(BigDecimal amount) {
-        return currency().latestUsdQuote() == null ? null : currency().latestUsdQuote().getPrice().multiply(amount);
+        return currency() == null || currency().latestUsdQuote() == null ? null : currency().latestUsdQuote().getPrice().multiply(amount);
     }
 }

@@ -641,3 +641,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000385_add_index.sql
   - include:
       file: db/changelog/changelogs/00000386_add_index.sql
+  - include:
+      file: db/changelog/changelogs/00000387_add_index.sql

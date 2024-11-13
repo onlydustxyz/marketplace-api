@@ -5,7 +5,6 @@ import onlydust.com.marketplace.api.contract.ReadProgramsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.accounting.AllTransactionReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.BiFinancialMonthlyStatsReadEntity;
-import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.repositories.AllTransactionReadRepository;
 import onlydust.com.marketplace.api.read.repositories.BiFinancialMonthlyStatsReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
@@ -29,14 +28,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static java.lang.Boolean.FALSE;
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.api.contract.model.FinancialTransactionType.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
@@ -102,7 +99,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                 .map(p -> p.toProgramProjectResponse(programId))
                 .orElseThrow(() -> notFound("Project %s not found for program %s".formatted(projectId, programId)));
 
-        return ResponseEntity.ok(programProjectResponse);
+        return ok(programProjectResponse);
     }
 
     @Override
@@ -198,27 +195,14 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
 
         final var allTypes = List.of(ALLOCATED, UNALLOCATED, GRANTED, UNGRANTED);
 
-        final var stats = biFinancialMonthlyStatsReadRepository.findAll(programId,
-                        BiFinancialMonthlyStatsReadRepository.IdGrouping.PROGRAM_ID,
-                        DateMapper.parseZonedNullable(fromDate),
-                        DateMapper.parseZonedNullable(toDate),
-                        search,
-                        Optional.ofNullable(types).orElse(allTypes).stream().map(Enum::name).toList())
-                .stream().collect(groupingBy(BiFinancialMonthlyStatsReadEntity::date));
+        final var result = biFinancialMonthlyStatsReadRepository.findAll(programId,
+                null,
+                BiFinancialMonthlyStatsReadRepository.IdGrouping.PROGRAM_ID,
+                DateMapper.parseZonedNullable(fromDate),
+                DateMapper.parseZonedNullable(toDate),
+                search,
+                Optional.ofNullable(types).orElse(allTypes).stream().map(Enum::name).toList());
 
-        final var response = new BiFinancialsStatsListResponse()
-                .stats(stats.entrySet().stream().map(e -> new BiFinancialsStatsResponse()
-                                        .date(e.getKey().toInstant().atZone(ZoneOffset.UTC).toLocalDate())
-                                        .totalAllocated(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalAllocated))
-                                        .totalGranted(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalGranted))
-                                        .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalRewarded))
-                                        .transactionCount(e.getValue().stream().mapToInt(BiFinancialMonthlyStatsReadEntity::transactionCount).sum())
-                                )
-                                .filter(s -> !FALSE.equals(showEmpty) || s.getTransactionCount() > 0)
-                                .sorted(sortDirection == SortDirection.ASC ? comparison : comparison.reversed())
-                                .toList()
-                );
-
-        return ok(response);
+        return ok(new BiFinancialsStatsListResponse().stats(BiFinancialMonthlyStatsReadEntity.toDto(result, !FALSE.equals(showEmpty), sortDirection)));
     }
 }
