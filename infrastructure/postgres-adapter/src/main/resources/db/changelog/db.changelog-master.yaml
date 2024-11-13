@@ -37,3 +37,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000020_add_index.sql
   - include:
       file: db/changelog/changelogs/00000021_add_index.sql
+  - include:
+      file: db/changelog/changelogs/00000022_fix_aws_migration_1.sql
