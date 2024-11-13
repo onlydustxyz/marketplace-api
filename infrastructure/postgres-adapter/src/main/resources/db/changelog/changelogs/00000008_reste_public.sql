@@ -1217,3 +1217,19 @@ SELECT pl.project_id    as project_id,
        pl.user_id       as user_id
 FROM project_leads pl
          LEFT JOIN iam.users u on u.id = pl.user_id;
+
+
+create index if not exists rewards_project_id_index
+    on rewards (project_id);
+
+create index if not exists rewards_billing_profile_id_index
+    on rewards (billing_profile_id);
+
+create index if not exists rewards_invoice_id_index
+    on rewards (invoice_id);
+
+create index if not exists rewards_recipient_id_index
+    on rewards (recipient_id);
+
+create index if not exists rewards_requestor_id_index
+    on rewards (requestor_id);
