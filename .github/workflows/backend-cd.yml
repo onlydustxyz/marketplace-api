@@ -25,25 +25,20 @@ jobs:
         uses: ./.github/actions/docker-build-push
         if: github.ref == 'refs/heads/main'
         with:
-          aws-region: eu-west-3
-          role-to-assume: arn:aws:iam::102790067838:role/OnlyDustRepositoryStack-MarketplaceRepositoryGitHub-GUtlNwyyGXdz
-          tags: |
-            develop
+          aws-region: eu-west-1
+          role-to-assume: arn:aws:iam::116981777789:role/OnlyDustRepositoryStack-MarketplaceRepositoryGitHub-pSv0mpHv6tYW
 
       - name: Docker build and push [Staging]
         uses: ./.github/actions/docker-build-push
         if: github.ref == 'refs/heads/staging'
         with:
-          aws-region: eu-west-3
+          aws-region: eu-west-1
           role-to-assume: arn:aws:iam::102790067838:role/OnlyDustRepositoryStack-MarketplaceRepositoryGitHub-GUtlNwyyGXdz
-          tags: |
-            staging
 
       - name: Docker build and push [Production]
         uses: ./.github/actions/docker-build-push
         if: github.ref == 'refs/heads/production'
         with:
-          aws-region: eu-west-3
+          aws-region: eu-west-1
           role-to-assume: arn:aws:iam::102790067838:role/OnlyDustRepositoryStack-MarketplaceRepositoryGitHub-GUtlNwyyGXdz
-          tags: |
-            production
+
