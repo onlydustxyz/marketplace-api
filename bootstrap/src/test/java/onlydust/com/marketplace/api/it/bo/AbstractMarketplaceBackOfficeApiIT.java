@@ -59,7 +59,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         @ConfigureWireMock(name = "dustyBot", stubLocation = "", property = "infrastructure.dustyBot.baseUri")
 })
 public class AbstractMarketplaceBackOfficeApiIT {
-    private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
+    private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:16.4-alpine")
             .withDatabaseName("marketplace_db")
             .withUsername("test")
             .withPassword("test")
