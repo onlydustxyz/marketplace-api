@@ -52,6 +52,7 @@ public class ReadRewardsPostgresAdapter implements ReadRewardsApi {
                 q.getStatuses() == null ? null : q.getStatuses().stream().map(Enum::name).toArray(String[]::new),
                 q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
                 q.getBillingProfileIds() == null ? null : q.getBillingProfileIds().toArray(UUID[]::new),
+                q.getCurrencyIds() == null ? null : q.getCurrencyIds().toArray(UUID[]::new),
                 q.getContributionUUIDs() == null ? null : q.getContributionUUIDs().toArray(UUID[]::new),
                 q.getRecipientIds() == null ? null : q.getRecipientIds().toArray(Long[]::new),
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(Sort.Order.desc("requested_at")))
@@ -81,6 +82,7 @@ public class ReadRewardsPostgresAdapter implements ReadRewardsApi {
                                 .map(AuthenticatedUser.BillingProfileMembership::billingProfileId)
                                 .toArray(UUID[]::new),
                 authenticatedUser.githubUserId(),
+                null,
                 null,
                 null,
                 null,
