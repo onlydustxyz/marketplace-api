@@ -45,12 +45,6 @@ create table indexer.repo_indexing_jobs
     is_public                 boolean                                                  not null
 );
 
-create trigger indexer_repo_indexing_jobs_set_tech_updated_at
-    before update
-    on indexer.repo_indexing_jobs
-    for each row
-execute procedure public.set_tech_updated_at();
-
 create table indexer.user_indexing_jobs
 (
     user_id         bigint                                                   not null
@@ -63,12 +57,6 @@ create table indexer.user_indexing_jobs
     finished_at     timestamp
 );
 
-create trigger indexer_user_indexing_jobs_set_tech_updated_at
-    before update
-    on indexer.user_indexing_jobs
-    for each row
-execute procedure public.set_tech_updated_at();
-
 create table indexer.user_public_events_indexing_jobs
 (
     user_id              bigint                                                         not null
@@ -80,12 +68,6 @@ create table indexer.user_public_events_indexing_jobs
     tech_created_at      timestamp with time zone default now()                         not null,
     tech_updated_at      timestamp with time zone default now()                         not null
 );
-
-create trigger user_stats_indexing_jobs_set_tech_updated_at
-    before update
-    on indexer.user_public_events_indexing_jobs
-    for each row
-execute procedure public.set_tech_updated_at();
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA indexer;
 

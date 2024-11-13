@@ -9,7 +9,16 @@ services:
       - POSTGRES_DB=marketplace_db
     ports:
       - "5434:5432"
+    volumes:
+      - ./bootstrap/src/test/resources/database/dumps:/tmp
+      - ./bootstrap/src/test/resources/database/scripts:/scripts
     healthcheck:
       test: [ "CMD", "pg_isready", "-d", "marketplace_db", "-U", "test" ]
       interval: 2s
       timeout: 1s
+
+
+# To load the data dump, run the following command:
+# > docker exec -it marketplace_db "/scripts/restore_db.sh" true
+# To dump the DB, run the following command:
+# > docker exec -it marketplace_db "/scripts/dump_db.sh"

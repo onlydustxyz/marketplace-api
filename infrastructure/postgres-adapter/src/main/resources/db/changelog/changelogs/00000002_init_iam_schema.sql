@@ -16,10 +16,10 @@ create table if not exists iam.users
     github_login      text                    not null,
     github_avatar_url text                    not null,
     roles             iam.user_role[]         not null,
-    created_at        timestamp default now() not null,
-    updated_at        timestamp default now() not null,
+    created_at        timestamptz default now() not null,
+    updated_at        timestamptz default now() not null,
     email             text                    not null,
-    last_seen_at      timestamp default now() not null
+    last_seen_at      timestamptz default now() not null
 );
 
 create unique index if not exists users_github_user_id_uindex
@@ -39,8 +39,8 @@ create table if not exists iam.backoffice_users
     name       text                       not null,
     avatar_url text,
     roles      iam.backoffice_user_role[] not null,
-    created_at timestamp default CURRENT_TIMESTAMP,
-    updated_at timestamp default CURRENT_TIMESTAMP
+    created_at timestamptz default CURRENT_TIMESTAMP,
+    updated_at timestamptz default CURRENT_TIMESTAMP
 );
 
 create unique index if not exists backoffice_users_email_idx
@@ -52,7 +52,7 @@ create table if not exists iam.user_notification_settings_channels
     user_id         uuid                      not null
         references iam.users,
     category        iam.notification_category not null,
-    tech_created_at timestamp default now()   not null,
+    tech_created_at timestamptz default now()   not null,
     channel         iam.notification_channel  not null
 );
 
@@ -64,16 +64,16 @@ create table if not exists iam.notifications
         references iam.users,
     category        iam.notification_category not null,
     data            jsonb                     not null,
-    created_at      timestamp                 not null,
-    tech_created_at timestamp default now()   not null
+    created_at      timestamptz                 not null,
+    tech_created_at timestamptz default now()   not null
 );
 
 create table if not exists iam.notification_channels
 (
     notification_id uuid                     not null,
-    sent_at         timestamp,
-    tech_created_at timestamp default now()  not null,
-    read_at         timestamp,
+    sent_at         timestamptz,
+    tech_created_at timestamptz default now()  not null,
+    read_at         timestamptz,
     channel         iam.notification_channel not null,
     constraint notification_channels_pk
         primary key (notification_id, channel)

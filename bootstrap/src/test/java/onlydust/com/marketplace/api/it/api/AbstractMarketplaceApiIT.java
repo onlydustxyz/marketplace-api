@@ -221,7 +221,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PULL_REQUESTS_BY_ID = "/api/v1/pull-requests/%s";
     protected static final String GET_REWARDS = "/api/v1/rewards";
 
-    private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
+    private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:16.4-alpine")
             .withDatabaseName("marketplace_db")
             .withUsername("test")
             .withPassword("test")

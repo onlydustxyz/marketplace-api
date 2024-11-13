@@ -70,8 +70,8 @@ create table if not exists currencies
     logo_url             text,
     decimals             integer                        not null,
     description          text,
-    tech_created_at      timestamp default now()        not null,
-    tech_updated_at      timestamp default now()        not null,
+    tech_created_at      timestamptz default now()        not null,
+    tech_updated_at      timestamptz default now()        not null,
     country_restrictions text[]    default '{}'::text[] not null,
     cmc_id               integer                        not null
 );
@@ -103,8 +103,8 @@ create table if not exists global_settings
 (
     id                                       serial
         primary key,
-    terms_and_conditions_latest_version_date timestamp not null,
-    invoice_mandate_latest_version_date      timestamp not null,
+    terms_and_conditions_latest_version_date timestamptz not null,
+    invoice_mandate_latest_version_date      timestamptz not null,
     required_github_app_permissions          text[]    not null
 );
 
@@ -130,8 +130,8 @@ create table if not exists indexer_outbox_events
     payload         jsonb                                                      not null,
     status          outbox_event_status default 'PENDING'::outbox_event_status not null,
     error           text,
-    tech_created_at timestamp           default now()                          not null,
-    tech_updated_at timestamp           default now()                          not null
+    tech_created_at timestamptz           default now()                          not null,
+    tech_updated_at timestamptz           default now()                          not null
 );
 
 create table if not exists notification_outbox_events
@@ -142,8 +142,8 @@ create table if not exists notification_outbox_events
     payload         jsonb                                                      not null,
     status          outbox_event_status default 'PENDING'::outbox_event_status not null,
     error           text,
-    tech_created_at timestamp           default now()                          not null,
-    tech_updated_at timestamp           default now()                          not null
+    tech_created_at timestamptz           default now()                          not null,
+    tech_updated_at timestamptz           default now()                          not null
 );
 
 create table if not exists onboardings
@@ -151,8 +151,8 @@ create table if not exists onboardings
     user_id                              uuid not null
         constraint terms_and_conditions_acceptances_pkey
             primary key,
-    terms_and_conditions_acceptance_date timestamp,
-    completion_date                      timestamp
+    terms_and_conditions_acceptance_date timestamptz,
+    completion_date                      timestamptz
 );
 
 create table if not exists projects
@@ -171,9 +171,9 @@ create table if not exists projects
     reward_ignore_pull_requests_by_default             boolean   default false    not null,
     reward_ignore_issues_by_default                    boolean   default false    not null,
     reward_ignore_code_reviews_by_default              boolean   default false    not null,
-    reward_ignore_contributions_before_date_by_default timestamp,
-    created_at                                         timestamp default now()    not null,
-    updated_at                                         timestamp,
+    reward_ignore_contributions_before_date_by_default timestamptz,
+    created_at                                         timestamptz default now()    not null,
+    updated_at                                         timestamptz,
     slug                                               text                       not null,
     bot_notify_external_applications                   boolean                    not null
 );
@@ -197,8 +197,8 @@ create table if not exists project_allowances
         references currencies,
     current_allowance numeric                 not null,
     initial_allowance numeric                 not null,
-    tech_created_at   timestamp default now() not null,
-    tech_updated_at   timestamp default now() not null,
+    tech_created_at   timestamptz default now() not null,
+    tech_updated_at   timestamptz default now() not null,
     primary key (project_id, currency_id)
 );
 
@@ -231,7 +231,7 @@ create table if not exists project_leads
 (
     project_id  uuid                    not null,
     user_id     uuid                    not null,
-    assigned_at timestamp default now() not null,
+    assigned_at timestamptz default now() not null,
     primary key (project_id, user_id)
 );
 
@@ -243,8 +243,8 @@ create table if not exists project_more_infos
     project_id uuid                    not null,
     url        text                    not null,
     name       text,
-    created_at timestamp default now() not null,
-    updated_at timestamp,
+    created_at timestamptz default now() not null,
+    updated_at timestamptz,
     rank       integer                 not null
 );
 
@@ -252,8 +252,8 @@ create table if not exists projects_tags
 (
     project_id uuid                    not null,
     tag        project_tag             not null,
-    created_at timestamp default now() not null,
-    updated_at timestamp default now() not null
+    created_at timestamptz default now() not null,
+    updated_at timestamptz default now() not null
 );
 
 create table if not exists sponsors
@@ -279,8 +279,8 @@ create table if not exists tracking_outbox_events
     payload         jsonb                                                      not null,
     status          outbox_event_status default 'PENDING'::outbox_event_status not null,
     error           text,
-    tech_created_at timestamp           default now()                          not null,
-    tech_updated_at timestamp           default now()                          not null
+    tech_created_at timestamptz           default now()                          not null,
+    tech_updated_at timestamptz           default now()                          not null
 );
 
 create table if not exists user_profile_info
@@ -295,8 +295,8 @@ create table if not exists user_profile_info
     looking_for_a_job      boolean,
     avatar_url             text,
     cover                  profile_cover,
-    tech_created_at        timestamp            default now() not null,
-    tech_updated_at        timestamp            default now() not null,
+    tech_created_at        timestamptz            default now() not null,
+    tech_updated_at        timestamptz            default now() not null,
     first_name             text,
     last_name              text,
     joining_reason         user_joining_reasons default 'CONTRIBUTOR'::user_joining_reasons,
@@ -316,11 +316,11 @@ create table if not exists hackathons
     description     text,
     location        text,
     budget          text,
-    start_date      timestamp                      not null,
-    end_date        timestamp                      not null,
+    start_date      timestamptz                      not null,
+    end_date        timestamptz                      not null,
     links           jsonb                          not null,
-    tech_created_at timestamp default now()        not null,
-    tech_updated_at timestamp default now()        not null,
+    tech_created_at timestamptz default now()        not null,
+    tech_updated_at timestamptz default now()        not null,
     index           serial,
     github_labels   text[]    default '{}'::text[] not null,
     community_links jsonb     default '[]'::jsonb  not null
@@ -337,8 +337,8 @@ create table if not exists node_guardians_boost_rewards
     boosted_reward_id uuid                    not null,
     boost_reward_id   uuid,
     recipient_id      bigint                  not null,
-    tech_created_at   timestamp default now() not null,
-    tech_updated_at   timestamp default now() not null,
+    tech_created_at   timestamptz default now() not null,
+    tech_updated_at   timestamptz default now() not null,
     primary key (recipient_id, boosted_reward_id)
 );
 
@@ -349,8 +349,8 @@ create table if not exists node_guardians_rewards_boost_outbox_events
     payload         jsonb                                                      not null,
     status          outbox_event_status default 'PENDING'::outbox_event_status not null,
     error           text,
-    tech_created_at timestamp           default now()                          not null,
-    tech_updated_at timestamp           default now()                          not null
+    tech_created_at timestamptz           default now()                          not null,
+    tech_updated_at timestamptz           default now()                          not null
 );
 
 create table if not exists languages
@@ -360,8 +360,8 @@ create table if not exists languages
     name            text                    not null,
     logo_url        text,
     banner_url      text,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
     slug            text                    not null
         unique
 );
@@ -373,8 +373,8 @@ create table if not exists language_file_extensions
     language_id     uuid                    not null
         references languages
             on delete cascade,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null
 );
 
 create unique index if not exists language_file_extensions_extension_language_id_key
@@ -387,7 +387,7 @@ create table if not exists historical_user_ranks
 (
     github_user_id bigint    not null,
     rank           integer   not null,
-    timestamp      timestamp not null,
+    timestamp      timestamptz not null,
     primary key (github_user_id, timestamp)
 );
 
@@ -397,8 +397,8 @@ create table if not exists project_categories
         primary key,
     name            text                    not null,
     icon_slug       text                    not null,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
     slug            text                    not null
         unique,
     description     text                    not null
@@ -410,10 +410,10 @@ create table if not exists committees
         primary key,
     status                 committee_status        not null,
     name                   text                    not null,
-    application_start_date timestamp               not null,
-    application_end_date   timestamp               not null,
-    tech_created_at        timestamp default now() not null,
-    tech_updated_at        timestamp default now() not null,
+    application_start_date timestamptz               not null,
+    application_end_date   timestamptz               not null,
+    tech_created_at        timestamptz default now() not null,
+    tech_updated_at        timestamptz default now() not null,
     vote_per_jury          integer
 );
 
@@ -425,8 +425,8 @@ create table if not exists committee_project_questions
         references committees,
     question        text                    not null,
     required        boolean                 not null,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
     rank            integer
 );
 
@@ -443,8 +443,8 @@ create table if not exists committee_project_answers
         references committee_project_questions,
     user_id         uuid                    not null,
     answer          text,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
     primary key (committee_id, project_id, question_id)
 );
 
@@ -455,8 +455,8 @@ create table if not exists mail_outbox_events
     payload         jsonb                                                      not null,
     status          outbox_event_status default 'PENDING'::outbox_event_status not null,
     error           text,
-    tech_created_at timestamp           default now()                          not null,
-    tech_updated_at timestamp           default now()                          not null
+    tech_created_at timestamptz           default now()                          not null,
+    tech_updated_at timestamptz           default now()                          not null
 );
 
 create table if not exists committee_jury_criteria
@@ -466,8 +466,8 @@ create table if not exists committee_jury_criteria
     committee_id    uuid                    not null
         references committees,
     criteria        text                    not null,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
     rank            integer
 );
 
@@ -483,8 +483,8 @@ create table if not exists committee_budget_allocations
     currency_id     uuid    not null
         references currencies,
     amount          numeric not null,
-    tech_created_at timestamp with time zone default now(),
-    tech_updated_at timestamp with time zone default now(),
+    tech_created_at timestamptz default now(),
+    tech_updated_at timestamptz default now(),
     primary key (committee_id, currency_id, project_id)
 );
 
@@ -494,8 +494,8 @@ create table if not exists ecosystem_banners
         primary key,
     font_color      banner_font_color       not null,
     image_url       text                    not null,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null
 );
 
 create table if not exists ecosystems
@@ -514,8 +514,8 @@ create table if not exists ecosystems
     xl_banner_id    uuid
         references ecosystem_banners,
     featured_rank   integer,
-    tech_created_at timestamp default now()             not null,
-    tech_updated_at timestamp default now()             not null,
+    tech_created_at timestamptz default now()             not null,
+    tech_updated_at timestamptz default now()             not null,
     hidden          boolean                             not null
 );
 
@@ -538,8 +538,8 @@ create table if not exists ecosystem_articles
     description     text                    not null,
     url             text                    not null,
     image_url       text                    not null,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null
 );
 
 create table if not exists ecosystems_articles
@@ -548,8 +548,8 @@ create table if not exists ecosystems_articles
         references ecosystems,
     article_id      uuid                    not null
         references ecosystem_articles,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
     primary key (ecosystem_id, article_id)
 );
 
@@ -558,8 +558,8 @@ create table if not exists project_category_suggestions
     id              uuid                    not null
         primary key,
     name            text                    not null,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
     project_id      uuid                    not null
         references projects
 );
@@ -570,8 +570,8 @@ create table if not exists projects_project_categories
         references projects,
     project_category_id uuid                    not null
         references project_categories,
-    tech_created_at     timestamp default now() not null,
-    tech_updated_at     timestamp default now() not null,
+    tech_created_at     timestamptz default now() not null,
+    tech_updated_at     timestamptz default now() not null,
     primary key (project_id, project_category_id)
 );
 
@@ -584,13 +584,13 @@ create table if not exists banners
     button_icon_slug  text,
     button_link_url   text,
     visible           boolean                 not null,
-    updated_at        timestamp               not null,
-    tech_created_at   timestamp default now() not null,
-    tech_updated_at   timestamp default now() not null,
+    updated_at        timestamptz               not null,
+    tech_created_at   timestamptz default now() not null,
+    tech_updated_at   timestamptz default now() not null,
     long_description  text                    not null,
     title             text                    not null,
     sub_title         text                    not null,
-    date              timestamp
+    date              timestamptz
 );
 
 create index if not exists banners_visible_index
@@ -602,8 +602,8 @@ create table if not exists hackathon_projects
         references hackathons,
     project_id      uuid                    not null
         references projects,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
     primary key (hackathon_id, project_id)
 );
 
@@ -616,11 +616,11 @@ create table if not exists hackathon_events
     name            text                          not null,
     subtitle        text                          not null,
     icon_slug       text                          not null,
-    start_at        timestamp                     not null,
-    end_at          timestamp                     not null,
+    start_at        timestamptz                     not null,
+    end_at          timestamptz                     not null,
     links           jsonb     default '[]'::jsonb not null,
-    tech_created_at timestamp default now()       not null,
-    tech_updated_at timestamp default now()       not null
+    tech_created_at timestamptz default now()       not null,
+    tech_updated_at timestamptz default now()       not null
 );
 
 create table if not exists programs
@@ -630,8 +630,8 @@ create table if not exists programs
     name            text                    not null,
     url             text,
     logo_url        text,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
     sponsor_id      uuid                    not null
         references sponsors
 );
@@ -645,8 +645,8 @@ create table if not exists project_contributor_labels
         references projects
             on delete cascade,
     name            text                                   not null,
-    tech_updated_at timestamp with time zone default now() not null,
-    tech_created_at timestamp with time zone default now() not null
+    tech_updated_at timestamptz default now() not null,
+    tech_created_at timestamptz default now() not null
 );
 
 create unique index if not exists project_contributor_labels_slug_index
@@ -660,8 +660,8 @@ create table if not exists contributor_project_contributor_labels
     github_user_id  bigint                                 not null,
     label_id        uuid                                   not null
         references project_contributor_labels,
-    tech_updated_at timestamp with time zone default now() not null,
-    tech_created_at timestamp with time zone default now() not null,
+    tech_updated_at timestamptz default now() not null,
+    tech_created_at timestamptz default now() not null,
     primary key (github_user_id, label_id)
 );
 
@@ -677,8 +677,8 @@ create table if not exists p_user_project_recommendations
     user_id         uuid,
     rank            bigint,
     hash            text,
-    tech_created_at timestamp with time zone default now() not null,
-    tech_updated_at timestamp with time zone default now() not null
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null
 );
 
 create unique index if not exists public_p_user_project_recommendations_pk_hash_idx
@@ -700,8 +700,8 @@ create table if not exists archived_github_contributions
 (
     contribution_uuid uuid                    not null
         primary key,
-    tech_created_at   timestamp default now() not null,
-    tech_updated_at   timestamp default now() not null
+    tech_created_at   timestamptz default now() not null,
+    tech_updated_at   timestamptz default now() not null
 );
 
 

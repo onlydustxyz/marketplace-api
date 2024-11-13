@@ -4,12 +4,12 @@ create table if not exists bi.p_reward_data
 (
     reward_id            uuid                                   not null
         primary key,
-    timestamp            timestamp,
-    day_timestamp        timestamp,
-    week_timestamp       timestamp,
-    month_timestamp      timestamp,
-    quarter_timestamp    timestamp,
-    year_timestamp       timestamp,
+    timestamp            timestamptz,
+    day_timestamp        timestamptz,
+    week_timestamp       timestamptz,
+    month_timestamp      timestamptz,
+    quarter_timestamp    timestamptz,
+    year_timestamp       timestamptz,
     contributor_id       bigint,
     requestor_id         uuid,
     project_id           uuid,
@@ -23,8 +23,8 @@ create table if not exists bi.p_reward_data
     project_category_ids uuid[],
     search               text,
     hash                 text,
-    tech_created_at      timestamp with time zone default now() not null,
-    tech_updated_at      timestamp with time zone default now() not null
+    tech_created_at      timestamptz default now() not null,
+    tech_updated_at      timestamptz default now() not null
 );
 
 create unique index if not exists bi_p_reward_data_reward_id_hash_idx
@@ -121,19 +121,19 @@ create table if not exists bi.p_project_grants_data
     project_id        uuid,
     program_id        uuid,
     currency_id       uuid,
-    timestamp         timestamp with time zone,
-    day_timestamp     timestamp with time zone,
-    week_timestamp    timestamp with time zone,
-    month_timestamp   timestamp with time zone,
-    quarter_timestamp timestamp with time zone,
-    year_timestamp    timestamp with time zone,
+    timestamp         timestamptz,
+    day_timestamp     timestamptz,
+    week_timestamp    timestamptz,
+    month_timestamp   timestamptz,
+    quarter_timestamp timestamptz,
+    year_timestamp    timestamptz,
     usd_amount        numeric,
     amount            numeric,
     ecosystem_ids     uuid[],
     search            text,
     hash              text,
-    tech_created_at   timestamp with time zone default now() not null,
-    tech_updated_at   timestamp with time zone default now() not null
+    tech_created_at   timestamptz default now() not null,
+    tech_updated_at   timestamptz default now() not null
 );
 
 create unique index if not exists bi_p_project_grants_data_transaction_id_hash_idx
@@ -189,7 +189,7 @@ create table if not exists bi.p_project_global_data
     project_id                             uuid                                   not null
         primary key,
     project_slug                           text,
-    created_at                             timestamp,
+    created_at                             timestamptz,
     rank                                   integer,
     project                                jsonb,
     project_name                           text,
@@ -213,8 +213,8 @@ create table if not exists bi.p_project_global_data
     has_repos_without_github_app_installed boolean,
     search                                 text,
     hash                                   text,
-    tech_created_at                        timestamp with time zone default now() not null,
-    tech_updated_at                        timestamp with time zone default now() not null
+    tech_created_at                        timestamptz default now() not null,
+    tech_updated_at                        timestamptz default now() not null
 );
 
 create unique index if not exists bi_p_project_global_data_project_id_hash_idx
@@ -237,8 +237,8 @@ create table if not exists bi.p_project_budget_data
     percent_spent_budget_usd numeric,
     budget                   jsonb,
     hash                     text,
-    tech_created_at          timestamp with time zone default now() not null,
-    tech_updated_at          timestamp with time zone default now() not null
+    tech_created_at          timestamptz default now() not null,
+    tech_updated_at          timestamptz default now() not null
 );
 
 create unique index if not exists bi_p_project_budget_data_project_id_hash_idx
@@ -260,7 +260,7 @@ create table if not exists bi.p_contribution_data
     repo_id              bigint,
     project_id           uuid,
     project_slug         text,
-    timestamp            timestamp,
+    timestamp            timestamptz,
     contribution_status  indexer_exp.contribution_status,
     contribution_type    indexer_exp.contribution_type,
     github_id            text,
@@ -270,9 +270,9 @@ create table if not exists bi.p_contribution_data
     github_title         text,
     github_html_url      text,
     github_body          text,
-    created_at           timestamp,
-    updated_at           timestamp with time zone,
-    completed_at         timestamp,
+    created_at           timestamptz,
+    updated_at           timestamptz,
+    completed_at         timestamptz,
     issue_id             bigint,
     pull_request_id      bigint,
     code_review_id       text,
@@ -294,8 +294,8 @@ create table if not exists bi.p_contribution_data
     linked_issues        jsonb,
     search               text,
     hash                 text,
-    tech_created_at      timestamp with time zone default now() not null,
-    tech_updated_at      timestamp with time zone default now() not null
+    tech_created_at      timestamptz default now() not null,
+    tech_updated_at      timestamptz default now() not null
 );
 
 create unique index if not exists bi_p_contribution_data_contribution_uuid_hash_idx
@@ -352,8 +352,8 @@ create table if not exists bi.p_contribution_reward_data
     reward_ids                uuid[],
     total_rewarded_usd_amount numeric,
     hash                      text,
-    tech_created_at           timestamp with time zone default now() not null,
-    tech_updated_at           timestamp with time zone default now() not null
+    tech_created_at           timestamptz default now() not null,
+    tech_updated_at           timestamptz default now() not null
 );
 
 create unique index if not exists bi_p_contribution_reward_data_contribution_uuid_hash_idx
@@ -385,8 +385,8 @@ create table if not exists bi.p_contributor_reward_data
     currencies      jsonb,
     search          text,
     hash            text,
-    tech_created_at timestamp with time zone default now() not null,
-    tech_updated_at timestamp with time zone default now() not null
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null
 );
 
 create unique index if not exists bi_p_contributor_reward_data_contributor_id_hash_idx
@@ -405,8 +405,8 @@ create table if not exists bi.p_contributor_application_data
     applied_on_project_ids   uuid[],
     applied_on_project_slugs text[],
     hash                     text,
-    tech_created_at          timestamp with time zone default now() not null,
-    tech_updated_at          timestamp with time zone default now() not null
+    tech_created_at          timestamptz default now() not null,
+    tech_updated_at          timestamptz default now() not null
 );
 
 create unique index if not exists bi_p_contributor_application_data_contributor_id_hash_idx
@@ -442,8 +442,8 @@ create table if not exists bi.p_contributor_global_data
     programs                     jsonb,
     search                       text,
     hash                         text,
-    tech_created_at              timestamp with time zone default now() not null,
-    tech_updated_at              timestamp with time zone default now() not null
+    tech_created_at              timestamptz default now() not null,
+    tech_updated_at              timestamptz default now() not null
 );
 
 create unique index if not exists bi_p_contributor_global_data_contributor_id_hash_idx
@@ -472,8 +472,8 @@ create table if not exists bi.p_contribution_contributors_data
     applicants        jsonb,
     search            text,
     hash              text,
-    tech_created_at   timestamp with time zone default now() not null,
-    tech_updated_at   timestamp with time zone default now() not null
+    tech_created_at   timestamptz default now() not null,
+    tech_updated_at   timestamptz default now() not null
 );
 
 create unique index if not exists bi_p_contribution_contributors_data_contribution_uuid_hash_idx
@@ -502,7 +502,7 @@ create table if not exists bi.p_per_contributor_contribution_data
     contributor_id                    bigint,
     contributor_user_id               uuid,
     contributor_country               text,
-    timestamp                         timestamp,
+    timestamp                         timestamptz,
     contribution_status               indexer_exp.contribution_status,
     contribution_type                 indexer_exp.contribution_type,
     github_author_id                  bigint,
@@ -511,14 +511,14 @@ create table if not exists bi.p_per_contributor_contribution_data
     github_title                      text,
     github_html_url                   text,
     github_body                       text,
-    created_at                        timestamp,
-    updated_at                        timestamp with time zone,
-    completed_at                      timestamp,
-    day_timestamp                     timestamp,
-    week_timestamp                    timestamp,
-    month_timestamp                   timestamp,
-    quarter_timestamp                 timestamp,
-    year_timestamp                    timestamp,
+    created_at                        timestamptz,
+    updated_at                        timestamptz,
+    completed_at                      timestamptz,
+    day_timestamp                     timestamptz,
+    week_timestamp                    timestamptz,
+    month_timestamp                   timestamptz,
+    quarter_timestamp                 timestamptz,
+    year_timestamp                    timestamptz,
     is_first_contribution_on_onlydust boolean,
     is_issue                          integer,
     is_pr                             integer,
@@ -535,8 +535,8 @@ create table if not exists bi.p_per_contributor_contribution_data
     closing_issue_ids                 bigint[],
     applicant_ids                     bigint[],
     hash                              text,
-    tech_created_at                   timestamp with time zone default now() not null,
-    tech_updated_at                   timestamp with time zone default now() not null
+    tech_created_at                   timestamptz default now() not null,
+    tech_updated_at                   timestamptz default now() not null
 );
 
 create unique index if not exists bi_p_per_contributor_contribution_data_technical_id_hash_idx
@@ -649,8 +649,8 @@ create table if not exists bi.p_project_contributions_data
     contributor_count      bigint,
     good_first_issue_count bigint,
     hash                   text,
-    tech_created_at        timestamp with time zone default now() not null,
-    tech_updated_at        timestamp with time zone default now() not null
+    tech_created_at        timestamptz default now() not null,
+    tech_updated_at        timestamptz default now() not null
 );
 
 create unique index if not exists bi_p_project_contributions_data_project_id_hash_idx
@@ -673,12 +673,12 @@ create table if not exists bi.p_application_data
     application_id       uuid                                   not null
         primary key,
     contribution_uuid    uuid,
-    timestamp            timestamp,
-    day_timestamp        timestamp,
-    week_timestamp       timestamp,
-    month_timestamp      timestamp,
-    quarter_timestamp    timestamp,
-    year_timestamp       timestamp,
+    timestamp            timestamptz,
+    day_timestamp        timestamptz,
+    week_timestamp       timestamptz,
+    month_timestamp      timestamptz,
+    quarter_timestamp    timestamptz,
+    year_timestamp       timestamptz,
     contributor_id       bigint,
     origin               application_origin,
     status               application_status,
@@ -691,8 +691,8 @@ create table if not exists bi.p_application_data
     project_category_ids uuid[],
     search               text,
     hash                 text,
-    tech_created_at      timestamp with time zone default now() not null,
-    tech_updated_at      timestamp with time zone default now() not null
+    tech_created_at      timestamptz default now() not null,
+    tech_updated_at      timestamptz default now() not null
 );
 
 create unique index if not exists bi_p_application_data_application_id_hash_idx
@@ -1723,10 +1723,10 @@ FROM (SELECT c.contribution_uuid,
                  ELSE NULL::jsonb
                  END                                                                              AS github_author,
              jsonb_agg(DISTINCT
-             jsonb_set(cd.contributor, '{since}'::text[], to_jsonb(gcc.tech_created_at::timestamp with time zone),
+             jsonb_set(cd.contributor, '{since}'::text[], to_jsonb(gcc.tech_created_at::timestamptz),
                        true)) FILTER (WHERE cd.contributor_id IS NOT NULL)                        AS contributors,
              jsonb_agg(DISTINCT jsonb_set(
-                     jsonb_set(apd.contributor, '{since}'::text[], to_jsonb(a.received_at::timestamp with time zone),
+                     jsonb_set(apd.contributor, '{since}'::text[], to_jsonb(a.received_at::timestamptz),
                                true), '{applicationId}'::text[], to_jsonb(a.id), true))
              FILTER (WHERE apd.contributor_id IS NOT NULL)                                        AS applicants,
              concat(c.github_number, ' ', c.github_title, ' ', ad.contributor_login, ' ',
@@ -1852,8 +1852,8 @@ FROM public.projects p
 GROUP BY (date_trunc('day'::text, p.created_at));
 
 create or replace view bi.monthly_contributors(date, repo_id, contributor_id, first, latest) as
-WITH monthly AS (SELECT generate_series(date_trunc('month'::text, '2023-01-01'::date::timestamp with time zone),
-                                        date_trunc('month'::text, CURRENT_DATE::timestamp with time zone),
+WITH monthly AS (SELECT generate_series(date_trunc('month'::text, '2023-01-01'::date::timestamptz),
+                                        date_trunc('month'::text, CURRENT_DATE::timestamptz),
                                         '1 mon'::interval) AS date)
 SELECT m.date,
        c.repo_id,
@@ -1879,8 +1879,8 @@ FROM bi.monthly_contributors c
 GROUP BY e.name, c.date;
 
 create or replace view bi.weekly_contributors(date, repo_id, contributor_id, first, latest) as
-WITH weekly AS (SELECT generate_series(date_trunc('week'::text, '2023-01-01'::date::timestamp with time zone),
-                                       date_trunc('week'::text, CURRENT_DATE::timestamp with time zone),
+WITH weekly AS (SELECT generate_series(date_trunc('week'::text, '2023-01-01'::date::timestamptz),
+                                       date_trunc('week'::text, CURRENT_DATE::timestamptz),
                                        '7 days'::interval) AS date)
 SELECT w.date,
        c.repo_id,
@@ -2354,7 +2354,7 @@ create unique index if not exists bi_m_application_data_pk
 create unique index if not exists bi_m_application_data_application_id_hash_idx
     on bi.m_application_data (application_id, hash);
 
-create or replace function bi.select_projects(fromdate timestamp with time zone, todate timestamp with time zone, datasourceids uuid[], programids uuid[],
+create or replace function bi.select_projects(fromdate timestamptz, todate timestamptz, datasourceids uuid[], programids uuid[],
                                               projectids uuid[], projectslugs text[], projectleadids uuid[], categoryids uuid[], languageids uuid[],
                                               ecosystemids uuid[], searchquery text, showfilteredkpis boolean)
     returns TABLE

@@ -18,17 +18,15 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000010_init_bi_schema.sql
   - include:
-      file: db/changelog/changelogs/00000011_init_mandatory_data.sql
+      file: db/changelog/changelogs/00000011_remove_contacts_from_projection.sql
   - include:
-      file: db/changelog/changelogs/00000012_remove_contacts_from_projection.sql
+      file: db/changelog/changelogs/00000012_refactor_select_projects_with_engagement_status.sql
   - include:
-      file: db/changelog/changelogs/00000013_refactor_select_projects_with_engagement_status.sql
+      file: db/changelog/changelogs/00000013_fix_project_contributor_labels_uniqueness.sql
   - include:
-      file: db/changelog/changelogs/00000014_fix_project_contributor_labels_uniqueness.sql
+      file: db/changelog/changelogs/00000014_add_unique_contraint_on_project_github_repos.sql
   - include:
-      file: db/changelog/changelogs/00000015_add_unique_contraint_on_project_github_repos.sql
-  - include:
-      file: db/changelog/changelogs/00000016_update_pseudo_projections.sql
+      file: db/changelog/changelogs/00000015_update_pseudo_projections.sql
   - include:
       file: db/changelog/changelogs/00000017_add_index.sql
   - include:

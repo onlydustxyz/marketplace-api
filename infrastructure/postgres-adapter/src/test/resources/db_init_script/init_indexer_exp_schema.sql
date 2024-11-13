@@ -39,11 +39,6 @@ create table indexer_exp.github_accounts
 create unique index github_accounts_login_uidx
     on indexer_exp.github_accounts (login);
 
-create trigger indexer_exp_github_accounts_set_tech_updated_at
-    before update
-    on indexer_exp.github_accounts
-    for each row
-execute procedure public.set_tech_updated_at();
 
 create table indexer_exp.github_app_installations
 (
@@ -59,12 +54,6 @@ create table indexer_exp.github_app_installations
 
 create unique index github_app_installations_account_id_idx
     on indexer_exp.github_app_installations (account_id);
-
-create trigger indexer_exp_github_app_installations_set_tech_updated_at
-    before update
-    on indexer_exp.github_app_installations
-    for each row
-execute procedure public.set_tech_updated_at();
 
 create table indexer_exp.github_repos
 (
@@ -136,12 +125,6 @@ create index github_issues_status_index
 
 create unique index github_issues_contribution_uuid_index
     on indexer_exp.github_issues (contribution_uuid);
-
-create trigger indexer_exp_github_issues_set_tech_updated_at
-    before update
-    on indexer_exp.github_issues
-    for each row
-execute procedure public.set_tech_updated_at();
 
 create table indexer_exp.github_issues_assignees
 (
@@ -302,23 +285,11 @@ create index indexer_exp_contributions_contributor_id_created_at_idx
 create index contributions_contribution_uuid_index
     on indexer_exp.contributions (contribution_uuid);
 
-create trigger indexer_exp_contributions_set_tech_updated_at
-    before update
-    on indexer_exp.contributions
-    for each row
-execute procedure public.set_tech_updated_at();
-
 create index github_code_reviews_pull_request_id_index
     on indexer_exp.github_code_reviews (pull_request_id);
 
 create unique index github_code_reviews_contribution_uuid_index
     on indexer_exp.github_code_reviews (contribution_uuid);
-
-create trigger indexer_exp_github_code_reviews_set_tech_updated_at
-    before update
-    on indexer_exp.github_code_reviews
-    for each row
-execute procedure public.set_tech_updated_at();
 
 create table indexer_exp.github_pull_request_commit_counts
 (
@@ -337,12 +308,6 @@ create unique index github_pull_requests_id_as_text_index
 
 create unique index github_pull_requests_contribution_uuid_index
     on indexer_exp.github_pull_requests (contribution_uuid);
-
-create trigger indexer_exp_github_pull_requests_set_tech_updated_at
-    before update
-    on indexer_exp.github_pull_requests
-    for each row
-execute procedure public.set_tech_updated_at();
 
 create table indexer_exp.github_pull_requests_closing_issues
 (
@@ -367,23 +332,11 @@ create table indexer_exp.github_repo_languages
     primary key (repo_id, language)
 );
 
-create trigger indexer_exp_github_repo_languages_set_tech_updated_at
-    before update
-    on indexer_exp.github_repo_languages
-    for each row
-execute procedure public.set_tech_updated_at();
-
 create index github_repos_owner_login_name_idx
     on indexer_exp.github_repos (owner_login, name);
 
 create index github_repos_id_visibility_idx
     on indexer_exp.github_repos (id, visibility);
-
-create trigger indexer_exp_github_repos_set_tech_updated_at
-    before update
-    on indexer_exp.github_repos
-    for each row
-execute procedure public.set_tech_updated_at();
 
 create table indexer_exp.github_repos_stats
 (
@@ -414,12 +367,6 @@ create table indexer_exp.github_labels
     tech_updated_at timestamp default now() not null
 );
 
-create trigger indexer_exp_github_labels_set_tech_updated_at
-    before update
-    on indexer_exp.github_labels
-    for each row
-execute procedure public.set_tech_updated_at();
-
 create table indexer_exp.github_issues_labels
 (
     issue_id        bigint                  not null
@@ -430,12 +377,6 @@ create table indexer_exp.github_issues_labels
     tech_updated_at timestamp default now() not null,
     primary key (issue_id, label_id)
 );
-
-create trigger indexer_exp_github_issues_labels_set_tech_updated_at
-    before update
-    on indexer_exp.github_issues_labels
-    for each row
-execute procedure public.set_tech_updated_at();
 
 create table indexer_exp.github_user_file_extensions
 (
@@ -449,12 +390,6 @@ create table indexer_exp.github_user_file_extensions
     primary key (user_id, file_extension)
 );
 
-create trigger indexer_exp_github_user_file_extensions_set_tech_updated_at
-    before update
-    on indexer_exp.github_user_file_extensions
-    for each row
-execute procedure public.set_tech_updated_at();
-
 create table indexer_exp.github_commits
 (
     sha             text                                   not null
@@ -463,12 +398,6 @@ create table indexer_exp.github_commits
     tech_created_at timestamp with time zone default now() not null,
     tech_updated_at timestamp with time zone default now() not null
 );
-
-create trigger indexer_exp_github_commits_set_tech_updated_at
-    before update
-    on indexer_exp.github_commits
-    for each row
-execute procedure public.set_tech_updated_at();
 
 create table indexer_exp.github_pull_requests_commits
 (
@@ -480,12 +409,6 @@ create table indexer_exp.github_pull_requests_commits
     tech_updated_at timestamp with time zone default now() not null,
     primary key (commit_sha, pull_request_id)
 );
-
-create trigger indexer_exp_github_pull_requests_commits_set_tech_updated_at
-    before update
-    on indexer_exp.github_pull_requests_commits
-    for each row
-execute procedure public.set_tech_updated_at();
 
 create table indexer_exp.grouped_contributions
 (
@@ -561,12 +484,6 @@ create index grouped_contributions_type_as_text_index
 create index grouped_contributions_coalesce_idx
     on indexer_exp.grouped_contributions (COALESCE(issue_id::text, pull_request_id::text, code_review_id));
 
-create trigger grouped_contributions_set_tech_updated_at
-    before update
-    on indexer_exp.grouped_contributions
-    for each row
-execute procedure public.set_tech_updated_at();
-
 create table indexer_exp.grouped_contribution_contributors
 (
     contribution_uuid uuid                    not null
@@ -580,10 +497,4 @@ create table indexer_exp.grouped_contribution_contributors
 
 create unique index grouped_contribution_contributors_pk_inv
     on indexer_exp.grouped_contribution_contributors (contributor_id, contribution_uuid);
-
-create trigger grouped_contribution_contributors_set_tech_updated_at
-    before update
-    on indexer_exp.grouped_contribution_contributors
-    for each row
-execute procedure public.set_tech_updated_at();
 

@@ -5,8 +5,8 @@ create table if not exists iam.user_projects_notification_settings
     project_id                uuid                    not null
         references public.projects,
     on_good_first_issue_added boolean                 not null,
-    tech_created_at           timestamp default now() not null,
-    tech_updated_at           timestamp default now() not null,
+    tech_created_at           timestamptz default now() not null,
+    tech_updated_at           timestamptz default now() not null,
     primary key (user_id, project_id)
 );
 
@@ -25,8 +25,8 @@ SELECT u.id                                                         AS user_id,
        COALESCE(upi.avatar_url, ga.avatar_url, u.github_avatar_url) AS avatar_url,
        u.email,
        COALESCE(upi.bio, ga.bio)                                    AS bio,
-       u.created_at::timestamp with time zone                       AS signed_up_at,
-       ga.created_at::timestamp with time zone                      AS signed_up_on_github_at
+       u.created_at::timestamptz                       AS signed_up_at,
+       ga.created_at::timestamptz                      AS signed_up_on_github_at
 FROM iam.users u
          FULL JOIN indexer_exp.github_accounts ga ON ga.id = u.github_user_id
          LEFT JOIN public.user_profile_info upi ON u.id = upi.id;
@@ -39,8 +39,8 @@ SELECT u.id                                                         AS user_id,
        COALESCE(upi.avatar_url, ga.avatar_url, u.github_avatar_url) AS avatar_url,
        u.email,
        COALESCE(upi.bio, ga.bio)                                    AS bio,
-       u.created_at::timestamp with time zone                       AS signed_up_at,
-       ga.created_at::timestamp with time zone                      AS signed_up_on_github_at
+       u.created_at::timestamptz                       AS signed_up_at,
+       ga.created_at::timestamptz                      AS signed_up_on_github_at
 FROM indexer_exp.github_accounts ga
          LEFT JOIN iam.users u ON u.github_user_id = ga.id
          LEFT JOIN public.user_profile_info upi ON u.id = upi.id;

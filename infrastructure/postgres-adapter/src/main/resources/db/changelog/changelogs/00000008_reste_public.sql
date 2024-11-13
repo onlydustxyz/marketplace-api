@@ -149,8 +149,8 @@ create table if not exists reward_items
     project_id        uuid                    not null
         references projects,
     recipient_id      bigint                  not null,
-    tech_created_at   timestamp default now() not null,
-    tech_updated_at   timestamp default now() not null,
+    tech_created_at   timestamptz default now() not null,
+    tech_updated_at   timestamptz default now() not null,
     contribution_uuid uuid                    not null,
     primary key (reward_id, repo_id, number)
 );
@@ -198,8 +198,8 @@ create table if not exists erc20
     symbol          text                    not null,
     decimals        integer                 not null,
     total_supply    numeric                 not null,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
     currency_id     uuid                    not null
         references currencies,
     primary key (blockchain, address)
@@ -210,19 +210,19 @@ create table if not exists applications
 (
     id              uuid                                                         not null
         primary key,
-    received_at     timestamp                                                    not null,
+    received_at     timestamptz                                                    not null,
     project_id      uuid                                                         not null
         references projects,
     issue_id        bigint,
     comment_id      bigint,
     comment_body    text,
-    tech_created_at timestamp          default now()                             not null,
-    tech_updated_at timestamp          default now()                             not null,
+    tech_created_at timestamptz          default now()                             not null,
+    tech_updated_at timestamptz          default now()                             not null,
     origin          application_origin default 'MARKETPLACE'::application_origin not null,
     applicant_id    bigint                                                       not null
         constraint applications_applicant_id_fkey1
             references indexer_exp.github_accounts,
-    ignored_at      timestamp with time zone,
+    ignored_at      timestamptz,
     constraint applications_project_id_applicant_id_issue_id_unique
         unique (project_id, applicant_id, issue_id)
 );
@@ -244,7 +244,7 @@ create table if not exists sponsor_leads
     user_id         uuid                    not null
         constraint sponsors_users_user_id_fkey
             references iam.users,
-    tech_created_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
     constraint sponsors_users_pkey
         primary key (user_id, sponsor_id)
 );
@@ -255,8 +255,8 @@ create table if not exists hackathon_registrations
         references hackathons,
     user_id         uuid                    not null
         references iam.users,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
     primary key (hackathon_id, user_id)
 );
 
@@ -266,7 +266,7 @@ create table if not exists committee_juries
         references iam.users,
     committee_id    uuid                    not null
         references committees,
-    tech_created_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
     primary key (user_id, committee_id)
 );
 
@@ -281,8 +281,8 @@ create table if not exists committee_jury_votes
     user_id         uuid                    not null
         references iam.users,
     score           integer,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
     primary key (committee_id, criteria_id, project_id, user_id)
 );
 
@@ -292,8 +292,8 @@ create table if not exists banners_closed_by
         references banners,
     user_id         uuid                    not null
         references iam.users,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
     primary key (banner_id, user_id)
 );
 
@@ -303,8 +303,8 @@ create table if not exists program_leads
         references programs,
     user_id         uuid                    not null
         references iam.users,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
     primary key (program_id, user_id)
 );
 
@@ -314,8 +314,8 @@ create table if not exists ecosystem_leads
         references ecosystems,
     user_id         uuid                                   not null
         references iam.users,
-    tech_created_at timestamp with time zone default now() not null,
-    tech_updated_at timestamp with time zone default now() not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
     primary key (ecosystem_id, user_id)
 );
 

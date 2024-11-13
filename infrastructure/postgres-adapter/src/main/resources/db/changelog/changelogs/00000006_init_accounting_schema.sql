@@ -31,8 +31,8 @@ create table if not exists accounting.account_books
     currency_id     uuid                    not null
         unique
         references public.currencies,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null
 );
 
 create trigger account_books_events_set_tech_updated_at
@@ -47,9 +47,9 @@ create table if not exists accounting.account_books_events
     account_book_id uuid                    not null
         references accounting.account_books,
     payload         jsonb                   not null,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null,
-    timestamp       timestamp               not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
+    timestamp       timestamptz               not null,
     primary key (account_book_id, id)
 );
 
@@ -73,8 +73,8 @@ create table if not exists accounting.batch_payments
     network          accounting.network                                                                not null,
     status           accounting.batch_payment_status default 'TO_PAY'::accounting.batch_payment_status not null,
     transaction_hash text,
-    tech_created_at  timestamp                       default CURRENT_TIMESTAMP,
-    tech_updated_at  timestamp                       default CURRENT_TIMESTAMP
+    tech_created_at  timestamptz                       default CURRENT_TIMESTAMP,
+    tech_updated_at  timestamptz                       default CURRENT_TIMESTAMP
 );
 
 create index if not exists batch_payments_status_index
@@ -86,9 +86,9 @@ create table if not exists accounting.billing_profiles
         primary key,
     name                        text                                                                                 not null,
     type                        accounting.billing_profile_type                                                      not null,
-    invoice_mandate_accepted_at timestamp,
-    tech_created_at             timestamp                      default now()                                         not null,
-    tech_updated_at             timestamp                      default now()                                         not null,
+    invoice_mandate_accepted_at timestamptz,
+    tech_created_at             timestamptz                      default now()                                         not null,
+    tech_updated_at             timestamptz                      default now()                                         not null,
     verification_status         accounting.verification_status default 'NOT_STARTED'::accounting.verification_status not null,
     enabled                     boolean                        default true                                          not null
 );
@@ -101,8 +101,8 @@ create table if not exists accounting.bank_accounts
             references accounting.billing_profiles,
     bic                text                    not null,
     number             text                    not null,
-    tech_created_at    timestamp default now() not null,
-    tech_updated_at    timestamp default now() not null
+    tech_created_at    timestamptz default now() not null,
+    tech_updated_at    timestamptz default now() not null
 );
 
 create unique index if not exists billing_profiles_id_type_verification_status_idx
@@ -114,11 +114,11 @@ create table if not exists accounting.billing_profiles_user_invitations
         references accounting.billing_profiles,
     github_user_id     bigint                          not null,
     role               accounting.billing_profile_role not null,
-    invited_at         timestamp                       not null,
+    invited_at         timestamptz                       not null,
     invited_by         uuid                            not null
         references iam.users,
-    tech_created_at    timestamp default now()         not null,
-    tech_updated_at    timestamp default now()         not null,
+    tech_created_at    timestamptz default now()         not null,
+    tech_updated_at    timestamptz default now()         not null,
     accepted           boolean   default false,
     primary key (billing_profile_id, github_user_id)
 );
@@ -139,9 +139,9 @@ create table if not exists accounting.billing_profiles_users
             references accounting.billing_profiles,
     user_id            uuid                            not null,
     role               accounting.billing_profile_role not null,
-    tech_created_at    timestamp default now()         not null,
-    tech_updated_at    timestamp default now()         not null,
-    joined_at          timestamp,
+    tech_created_at    timestamptz default now()         not null,
+    tech_updated_at    timestamptz default now()         not null,
+    joined_at          timestamptz,
     constraint billing_profile_id_user_id
         primary key (billing_profile_id, user_id)
 );
@@ -154,7 +154,7 @@ create unique index if not exists billing_profiles_users_user_id_billing_profile
 
 create table if not exists accounting.historical_quotes
 (
-    timestamp timestamp not null,
+    timestamp timestamptz not null,
     base_id   uuid      not null
         constraint historical_quotes_currency_id_fkey
             references public.currencies,
@@ -186,15 +186,15 @@ create table if not exists accounting.invoices
         primary key,
     billing_profile_id uuid                      not null,
     number             text                      not null,
-    created_at         timestamp                 not null,
+    created_at         timestamptz                 not null,
     status             accounting.invoice_status not null,
     amount             numeric                   not null,
     currency_id        uuid                      not null
         references public.currencies,
     url                text,
     data               jsonb                     not null,
-    tech_created_at    timestamp default now()   not null,
-    tech_updated_at    timestamp default now()   not null,
+    tech_created_at    timestamptz default now()   not null,
+    tech_updated_at    timestamptz default now()   not null,
     original_file_name text,
     rejection_reason   text,
     created_by         uuid                      not null,
@@ -218,7 +218,7 @@ create table if not exists accounting.kyb
     verification_status accounting.verification_status not null,
     name                text,
     registration_number text,
-    registration_date   timestamp,
+    registration_date   timestamptz,
     address             text,
     country             text,
     us_entity           boolean,
@@ -226,8 +226,8 @@ create table if not exists accounting.kyb
     eu_vat_number       text,
     review_message      text,
     applicant_id        text,
-    tech_created_at     timestamp default now()        not null,
-    tech_updated_at     timestamp default now()        not null
+    tech_created_at     timestamptz default now()        not null,
+    tech_updated_at     timestamptz default now()        not null
 );
 
 create index if not exists kyb_billing_profile_id_index
@@ -249,16 +249,16 @@ create table if not exists accounting.kyc
     last_name                          text,
     address                            text,
     country                            text,
-    birthdate                          timestamp,
-    valid_until                        timestamp,
+    birthdate                          timestamptz,
+    valid_until                        timestamptz,
     id_document_number                 text,
     id_document_type                   accounting.id_document_type,
     id_document_country_code           text,
     considered_us_person_questionnaire boolean,
     review_message                     text,
     applicant_id                       text,
-    tech_created_at                    timestamp default now()        not null,
-    tech_updated_at                    timestamp default now()        not null,
+    tech_created_at                    timestamptz default now()        not null,
+    tech_updated_at                    timestamptz default now()        not null,
     us_citizen                         boolean
 );
 
@@ -272,8 +272,8 @@ create table if not exists accounting.payout_infos
 (
     billing_profile_id uuid                    not null
         primary key,
-    tech_created_at    timestamp default now() not null,
-    tech_updated_at    timestamp default now() not null
+    tech_created_at    timestamptz default now() not null,
+    tech_updated_at    timestamptz default now() not null
 );
 
 create table if not exists accounting.payout_preferences
@@ -283,8 +283,8 @@ create table if not exists accounting.payout_preferences
             references accounting.billing_profiles,
     project_id         uuid                    not null,
     user_id            uuid                    not null,
-    tech_created_at    timestamp default now() not null,
-    tech_updated_at    timestamp default now() not null,
+    tech_created_at    timestamptz default now() not null,
+    tech_updated_at    timestamptz default now() not null,
     primary key (project_id, user_id)
 );
 
@@ -304,14 +304,14 @@ create table if not exists public.rewards
         references iam.users,
     recipient_id        bigint                  not null,
     amount              numeric                 not null,
-    requested_at        timestamp               not null,
-    tech_created_at     timestamp default now() not null,
-    tech_updated_at     timestamp default now() not null,
+    requested_at        timestamptz               not null,
+    tech_created_at     timestamptz default now() not null,
+    tech_updated_at     timestamptz default now() not null,
     invoice_id          uuid
         references accounting.invoices,
     currency_id         uuid                    not null
         references currencies,
-    payment_notified_at timestamp,
+    payment_notified_at timestamptz,
     billing_profile_id  uuid
         references accounting.billing_profiles
 );
@@ -324,11 +324,11 @@ create table if not exists accounting.reward_status_data
         references public.rewards
             deferrable initially deferred,
     sponsor_has_enough_fund boolean,
-    unlock_date             timestamp,
-    invoice_received_at     timestamp,
-    paid_at                 timestamp,
-    tech_created_at         timestamp default now() not null,
-    tech_updated_at         timestamp default now() not null,
+    unlock_date             timestamptz,
+    invoice_received_at     timestamptz,
+    paid_at                 timestamptz,
+    tech_created_at         timestamptz default now() not null,
+    tech_updated_at         timestamptz default now() not null,
     amount_usd_equivalent   numeric,
     networks                accounting.network[]    not null,
     usd_conversion_rate     numeric
@@ -351,9 +351,9 @@ create table if not exists accounting.sponsor_accounts
         references public.currencies,
     sponsor_id      uuid                    not null
         references public.sponsors,
-    locked_until    timestamp,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null
+    locked_until    timestamptz,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null
 );
 
 create index if not exists sponsor_accounts_sponsor_id_index
@@ -373,8 +373,8 @@ create table if not exists accounting.wallets
     network            accounting.network      not null,
     type               accounting.wallet_type  not null,
     address            text                    not null,
-    tech_created_at    timestamp default now() not null,
-    tech_updated_at    timestamp default now() not null,
+    tech_created_at    timestamptz default now() not null,
+    tech_updated_at    timestamptz default now() not null,
     primary key (billing_profile_id, network)
 );
 
@@ -385,8 +385,8 @@ create table if not exists accounting.billing_profile_verification_outbox_events
     payload         jsonb                                                                            not null,
     status          accounting.outbox_event_status default 'PENDING'::accounting.outbox_event_status not null,
     error           text,
-    tech_created_at timestamp                      default now()                                     not null,
-    tech_updated_at timestamp                      default now()                                     not null
+    tech_created_at timestamptz                      default now()                                     not null,
+    tech_updated_at timestamptz                      default now()                                     not null
 );
 
 create trigger accounting_bbp_verification_outbox_events_set_tech_updated_at
@@ -401,8 +401,8 @@ create table if not exists accounting.children_kyc
         primary key,
     parent_applicant_id text                           not null,
     verification_status accounting.verification_status not null,
-    tech_created_at     timestamp default now()        not null,
-    tech_updated_at     timestamp default now()        not null
+    tech_created_at     timestamptz default now()        not null,
+    tech_updated_at     timestamptz default now()        not null
 );
 
 create index if not exists children_kyc_parent_applicant_id_index
@@ -412,13 +412,13 @@ create table if not exists accounting.receipts
 (
     id                         uuid                    not null
         primary key,
-    created_at                 timestamp               not null,
+    created_at                 timestamptz               not null,
     network                    accounting.network      not null,
     third_party_name           text                    not null,
     third_party_account_number text                    not null,
     transaction_reference      text                    not null,
-    tech_created_at            timestamp default now() not null,
-    tech_updated_at            timestamp default now() not null
+    tech_created_at            timestamptz default now() not null,
+    tech_updated_at            timestamptz default now() not null
 );
 
 create index if not exists receipts_transaction_reference_index
@@ -446,8 +446,8 @@ create table if not exists accounting.batch_payment_rewards
     reward_id        uuid                    not null
         references public.rewards,
     amount           numeric                 not null,
-    tech_created_at  timestamp default now() not null,
-    tech_updated_at  timestamp default now() not null,
+    tech_created_at  timestamptz default now() not null,
+    tech_updated_at  timestamptz default now() not null,
     primary key (batch_payment_id, reward_id)
 );
 
@@ -462,14 +462,14 @@ execute procedure public.set_tech_updated_at();
 
 create table if not exists accounting.latest_quotes
 (
-    timestamp       timestamp               not null,
+    timestamp       timestamptz               not null,
     base_id         uuid                    not null
         references public.currencies,
     target_id       uuid                    not null
         references public.currencies,
     price           numeric                 not null,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
     primary key (base_id, target_id)
 );
 
@@ -484,14 +484,14 @@ execute procedure public.set_tech_updated_at();
 
 create table if not exists accounting.oldest_quotes
 (
-    timestamp       timestamp               not null,
+    timestamp       timestamptz               not null,
     base_id         uuid                    not null
         references public.currencies,
     target_id       uuid                    not null
         references public.currencies,
     price           numeric                 not null,
-    tech_created_at timestamp default now() not null,
-    tech_updated_at timestamp default now() not null,
+    tech_created_at timestamptz default now() not null,
+    tech_updated_at timestamptz default now() not null,
     primary key (base_id, target_id)
 );
 
@@ -505,8 +505,8 @@ create table if not exists accounting.mail_outbox_events
     payload         jsonb                                                      not null,
     status          outbox_event_status default 'PENDING'::outbox_event_status not null,
     error           text,
-    tech_created_at timestamp           default now()                          not null,
-    tech_updated_at timestamp           default now()                          not null
+    tech_created_at timestamptz           default now()                          not null,
+    tech_updated_at timestamptz           default now()                          not null
 );
 
 create trigger accounting_mail_outbox_events_set_tech_updated_at
@@ -543,7 +543,7 @@ create table if not exists accounting.all_transactions
     id             uuid                        not null
         constraint account_book_transactions_pkey
             primary key,
-    timestamp      timestamp with time zone    not null,
+    timestamp      timestamptz    not null,
     currency_id    uuid                        not null
         constraint account_book_transactions_currency_id_fkey
             references public.currencies,
@@ -594,13 +594,13 @@ create table if not exists accounting.transfer_transactions
     blockchain        accounting.network                     not null,
     reference         text                                   not null,
     index             serial,
-    timestamp         timestamp with time zone               not null,
+    timestamp         timestamptz               not null,
     sender_address    text                                   not null,
     recipient_address text                                   not null,
     amount            numeric                                not null,
     contract_address  text,
-    tech_created_at   timestamp with time zone default now() not null,
-    tech_updated_at   timestamp with time zone default now() not null,
+    tech_created_at   timestamptz default now() not null,
+    tech_updated_at   timestamptz default now() not null,
     unique (blockchain, reference, index)
 );
 
@@ -612,12 +612,12 @@ create table if not exists accounting.sponsor_account_transactions
     amount                     numeric                     not null,
     third_party_name           text                        not null,
     third_party_account_number text                        not null,
-    tech_created_at            timestamp default now()     not null,
-    tech_updated_at            timestamp default now()     not null,
+    tech_created_at            timestamptz default now()     not null,
+    tech_updated_at            timestamptz default now()     not null,
     id                         uuid                        not null
         primary key,
     type                       accounting.transaction_type not null,
-    timestamp                  timestamp                   not null,
+    timestamp                  timestamptz                   not null,
     transaction_id             uuid
         unique
         references accounting.transfer_transactions
@@ -653,8 +653,8 @@ create table if not exists accounting.deposits
         references public.currencies,
     status              accounting.deposit_status              not null,
     billing_information jsonb,
-    tech_created_at     timestamp with time zone default now() not null,
-    tech_updated_at     timestamp with time zone default now() not null
+    tech_created_at     timestamptz default now() not null,
+    tech_updated_at     timestamptz default now() not null
 );
 
 create trigger accounting_deposits_set_tech_updated_at
@@ -878,7 +878,7 @@ FROM accounting.billing_profiles_user_invitations bpui
          LEFT JOIN iam.users u ON u.github_user_id = bpui.github_user_id
 WHERE bpui.accepted IS FALSE;
 
-create or replace function accounting.usd_quote_at(currency_id uuid, at timestamp with time zone) returns numeric
+create or replace function accounting.usd_quote_at(currency_id uuid, at timestamptz) returns numeric
     stable
     parallel safe
     language sql
@@ -893,7 +893,7 @@ ORDER BY hq.timestamp DESC
 LIMIT 1
 $$;
 
-create or replace function accounting.usd_equivalent_at(amount numeric, currency_id uuid, at timestamp with time zone) returns numeric
+create or replace function accounting.usd_equivalent_at(amount numeric, currency_id uuid, at timestamptz) returns numeric
     stable
     parallel safe
     language sql
