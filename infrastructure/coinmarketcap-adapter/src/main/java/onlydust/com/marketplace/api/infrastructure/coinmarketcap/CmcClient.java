@@ -67,18 +67,15 @@ public class CmcClient extends HttpClient {
             return get("/v2/cryptocurrency/info?aux=logo,description&address=%s".formatted(erc20.getAddress()), typeRef).flatMap(d -> d.values().stream().findFirst());
         } catch (OnlyDustException e) {
             if (e.getStatus() == 400) {
-                LOGGER.warn("Unable to fetch metadata for ERC20 token %s".formatted(erc20.getAddress()));
-                return Optional.empty();
+                LOGGER.warn("Unable to fetch metadata for ERC20 token %s, trying with symbol %s".formatted(erc20.getAddress(), erc20.getSymbol()));
+                return allMetadata(Currency.Code.of(erc20.getSymbol())).stream().filter(m -> m.category.equals("token")).findFirst();
             }
             throw e;
         }
     }
 
     public Optional<MetadataResponse> metadata(Currency.Code code) {
-        final var typeRef = new TypeReference<Response<Map<String, List<MetadataResponse>>>>() {
-        };
-        return get("/v2/cryptocurrency/info?aux=logo,description&symbol=%s".formatted(code), typeRef).flatMap(d -> d.values().stream().findFirst()
-                .flatMap(l -> l.stream().filter(m -> m.category.equals("coin")).findFirst()));
+        return allMetadata(code).stream().filter(m -> m.category.equals("coin")).findFirst();
     }
 
     public Map<Integer, QuoteResponse> quotes(Set<Currency> from, Set<Currency> to) {
@@ -97,6 +94,14 @@ public class CmcClient extends HttpClient {
                 .sorted()
                 .map(Object::toString)
                 .collect(joining(","));
+    }
+
+    private List<MetadataResponse> allMetadata(Currency.Code code) {
+        final var typeRef = new TypeReference<Response<Map<String, List<MetadataResponse>>>>() {
+        };
+        return get("/v2/cryptocurrency/info?aux=logo,description&symbol=%s".formatted(code), typeRef)
+                .flatMap(d -> d.values().stream().findFirst())
+                .orElse(List.of());
     }
 
     private <T> Optional<T> get(String path, TypeReference<Response<T>> typeRef) {
