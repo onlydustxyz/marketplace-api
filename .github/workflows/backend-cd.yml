@@ -36,7 +36,7 @@ jobs:
         if: github.ref == 'refs/heads/staging'
         with:
           aws-region: eu-west-1
-          role-to-assume: arn:aws:iam::102790067838:role/OnlyDustRepositoryStack-MarketplaceRepositoryGitHub-GUtlNwyyGXdz
+          role-to-assume: arn:aws:iam::890742575374:role/OnlyDustRepositoryStack-MarketplaceRepositoryGitHub-v9bYePRqxMSJ
 
       - name: Docker build and push [Production]
         uses: ./.github/actions/docker-build-push
