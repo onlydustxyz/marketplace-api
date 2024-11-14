@@ -1,9 +1,12 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.entity;
 
 import jakarta.persistence.EntityManagerFactory;
+import onlydust.com.marketplace.api.postgres.adapter.entity.GlobalSettingsEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAppInstallationViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GithubAppInstallationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,6 +19,15 @@ public class GithubAppInstallationViewEntityIT extends AbstractPostgresIT {
     GithubAppInstallationRepository githubAppInstallationRepository;
     @Autowired
     EntityManagerFactory entityManagerFactory;
+    @Autowired
+    GlobalSettingsRepository globalSettingsRepository;
+
+    @BeforeEach
+    void setUp() {
+        globalSettingsRepository.deleteAll();
+        globalSettingsRepository.save(new GlobalSettingsEntity(1, ZonedDateTime.now(), ZonedDateTime.now(), new String[]{"issues:write", "issues:read",
+                "metadata:read", "pull_requests:read"}));
+    }
 
     @Test
     void should_determine_status_complete() {
@@ -74,7 +86,8 @@ public class GithubAppInstallationViewEntityIT extends AbstractPostgresIT {
         em.getTransaction().begin();
         // Disable FK checks
         em.createNativeQuery("ALTER TABLE indexer_exp.github_app_installations DISABLE TRIGGER ALL;").executeUpdate();
-        em.createNativeQuery("INSERT INTO indexer_exp.github_app_installations (id, account_id, suspended_at, permissions) VALUES (:id, :accountId, :suspendedAt, :permissions)")
+        em.createNativeQuery("INSERT INTO indexer_exp.github_app_installations (id, account_id, suspended_at, permissions) VALUES (:id, :accountId, " +
+                             ":suspendedAt, :permissions)")
                 .setParameter("id", id)
                 .setParameter("accountId", id)
                 .setParameter("suspendedAt", suspendedAt)

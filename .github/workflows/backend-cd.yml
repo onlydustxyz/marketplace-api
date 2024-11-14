@@ -1,0 +1,44 @@
+name: Backend CD
+
+on:
+  push:
+    branches:
+      - "main"
+      - "staging"
+      - "production"
+
+jobs:
+  build_and_push_docker_image:
+    name: Build and push docker image to AWS ECR
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Java setup
+        uses: ./.github/actions/java-setup
+
+      - name: Docker build and push [Develop]
+        uses: ./.github/actions/docker-build-push
+        if: github.ref == 'refs/heads/main'
+        with:
+          aws-region: eu-west-1
+          role-to-assume: arn:aws:iam::116981777789:role/OnlyDustRepositoryStack-MarketplaceRepositoryGitHub-pSv0mpHv6tYW
+
+      - name: Docker build and push [Staging]
+        uses: ./.github/actions/docker-build-push
+        if: github.ref == 'refs/heads/staging'
+        with:
+          aws-region: eu-west-1
+          role-to-assume: arn:aws:iam::102790067838:role/OnlyDustRepositoryStack-MarketplaceRepositoryGitHub-GUtlNwyyGXdz
+
+      - name: Docker build and push [Production]
+        uses: ./.github/actions/docker-build-push
+        if: github.ref == 'refs/heads/production'
+        with:
+          aws-region: eu-west-1
+          role-to-assume: arn:aws:iam::102790067838:role/OnlyDustRepositoryStack-MarketplaceRepositoryGitHub-GUtlNwyyGXdz
+

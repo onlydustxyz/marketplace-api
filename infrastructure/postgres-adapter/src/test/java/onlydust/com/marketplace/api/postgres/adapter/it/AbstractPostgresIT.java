@@ -27,7 +27,7 @@ public class AbstractPostgresIT {
     protected final static Faker faker = new Faker();
     @Container
     static PostgreSQLContainer postgresSQLContainer =
-            new PostgreSQLContainer<>("postgres:15.6-alpine")
+            new PostgreSQLContainer<>("postgres:16.4-alpine")
                     .withDatabaseName("marketplace_db")
                     .withUsername("test")
                     .withPassword("test")
