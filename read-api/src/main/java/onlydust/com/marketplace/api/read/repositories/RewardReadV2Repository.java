@@ -58,8 +58,10 @@ public interface RewardReadV2Repository extends JpaRepository<RewardV2ReadEntity
               and (cast(:statuses as accounting.reward_status[]) is null or r.status = any (cast(:statuses as accounting.reward_status[])))
               and (cast(:projectIds as uuid[]) is null or r.project_id = any (cast(:projectIds as uuid[])))
               and (cast(:billingProfileIds as uuid[]) is null or r.billing_profile_id = any (cast(:billingProfileIds as uuid[])))
+              and (cast(:currencyIds as uuid[]) is null or r.currency_id = any (cast(:currencyIds as uuid[])))
               and (cast(:recipientIds as bigint[]) is null or r.recipient_id = any (cast(:recipientIds as bigint[])))
               and (cast(:contributionUUIDs as uuid[]) is null or r.reward_id = any (get_reward_ids_of_contributions(cast(:contributionUUIDs as uuid[]))))
+              and (cast(:search as text) is null or cast(r.status as text) ilike '%' || :search || '%' or rd.search ilike '%' || :search || '%')
             """, nativeQuery = true)
     Page<RewardV2ReadEntity> findAll(boolean includeProjectLeds,
                                      boolean includeBillingProfileAdministrated,
@@ -71,7 +73,9 @@ public interface RewardReadV2Repository extends JpaRepository<RewardV2ReadEntity
                                      String[] statuses,
                                      UUID[] projectIds,
                                      UUID[] billingProfileIds,
+                                     UUID[] currencyIds,
                                      UUID[] contributionUUIDs,
                                      Long[] recipientIds,
+                                     String search,
                                      Pageable pageable);
 }

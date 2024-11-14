@@ -471,6 +471,12 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                     assertThat(reward.getAmount().getCurrency().getCode()).isEqualTo("STRK");
                 }), true
         );
+        test_get_rewards(Map.of("currencyIds", ETH.toString()),
+                response -> response.getRewards().forEach(reward -> assertThat(reward.getAmount().getCurrency().getCode()).isEqualTo("ETH")), true
+        );
+        test_get_rewards(Map.of("search", rewardId.toString().substring(0, 4)),
+                response -> response.getRewards().forEach(reward -> assertThat(reward.getId()).isEqualTo(rewardId.value())), true
+        );
     }
 
 

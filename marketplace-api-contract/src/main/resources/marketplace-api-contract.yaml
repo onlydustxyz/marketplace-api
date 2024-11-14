@@ -12679,6 +12679,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BillingProfileId'
+        currencyIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurrencyId'
+        search:
+          type: string
 
     RewardPageResponse:
       allOf:

@@ -93,7 +93,8 @@ public class RewardV2ReadEntity {
                 .invoiceId(invoiceId)
                 .items(contributionUuids == null ? List.of() : List.of(contributionUuids))
                 .transactionReference(receipt == null ? null : receipt.transactionReference)
-                .transactionReferenceLink(receipt == null ? null : blockExplorer.url(receipt.blockchain(), receipt.transactionReference))
+                .transactionReferenceLink(receipt == null || receipt.blockchain() == null ? null
+                        : blockExplorer.url(receipt.blockchain(), receipt.transactionReference))
                 ;
     }
 
