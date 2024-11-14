@@ -21,6 +21,9 @@ jobs:
       - name: Java setup
         uses: ./.github/actions/java-setup
 
+      - name: Maven build
+        run: ./mvnw clean install -T 4 -DskipTests -DskipITs -DskipUTs
+
       - name: Docker build and push [Develop]
         uses: ./.github/actions/docker-build-push
         if: github.ref == 'refs/heads/main'
