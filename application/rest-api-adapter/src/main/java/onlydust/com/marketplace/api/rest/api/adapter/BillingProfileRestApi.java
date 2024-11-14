@@ -28,6 +28,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,7 +75,8 @@ public class BillingProfileRestApi implements BillingProfilesApi {
                 BillingProfile.Id.of(billingProfileId),
                 rewardIds.stream().map(RewardId::of).toList());
 
-        final var usdToEurConversionRate = currencyFacadePort.latestQuote(Currency.Code.USD, Currency.Code.EUR);
+        final var eurToUsdConversionRate = currencyFacadePort.latestQuote(Currency.Code.EUR, Currency.Code.USD);
+        final var usdToEurConversionRate = BigDecimal.ONE.divide(eurToUsdConversionRate, 2, RoundingMode.HALF_EVEN);
         return ok(map(preview).usdToEurConversionRate(usdToEurConversionRate));
     }
 

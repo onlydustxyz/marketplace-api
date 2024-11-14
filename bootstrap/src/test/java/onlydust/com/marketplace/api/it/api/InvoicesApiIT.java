@@ -4,17 +4,17 @@ import jakarta.persistence.EntityManagerFactory;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
-import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.api.contract.model.BillingProfileInvoicesPageResponse;
+import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
@@ -22,6 +22,8 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRe
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
 import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.*;
@@ -31,7 +33,9 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.http.MediaType;
 
 import java.io.ByteArrayInputStream;
+import java.math.BigDecimal;
 import java.net.URL;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Set;
@@ -75,6 +79,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         companyBillingProfileId = initBillingProfile(antho).value();
 
         payoutPreferenceFacadePort.setPayoutPreference(PROJECT_ID, BillingProfile.Id.of(companyBillingProfileId), UserId.of(antho.user().getId()));
+        accountingHelper.saveQuote(new Quote(CurrencyHelper.EUR, CurrencyHelper.USD, BigDecimal.valueOf(1.087), Instant.EPOCH));
     }
 
     private BillingProfile.Id initBillingProfile(UserAuthHelper.AuthenticatedUser owner) {

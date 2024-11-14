@@ -5,7 +5,6 @@ import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Quote;
-import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
@@ -17,11 +16,13 @@ import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
 import onlydust.com.marketplace.api.contract.model.InvoicePreviewResponse;
+import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.suites.tags.TagConcurrency;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
@@ -104,6 +105,7 @@ public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
         antho = userAuthHelper.authenticateAntho();
         companyBillingProfileId = initBillingProfile(antho).value();
         payoutPreferenceFacadePort.setPayoutPreference(PROJECT_ID, BillingProfile.Id.of(companyBillingProfileId), UserId.of(antho.user().getId()));
+        accountingHelper.saveQuote(new Quote(CurrencyHelper.EUR, CurrencyHelper.USD, BigDecimal.valueOf(1.087), Instant.EPOCH));
     }
 
     private BillingProfile.Id initBillingProfile(UserAuthHelper.AuthenticatedUser owner) {
