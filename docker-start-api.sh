@@ -12,7 +12,7 @@ fi
 
 java_options="-server -XX:MaxRAMPercentage=75.0 -XX:MaxMetaspaceSize=256m -XX:+UseG1GC -Xss100m \
                  -XX:FlightRecorderOptions=stackdepth=256 -Djava.security.egd=file:/dev/urandom \
-                  -Dliquibase.changelogLockPollRate=1 -Duser.timezone=\"Europe/Paris\""
+                  -Dliquibase.changelogLockPollRate=1 -Duser.timezone=\"UTC\""
 
 if [[ $DD_ENV == "aws" ]]; then
   echo "Starting marketplace-api for spring-profiles-active ${SPRING_PROFILES_ACTIVE} and Datadog env ${DD_ENV}"
