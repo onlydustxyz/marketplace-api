@@ -1,0 +1,27 @@
+{
+    "priority": 1,
+    "request": {
+        "url": "/",
+        "method": "POST",
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "jsonrpc": "2.0",
+                    "method": "eth_getTransactionByHash",
+                    "params": [
+                        "0x384cf237da4ed3592b5140ab1ff5bbbad8b06abef3a5e2ae250d0f4333ea27dd"
+                    ]
+                },
+                "ignoreArrayOrder": true,
+                "ignoreExtraElements": true
+            }
+        ]
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-eth_getTransactionByHashERC20_proxied.json",
+        "headers": {
+            "Content-Type": "application/json"
+        }
+    }
+}

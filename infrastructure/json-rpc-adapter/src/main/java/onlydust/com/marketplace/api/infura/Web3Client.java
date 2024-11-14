@@ -13,6 +13,7 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.EthBlock;
 import org.web3j.protocol.core.methods.response.EthGetTransactionReceipt;
 import org.web3j.protocol.core.methods.response.EthTransaction;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.ContractGasProvider;
 import org.web3j.tx.gas.DefaultGasProvider;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.HexFormat;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -86,6 +88,15 @@ public class Web3Client {
 
         public static ERC20Contract load(String contractAddress, Web3j web3j, Credentials credentials, ContractGasProvider contractGasProvider) {
             return new ERC20Contract(contractAddress, web3j, credentials, contractGasProvider);
+        }
+
+        public static Optional<ERC20Contract> fromTransferReceipt(TransactionReceipt receipt, Web3j web3j, Credentials credentials,
+                                                                  ContractGasProvider contractGasProvider) {
+            final var calledContract = ERC20Contract.load(receipt.getTo(), web3j, credentials, contractGasProvider);
+            // Returns the contract from which the Transfer event originated
+            return calledContract.getTransferEvents(receipt).stream()
+                    .map(l -> ERC20Contract.load(l.log.getAddress(), web3j, credentials, contractGasProvider))
+                    .findFirst();
         }
 
         public CompletableFuture<String> nameWithBinaryFallback() {

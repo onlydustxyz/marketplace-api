@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.infura.adapters;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.port.out.BlockchainTransactionStoragePort;
+import onlydust.com.marketplace.api.infura.NotAnERC20TransferException;
 import onlydust.com.marketplace.api.infura.Web3Client;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmTransaction;
@@ -61,7 +62,8 @@ public class Web3EvmTransactionStorageAdapter extends Web3Client implements Bloc
                                                   final @NonNull Transaction transaction,
                                                   final @NonNull TransactionReceipt receipt) {
         try {
-            final var erc20 = ERC20Contract.load(transaction.getTo(), web3j, credentials, gasPriceProvider);
+            final var erc20 = ERC20Contract.fromTransferReceipt(receipt, web3j, credentials, gasPriceProvider)
+                    .orElseThrow(() -> new NotAnERC20TransferException("Transaction %s is not an ERC20 transfer".formatted(transaction.getHash())));
             final var decimals = erc20.decimals().send();
 
             return erc20.getTransferEvents(receipt).stream()
@@ -73,10 +75,10 @@ public class Web3EvmTransactionStorageAdapter extends Web3Client implements Bloc
                             Ethereum.accountAddress(l._from),
                             Ethereum.accountAddress(l._to),
                             new BigDecimal(l._value, decimals.intValue()),
-                            Ethereum.contractAddress(transaction.getTo())))
+                            Ethereum.contractAddress(erc20.getContractAddress())))
                     .findFirst()
                     .map(identity());
-        } catch (ContractCallException e) {
+        } catch (ContractCallException | NotAnERC20TransferException e) {
             return Optional.empty();
         } catch (Exception e) {
             throw internalServerError("Unable to fetch ERC20 decimals at address %s".formatted(transaction.getTo()), e);

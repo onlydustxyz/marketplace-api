@@ -290,6 +290,91 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         }
 
         @Test
+        void should_preview_a_proxied_deposit_of_usdc_on_ethereum() {
+            // Given
+            onlyDustWallets.setEthereum("0x8371e21f595dbf98caffdcef665ebcaccb983cb1");
+            final var depositId = new MutableObject<String>();
+
+            // When
+            client.post()
+                    .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "network": "ETHEREUM",
+                                "transactionReference": "0x384cf237da4ed3592b5140ab1ff5bbbad8b06abef3a5e2ae250d0f4333ea27dd"
+                            }
+                            """)
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.id").value(depositId::setValue);
+
+            client.get()
+                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(depositId)))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
+                    .json("""
+                            {
+                              "amount": {
+                                "amount": 23000.000000,
+                                "prettyAmount": 23000.00,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 23230.02,
+                                "usdConversionRate": 1.010001
+                              },
+                              "status": "DRAFT",
+                              "currentBalance": {
+                                "amount": 0,
+                                "prettyAmount": 0,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 0.00,
+                                "usdConversionRate": 1.010001
+                              },
+                              "finalBalance": {
+                                "amount": 23000.000000,
+                                "prettyAmount": 23000.00,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 23230.02,
+                                "usdConversionRate": 1.010001
+                              },
+                              "senderInformation": {
+                                "accountNumber": "0x13b2639533ec7741172563b490b64cde14a34258",
+                                "transactionReference": "0x384cf237da4ed3592b5140ab1ff5bbbad8b06abef3a5e2ae250d0f4333ea27dd"
+                              },
+                              "billingInformation": null,
+                              "latestBillingInformation": null
+                            }
+                            """);
+        }
+
+        @Test
         void should_preview_a_deposit_of_eth_on_optimism() {
             // Given
             onlyDustWallets.setOptimism("0xb060429d14266d06a8be63281205668be823604f");
