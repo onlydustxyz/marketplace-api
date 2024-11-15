@@ -467,6 +467,7 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
+    @Transactional
     public Deposit previewDeposit(final @NonNull UserId userId, final @NonNull SponsorId sponsorId, final @NonNull Network network,
                                   final @NonNull String transactionReference) {
         if (!permissionPort.isUserSponsorLead(userId, sponsorId))
