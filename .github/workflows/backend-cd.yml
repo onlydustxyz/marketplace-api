@@ -43,5 +43,5 @@ jobs:
         if: github.ref == 'refs/heads/production'
         with:
           aws-region: eu-west-1
-          role-to-assume: arn:aws:iam::102790067838:role/OnlyDustRepositoryStack-MarketplaceRepositoryGitHub-GUtlNwyyGXdz
+          role-to-assume: arn:aws:iam::897722669743:role/OnlyDustRepositoryStack-GitHubActionsRole4F1BBA26-hVZUkgMJzNcm
 
