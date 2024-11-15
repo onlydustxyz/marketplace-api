@@ -31,6 +31,13 @@ jobs:
       - name: Maven build
         run: ./mvnw clean install -T 4 -DskipTests -DskipITs -DskipUTs
 
+      - name: Upload jar file as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: marketplace-api.jar
+          path: bootstrap/target/marketplace-api.jar
+          if-no-files-found: error
+
   unit_tests:
     name: Unit tests
     runs-on: ubuntu-latest
