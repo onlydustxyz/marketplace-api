@@ -6191,6 +6191,23 @@ components:
               type: string
               format: date-time
 
+    AssignedContributorResponse:
+      allOf:
+        - $ref: '#/components/schemas/DatedGithubUserResponse'
+        - type: object
+          properties:
+            assignedBy:
+              allOf:
+                - $ref: '#/components/schemas/GithubUserResponse'
+                - type: object
+                  required:
+                    - contacts
+                  properties:
+                    contacts:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ContactInformation'
+
     RegisteredUserResponse:
       allOf:
         - $ref: '#/components/schemas/GithubUserResponse'
@@ -12525,7 +12542,7 @@ components:
             contributors:
               type: array
               items:
-                $ref: '#/components/schemas/DatedGithubUserResponse'
+                $ref: '#/components/schemas/AssignedContributorResponse'
             applicants:
               type: array
               items:

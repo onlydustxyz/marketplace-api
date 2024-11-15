@@ -41,3 +41,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000022_fix_aws_migration_1.sql
   - include:
       file: db/changelog/changelogs/00000023_improve_reward_data_search.sql
+  - include:
+      file: db/changelog/changelogs/00000024_add_assigned_by_into_contribution_contributors_data.sql
