@@ -17,9 +17,9 @@ shift
 
 echo "Starting $jar [$SPRING_PROFILES_ACTIVE] in $DD_ENV"
 
-#if [ "$DD_ENV" = "production" ]; then
-set -- -javaagent:/webapp/dd-java-agent.jar -Ddd.profiling.enabled=true -Ddd.logs.injection=true "$@"
-#fi
+if [ "$DD_ENV" = "production" ]; then
+  set -- -javaagent:/webapp/dd-java-agent.jar -Ddd.profiling.enabled=true -Ddd.logs.injection=true "$@"
+fi
 
 java "$@" \
   -server \
