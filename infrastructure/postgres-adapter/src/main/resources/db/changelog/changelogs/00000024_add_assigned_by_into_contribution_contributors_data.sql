@@ -10,7 +10,8 @@ FROM (select c.contribution_uuid                                                
 
              case when ad.contributor_id is not null then ad.contributor end                        as github_author,
 
-             jsonb_agg(distinct jsonb_set(cd.contributor, '{since}', to_jsonb(gcc.tech_created_at::timestamptz), true))
+             jsonb_agg(distinct jsonb_set(jsonb_set(cd.contributor, '{since}', to_jsonb(gcc.tech_created_at::timestamptz), true),
+                                          '{assignedBy}', assigned_by_d.contributor, true))
              filter ( where cd.contributor_id is not null )                                         as contributors,
 
              jsonb_agg(distinct jsonb_set(jsonb_set(apd.contributor, '{since}', to_jsonb(a.received_at::timestamptz), true),
@@ -28,6 +29,7 @@ FROM (select c.contribution_uuid                                                
                left join bi.p_contributor_global_data cd on cd.contributor_id = gcc.contributor_id
                left join bi.p_contributor_global_data ad on ad.contributor_id = c.github_author_id
                left join indexer_exp.github_issues_assignees gia ON gia.issue_id = c.issue_id
+               left join bi.p_contributor_global_data assigned_by_d on assigned_by_d.contributor_id = gia.assigned_by_user_id
                left join applications a on a.issue_id = c.issue_id
                left join bi.p_contributor_global_data apd on apd.contributor_id = a.applicant_id
       group by c.contribution_uuid, ad.contributor_id) v;
