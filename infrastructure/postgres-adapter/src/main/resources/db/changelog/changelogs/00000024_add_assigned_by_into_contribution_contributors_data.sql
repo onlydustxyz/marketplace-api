@@ -11,7 +11,7 @@ FROM (select c.contribution_uuid                                                
              case when ad.contributor_id is not null then ad.contributor end                        as github_author,
 
              jsonb_agg(distinct jsonb_set(jsonb_set(cd.contributor, '{since}', to_jsonb(gcc.tech_created_at::timestamptz), true),
-                                          '{assignedBy}', assigned_by_d.contributor, true))
+                                          '{assignedBy}', coalesce(assigned_by_d.contributor, '{}'::jsonb), assigned_by_d.contributor is not null))
              filter ( where cd.contributor_id is not null )                                         as contributors,
 
              jsonb_agg(distinct jsonb_set(jsonb_set(apd.contributor, '{since}', to_jsonb(a.received_at::timestamptz), true),

@@ -75,7 +75,7 @@ public class ContributionReadEntity {
     ProjectLinkResponse project;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    List<DatedContributorResponse> contributors;
+    List<AssignedContributorResponse> contributors;
 
     @JdbcTypeCode(SqlTypes.JSON)
     List<ApplicantResponse> applicants;
