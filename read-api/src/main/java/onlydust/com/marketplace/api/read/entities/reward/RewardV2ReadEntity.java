@@ -64,6 +64,7 @@ public class RewardV2ReadEntity {
     ProjectLinkResponse project;
     @NonNull
     ZonedDateTime requestedAt;
+    ZonedDateTime invoicedAt;
     ZonedDateTime processedAt;
     ZonedDateTime unlockDate;
 
@@ -86,6 +87,7 @@ public class RewardV2ReadEntity {
                 .from(requestor)
                 .to(recipient)
                 .requestedAt(requestedAt)
+                .invoicedAt(invoicedAt)
                 .processedAt(processedAt)
                 .unlockDate(unlockDate)
                 .billingProfileId(billingProfileId)

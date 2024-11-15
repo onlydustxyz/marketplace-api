@@ -38,6 +38,7 @@ public interface RewardReadV2Repository extends JpaRepository<RewardV2ReadEntity
                                       'logoUrl', p.logo_url) as project,
                    r.recipient_id                            as recipient_id,
                    r.requested_at                            as requested_at,
+                   r.invoice_received_at                     as invoiced_at,
                    r.paid_at                                 as processed_at,
                    r.unlock_date                             as unlock_date,
                    r.usd_conversion_rate                     as usd_conversion_rate,

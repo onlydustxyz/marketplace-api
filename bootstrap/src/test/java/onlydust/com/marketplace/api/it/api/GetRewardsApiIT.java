@@ -194,6 +194,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "pierre"
                               },
                               "requestedAt": "2024-06-10T00:00:00Z",
+                              "invoicedAt": null,
                               "processedAt": null,
                               "unlockDate": null,
                               "invoiceId": null,
@@ -225,6 +226,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "antho"
                               },
                               "requestedAt": "2024-06-03T00:00:00Z",
+                              "invoicedAt": null,
                               "processedAt": null,
                               "unlockDate": null,
                               "invoiceId": null,
@@ -256,6 +258,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "james"
                               },
                               "requestedAt": "2024-06-01T00:02:00Z",
+                              "invoicedAt": null,
                               "processedAt": null,
                               "unlockDate": null,
                               "billingProfileId": null,
@@ -288,6 +291,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "antho"
                               },
                               "requestedAt": "2024-06-01T00:01:00Z",
+                              "invoicedAt": "2024-06-02T00:00:00Z",
                               "processedAt": "2024-06-03T00:00:00Z",
                               "unlockDate": null,
                               "transactionReference": "0x123",
@@ -318,6 +322,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "antho"
                               },
                               "requestedAt": "2024-06-01T00:00:00Z",
+                              "invoicedAt": null,
                               "processedAt": null,
                               "unlockDate": null,
                               "invoiceId": null,

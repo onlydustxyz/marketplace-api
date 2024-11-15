@@ -12737,6 +12737,9 @@ components:
         requestedAt:
           type: string
           format: date-time
+        invoicedAt:
+          type: string
+          format: date-time
         processedAt:
           type: string
           format: date-time
