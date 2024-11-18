@@ -6198,16 +6198,19 @@ components:
         - type: object
           properties:
             assignedBy:
-              allOf:
-                - $ref: '#/components/schemas/GithubUserResponse'
-                - type: object
-                  required:
-                    - contacts
-                  properties:
-                    contacts:
-                      type: array
-                      items:
-                        $ref: '#/components/schemas/ContactInformation'
+              $ref: '#/components/schemas/ContactableContributorResponse'
+
+    ContactableContributorResponse:
+      allOf:
+        - $ref: '#/components/schemas/GithubUserResponse'
+        - type: object
+          required:
+            - contacts
+          properties:
+            contacts:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContactInformation'
 
     RegisteredUserResponse:
       allOf:
@@ -12548,6 +12551,8 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ApplicantResponse'
+            mergedBy:
+              $ref: '#/components/schemas/ContactableContributorResponse'
             languages:
               type: array
               items:

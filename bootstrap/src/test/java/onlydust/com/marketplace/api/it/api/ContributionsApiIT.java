@@ -60,6 +60,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         githubHelper.addClosingIssue(43506983L, 1966796364L);
         databaseHelper.executeQuery("UPDATE indexer_exp.github_issues_assignees SET assigned_by_user_id = :assignedBy " +
                                     "WHERE issue_id = 1300430041 and user_id = 595505 ", Map.of("assignedBy", projectLead.githubUserId().value()));
+        githubHelper.setMergedBy(43506983L, olivier.githubUserId().value());
         postgresBiProjectorAdapter.onContributionsChanged(ContributionUUID.of(UUID.fromString("0f8d789f-fbbd-3171-ad03-9b2b6f8d9174")));
         postgresBiProjectorAdapter.onContributionsChanged(ContributionUUID.of(UUID.fromString("f4db1d9b-4e1d-300c-9277-8d05824c804e")));
 
@@ -159,6 +160,23 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                             "githubUserId": 1814312,
                             "login": "krzkaczor",
                             "avatarUrl": "https://avatars.githubusercontent.com/u/1814312?v=4"
+                          },
+                          "mergedBy": {
+                            "githubUserId": 595505,
+                            "login": "ofux",
+                            "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                            "contacts": [
+                              {
+                                "channel": "TWITTER",
+                                "contact": "https://twitter.com/fuxeto",
+                                "visibility": "private"
+                              },
+                              {
+                                "channel": "TELEGRAM",
+                                "contact": "https://t.me/ofux",
+                                "visibility": "private"
+                              }
+                            ]
                           },
                           "githubNumber": 8,
                           "githubStatus": "CLOSED",
