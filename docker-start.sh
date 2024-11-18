@@ -17,11 +17,7 @@ shift
 
 echo "Starting $jar [$SPRING_PROFILES_ACTIVE] in $DD_ENV"
 
-if [ "$DD_ENV" = "production" ]; then
-  set -- -javaagent:/webapp/dd-java-agent.jar "$@"
-fi
-
-java "$@" \
+java -javaagent:/webapp/dd-java-agent.jar "$@" \
   -server \
   -XX:MaxRAMPercentage=75.0 \
   -XX:MaxMetaspaceSize=256m \
