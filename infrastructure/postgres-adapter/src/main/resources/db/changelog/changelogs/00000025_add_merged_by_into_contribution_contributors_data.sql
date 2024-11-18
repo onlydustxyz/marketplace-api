@@ -16,8 +16,8 @@ $$
 
 
 
-create schema tmp;
-create table tmp.pseudo_projection_definitions
+create schema migration;
+create table migration.pseudo_projection_definitions
 (
     schema_name            text,
     pseudo_projection_name text,
@@ -40,7 +40,7 @@ BEGIN
     materialized_view_name := 'm_' || name;
     projection_table_name := 'p_' || name;
 
-    INSERT INTO tmp.pseudo_projection_definitions (schema_name, pseudo_projection_name, definition)
+    INSERT INTO migration.pseudo_projection_definitions (schema_name, pseudo_projection_name, definition)
     SELECT schema, name, get_pseudo_projection_definition(schema, name)
     ON CONFLICT (schema_name, pseudo_projection_name) DO UPDATE SET definition = EXCLUDED.definition;
 
@@ -61,7 +61,7 @@ DECLARE
 BEGIN
     SELECT definition
     INTO pseudo_projection_definition
-    FROM tmp.pseudo_projection_definitions
+    FROM migration.pseudo_projection_definitions
     WHERE schema_name = schema
       AND pseudo_projection_name = name;
 
