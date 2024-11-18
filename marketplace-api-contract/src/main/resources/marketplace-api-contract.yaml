@@ -347,7 +347,8 @@ paths:
       summary: Get rewards
       operationId: getRewards
       description: |
-        Get rewards
+        Get rewards.
+        Use Accept: text/csv header to get the response in CSV format.
       parameters:
         - name: queryParams
           in: query
