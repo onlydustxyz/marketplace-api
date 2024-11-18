@@ -177,7 +177,8 @@ create table indexer_exp.github_pull_requests
     commit_count         integer                                      not null,
     main_file_extensions text[],
     updated_at           timestamp with time zone                     not null,
-    contribution_uuid    uuid                                         not null
+    contribution_uuid    uuid                                         not null,
+    merged_by_id         bigint
 );
 
 create table indexer_exp.github_code_reviews
