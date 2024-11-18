@@ -81,6 +81,9 @@ public class ContributionReadEntity {
     List<ApplicantResponse> applicants;
 
     @JdbcTypeCode(SqlTypes.JSON)
+    ContactableContributorResponse mergedBy;
+
+    @JdbcTypeCode(SqlTypes.JSON)
     List<LanguageResponse> languages;
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -110,6 +113,7 @@ public class ContributionReadEntity {
                 .project(project)
                 .contributors(contributors)
                 .applicants(applicants)
+                .mergedBy(mergedBy)
                 .languages(languages)
                 .linkedIssues(linkedIssues)
                 .githubCommentCount(githubCommentCount)

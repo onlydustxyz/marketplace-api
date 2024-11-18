@@ -202,6 +202,19 @@ public class GithubHelper {
                 "prId", prId,
                 "issueId", issueId
         ));
+        postgresBiProjectorAdapter.onContributionsChanged(ContributionUUID.of(prId));
+    }
+
+    public void setMergedBy(Long prId, Long mergedByGithubUserId) {
+        databaseHelper.executeQuery("""
+                update indexer_exp.github_pull_requests
+                set merged_by_id = :mergedByGithubUserId
+                where id = :prId
+                """, Map.of(
+                "prId", prId,
+                "mergedByGithubUserId", mergedByGithubUserId
+        ));
+        postgresBiProjectorAdapter.onContributionsChanged(ContributionUUID.of(prId));
     }
 
     public Long createIssue(GithubRepo repo, UserAuthHelper.AuthenticatedUser author) {
