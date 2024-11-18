@@ -7,6 +7,7 @@ on:
       - main
       - staging
       - production
+      - perf
     types:
       - completed
 
