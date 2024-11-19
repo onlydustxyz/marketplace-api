@@ -287,7 +287,6 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/ContributionUuid'
-
       responses:
         "200":
           description: 'Contribution'
@@ -305,7 +304,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
 
-  /api/v1/contributions/{contributionId}/events:
+  /api/v1/contributions/{contributionUuid}/events:
     get:
       security:
         - bearerAuth: [ ]
@@ -316,11 +315,11 @@ paths:
       description: |
         Get contribution events
       parameters:
-        - name: contributionId
+        - name: contributionUuid
           in: path
           required: true
           schema:
-            $ref: '#/components/schemas/ContributionId'
+            $ref: '#/components/schemas/ContributionUuid'
       responses:
         "200":
           description: 'Contribution event list'
@@ -12608,63 +12607,35 @@ components:
           items:
             $ref: '#/components/schemas/ContributionEventResponse'
 
+    ContributionEventEnum:
+      type: string
+      enum:
+        - ISSUE_CREATED
+        - PR_CREATED
+        - ISSUE_ASSIGNED
+        - PR_MERGED
+        - ISSUE_CLOSED
+        - LINKED_ISSUE_CREATED
+        - LINKED_ISSUE_ASSIGNED
+        - LINKED_ISSUE_CLOSED
+
     ContributionEventResponse:
       type: object
       required:
         - timestamp
+        - type
       properties:
         timestamp:
           type: string
           format: date-time
-        assigneeAdded:
-          type: object
-          required:
-            - assignee
-          properties:
-            assignee:
-              $ref: '#/components/schemas/GithubUserResponse'
-        assigneeRemoved:
-          type: object
-          required:
-            - assignee
-          properties:
-            assignee:
-              $ref: '#/components/schemas/GithubUserResponse'
-        opened:
-          type: object
-          required:
-            - by
-          properties:
-            by:
-              $ref: '#/components/schemas/GithubUserResponse'
-        merged:
-          type: object
-          required:
-            - by
-          properties:
-            by:
-              $ref: '#/components/schemas/GithubUserResponse'
-        closed:
-          type: object
-          required:
-            - by
-          properties:
-            by:
-              $ref: '#/components/schemas/GithubUserResponse'
-        issueLinked:
-          type: object
-          required:
-            - issue
-          properties:
-            issue:
-              $ref: '#/components/schemas/GithubIssueLinkResponse'
-        issueUnlinked:
-          type: object
-          required:
-            - issue
-          properties:
-            issue:
-              $ref: '#/components/schemas/GithubIssueLinkResponse'
+        type:
+          $ref: '#/components/schemas/ContributionEventEnum'
+        assignee:
+          $ref: '#/components/schemas/AssignedContributorResponse'
+        mergedBy:
+          $ref: '#/components/schemas/ContactableContributorResponse'
+        linkedIssueContributionUuid:
+          $ref: '#/components/schemas/ContributionUuid'
 
     IssuePatchRequest:
       type: object
