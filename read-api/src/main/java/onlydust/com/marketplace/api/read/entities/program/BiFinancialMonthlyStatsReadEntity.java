@@ -122,11 +122,11 @@ public class BiFinancialMonthlyStatsReadEntity implements ProgramTransactionStat
                                 comparing(BiFinancialsStatsResponse::getDate) :
                                 comparing(BiFinancialsStatsResponse::getDate).reversed())
                         .toList())
-                .totalDeposited(DetailedTotalMoneyMapper.map(totalsPerCurrency, BiFinancialMonthlyStatsReadEntity::totalDeposited))
-                .totalAllocated(DetailedTotalMoneyMapper.map(totalsPerCurrency, BiFinancialMonthlyStatsReadEntity::totalAllocated))
-                .totalGranted(DetailedTotalMoneyMapper.map(totalsPerCurrency, BiFinancialMonthlyStatsReadEntity::totalGranted))
-                .totalRewarded(DetailedTotalMoneyMapper.map(totalsPerCurrency, BiFinancialMonthlyStatsReadEntity::totalRewarded))
-                .totalPaid(DetailedTotalMoneyMapper.map(totalsPerCurrency, BiFinancialMonthlyStatsReadEntity::totalPaid))
+                .totalDeposited(DetailedTotalMoneyMapper.map(totalsPerCurrency, BiFinancialMonthlyStatsReadEntity::totalDeposited, true))
+                .totalAllocated(DetailedTotalMoneyMapper.map(totalsPerCurrency, BiFinancialMonthlyStatsReadEntity::totalAllocated, true))
+                .totalGranted(DetailedTotalMoneyMapper.map(totalsPerCurrency, BiFinancialMonthlyStatsReadEntity::totalGranted, true))
+                .totalRewarded(DetailedTotalMoneyMapper.map(totalsPerCurrency, BiFinancialMonthlyStatsReadEntity::totalRewarded, true))
+                .totalPaid(DetailedTotalMoneyMapper.map(totalsPerCurrency, BiFinancialMonthlyStatsReadEntity::totalPaid, true))
                 .transactionCount(totalsPerCurrency.stream().mapToInt(BiFinancialMonthlyStatsReadEntity::transactionCount).sum());
     }
 }

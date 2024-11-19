@@ -14,7 +14,12 @@ import static java.util.Comparator.*;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
 public interface DetailedTotalMoneyMapper {
+
     static <T extends ProgramTransactionStat> DetailedTotalMoney map(Collection<T> stats, Function<T, BigDecimal> amountSupplier) {
+        return map(stats, amountSupplier, false);
+    }
+
+    static <T extends ProgramTransactionStat> DetailedTotalMoney map(Collection<T> stats, Function<T, BigDecimal> amountSupplier, boolean removeZeroAmounts) {
         if (stats == null)
             return null;
 
@@ -31,6 +36,7 @@ public interface DetailedTotalMoneyMapper {
                         .sorted(comparing(c -> c.currency().name()))
                         .map(s -> s.toMoney(amountSupplier.apply(s), usdTotal))
                         .filter(Objects::nonNull)
+                        .filter(s -> !removeZeroAmounts || s.getAmount().compareTo(ZERO) != 0)
                         .sorted(comparing(DetailedTotalMoneyTotalPerCurrencyInner::getUsdEquivalent, nullsLast(naturalOrder())).reversed())
                         .toList())
                 .totalUsdEquivalent(prettyUsd(usdTotal));
