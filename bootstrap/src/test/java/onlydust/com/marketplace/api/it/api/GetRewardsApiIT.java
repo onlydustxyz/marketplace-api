@@ -20,6 +20,7 @@ import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
@@ -153,7 +154,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                         "pageIndex", "0",
                         "pageSize", "10")
                 ))
-                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(pierre).jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -165,6 +166,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[3].billingProfileId").isEqualTo(anthoBillingProfile.id().toString())
                 .jsonPath("$.rewards[4].billingProfileId").isEqualTo(anthoBillingProfile.id().toString())
                 .jsonPath("$.rewards[3].invoiceId").isEqualTo(invoiceId.toString())
+                .jsonPath("$.rewards[3].invoiceNumber").isNotEmpty()
                 .json("""
                         {
                           "totalPageNumber": 1,
@@ -194,9 +196,11 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "pierre"
                               },
                               "requestedAt": "2024-06-10T00:00:00Z",
+                              "invoicedAt": null,
                               "processedAt": null,
                               "unlockDate": null,
                               "invoiceId": null,
+                              "invoiceNumber": null,
                               "transactionReference": null,
                               "transactionReferenceLink": null,
                               "items": [
@@ -225,9 +229,11 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "antho"
                               },
                               "requestedAt": "2024-06-03T00:00:00Z",
+                              "invoicedAt": null,
                               "processedAt": null,
                               "unlockDate": null,
                               "invoiceId": null,
+                              "invoiceNumber": null,
                               "transactionReference": null,
                               "transactionReferenceLink": null,
                               "items": [
@@ -256,10 +262,12 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "james"
                               },
                               "requestedAt": "2024-06-01T00:02:00Z",
+                              "invoicedAt": null,
                               "processedAt": null,
                               "unlockDate": null,
                               "billingProfileId": null,
                               "invoiceId": null,
+                              "invoiceNumber": null,
                               "transactionReference": null,
                               "transactionReferenceLink": null,
                               "items": [
@@ -288,6 +296,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "antho"
                               },
                               "requestedAt": "2024-06-01T00:01:00Z",
+                              "invoicedAt": "2024-06-02T00:00:00Z",
                               "processedAt": "2024-06-03T00:00:00Z",
                               "unlockDate": null,
                               "transactionReference": "0x123",
@@ -318,9 +327,11 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                                 "login": "antho"
                               },
                               "requestedAt": "2024-06-01T00:00:00Z",
+                              "invoicedAt": null,
                               "processedAt": null,
                               "unlockDate": null,
                               "invoiceId": null,
+                              "invoiceNumber": null,
                               "transactionReference": null,
                               "transactionReferenceLink": null,
                               "items": [
@@ -333,6 +344,31 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    void should_export_pierre_rewards() {
+        final var csv = client.get()
+                .uri(getApiURI(String.format(GET_REWARDS), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10")
+                ))
+                .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(pierre).jwt())
+                .header(HttpHeaders.ACCEPT, "text/csv")
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody(String.class)
+                .returnResult().getResponseBody();
+
+        final var lines = csv.split("\\R");
+        assertThat(lines.length).isEqualTo(6);
+        assertThat(lines[0]).isEqualTo("id,status,request_at,invoiced_at,processed_at,unlock_date,requestor,recipient,project_id,billing_profile_id," +
+                                       "invoice_id,invoice_number,amount,currency_code,amount_usd_equivalent,transaction_reference,transaction_reference_link");
+        assertThat(lines[1]).contains("LOCKED,2024-06-10T00:00Z");
+        assertThat(lines[1]).contains("hayden,pierre");
+        assertThat(lines[1]).contains("5,ETH,8909.90");
+    }
+
+    @Test
     void should_list_pierre_rewards_as_recipient_and_bp_admin_only() {
         // When
         client.get()
@@ -341,7 +377,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                         "pageSize", "10",
                         "includeProjectLeds", "false")
                 ))
-                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(pierre).jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -381,6 +417,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "processedAt": null,
                               "unlockDate": null,
                               "invoiceId": null,
+                              "invoiceNumber": null,
                               "transactionReference": null,
                               "transactionReferenceLink": null,
                               "items": [
@@ -411,6 +448,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "processedAt": null,
                               "unlockDate": null,
                               "invoiceId": null,
+                              "invoiceNumber": null,
                               "transactionReference": null,
                               "transactionReferenceLink": null,
                               "items": [
@@ -456,6 +494,14 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
         test_get_rewards(Map.of("recipientIds", james.githubUserId().toString()),
                 response -> response.getRewards().forEach(reward -> assertThat(reward.getTo().getGithubUserId()).isEqualTo(james.githubUserId().value())), true
         );
+        test_get_rewards(Map.of("fromDate", "2024-06-10"),
+                response -> response.getRewards().forEach(reward -> assertThat(reward.getRequestedAt())
+                        .isAfterOrEqualTo(ZonedDateTime.parse("2024-06-10T00:00:00Z"))), true
+        );
+        test_get_rewards(Map.of("toDate", "2024-06-02"),
+                response -> response.getRewards().forEach(reward -> assertThat(reward.getRequestedAt())
+                        .isBeforeOrEqualTo(ZonedDateTime.parse("2024-06-02T00:00:00Z"))), true
+        );
         test_get_rewards(Map.of("statuses", "LOCKED"),
                 response -> response.getRewards().forEach(reward -> assertThat(reward.getStatus() == RewardStatusContract.LOCKED || reward.getStatus() == RewardStatusContract.PENDING_CONTRIBUTOR)),
                 true
@@ -485,7 +531,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(String.format(GET_REWARDS_BY_ID.formatted(rewardId.toString()))))
-                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                .header("Authorization", BEARER_PREFIX + userAuthHelper.signInUser(pierre).jwt())
                 .exchange()
                 // Then
                 .expectStatus()

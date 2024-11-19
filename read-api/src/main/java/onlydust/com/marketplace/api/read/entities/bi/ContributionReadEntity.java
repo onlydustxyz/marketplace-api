@@ -75,10 +75,13 @@ public class ContributionReadEntity {
     ProjectLinkResponse project;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    List<DatedGithubUserResponse> contributors;
+    List<AssignedContributorResponse> contributors;
 
     @JdbcTypeCode(SqlTypes.JSON)
     List<ApplicantResponse> applicants;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    ContactableContributorResponse mergedBy;
 
     @JdbcTypeCode(SqlTypes.JSON)
     List<LanguageResponse> languages;
@@ -110,6 +113,7 @@ public class ContributionReadEntity {
                 .project(project)
                 .contributors(contributors)
                 .applicants(applicants)
+                .mergedBy(mergedBy)
                 .languages(languages)
                 .linkedIssues(linkedIssues)
                 .githubCommentCount(githubCommentCount)

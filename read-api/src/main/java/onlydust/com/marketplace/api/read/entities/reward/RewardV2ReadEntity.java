@@ -15,12 +15,14 @@ import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
+import org.apache.commons.csv.CSVPrinter;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.ZonedDateTime;
@@ -64,6 +66,7 @@ public class RewardV2ReadEntity {
     ProjectLinkResponse project;
     @NonNull
     ZonedDateTime requestedAt;
+    ZonedDateTime invoicedAt;
     ZonedDateTime processedAt;
     ZonedDateTime unlockDate;
 
@@ -71,6 +74,8 @@ public class RewardV2ReadEntity {
     BigDecimal usdConversionRate;
 
     UUID invoiceId;
+    String invoiceNumber;
+
     @JdbcTypeCode(SqlTypes.ARRAY)
     UUID[] contributionUuids;
 
@@ -86,11 +91,13 @@ public class RewardV2ReadEntity {
                 .from(requestor)
                 .to(recipient)
                 .requestedAt(requestedAt)
+                .invoicedAt(invoicedAt)
                 .processedAt(processedAt)
                 .unlockDate(unlockDate)
                 .billingProfileId(billingProfileId)
                 .project(project)
                 .invoiceId(invoiceId)
+                .invoiceNumber(invoiceNumber)
                 .items(contributionUuids == null ? List.of() : List.of(contributionUuids))
                 .transactionReference(receipt == null ? null : receipt.transactionReference)
                 .transactionReferenceLink(receipt == null || receipt.blockchain() == null ? null
@@ -135,6 +142,29 @@ public class RewardV2ReadEntity {
             case PENDING_SIGNUP -> RewardStatusContract.PENDING_SIGNUP;
             case PROCESSING -> RewardStatusContract.PROCESSING;
         };
+    }
+
+    public void toCsv(final AuthenticatedUser caller, final MetaBlockExplorer blockExplorer, final CSVPrinter csv) throws IOException {
+        csv.printRecord(
+                id,
+                statusAsUser(caller),
+                requestedAt,
+                invoicedAt,
+                processedAt,
+                unlockDate,
+                requestor.getLogin(),
+                recipient.getLogin(),
+                projectId,
+                billingProfileId,
+                invoiceId,
+                invoiceNumber,
+                amount,
+                currency.code(),
+                amountUsdEquivalent,
+                receipt == null ? null : receipt.transactionReference,
+                receipt == null || receipt.blockchain() == null ? null
+                        : blockExplorer.url(receipt.blockchain(), receipt.transactionReference)
+        );
     }
 
     public record Receipt(

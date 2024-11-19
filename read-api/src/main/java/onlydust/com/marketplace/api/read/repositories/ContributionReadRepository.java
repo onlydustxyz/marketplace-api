@@ -41,6 +41,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                    c.project                                 as project,
                    ccd.contributors                          as contributors,
                    ccd.applicants                            as applicants,
+                   ccd.github_merged_by                      as merged_by,
                    c.languages                               as languages,
                    c.linked_issues                           as linked_issues,
                    c.github_comment_count                    as github_comment_count,

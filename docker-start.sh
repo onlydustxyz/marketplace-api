@@ -17,11 +17,7 @@ shift
 
 echo "Starting $jar [$SPRING_PROFILES_ACTIVE] in $DD_ENV"
 
-if [ "$DD_ENV" = "production" ]; then
-  set -- -javaagent:/webapp/dd-java-agent.jar -Ddd.profiling.enabled=true -Ddd.logs.injection=true "$@"
-fi
-
-java "$@" \
+java -javaagent:/webapp/dd-java-agent.jar "$@" \
   -server \
   -XX:MaxRAMPercentage=75.0 \
   -XX:MaxMetaspaceSize=256m \
@@ -31,5 +27,7 @@ java "$@" \
   -Djava.security.egd=file:/dev/urandom \
   -Dliquibase.changelogLockPollRate=1 \
   -Duser.timezone=\"UTC\" \
+  -Ddd.profiling.enabled=true -Ddd.logs.injection=true \
+  -Djdk.httpclient.keepalive.timeout=300 \
   -jar "$jar" \
   --spring.profiles.active="$SPRING_PROFILES_ACTIVE"

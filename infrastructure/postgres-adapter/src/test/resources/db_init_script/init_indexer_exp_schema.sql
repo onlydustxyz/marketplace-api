@@ -128,12 +128,24 @@ create unique index github_issues_contribution_uuid_index
 
 create table indexer_exp.github_issues_assignees
 (
-    issue_id bigint not null
+    issue_id            bigint not null
         references indexer_exp.github_issues,
-    user_id  bigint not null
+    user_id             bigint not null
+        references indexer_exp.github_accounts,
+    assigned_by_user_id bigint
         references indexer_exp.github_accounts,
     primary key (issue_id, user_id)
 );
+
+create unique index github_issues_assignees_issue_id_user_id_assigned_by_user_i_idx
+    on indexer_exp.github_issues_assignees (issue_id, user_id, assigned_by_user_id);
+
+create unique index github_issues_assignees_user_id_issue_id_assigned_by_user_i_idx
+    on indexer_exp.github_issues_assignees (user_id, issue_id, assigned_by_user_id);
+
+create unique index github_issues_assignees_assigned_by_user_id_user_id_issue_i_idx
+    on indexer_exp.github_issues_assignees (assigned_by_user_id, user_id, issue_id);
+
 
 create table indexer_exp.github_pull_requests
 (
@@ -165,7 +177,8 @@ create table indexer_exp.github_pull_requests
     commit_count         integer                                      not null,
     main_file_extensions text[],
     updated_at           timestamp with time zone                     not null,
-    contribution_uuid    uuid                                         not null
+    contribution_uuid    uuid                                         not null,
+    merged_by_id         bigint
 );
 
 create table indexer_exp.github_code_reviews

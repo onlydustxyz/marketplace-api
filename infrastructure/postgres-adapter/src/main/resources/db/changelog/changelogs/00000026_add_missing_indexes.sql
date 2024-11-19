@@ -1,0 +1,12 @@
+CREATE UNIQUE INDEX IF NOT EXISTS applications_applicant_id_project_id_id_idx ON public.applications USING btree (applicant_id, project_id, id);
+CREATE UNIQUE INDEX IF NOT EXISTS erc20_blockchain_symbol_idx ON public.erc20 USING btree (blockchain, symbol);
+CREATE UNIQUE INDEX IF NOT EXISTS p_user_project_recommendation_github_user_id_rank_project_i_idx ON public.p_user_project_recommendations USING btree (github_user_id, rank, project_id DESC NULLS LAST);
+CREATE UNIQUE INDEX IF NOT EXISTS p_user_project_recommendations_github_user_id_project_id_idx ON public.p_user_project_recommendations USING btree (github_user_id, project_id DESC NULLS LAST);
+CREATE UNIQUE INDEX IF NOT EXISTS p_user_project_recommendations_user_id_project_id_idx ON public.p_user_project_recommendations USING btree (user_id, project_id DESC NULLS LAST);
+CREATE UNIQUE INDEX IF NOT EXISTS p_user_project_recommendations_user_id_rank_project_id_idx ON public.p_user_project_recommendations USING btree (user_id, rank, project_id DESC NULLS LAST);
+CREATE UNIQUE INDEX IF NOT EXISTS pending_project_leader_invitation_github_user_id_project_id_idx ON public.pending_project_leader_invitations USING btree (github_user_id, project_id);
+CREATE UNIQUE INDEX IF NOT EXISTS rewards_billing_profile_id_id_idx ON public.rewards USING btree (billing_profile_id, id);
+CREATE UNIQUE INDEX IF NOT EXISTS rewards_id_billing_profile_id_idx ON public.rewards USING btree (id, billing_profile_id);
+CREATE INDEX IF NOT EXISTS rewards_recipient_id_index ON public.rewards USING btree (recipient_id);
+CREATE INDEX IF NOT EXISTS notifications_recipient_id_index ON iam.notifications USING btree (recipient_id);
+CREATE UNIQUE INDEX IF NOT EXISTS notification_channels_notification_id_channel_read_at_index ON iam.notification_channels (notification_id, channel, read_at);
