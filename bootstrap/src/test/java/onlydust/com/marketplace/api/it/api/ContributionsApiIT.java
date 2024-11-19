@@ -229,6 +229,68 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    void should_get_pr_contribution_events() {
+        // When
+        client.get()
+                .uri(getApiURI(CONTRIBUTIONS_BY_ID_EVENTS.formatted("f4db1d9b-4e1d-300c-9277-8d05824c804e")))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "events": [
+                            {
+                              "timestamp": "2015-08-27T11:38:25Z",
+                              "type": "PR_CREATED",
+                              "assignee": null,
+                              "mergedBy": null,
+                              "linkedIssueContributionUuid": null
+                            },
+                            {
+                              "timestamp": "2015-08-30T19:18:14Z",
+                              "type": "PR_MERGED",
+                              "assignee": null,
+                              "mergedBy": {
+                                "githubUserId": 595505,
+                                "login": "ofux",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                                "contacts": [
+                                  {
+                                    "channel": "TWITTER",
+                                    "contact": "https://twitter.com/fuxeto",
+                                    "visibility": "private"
+                                  },
+                                  {
+                                    "channel": "TELEGRAM",
+                                    "contact": "https://t.me/ofux",
+                                    "visibility": "private"
+                                  }
+                                ]
+                              },
+                              "linkedIssueContributionUuid": null
+                            },
+                            {
+                              "timestamp": "2023-10-29T01:01:47Z",
+                              "type": "LINKED_ISSUE_CREATED",
+                              "assignee": null,
+                              "mergedBy": null,
+                              "linkedIssueContributionUuid": "4782d22d-be45-3253-a3b4-5688045632f7"
+                            },
+                            {
+                              "timestamp": "2023-10-29T07:41:49Z",
+                              "type": "LINKED_ISSUE_CLOSED",
+                              "assignee": null,
+                              "mergedBy": null,
+                              "linkedIssueContributionUuid": "4782d22d-be45-3253-a3b4-5688045632f7"
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
     void should_get_issue_contribution() {
         // When
         client.get()
@@ -338,6 +400,72 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                           "languages": null,
                           "linkedIssues": null,
                           "totalRewardedUsdAmount": null
+                        }
+                        """);
+    }
+
+    @Test
+    void should_get_issue_contribution_events() {
+        // When
+        client.get()
+                .uri(getApiURI(CONTRIBUTIONS_BY_ID_EVENTS.formatted("0f8d789f-fbbd-3171-ad03-9b2b6f8d9174")))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "events": [
+                            {
+                              "timestamp": "2022-07-11T09:14:38Z",
+                              "type": "ISSUE_CREATED",
+                              "assignee": null,
+                              "mergedBy": null,
+                              "linkedIssueContributionUuid": null
+                            },
+                            {
+                              "timestamp": "2024-10-17T14:03:10.967909Z",
+                              "type": "ISSUE_ASSIGNED",
+                              "assignee": {
+                                "githubUserId": 595505,
+                                "login": "ofux",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                                "since": "2024-10-17T14:03:10.967909Z",
+                                "assignedBy": {
+                                  "githubUserId": 43467246,
+                                  "login": "AnthonyBuisset",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                  "contacts": [
+                                    {
+                                      "channel": "TELEGRAM",
+                                      "contact": "https://t.me/abuisset",
+                                      "visibility": "public"
+                                    },
+                                    {
+                                      "channel": "TWITTER",
+                                      "contact": "https://twitter.com/abuisset",
+                                      "visibility": "public"
+                                    },
+                                    {
+                                      "channel": "DISCORD",
+                                      "contact": "antho",
+                                      "visibility": "public"
+                                    }
+                                  ]
+                                }
+                              },
+                              "mergedBy": null,
+                              "linkedIssueContributionUuid": null
+                            },
+                            {
+                              "timestamp": "2022-08-05T08:07:52Z",
+                              "type": "ISSUE_CLOSED",
+                              "assignee": null,
+                              "mergedBy": null,
+                              "linkedIssueContributionUuid": null
+                            }
+                          ]
                         }
                         """);
     }

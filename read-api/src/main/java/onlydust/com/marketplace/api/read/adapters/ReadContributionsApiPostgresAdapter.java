@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadContributionsApi;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.read.entities.bi.ContributionReadEntity;
 import onlydust.com.marketplace.api.read.properties.Cache;
 import onlydust.com.marketplace.api.read.repositories.ContributionReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
@@ -11,10 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.api.contract.model.ContributionEventEnum.*;
 import static onlydust.com.marketplace.api.read.properties.Cache.XS;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
@@ -33,41 +36,21 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
     @Override
     public ResponseEntity<ContributionActivityPageItemResponse> getContributionById(UUID contributionUuid) {
         final var authenticatedUser = authenticatedAppUserService.tryGetAuthenticatedUser();
-        final var page = contributionReadRepository.findAll(new ContributionsQueryParams()
-                .pageIndex(0)
-                .pageSize(1)
-                .ids(List.of(contributionUuid)));
-
-        final var contribution = page.stream().findFirst()
-                .orElseThrow(() -> notFound("Contribution %s not found".formatted(contributionUuid)));
+        final var contribution = findContribution(contributionUuid);
 
         return ok()
                 .cacheControl(cache.whenAnonymous(authenticatedUser, XS))
                 .body(contribution.toDto(authenticatedUser));
     }
 
-    @Override
-    public ResponseEntity<ContributionEventListResponse> getContributionEvents(String contributionId) {
-        return ok(new ContributionEventListResponse()
-                .events(List.of(
-                                new ContributionEventResponse()
-                                        .timestamp(ZonedDateTime.now().minusDays(2).minusHours(1).minusMinutes(5))
-                                        .assigneeAdded(new ContributionEventResponseAssigneeAdded()
-                                                .assignee(new GithubUserResponse()
-                                                        .avatarUrl("https://avatars.githubusercontent.com/u/43467246?v=4")
-                                                        .githubUserId(1L)
-                                                        .login("Antho")
-                                                )),
-                                new ContributionEventResponse()
-                                        .timestamp(ZonedDateTime.now().minusDays(2).minusHours(1).minusMinutes(5))
-                                        .opened(new ContributionEventResponseOpened()
-                                                .by(new GithubUserResponse()
-                                                        .avatarUrl("https://avatars.githubusercontent.com/u/43467246?v=4")
-                                                        .githubUserId(1L)
-                                                        .login("Antho")
-                                                ))
-                        )
-                ));
+    private ContributionReadEntity findContribution(UUID contributionUuid) {
+        final var page = contributionReadRepository.findAll(new ContributionsQueryParams()
+                .pageIndex(0)
+                .pageSize(1)
+                .ids(List.of(contributionUuid)));
+
+        return page.stream().findFirst()
+                .orElseThrow(() -> notFound("Contribution %s not found".formatted(contributionUuid)));
     }
 
     @Override
@@ -83,5 +66,65 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
                         .nextPageIndex(nextPageIndex(q.getPageIndex(), page.getTotalPages()))
                         .totalItemNumber((int) page.getTotalElements())
                         .totalPageNumber(page.getTotalPages()));
+    }
+
+    @Override
+    public ResponseEntity<ContributionEventListResponse> getContributionEvents(UUID contributionUuid) {
+        final var contribution = findContribution(contributionUuid);
+        final List<ContributionEventResponse> events = new ArrayList<>();
+
+        switch (contribution.contributionType()) {
+            case ISSUE -> {
+                events.add(new ContributionEventResponse()
+                        .timestamp(contribution.createdAt())
+                        .type(ISSUE_CREATED));
+                if (contribution.contributors() != null) {
+                    contribution.contributors().forEach(a -> events.add(new ContributionEventResponse()
+                            .timestamp(a.getSince())
+                            .type(ISSUE_ASSIGNED)
+                            .assignee(a)));
+                }
+                events.add(new ContributionEventResponse()
+                        .timestamp(contribution.completedAt())
+                        .type(ISSUE_CLOSED));
+            }
+            case PULL_REQUEST -> {
+                events.add(new ContributionEventResponse()
+                        .timestamp(contribution.createdAt())
+                        .type(PR_CREATED));
+                Optional.ofNullable(contribution.mergedBy()).ifPresent(c -> events.add(new ContributionEventResponse()
+                        .timestamp(contribution.completedAt())
+                        .type(PR_MERGED)
+                        .mergedBy(c)));
+                if (contribution.linkedIssues() != null) {
+                    contribution.linkedIssues().forEach(c -> {
+                        final var linkedIssue = findContribution(c.getContributionUuid());
+                        events.add(new ContributionEventResponse()
+                                .timestamp(linkedIssue.createdAt())
+                                .linkedIssueContributionUuid(linkedIssue.contributionUuid())
+                                .type(LINKED_ISSUE_CREATED));
+                        if (linkedIssue.contributors() != null) {
+                            linkedIssue.contributors().forEach(a -> events.add(new ContributionEventResponse()
+                                    .timestamp(a.getSince())
+                                    .linkedIssueContributionUuid(linkedIssue.contributionUuid())
+                                    .type(LINKED_ISSUE_ASSIGNED)
+                                    .assignee(a)));
+                        }
+                        events.add(new ContributionEventResponse()
+                                .timestamp(linkedIssue.completedAt())
+                                .linkedIssueContributionUuid(linkedIssue.contributionUuid())
+                                .type(LINKED_ISSUE_CLOSED));
+                    });
+                }
+            }
+            case CODE_REVIEW -> {
+                return ok(new ContributionEventListResponse().events(List.of()));
+            }
+        }
+
+        return ok()
+                .cacheControl(cache.forEverybody(XS))
+                .body(new ContributionEventListResponse()
+                        .events(events));
     }
 }
