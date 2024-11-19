@@ -45,3 +45,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000024_add_assigned_by_into_contribution_contributors_data.sql
   - include:
       file: db/changelog/changelogs/00000025_add_merged_by_into_contribution_contributors_data.sql
+  - include:
+      file: db/changelog/changelogs/00000026_add_missing_indexes.sql
