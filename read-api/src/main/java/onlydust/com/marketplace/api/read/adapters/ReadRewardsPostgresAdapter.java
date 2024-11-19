@@ -26,8 +26,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseZonedNullable;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.model.AuthenticatedUser.BillingProfileMembership.Role.ADMIN;
@@ -73,7 +75,7 @@ public class ReadRewardsPostgresAdapter implements ReadRewardsApi {
 
         try (final var printer = new CSVPrinter(sw, format)) {
             printer.printRecord("id", "status", "request_at", "invoiced_at", "processed_at", "unlock_date", "requestor", "recipient",
-                    "project_id", "billing_profile_id", "invoice_id", "amount", "currency_code", "amount_usd_equivalent",
+                    "project_id", "billing_profile_id", "invoice_id", "invoice_number", "amount", "currency_code", "amount_usd_equivalent",
                     "transaction_reference", "transaction_reference_link");
             for (final var reward : page.getContent())
                 reward.toCsv(authenticatedUser, blockExplorer, printer);
@@ -87,11 +89,16 @@ public class ReadRewardsPostgresAdapter implements ReadRewardsApi {
     }
 
     private Page<RewardV2ReadEntity> findRewards(PageableRewardsQueryParams q, AuthenticatedUser authenticatedUser) {
+        final var sanitizedFromDate = q.getFromDate() == null ? null : parseZonedNullable(q.getFromDate()).truncatedTo(ChronoUnit.DAYS);
+        final var sanitizedToDate = q.getToDate() == null ? null : parseZonedNullable(q.getToDate()).truncatedTo(ChronoUnit.DAYS).plusDays(1);
+
         return rewardReadV2Repository.findAll(
                 q.getIncludeProjectLeds(),
                 q.getIncludeBillingProfileAdministrated(),
                 q.getIncludeAsRecipient(),
                 null,
+                sanitizedFromDate,
+                sanitizedToDate,
                 authenticatedUser.projectsLed() == null ? null : authenticatedUser.projectsLed().toArray(UUID[]::new),
                 authenticatedUser.billingProfiles() == null ? null :
                         authenticatedUser.billingProfiles().stream()
@@ -119,6 +126,8 @@ public class ReadRewardsPostgresAdapter implements ReadRewardsApi {
                 true,
                 true,
                 rewardId,
+                null,
+                null,
                 authenticatedUser.projectsLed() == null ? null : authenticatedUser.projectsLed().toArray(UUID[]::new),
                 authenticatedUser.billingProfiles() == null ? null :
                         authenticatedUser.billingProfiles().stream()

@@ -12688,6 +12688,12 @@ components:
       allOf:
         - $ref: '#/components/schemas/PaginationQueryParams'
         - $ref: '#/components/schemas/RewardsQueryParams'
+        - type: object
+          properties:
+            fromDate:
+              $ref: '#/components/schemas/FromDateParam'
+            toDate:
+              $ref: '#/components/schemas/ToDateParam'
 
     RewardsQueryParams:
       type: object
@@ -12777,6 +12783,8 @@ components:
           $ref: '#/components/schemas/BillingProfileId'
         invoiceId:
           $ref: '#/components/schemas/InvoiceId'
+        invoiceNumber:
+          type: string
         transactionReference:
           $ref: '#/components/schemas/TransactionReference'
         transactionReferenceLink:

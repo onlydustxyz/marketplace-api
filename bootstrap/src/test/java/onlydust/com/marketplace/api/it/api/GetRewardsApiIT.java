@@ -166,6 +166,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[3].billingProfileId").isEqualTo(anthoBillingProfile.id().toString())
                 .jsonPath("$.rewards[4].billingProfileId").isEqualTo(anthoBillingProfile.id().toString())
                 .jsonPath("$.rewards[3].invoiceId").isEqualTo(invoiceId.toString())
+                .jsonPath("$.rewards[3].invoiceNumber").isNotEmpty()
                 .json("""
                         {
                           "totalPageNumber": 1,
@@ -199,6 +200,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "processedAt": null,
                               "unlockDate": null,
                               "invoiceId": null,
+                              "invoiceNumber": null,
                               "transactionReference": null,
                               "transactionReferenceLink": null,
                               "items": [
@@ -231,6 +233,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "processedAt": null,
                               "unlockDate": null,
                               "invoiceId": null,
+                              "invoiceNumber": null,
                               "transactionReference": null,
                               "transactionReferenceLink": null,
                               "items": [
@@ -264,6 +267,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "unlockDate": null,
                               "billingProfileId": null,
                               "invoiceId": null,
+                              "invoiceNumber": null,
                               "transactionReference": null,
                               "transactionReferenceLink": null,
                               "items": [
@@ -327,6 +331,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "processedAt": null,
                               "unlockDate": null,
                               "invoiceId": null,
+                              "invoiceNumber": null,
                               "transactionReference": null,
                               "transactionReferenceLink": null,
                               "items": [
@@ -357,7 +362,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
         final var lines = csv.split("\\R");
         assertThat(lines.length).isEqualTo(6);
         assertThat(lines[0]).isEqualTo("id,status,request_at,invoiced_at,processed_at,unlock_date,requestor,recipient,project_id,billing_profile_id," +
-                                       "invoice_id,amount,currency_code,amount_usd_equivalent,transaction_reference,transaction_reference_link");
+                                       "invoice_id,invoice_number,amount,currency_code,amount_usd_equivalent,transaction_reference,transaction_reference_link");
         assertThat(lines[1]).contains("LOCKED,2024-06-10T00:00Z");
         assertThat(lines[1]).contains("hayden,pierre");
         assertThat(lines[1]).contains("5,ETH,8909.90");
@@ -412,6 +417,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "processedAt": null,
                               "unlockDate": null,
                               "invoiceId": null,
+                              "invoiceNumber": null,
                               "transactionReference": null,
                               "transactionReferenceLink": null,
                               "items": [
@@ -442,6 +448,7 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
                               "processedAt": null,
                               "unlockDate": null,
                               "invoiceId": null,
+                              "invoiceNumber": null,
                               "transactionReference": null,
                               "transactionReferenceLink": null,
                               "items": [
@@ -486,6 +493,14 @@ public class GetRewardsApiIT extends AbstractMarketplaceApiIT {
         );
         test_get_rewards(Map.of("recipientIds", james.githubUserId().toString()),
                 response -> response.getRewards().forEach(reward -> assertThat(reward.getTo().getGithubUserId()).isEqualTo(james.githubUserId().value())), true
+        );
+        test_get_rewards(Map.of("fromDate", "2024-06-10"),
+                response -> response.getRewards().forEach(reward -> assertThat(reward.getRequestedAt())
+                        .isAfterOrEqualTo(ZonedDateTime.parse("2024-06-10T00:00:00Z"))), true
+        );
+        test_get_rewards(Map.of("toDate", "2024-06-02"),
+                response -> response.getRewards().forEach(reward -> assertThat(reward.getRequestedAt())
+                        .isBeforeOrEqualTo(ZonedDateTime.parse("2024-06-02T00:00:00Z"))), true
         );
         test_get_rewards(Map.of("statuses", "LOCKED"),
                 response -> response.getRewards().forEach(reward -> assertThat(reward.getStatus() == RewardStatusContract.LOCKED || reward.getStatus() == RewardStatusContract.PENDING_CONTRIBUTOR)),
