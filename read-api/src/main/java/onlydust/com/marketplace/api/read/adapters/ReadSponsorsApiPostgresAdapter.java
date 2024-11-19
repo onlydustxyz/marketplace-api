@@ -175,7 +175,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
                 search,
                 Optional.ofNullable(types).orElse(allTypes).stream().map(FinancialTransactionType::name).toList());
 
-        return ok(new BiFinancialsStatsListResponse().stats(BiFinancialMonthlyStatsReadEntity.toDto(result, !FALSE.equals(showEmpty), sortDirection)));
+        return ok(BiFinancialMonthlyStatsReadEntity.toDto(result, !FALSE.equals(showEmpty), sortDirection));
     }
 
     @Override

@@ -203,6 +203,6 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                 search,
                 Optional.ofNullable(types).orElse(allTypes).stream().map(Enum::name).toList());
 
-        return ok(new BiFinancialsStatsListResponse().stats(BiFinancialMonthlyStatsReadEntity.toDto(result, !FALSE.equals(showEmpty), sortDirection)));
+        return ok(BiFinancialMonthlyStatsReadEntity.toDto(result, !FALSE.equals(showEmpty), sortDirection));
     }
 }

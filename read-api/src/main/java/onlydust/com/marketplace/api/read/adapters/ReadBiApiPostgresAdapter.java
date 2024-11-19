@@ -406,6 +406,6 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 search,
                 sanitizedTypes.stream().map(FinancialTransactionType::name).toList());
 
-        return ok(new BiFinancialsStatsListResponse().stats(BiFinancialMonthlyStatsReadEntity.toDto(result, !FALSE.equals(showEmpty), sortDirection)));
+        return ok(BiFinancialMonthlyStatsReadEntity.toDto(result, !FALSE.equals(showEmpty), sortDirection));
     }
 }
