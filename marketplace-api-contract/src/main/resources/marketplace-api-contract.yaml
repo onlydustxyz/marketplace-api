@@ -106,7 +106,6 @@ paths:
           name: sortDirection
           schema:
             $ref: '#/components/schemas/SortDirection'
-
       responses:
         "200":
           description: 'Financials stats'
@@ -7328,7 +7327,27 @@ components:
       type: object
       required:
         - stats
+        - totalDeposited
+        - totalAllocated
+        - totalGranted
+        - totalRewarded
+        - totalPaid
+        - transactionCount
       properties:
+        totalDeposited:
+          $ref: '#/components/schemas/DetailedTotalMoney'
+        totalAllocated:
+          $ref: '#/components/schemas/DetailedTotalMoney'
+        totalGranted:
+          $ref: '#/components/schemas/DetailedTotalMoney'
+        totalRewarded:
+          $ref: '#/components/schemas/DetailedTotalMoney'
+        totalPaid:
+          $ref: '#/components/schemas/DetailedTotalMoney'
+        transactionCount:
+          type: integer
+          description: Number of transactions for this month
+          example: 42
         stats:
           type: array
           items:
@@ -12669,6 +12688,12 @@ components:
       allOf:
         - $ref: '#/components/schemas/PaginationQueryParams'
         - $ref: '#/components/schemas/RewardsQueryParams'
+        - type: object
+          properties:
+            fromDate:
+              $ref: '#/components/schemas/FromDateParam'
+            toDate:
+              $ref: '#/components/schemas/ToDateParam'
 
     RewardsQueryParams:
       type: object
@@ -12758,6 +12783,8 @@ components:
           $ref: '#/components/schemas/BillingProfileId'
         invoiceId:
           $ref: '#/components/schemas/InvoiceId'
+        invoiceNumber:
+          type: string
         transactionReference:
           $ref: '#/components/schemas/TransactionReference'
         transactionReferenceLink:

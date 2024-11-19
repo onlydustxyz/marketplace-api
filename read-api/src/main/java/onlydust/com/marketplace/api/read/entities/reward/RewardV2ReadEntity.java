@@ -74,6 +74,8 @@ public class RewardV2ReadEntity {
     BigDecimal usdConversionRate;
 
     UUID invoiceId;
+    String invoiceNumber;
+
     @JdbcTypeCode(SqlTypes.ARRAY)
     UUID[] contributionUuids;
 
@@ -95,6 +97,7 @@ public class RewardV2ReadEntity {
                 .billingProfileId(billingProfileId)
                 .project(project)
                 .invoiceId(invoiceId)
+                .invoiceNumber(invoiceNumber)
                 .items(contributionUuids == null ? List.of() : List.of(contributionUuids))
                 .transactionReference(receipt == null ? null : receipt.transactionReference)
                 .transactionReferenceLink(receipt == null || receipt.blockchain() == null ? null
@@ -154,6 +157,7 @@ public class RewardV2ReadEntity {
                 projectId,
                 billingProfileId,
                 invoiceId,
+                invoiceNumber,
                 amount,
                 currency.code(),
                 amountUsdEquivalent,

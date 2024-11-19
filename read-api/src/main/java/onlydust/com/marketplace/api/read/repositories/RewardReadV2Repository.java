@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 public interface RewardReadV2Repository extends JpaRepository<RewardV2ReadEntity, UUID> {
@@ -44,6 +45,7 @@ public interface RewardReadV2Repository extends JpaRepository<RewardV2ReadEntity
                    r.usd_conversion_rate                     as usd_conversion_rate,
                    r.amount_usd_equivalent                   as amount_usd_equivalent,
                    r.invoice_id                              as invoice_id,
+                   i.number                                  as invoice_number,
                    rd.contribution_uuids                     as contribution_uuids,
                    rd.receipt                                as receipt
             from accounting.reward_statuses r
@@ -51,11 +53,14 @@ public interface RewardReadV2Repository extends JpaRepository<RewardV2ReadEntity
                      join iam.all_indexed_users recipient on r.recipient_id = recipient.github_user_id
                      join projects p on p.id = r.project_id
                      left join bi.p_reward_data rd on r.reward_id = rd.reward_id
+                     left join accounting.invoices i on r.invoice_id = i.id
             
             where (:includeProjectLeds and cast(:dataSourceProjectLedIds as uuid[]) is not null and r.project_id = any (cast(:dataSourceProjectLedIds as uuid[]))
                 or :includeBillingProfileAdministrated and cast(:dataSourceBillingProfileIds as uuid[]) is not null and r.billing_profile_id = any (cast(:dataSourceBillingProfileIds as uuid[]))
                 or :includeAsRecipient and r.recipient_id = :dataSourceRecipientId)
               and (:rewardId is null or r.reward_id = :rewardId)
+              and (cast(:fromDate as timestamptz) is null or r.requested_at >= cast(:fromDate as timestamptz))
+              and (cast(:toDate as timestamptz) is null or r.requested_at < cast(:toDate as timestamptz))
               and (cast(:statuses as accounting.reward_status[]) is null or r.status = any (cast(:statuses as accounting.reward_status[])))
               and (cast(:projectIds as uuid[]) is null or r.project_id = any (cast(:projectIds as uuid[])))
               and (cast(:billingProfileIds as uuid[]) is null or r.billing_profile_id = any (cast(:billingProfileIds as uuid[])))
@@ -68,6 +73,8 @@ public interface RewardReadV2Repository extends JpaRepository<RewardV2ReadEntity
                                      boolean includeBillingProfileAdministrated,
                                      boolean includeAsRecipient,
                                      UUID rewardId,
+                                     ZonedDateTime fromDate,
+                                     ZonedDateTime toDate,
                                      UUID[] dataSourceProjectLedIds,
                                      UUID[] dataSourceBillingProfileIds,
                                      Long dataSourceRecipientId,
