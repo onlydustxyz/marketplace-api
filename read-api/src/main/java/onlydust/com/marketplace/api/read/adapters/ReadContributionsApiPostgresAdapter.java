@@ -123,6 +123,7 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
                 .cacheControl(cache.forEverybody(XS))
                 .body(new ContributionEventListResponse()
                         .events(events.stream()
+                                .filter(e -> e.getTimestamp() != null)
                                 .sorted(Comparator.comparing(ContributionEventResponse::getTimestamp).reversed())
                                 .toList()));
     }
