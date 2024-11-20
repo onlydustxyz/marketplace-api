@@ -221,6 +221,10 @@ END
 $$;
 
 
+
+DROP FUNCTION get_pseudo_projection_definition(schema text, name text);
+
+
 -- TEST ---------------------------------------------------------------------------------------------
 create schema tmp_test;
 call create_pseudo_projection('tmp_test', 'my_projection',
