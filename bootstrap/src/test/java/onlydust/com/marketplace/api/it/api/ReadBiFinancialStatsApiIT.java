@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.api.contract.model.BiFinancialsStatsListResponse;
 import onlydust.com.marketplace.api.contract.model.FinancialTransactionType;
@@ -174,7 +175,24 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
             final var reward6 = at("2024-08-02T00:00:00Z", () -> rewardHelper.create(myProject.getId(), caller, recipientId, 1, ETH));
             at("2024-08-03T00:00:00Z", () -> rewardHelper.cancel(myProject.getId(), caller, reward6));
 
-            // pay reward1
+            // pay reward1 directly
+            databaseHelper.executeQuery("""
+                    insert into accounting.all_transactions (id, timestamp, currency_id, type, sponsor_id, program_id, project_id, reward_id, payment_id, amount)
+                    values (:id, :timestamp, :currency_id, cast(:type as accounting.transaction_type), :sponsor_id, :program_id, :project_id, :reward_id, null, :amount)
+                    """, Map.of(
+                    "id", UUID.randomUUID(),
+                    "timestamp", ZonedDateTime.parse("2024-08-15T00:00:00Z"),
+                    "currency_id", USDC.value(),
+                    "type", "BURN",
+                    "sponsor_id", mySponsor.id().value(),
+                    "program_id", myProgram.id().value(),
+                    "project_id", myProject.getId().value(),
+                    "reward_id", reward1.value(),
+                    "amount", 400
+            ));
+
+            // pay reward4 with bulk payment
+            final var paymentId = Payment.Id.random();
             databaseHelper.executeQuery("""
                     insert into accounting.all_transactions (id, timestamp, currency_id, type, sponsor_id, program_id, project_id, reward_id, payment_id, amount)
                     values (:id, :timestamp, :currency_id, cast(:type as accounting.transaction_type), :sponsor_id, :program_id, :project_id, :reward_id, :payment_id, :amount)
@@ -186,10 +204,26 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                     "sponsor_id", mySponsor.id().value(),
                     "program_id", myProgram.id().value(),
                     "project_id", myProject.getId().value(),
-                    "reward_id", reward1.value(),
-                    "payment_id", UUID.randomUUID(),
-                    "amount", 400
+                    "reward_id", reward4.value(),
+                    "payment_id", paymentId.value(),
+                    "amount", 100
             ));
+            databaseHelper.executeQuery("""
+                    insert into accounting.all_transactions (id, timestamp, currency_id, type, sponsor_id, program_id, project_id, reward_id, payment_id, amount)
+                    values (:id, :timestamp, :currency_id, cast(:type as accounting.transaction_type), :sponsor_id, :program_id, :project_id, :reward_id, :payment_id, :amount)
+                    """, Map.of(
+                    "id", UUID.randomUUID(),
+                    "timestamp", ZonedDateTime.parse("2024-08-15T00:00:00Z"),
+                    "currency_id", USDC.value(),
+                    "type", "BURN",
+                    "sponsor_id", mySponsor.id().value(),
+                    "program_id", myProgram.id().value(),
+                    "project_id", myProject.getId().value(),
+                    "reward_id", reward4.value(),
+                    "payment_id", paymentId.value(),
+                    "amount", 100
+            ));
+
 
             projectFacadePort.refreshStats();
         }
@@ -213,7 +247,6 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isOk()
                     .expectBody()
-                    .consumeWith(System.out::println)
                     .json("""
                             {
                               "totalDeposited": {
@@ -276,11 +309,11 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                                 ]
                               },
                               "totalPaid": {
-                                "totalUsdEquivalent": 404.00,
+                                "totalUsdEquivalent": 505.00,
                                 "totalPerCurrency": [
                                   {
-                                    "amount": 400,
-                                    "prettyAmount": 400,
+                                    "amount": 500,
+                                    "prettyAmount": 500,
                                     "currency": {
                                       "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                       "code": "USDC",
@@ -288,13 +321,13 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                                       "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                       "decimals": 6
                                     },
-                                    "usdEquivalent": 404.00,
+                                    "usdEquivalent": 505.00,
                                     "usdConversionRate": 1.010001,
                                     "ratio": 100
                                   }
                                 ]
                               },
-                              "transactionCount": 7
+                              "transactionCount": 8
                             }
                             """)
                     .jsonPath("$.stats[?(@.date == '2024-07-01')]").value(jsonObjectEquals("""
@@ -730,7 +763,7 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                                     ]
                                   },
                                   "totalPaid": {
-                                    "totalUsdEquivalent": 404.00,
+                                    "totalUsdEquivalent": 505.00,
                                     "totalPerCurrency": [
                                       {
                                         "amount": 0,
@@ -747,8 +780,8 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                                         "ratio": null
                                       },
                                       {
-                                        "amount": 400,
-                                        "prettyAmount": 400,
+                                        "amount": 500,
+                                        "prettyAmount": 500,
                                         "currency": {
                                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                           "code": "USDC",
@@ -756,7 +789,7 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                                           "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                           "decimals": 6
                                         },
-                                        "usdEquivalent": 404.00,
+                                        "usdEquivalent": 505.00,
                                         "usdConversionRate": 1.010001,
                                         "ratio": 100
                                       },
@@ -776,7 +809,7 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                                       }
                                     ]
                                   },
-                                  "transactionCount": 3
+                                  "transactionCount": 4
                                 }
                             """))
                     .jsonPath("$.stats[?(@.date == '2024-09-01')]").value(jsonObjectEquals("""
@@ -1101,7 +1134,7 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                     .jsonPath("$.stats[0].date").isEqualTo("2024-07-01")
                     .jsonPath("$.stats[0].transactionCount").isEqualTo(4)
                     .jsonPath("$.stats[1].date").isEqualTo("2024-08-01")
-                    .jsonPath("$.stats[1].transactionCount").isEqualTo(1)
+                    .jsonPath("$.stats[1].transactionCount").isEqualTo(2)
             ;
         }
 
@@ -1131,7 +1164,7 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                     assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.AUGUST).findFirst().orElseThrow().getTransactionCount()).isEqualTo(2);
                 }
                 case PAID -> {
-                    assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.AUGUST).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
+                    assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.AUGUST).findFirst().orElseThrow().getTransactionCount()).isEqualTo(2);
                     assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.SEPTEMBER).findFirst().orElseThrow().getTransactionCount()).isEqualTo(0);
                 }
                 case DEPOSITED -> stats.forEach(s -> assertThat(s.getTransactionCount()).isEqualTo(0));
