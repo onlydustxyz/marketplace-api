@@ -1,24 +1,20 @@
 name: Backend CD
 
 on:
-  workflow_run:
-    workflows: [ "Backend CI" ]
+  push:
     branches:
-      - main
-      - staging
-      - production
-      - perf
-    types:
-      - completed
+      - "main"
+      - "staging"
+      - "production"
+      - "perf"
 
 jobs:
   build_and_push_docker_image:
     name: Build and push docker image to AWS ECR
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    environment: ${{ github.event.workflow_run.head_branch == 'main' && 'develop' || github.event.workflow_run.head_branch }}
+    environment: ${{ github.ref_name == 'main' && 'develop' || github.ref_name }}
     concurrency:
-      group: ${{ github.event.workflow_run.head_branch }}
+      group: ${{ github.ref_name }}
       cancel-in-progress: true
     permissions:
       id-token: write
@@ -27,15 +23,13 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_branch }}
+          ref: ${{ github.ref_name }}
 
-      - name: Download jar file
-        uses: actions/download-artifact@v4
-        with:
-          name: marketplace-api.jar
-          run-id: ${{ github.event.workflow_run.id }}
-          path: bootstrap/target/marketplace-api.jar
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Java setup
+        uses: ./.github/actions/java-setup
+
+      - name: Maven build
+        run: ./mvnw clean install -T 4 -DskipTests -DskipITs -DskipUTs
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -45,7 +39,7 @@ jobs:
 
       - name: Retrieve parameters
         env:
-          REPO_NAME: ${{ github.event.workflow_run.head_repository.name }}
+          REPO_NAME: ${{ github.event.repository.name }}
         run: |
           echo SHA_SHORT=$(git rev-parse --short HEAD) >> "$GITHUB_ENV"
           echo ECR_REPOSITORY_URI=$(aws ecr describe-repositories --query "repositories[?contains(@.repositoryName, 'marketplacerepository') == \`true\`].repositoryUri" --output text) >> "$GITHUB_ENV"
