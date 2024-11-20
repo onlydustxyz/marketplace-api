@@ -418,13 +418,6 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                         {
                           "events": [
                             {
-                              "timestamp": "2022-07-11T09:14:38Z",
-                              "type": "ISSUE_CREATED",
-                              "assignee": null,
-                              "mergedBy": null,
-                              "linkedIssueContributionUuid": null
-                            },
-                            {
                               "timestamp": "2024-10-17T14:03:10.967909Z",
                               "type": "ISSUE_ASSIGNED",
                               "assignee": {
@@ -464,10 +457,17 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                               "assignee": null,
                               "mergedBy": null,
                               "linkedIssueContributionUuid": null
+                            },
+                            {
+                              "timestamp": "2022-07-11T09:14:38Z",
+                              "type": "ISSUE_CREATED",
+                              "assignee": null,
+                              "mergedBy": null,
+                              "linkedIssueContributionUuid": null
                             }
                           ]
                         }
-                        """);
+                        """, true);
     }
 
     @Test

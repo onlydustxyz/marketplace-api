@@ -12,10 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static onlydust.com.marketplace.api.contract.model.ContributionEventEnum.*;
 import static onlydust.com.marketplace.api.read.properties.Cache.XS;
@@ -125,6 +122,8 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
         return ok()
                 .cacheControl(cache.forEverybody(XS))
                 .body(new ContributionEventListResponse()
-                        .events(events));
+                        .events(events.stream()
+                                .sorted(Comparator.comparing(ContributionEventResponse::getTimestamp).reversed())
+                                .toList()));
     }
 }
