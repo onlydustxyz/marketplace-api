@@ -40,7 +40,7 @@ class Auth0UserInfoServiceTest {
     @Test
     void getUserInfo() {
         // Given
-        final var tokenExpirationInMilliseconds = 4000;
+        final var tokenExpirationInMilliseconds = 10000;
         final var accessToken = "accessToken";
 
         final HttpRequest request = HttpRequest.newBuilder()
