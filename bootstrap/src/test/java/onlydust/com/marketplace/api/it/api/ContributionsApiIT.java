@@ -39,6 +39,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
     static ProjectId kaaper = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
     static RewardId rewardId;
     static Application application;
+    static Long newIssueId;
 
     @Autowired
     ProjectContributorLabelFacadePort projectContributorLabelFacadePort;
@@ -63,6 +64,10 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         githubHelper.setMergedBy(43506983L, olivier.githubUserId().value());
         postgresBiProjectorAdapter.onContributionsChanged(ContributionUUID.of(UUID.fromString("0f8d789f-fbbd-3171-ad03-9b2b6f8d9174")));
         postgresBiProjectorAdapter.onContributionsChanged(ContributionUUID.of(UUID.fromString("f4db1d9b-4e1d-300c-9277-8d05824c804e")));
+
+        final var fooRepo = githubHelper.createRepo("foo");
+        newIssueId = at("2024-01-01T00:00:00Z", () -> githubHelper.createIssue(fooRepo.getId(), ZonedDateTime.parse("2024-01-01T00:00:00Z"), null, "OPEN",
+                projectLead));
 
         rewardId = rewardHelper.create(kaaper, projectLead, recipient.githubUserId(), 123, CurrencyHelper.USDC, List.of(
                 RequestRewardCommand.Item.builder()
@@ -470,6 +475,32 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                         """, true);
     }
 
+
+    @Test
+    void should_get_new_issue_contribution_events() {
+        // When
+        client.get()
+                .uri(getApiURI(CONTRIBUTIONS_BY_ID_EVENTS.formatted(ContributionUUID.of(newIssueId).toString())))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "events": [
+                            {
+                              "timestamp": "2024-01-01T00:00:00Z",
+                              "type": "ISSUE_CREATED",
+                              "assignee": null,
+                              "mergedBy": null,
+                              "linkedIssueContributionUuid": null
+                            }
+                          ]
+                        }
+                        """, true);
+    }
+
     @Test
     void should_get_linked_issue_by_id() {
         // When
@@ -528,8 +559,8 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 4694,
-                          "totalItemNumber": 4694,
+                          "totalPageNumber": 4695,
+                          "totalItemNumber": 4695,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "contributions": [
