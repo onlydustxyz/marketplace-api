@@ -41,4 +41,6 @@
             <appender-ref ref="JSON"/>
         </root>
     </springProfile>
+
+    <logger name="java.net.http.HttpClient" level="DEBUG" />
 </configuration>
