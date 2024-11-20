@@ -249,12 +249,7 @@ management:
     build:
       enabled: false
 
-org:
-  eclipse:
-    jetty:
-      util:
-        log:
-          class: org.eclipse.jetty.util.log.StrErrLog
-      LEVEL: DEBUG
-jetty:
-  logs: logs
+logging:
+  level:
+    jdk:
+      httpclient: debug
