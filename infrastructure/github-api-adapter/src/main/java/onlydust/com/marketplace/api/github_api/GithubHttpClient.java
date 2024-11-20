@@ -124,14 +124,23 @@ public class GithubHttpClient {
                             .method(method.name(), bodyPublisher)
                             .build(), HttpResponse.BodyHandlers.ofByteArray());
             return switch (httpResponse.statusCode()) {
-                case 200, 201, 204, 206 -> isNull(httpResponse.body()) || httpResponse.body().length == 0 ? Optional.empty() :
-                        Optional.ofNullable(decode(httpResponse.body(), responseClass));
+                case 200, 201, 204, 206 -> {
+                    if (isNull(httpResponse.body()) || httpResponse.body().length == 0) {
+                        LOGGER.warn("Github API returned http status %s with an empy body".formatted(httpResponse.statusCode()));
+                        yield Optional.empty();
+                    } else {
+                        yield Optional.ofNullable(decode(httpResponse.body(), responseClass));
+                    }
+                }
                 case 301, 302, 307, 308 -> {
                     final var location = httpResponse.headers().firstValue("Location")
                             .orElseThrow(() -> internalServerError("%d status received without Location header".formatted(httpResponse.statusCode())));
                     yield fetch(method, URI.create(location).getPath(), bodyPublisher, personalAccessToken, responseClass);
                 }
-                case 404 -> Optional.empty();
+                case 404 -> {
+                    LOGGER.warn("Github API returned http status %s with an empy body".formatted(httpResponse.statusCode()));
+                    yield Optional.empty();
+                }
                 case 401, 403 ->
                         throw forbidden("Unauthorized access to Github API: %s for error message %s".formatted(path, deserializeErrorMessage(httpResponse)));
                 default ->
