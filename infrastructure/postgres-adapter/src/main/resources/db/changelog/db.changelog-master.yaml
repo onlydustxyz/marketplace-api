@@ -47,3 +47,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000025_add_merged_by_into_contribution_contributors_data.sql
   - include:
       file: db/changelog/changelogs/00000026_add_missing_indexes.sql
+  - include:
+      file: db/changelog/changelogs/00000027_restore_indexes.sql

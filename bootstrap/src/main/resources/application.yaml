@@ -248,3 +248,8 @@ management:
       enabled: false
     build:
       enabled: false
+
+logging:
+  level:
+    jdk:
+      httpclient: debug
