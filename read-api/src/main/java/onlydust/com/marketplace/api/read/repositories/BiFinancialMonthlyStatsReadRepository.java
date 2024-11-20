@@ -42,8 +42,7 @@ public class BiFinancialMonthlyStatsReadRepository {
                                                coalesce(sum(tx.amount) filter ( where type = 'TRANSFER' and tx.reward_id is not null and tx.payment_id is null ), 0)
                                                    - coalesce(sum(tx.amount) filter ( where type = 'REFUND' and tx.reward_id is not null and tx.payment_id is null ), 0)  as total_rewarded,
             
-                                               coalesce(sum(tx.amount) filter ( where type = 'TRANSFER' and tx.payment_id is not null ), 0)
-                                                   - coalesce(sum(tx.amount) filter ( where type = 'REFUND' and tx.payment_id is not null ), 0)                           as total_paid,
+                                               coalesce(sum(tx.amount) filter ( where type = 'BURN' and tx.reward_id is not null ), 0)                                    as total_paid,
             
                                                count(tx.id)                                                                                                               as transaction_count
                                         from accounting.all_transactions tx
@@ -55,7 +54,7 @@ public class BiFinancialMonthlyStatsReadRepository {
                                         where #group_by# = :id
                                           and tx.timestamp >= d.date
                                           and tx.timestamp < d.date + interval '1 month'
-                                          and tx.type in ('DEPOSIT', 'WITHDRAW', 'TRANSFER', 'REFUND')
+                                          and tx.type in ('DEPOSIT', 'WITHDRAW', 'TRANSFER', 'REFUND', 'BURN')
                                           and (
                                             ('DEPOSITED' in (:types) and tx.type = 'DEPOSIT' and tx.deposit_status != 'DRAFT') or
                                             ('ALLOCATED' in (:types) and tx.type = 'TRANSFER' and tx.program_id is not null and tx.project_id is null) or
@@ -63,7 +62,7 @@ public class BiFinancialMonthlyStatsReadRepository {
                                             ('GRANTED' in (:types) and tx.type = 'TRANSFER' and tx.project_id is not null and tx.reward_id is null) or
                                             ('UNGRANTED' in (:types) and tx.type = 'REFUND' and tx.project_id is not null and tx.reward_id is null) or
                                             ('REWARDED' in (:types) and tx.type = 'TRANSFER' and tx.reward_id is not null and tx.payment_id is null) or
-                                            ('PAID' in (:types) and tx.type = 'TRANSFER' and tx.payment_id is not null)
+                                            ('PAID' in (:types) and tx.type = 'BURN' and tx.reward_id is not null)
                                             )
                                           and (cast(:search as text) is null or (concat(s.name, ' ', pgm.name, ' ', p.name, ' ', rr.login) ilike '%' || :search || '%'))
                                           and (cast(:searchProjectsAndRecipients as text) is null or (concat(p.name, ' ', rr.login) ilike '%' || :searchProjectsAndRecipients || '%'))
