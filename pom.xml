@@ -48,7 +48,7 @@
     <properties>
         <failsafe-include>**/*IT.java</failsafe-include>
         <skipUTs>${skipTests}</skipUTs>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
         <spring-boot.version>3.2.5</spring-boot.version>
         <start-class>onlydust.com.marketplace.api.MarketplaceApiApplication</start-class>
         <jackson.version>2.15.4</jackson.version>

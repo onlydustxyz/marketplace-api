@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 openjdk:17-alpine
+FROM --platform=linux/amd64 openjdk:21-alpine
 
 WORKDIR webapp/
 
