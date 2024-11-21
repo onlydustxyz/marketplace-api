@@ -49,3 +49,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000026_add_missing_indexes.sql
   - include:
       file: db/changelog/changelogs/00000027_restore_indexes.sql
+  - include:
+      file: db/changelog/changelogs/00000028_add_indexes.sql
