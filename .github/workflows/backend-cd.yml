@@ -27,6 +27,9 @@ jobs:
 
       - name: Java setup
         uses: ./.github/actions/java-setup
+        with:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Maven build
         run: ./mvnw clean install -T 4 -DskipTests -DskipITs -DskipUTs
