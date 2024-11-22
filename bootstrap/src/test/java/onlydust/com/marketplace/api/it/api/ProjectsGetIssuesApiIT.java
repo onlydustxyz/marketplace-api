@@ -255,7 +255,7 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
                 .allMatch(issue -> issue.getApplicants().isEmpty());
     }
 
-    private AbstractListAssert<?, ? extends List<? extends GithubIssuePageItemResponse>, GithubIssuePageItemResponse> assertIssues(Map<String, String> params) {
+    private AbstractListAssert<?, ? extends List<? extends GithubIssuePageItemResponse>, GithubIssuePageItemResponse, ?> assertIssues(Map<String, String> params) {
         final var q = new HashMap<String, String>();
         q.put("pageIndex", "0");
         q.put("pageSize", "30");

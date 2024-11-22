@@ -15,8 +15,8 @@
     <packaging>jar</packaging>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -253,7 +253,7 @@
                     <groupId>io.netty</groupId>
                     <artifactId>netty-resolver-dns-native-macos</artifactId>
                     <classifier>osx-aarch_64</classifier>
-                    <version>4.1.95.Final</version>
+                    <version>4.1.115.Final</version>
                 </dependency>
             </dependencies>
         </profile>

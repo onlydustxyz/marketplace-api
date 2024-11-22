@@ -28,7 +28,5 @@ java -javaagent:/webapp/dd-java-agent.jar "$@" \
   -Dliquibase.changelogLockPollRate=1 \
   -Duser.timezone=\"UTC\" \
   -Ddd.profiling.enabled=true -Ddd.logs.injection=true \
-  -Djdk.httpclient.keepalive.timeout=300 \
-  -Djdk.httpclient.connectionPoolSize=10 \
   -jar "$jar" \
   --spring.profiles.active="$SPRING_PROFILES_ACTIVE"

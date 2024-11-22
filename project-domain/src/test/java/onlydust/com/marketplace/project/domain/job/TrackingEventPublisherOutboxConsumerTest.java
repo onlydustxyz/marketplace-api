@@ -256,6 +256,7 @@ class TrackingEventPublisherOutboxConsumerTest {
                     .labels(Set.of("foo", "bar", goodFirstIssueLabel, "baz"))
                     .createdAt(faker.date().birthday().toInstant().atZone(ZoneOffset.UTC))
                     .assignedAt(faker.date().birthday().toInstant().atZone(ZoneOffset.UTC))
+                    .assignedById(faker.number().randomNumber())
                     .build();
 
             // When
@@ -311,6 +312,7 @@ class TrackingEventPublisherOutboxConsumerTest {
                     .labels(new HashSet<>(faker.lorem().words()))
                     .createdAt(faker.date().birthday().toInstant().atZone(ZoneOffset.UTC))
                     .assignedAt(faker.date().birthday().toInstant().atZone(ZoneOffset.UTC))
+                    .assignedById(faker.number().randomNumber())
                     .build();
 
         if (eventClass.equals(OnPullRequestCreated.class))
