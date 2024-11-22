@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.read.repositories;
 
-import onlydust.com.marketplace.api.read.cache.QueryCacheXS;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,10 +11,8 @@ import java.util.UUID;
 
 public interface ProjectReadRepository extends Repository<ProjectReadEntity, UUID> {
 
-    @QueryCacheXS
     Optional<ProjectReadEntity> findById(UUID id);
 
-    @QueryCacheXS
     Optional<ProjectReadEntity> findBySlug(String slug);
 
     @Query("""

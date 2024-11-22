@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.read.repositories;
 
-import onlydust.com.marketplace.api.read.cache.QueryCacheM;
 import onlydust.com.marketplace.api.read.entities.project.ProjectPageItemQueryEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -63,7 +62,6 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                    cast(:hasGoodFirstIssues as boolean) is false and pcd.good_first_issue_count = 0)
               and (cast(:search as text) is null or p.search ilike '%' || cast(:search as text) || '%')
             """, nativeQuery = true)
-    @QueryCacheM
     Page<ProjectPageItemQueryEntity> findAll(UUID userId,
                                              Boolean mine,
                                              String search,

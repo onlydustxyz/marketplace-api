@@ -142,12 +142,6 @@ spring:
       maxLifetime: 60000
       maximumPoolSize: 10
       minimumIdle: 1
-  jpa:
-    properties:
-      hibernate:
-        cache:
-          use_second_level_cache: false
-          use_query_cache: false
 decorator:
   datasource:
     datasource-proxy:
