@@ -38,10 +38,10 @@ public class ReadBannerApiPostgresAdapter implements ReadBannerApi {
                 : bannerReadRepository.findFirstVisibleBanner();
 
         return banner.map(bannerReadEntity -> ok()
-                        .cacheControl(cache.whenAnonymous(authenticatedUser, S))
+                        .cacheControl(cache.whenAnonymous(authenticatedUser, S, S))
                         .body(bannerReadEntity.toResponse()))
                 .orElseGet(() -> noContent()
-                        .cacheControl(cache.whenAnonymous(authenticatedUser, S))
+                        .cacheControl(cache.whenAnonymous(authenticatedUser, S, S))
                         .build());
     }
 }

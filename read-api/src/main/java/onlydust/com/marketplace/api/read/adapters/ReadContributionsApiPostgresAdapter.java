@@ -16,6 +16,7 @@ import java.util.*;
 
 import static onlydust.com.marketplace.api.contract.model.ContributionEventEnum.*;
 import static onlydust.com.marketplace.api.read.properties.Cache.XS;
+import static onlydust.com.marketplace.api.read.properties.Cache.ZERO;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
@@ -36,7 +37,7 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
         final var contribution = findContribution(contributionUuid);
 
         return ok()
-                .cacheControl(cache.whenAnonymous(authenticatedUser, XS))
+                .cacheControl(cache.whenAnonymous(authenticatedUser, XS, ZERO))
                 .body(contribution.toDto(authenticatedUser));
     }
 
@@ -56,7 +57,7 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
         final var page = contributionReadRepository.findAll(q);
 
         return ok()
-                .cacheControl(cache.whenAnonymous(authenticatedUser, XS))
+                .cacheControl(cache.whenAnonymous(authenticatedUser, XS, ZERO))
                 .body(new ContributionActivityPageResponse()
                         .contributions(page.stream().map(c -> c.toDto(authenticatedUser)).toList())
                         .hasMore(hasMore(q.getPageIndex(), page.getTotalPages()))
