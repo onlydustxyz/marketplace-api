@@ -1,13 +1,11 @@
-package onlydust.com.marketplace.api.read.properties;
+package onlydust.com.marketplace.api.read.cache;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.springframework.http.CacheControl;
 
 import java.time.Duration;
-import java.util.Optional;
 
 import static java.lang.Math.min;
 
@@ -26,27 +24,18 @@ public class Cache {
     private long defaultStaleWhileRevalidateSeconds = 10L;
 
     /**
-     * Add 'max-age' and 'stale-while-revalidate' headers when the user is anonymous, otherwise add 'max-age' and 'private' headers.
+     * Add 'max-age' and 'private' headers.
      * The 'private' header indicates that all or part of the response message is intended for a single user
-     * and MUST NOT be cached by a shared cache.
+     * and MUST NOT be cached by a shared cache. Hence, it will be cached by the browser only.
      *
-     * @param user            authenticated user (empty if anonymous)
-     * @param publicDuration  max-age duration if the user is not authenticated (CDN cache)
-     * @param privateDuration max-age duration if the user is authenticated (browser cache)
+     * @param duration max-age duration for the browser cache
      * @return CacheControl
      */
-    public CacheControl whenAnonymous(Optional<AuthenticatedUser> user, Duration publicDuration, Duration privateDuration) {
-        if (user.isEmpty()) {
-            if (publicDuration.isZero()) {
-                return CacheControl.noStore();
-            }
-            return sanitize(maxAge(publicDuration)
-                    .staleWhileRevalidate(Duration.ofSeconds(min(defaultStaleWhileRevalidateSeconds, publicDuration.getSeconds()))));
-        }
-        if (privateDuration.isZero()) {
+    public CacheControl inBrowser(Duration duration) {
+        if (duration.isZero()) {
             return CacheControl.noStore();
         }
-        return sanitize(maxAge(privateDuration).cachePrivate());
+        return sanitize(maxAge(duration).cachePrivate());
     }
 
     /**

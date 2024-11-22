@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.ContributionView
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomContributorRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectLeadViewRepository;
+import onlydust.com.marketplace.api.read.cache.Cache;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.accounting.AllTransactionReadEntity;
 import onlydust.com.marketplace.api.read.entities.github.ProjectGithubIssueItemReadEntity;
@@ -21,7 +22,6 @@ import onlydust.com.marketplace.api.read.entities.project.ProjectCustomStatReadE
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
 import onlydust.com.marketplace.api.read.mapper.UserMapper;
-import onlydust.com.marketplace.api.read.properties.Cache;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
@@ -55,7 +55,7 @@ import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.contract.model.FinancialTransactionType.*;
-import static onlydust.com.marketplace.api.read.properties.Cache.*;
+import static onlydust.com.marketplace.api.read.cache.Cache.XS;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapRewardSettings;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
@@ -141,17 +141,15 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
         final var filters = projectsPageItemFiltersRepository.findFilters(userId);
 
-        return ok()
-                .cacheControl(cache.whenAnonymous(user, M, M))
-                .body(new ProjectPageResponse()
-                        .projects(projects.stream().map(p -> p.toDto(userId)).toList())
-                        .categories(filters.categories().stream().sorted(comparing(ProjectCategoryResponse::getName)).toList())
-                        .languages(filters.languages().stream().sorted(comparing(LanguageResponse::getName)).toList())
-                        .ecosystems(filters.ecosystems().stream().sorted(comparing(EcosystemLinkResponse::getName)).toList())
-                        .totalPageNumber(projects.getTotalPages())
-                        .totalItemNumber((int) projects.getTotalElements())
-                        .hasMore(hasMore(pageIndex, projects.getTotalPages()))
-                        .nextPageIndex(nextPageIndex(pageIndex, projects.getTotalPages())));
+        return ok().body(new ProjectPageResponse()
+                .projects(projects.stream().map(p -> p.toDto(userId)).toList())
+                .categories(filters.categories().stream().sorted(comparing(ProjectCategoryResponse::getName)).toList())
+                .languages(filters.languages().stream().sorted(comparing(LanguageResponse::getName)).toList())
+                .ecosystems(filters.ecosystems().stream().sorted(comparing(EcosystemLinkResponse::getName)).toList())
+                .totalPageNumber(projects.getTotalPages())
+                .totalItemNumber((int) projects.getTotalElements())
+                .hasMore(hasMore(pageIndex, projects.getTotalPages()))
+                .nextPageIndex(nextPageIndex(pageIndex, projects.getTotalPages())));
     }
 
     @Override
@@ -165,9 +163,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final var project = projectReadRepository.findById(projectId)
                 .orElseThrow(() -> notFound(format("Project %s not found", projectId)));
 
-        return ok()
-                .cacheControl(cache.whenAnonymous(caller, M, ZERO))
-                .body(getProjectDetails(project, caller.orElse(null), includeAllAvailableRepos));
+        return ok().body(getProjectDetails(project, caller.orElse(null), includeAllAvailableRepos));
     }
 
     @Override
@@ -181,9 +177,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final var project = projectReadRepository.findBySlug(slug)
                 .orElseThrow(() -> notFound(format("Project %s not found", slug)));
 
-        return ok()
-                .cacheControl(cache.whenAnonymous(caller, M, ZERO))
-                .body(getProjectDetails(project, caller.orElse(null), includeAllAvailableRepos));
+        return ok().body(getProjectDetails(project, caller.orElse(null), includeAllAvailableRepos));
     }
 
     @Override
@@ -460,13 +454,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 .hasMore(hasMore(pageIndex, contributors.getTotalPages()))
                 .nextPageIndex(nextPageIndex(pageIndex, contributors.getTotalPages()));
 
-        return response.getTotalPageNumber() > 1 ?
-                status(PARTIAL_CONTENT)
-                        .cacheControl(cache.whenAnonymous(authenticatedUser, S, S))
-                        .body(response) :
-                ok()
-                        .cacheControl(cache.whenAnonymous(authenticatedUser, S, S))
-                        .body(response);
+        return ok().body(response);
     }
 
     @Override

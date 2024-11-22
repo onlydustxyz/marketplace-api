@@ -1373,7 +1373,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .isEqualTo(HttpStatus.OK)
                 .expectBody()
                 .json(GET_PROJECT_CONTRIBUTORS_PAGE_0);
 
@@ -1384,7 +1384,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .isEqualTo(HttpStatus.OK)
                 .expectBody()
                 .json(GET_PROJECT_CONTRIBUTORS_PAGE_1);
     }

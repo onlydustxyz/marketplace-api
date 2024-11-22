@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.contract.model.ContributionsQueryParams;
 import onlydust.com.marketplace.api.contract.model.ContributionsSortEnum;
 import onlydust.com.marketplace.api.contract.model.DataSourceEnum;
 import onlydust.com.marketplace.api.contract.model.SortDirection;
+import onlydust.com.marketplace.api.read.cache.QueryCacheS;
 import onlydust.com.marketplace.api.read.entities.bi.ContributionReadEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -74,6 +75,7 @@ public interface ContributionReadRepository extends Repository<ContributionReadE
                      ccd.contribution_uuid,
                      rd.contribution_uuid
             """, nativeQuery = true)
+    @QueryCacheS
     Page<ContributionReadEntity> findAll(ZonedDateTime fromDate,
                                          ZonedDateTime toDate,
                                          @NonNull Boolean onlyOnlyDustData,

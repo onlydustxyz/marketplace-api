@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.read.repositories;
 
+import onlydust.com.marketplace.api.read.cache.QueryCacheS;
 import onlydust.com.marketplace.api.read.entities.BannerReadEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ public interface BannerReadRepository extends Repository<BannerReadEntity, UUID>
                 AND c.userId = :userId
             ))
             """)
+    @QueryCacheS
     Optional<BannerReadEntity> findMyFirstVisibleBanner(UUID userId);
 
     @Query("""
@@ -32,6 +34,7 @@ public interface BannerReadRepository extends Repository<BannerReadEntity, UUID>
             FROM BannerReadEntity b
             WHERE b.visible = true
             """)
+    @QueryCacheS
     Optional<BannerReadEntity> findFirstVisibleBanner();
 
 

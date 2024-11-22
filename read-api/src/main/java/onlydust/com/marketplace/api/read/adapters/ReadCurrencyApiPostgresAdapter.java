@@ -9,14 +9,14 @@ import onlydust.com.marketplace.api.contract.model.NetworkContract;
 import onlydust.com.marketplace.api.contract.model.OnlyDustWalletResponse;
 import onlydust.com.marketplace.api.contract.model.SupportedCurrencyListResponse;
 import onlydust.com.marketplace.api.contract.model.SupportedCurrencyResponse;
-import onlydust.com.marketplace.api.read.properties.Cache;
+import onlydust.com.marketplace.api.read.cache.Cache;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 import static java.util.Comparator.comparing;
-import static onlydust.com.marketplace.api.read.properties.Cache.M;
+import static onlydust.com.marketplace.api.read.cache.Cache.M;
 
 @RestController
 @AllArgsConstructor

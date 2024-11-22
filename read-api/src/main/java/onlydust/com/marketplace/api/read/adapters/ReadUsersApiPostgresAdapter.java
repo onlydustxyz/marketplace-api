@@ -3,8 +3,8 @@ package onlydust.com.marketplace.api.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadUsersApi;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.read.cache.Cache;
 import onlydust.com.marketplace.api.read.entities.user.*;
-import onlydust.com.marketplace.api.read.properties.Cache;
 import onlydust.com.marketplace.api.read.repositories.*;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.api.read.properties.Cache.M;
+import static onlydust.com.marketplace.api.read.cache.Cache.M;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseZonedNullable;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static org.springframework.http.ResponseEntity.ok;
