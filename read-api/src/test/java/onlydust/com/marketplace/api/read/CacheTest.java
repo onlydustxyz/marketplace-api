@@ -27,7 +27,7 @@ class CacheTest {
         assertThat(cache.forEverybody(Duration.ofSeconds(maxAgeSeconds)).getHeaderValue())
                 .isEqualTo("max-age=%d, public, stale-while-revalidate=10".formatted(expectedSeconds));
         assertThat(cache.whenAnonymous(Optional.empty(), Duration.ofSeconds(maxAgeSeconds), Duration.ofSeconds(privateMaxAgeSeconds)).getHeaderValue())
-                .isEqualTo("max-age=%d, public, stale-while-revalidate=10".formatted(expectedSeconds));
+                .isEqualTo("max-age=%d, stale-while-revalidate=10".formatted(expectedSeconds));
         assertThat(cache.whenAnonymous(Optional.of(AuthenticatedUser.builder().build()), Duration.ofSeconds(maxAgeSeconds),
                 Duration.ofSeconds(privateMaxAgeSeconds)).getHeaderValue())
                 .isEqualTo("max-age=%d, private".formatted(expectedSecondsPrivate));
@@ -47,7 +47,7 @@ class CacheTest {
         assertThat(cache.forEverybody(Duration.ofMinutes(maxAgeMinutes)).getHeaderValue())
                 .isEqualTo("max-age=%d, public, stale-while-revalidate=10".formatted(expectedSeconds));
         assertThat(cache.whenAnonymous(Optional.empty(), Duration.ofMinutes(maxAgeMinutes), Duration.ofMinutes(privateMaxAgeMinutes)).getHeaderValue())
-                .isEqualTo("max-age=%d, public, stale-while-revalidate=10".formatted(expectedSeconds));
+                .isEqualTo("max-age=%d, stale-while-revalidate=10".formatted(expectedSeconds));
         assertThat(cache.whenAnonymous(Optional.of(AuthenticatedUser.builder().build()), Duration.ofMinutes(maxAgeMinutes),
                 Duration.ofMinutes(privateMaxAgeMinutes)).getHeaderValue())
                 .isEqualTo("max-age=%d, private".formatted(expectedSecondsPrivate));

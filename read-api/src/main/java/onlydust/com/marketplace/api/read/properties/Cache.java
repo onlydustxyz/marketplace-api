@@ -37,7 +37,11 @@ public class Cache {
      */
     public CacheControl whenAnonymous(Optional<AuthenticatedUser> user, Duration publicDuration, Duration privateDuration) {
         if (user.isEmpty()) {
-            return forEverybody(publicDuration);
+            if (publicDuration.isZero()) {
+                return CacheControl.noStore();
+            }
+            return sanitize(maxAge(publicDuration)
+                    .staleWhileRevalidate(Duration.ofSeconds(min(defaultStaleWhileRevalidateSeconds, publicDuration.getSeconds()))));
         }
         if (privateDuration.isZero()) {
             return CacheControl.noStore();
