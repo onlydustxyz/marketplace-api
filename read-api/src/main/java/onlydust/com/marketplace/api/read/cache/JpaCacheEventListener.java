@@ -13,13 +13,13 @@ public class JpaCacheEventListener implements CacheEventListener<Object, Object>
 
     @Override
     public void onEvent(CacheEvent event) {
-        //if (LOGGER.isTraceEnabled()) {
-        LOGGER.info(
-                "{ type: {}, key: {} }",
-                event.getType(),
-                event.getKey()
-        );
-        //}
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(
+                    "{ type: {}, key: {} }",
+                    event.getType(),
+                    event.getKey()
+            );
+        }
     }
 
 }
