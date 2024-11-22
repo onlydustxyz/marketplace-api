@@ -132,5 +132,11 @@ public class GoodFirstIssueCreatedNotifierJobIT extends AbstractMarketplaceApiIT
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("New good first issue"))));
 
         customerIOWireMockServer.verify(2, postRequestedFor(urlEqualTo("/send/email")));
+        customerIOWireMockServer.resetAll();
+
+        // Check that notification for a single issue is sent only once
+        goodFirstIssueCreatedNotifierJob.run();
+        Thread.sleep(1000L);
+        customerIOWireMockServer.verify(0, postRequestedFor(urlEqualTo("/send/email")));
     }
 }

@@ -31,6 +31,8 @@ public interface GithubIssueViewRepository extends Repository<GithubIssueViewEnt
               and gi.status = 'OPEN'
               and gia.user_id is null
               and NOT exists(SELECT 1 FROM hackathon_issues hi WHERE hi.issue_id = gi.id)
+              and NOT exists(SELECT 1 FROM iam.notifications n WHERE n.data->'notification'->>'@type' = 'GoodFirstIssueCreated'
+                                                               AND cast(n.data->'notification'->'issue'->>'id' as bigint) = gi.id)
             """, nativeQuery = true)
     List<GithubIssueViewEntity> findAllGoodFirstIssuesCreatedSince5Minutes(ZonedDateTime now, String timezone);
 

@@ -209,9 +209,6 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     @Transactional
     public void onApplicationRefused(Application application) {
         entityManager.flush();
-        final var contributionUUID = ContributionUUID.of(application.issueId().value());
-        biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
-        biPerContributorContributionDataRepository.refreshByUUID(contributionUUID);
         biContributorApplicationDataRepository.refresh(application.applicantId());
         biApplicationDataRepository.refresh(application.id());
     }
