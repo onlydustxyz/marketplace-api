@@ -72,11 +72,8 @@
         <spring-aspects.version>6.1.1</spring-aspects.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <datasource-proxy-spring-boot-starter.version>1.9.1</datasource-proxy-spring-boot-starter.version>
-        <junit-jupiter.version>5.11.3</junit-jupiter.version>
         <mockito-junit-jupiter.version>5.14.2</mockito-junit-jupiter.version>
         <assertj-core.version>3.26.3</assertj-core.version>
-        <junit-platform-suite-api.version>${junit-platform-suite-engine.version}</junit-platform-suite-api.version>
-        <junit-platform-suite-engine.version>1.10.2</junit-platform-suite-engine.version>
     </properties>
 
     <dependencyManagement>
@@ -364,7 +361,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${junit-jupiter.version}</version>
+            <version>5.11.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -388,13 +385,13 @@
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-suite-api</artifactId>
-            <version>${junit-platform-suite-api.version}</version>
+            <version>1.11.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-suite-engine</artifactId>
-            <version>${junit-platform-suite-engine.version}</version>
+            <version>1.11.3</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
