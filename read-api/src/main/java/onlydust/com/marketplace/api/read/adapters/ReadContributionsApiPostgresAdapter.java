@@ -16,7 +16,6 @@ import java.util.*;
 
 import static onlydust.com.marketplace.api.contract.model.ContributionEventEnum.*;
 import static onlydust.com.marketplace.api.read.cache.Cache.XS;
-import static onlydust.com.marketplace.api.read.cache.Cache.ZERO;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
@@ -36,9 +35,7 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
         final var authenticatedUser = authenticatedAppUserService.tryGetAuthenticatedUser();
         final var contribution = findContribution(contributionUuid);
 
-        return ok()
-                .cacheControl(cache.whenAnonymous(authenticatedUser, XS, ZERO))
-                .body(contribution.toDto(authenticatedUser));
+        return ok().body(contribution.toDto(authenticatedUser));
     }
 
     private ContributionReadEntity findContribution(UUID contributionUuid) {
@@ -56,14 +53,12 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
         final var authenticatedUser = authenticatedAppUserService.tryGetAuthenticatedUser();
         final var page = contributionReadRepository.findAll(q);
 
-        return ok()
-                .cacheControl(cache.whenAnonymous(authenticatedUser, XS, ZERO))
-                .body(new ContributionActivityPageResponse()
-                        .contributions(page.stream().map(c -> c.toDto(authenticatedUser)).toList())
-                        .hasMore(hasMore(q.getPageIndex(), page.getTotalPages()))
-                        .nextPageIndex(nextPageIndex(q.getPageIndex(), page.getTotalPages()))
-                        .totalItemNumber((int) page.getTotalElements())
-                        .totalPageNumber(page.getTotalPages()));
+        return ok().body(new ContributionActivityPageResponse()
+                .contributions(page.stream().map(c -> c.toDto(authenticatedUser)).toList())
+                .hasMore(hasMore(q.getPageIndex(), page.getTotalPages()))
+                .nextPageIndex(nextPageIndex(q.getPageIndex(), page.getTotalPages()))
+                .totalItemNumber((int) page.getTotalElements())
+                .totalPageNumber(page.getTotalPages()));
     }
 
     @Override

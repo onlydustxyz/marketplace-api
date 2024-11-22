@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
-import static onlydust.com.marketplace.api.read.cache.Cache.S;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -37,11 +36,7 @@ public class ReadBannerApiPostgresAdapter implements ReadBannerApi {
                 bannerReadRepository.findMyFirstVisibleBanner(authenticatedUser.map(AuthenticatedUser::id).map(UserId::value).orElse(null))
                 : bannerReadRepository.findFirstVisibleBanner();
 
-        return banner.map(bannerReadEntity -> ok()
-                        .cacheControl(cache.whenAnonymous(authenticatedUser, S, S))
-                        .body(bannerReadEntity.toResponse()))
-                .orElseGet(() -> noContent()
-                        .cacheControl(cache.whenAnonymous(authenticatedUser, S, S))
-                        .build());
+        return banner.map(bannerReadEntity -> ok().body(bannerReadEntity.toResponse()))
+                .orElseGet(() -> noContent().build());
     }
 }

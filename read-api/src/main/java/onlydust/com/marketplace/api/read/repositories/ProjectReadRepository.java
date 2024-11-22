@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ProjectReadRepository extends Repository<ProjectReadEntity, UUID> {
+
+    @QueryCacheXS
     Optional<ProjectReadEntity> findById(UUID id);
 
     @QueryCacheXS
