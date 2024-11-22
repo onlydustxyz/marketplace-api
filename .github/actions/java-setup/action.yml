@@ -30,10 +30,10 @@ runs:
             "password": "${{ inputs.GITHUB_TOKEN }}"
           }]
 
-#    - name: Cache mvn dependencies
-#      uses: actions/cache@v4
-#      with:
-#        path: |
-#          ~/.m2/repository
-#          bootstrap/target/marketplace-api.jar
-#        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-dependencies
+    - name: Cache mvn dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.m2/repository
+          bootstrap/target/marketplace-api.jar
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-dependencies
