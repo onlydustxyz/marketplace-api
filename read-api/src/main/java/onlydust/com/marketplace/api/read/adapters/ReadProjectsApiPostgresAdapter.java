@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.ContributionView
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomContributorRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectLeadViewRepository;
+import onlydust.com.marketplace.api.read.cache.Cache;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.accounting.AllTransactionReadEntity;
 import onlydust.com.marketplace.api.read.entities.github.ProjectGithubIssueItemReadEntity;
@@ -21,7 +22,6 @@ import onlydust.com.marketplace.api.read.entities.project.ProjectCustomStatReadE
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
 import onlydust.com.marketplace.api.read.mapper.UserMapper;
-import onlydust.com.marketplace.api.read.properties.Cache;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
@@ -55,7 +55,7 @@ import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.contract.model.FinancialTransactionType.*;
-import static onlydust.com.marketplace.api.read.properties.Cache.*;
+import static onlydust.com.marketplace.api.read.cache.Cache.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapRewardSettings;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;

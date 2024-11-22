@@ -8,10 +8,10 @@ import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
 import onlydust.com.marketplace.api.contract.model.HackathonProjectsIssuesResponse;
 import onlydust.com.marketplace.api.contract.model.HackathonsDetailsResponse;
 import onlydust.com.marketplace.api.contract.model.HackathonsListResponse;
+import onlydust.com.marketplace.api.read.cache.Cache;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonItemReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonProjectIssuesReadEntity;
-import onlydust.com.marketplace.api.read.properties.Cache;
 import onlydust.com.marketplace.api.read.repositories.HackathonItemReadRepository;
 import onlydust.com.marketplace.api.read.repositories.HackathonProjectIssuesReadRepository;
 import onlydust.com.marketplace.api.read.repositories.HackathonReadRepository;
@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.read.properties.Cache.S;
-import static onlydust.com.marketplace.api.read.properties.Cache.XS;
+import static onlydust.com.marketplace.api.read.cache.Cache.S;
+import static onlydust.com.marketplace.api.read.cache.Cache.XS;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController

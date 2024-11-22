@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.read;
 
-import onlydust.com.marketplace.api.read.properties.Cache;
+import onlydust.com.marketplace.api.read.cache.Cache;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

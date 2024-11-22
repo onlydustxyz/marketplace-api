@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.read.properties;
+package onlydust.com.marketplace.api.read.cache;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
