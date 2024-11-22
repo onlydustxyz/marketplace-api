@@ -51,6 +51,7 @@ public class GithubEventProcessingIT extends AbstractMarketplaceApiIT {
                 .assigneeId(antho.user().getGithubUserId())
                 .createdAt(createdAt)
                 .assignedAt(assignedAt)
+                .assignedById(antho.user().getGithubUserId())
                 .labels(Set.of("documentation", "good first issue"))
                 .build());
 
