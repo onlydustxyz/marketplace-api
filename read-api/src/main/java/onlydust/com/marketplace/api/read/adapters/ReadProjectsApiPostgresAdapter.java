@@ -182,7 +182,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 .orElseThrow(() -> notFound(format("Project %s not found", slug)));
 
         return ok()
-                .cacheControl(cache.whenAnonymous(caller, M, ZERO))
+                //.cacheControl(cache.whenAnonymous(caller, M, ZERO))
                 .body(getProjectDetails(project, caller.orElse(null), includeAllAvailableRepos));
     }
 
