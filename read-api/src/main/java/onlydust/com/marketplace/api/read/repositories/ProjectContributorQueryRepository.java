@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.read.repositories;
 
-import onlydust.com.marketplace.api.read.cache.QueryCacheM;
 import onlydust.com.marketplace.api.read.entities.project.ProjectContributorsQueryEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -107,7 +106,6 @@ public interface ProjectContributorQueryRepository extends Repository<ProjectCon
                       and (:login is null or ga.login ilike '%' || :login || '%')
                       and (hc.contributor_github_user_id is null or :showHidden)
                     """, nativeQuery = true)
-    @QueryCacheM
     Page<ProjectContributorsQueryEntity> findProjectContributors(final UUID projectId,
                                                                  final String login,
                                                                  final UUID projectLeadId,
