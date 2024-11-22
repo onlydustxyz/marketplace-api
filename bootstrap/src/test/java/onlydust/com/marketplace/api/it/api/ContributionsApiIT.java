@@ -694,7 +694,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
 
     }
 
-    private AbstractListAssert<?, ? extends List<? extends ContributionActivityPageItemResponse>, ContributionActivityPageItemResponse> assertContributions(Map<String, String> params) {
+    private AbstractListAssert<?, ? extends List<? extends ContributionActivityPageItemResponse>, ContributionActivityPageItemResponse, ?> assertContributions(Map<String, String> params) {
         final var q = new HashMap<String, String>();
         q.put("pageSize", "80");
         q.putAll(params);

@@ -26,6 +26,9 @@ jobs:
 
       - name: Java setup
         uses: ./.github/actions/java-setup
+        with:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Maven test
         run: ./mvnw test -T 6
@@ -52,6 +55,9 @@ jobs:
 
       - name: Java setup
         uses: ./.github/actions/java-setup
+        with:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Maven test
         run: ./mvnw verify -Dfailsafe-include='**/${{ matrix.suite }}Suite.java' -DskipUTs=true -T 6

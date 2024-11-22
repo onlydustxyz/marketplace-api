@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ProjectReadRepository extends Repository<ProjectReadEntity, UUID> {
+
     Optional<ProjectReadEntity> findById(UUID id);
 
     Optional<ProjectReadEntity> findBySlug(String slug);

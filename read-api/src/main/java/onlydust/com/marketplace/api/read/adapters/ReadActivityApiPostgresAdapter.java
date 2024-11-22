@@ -3,8 +3,8 @@ package onlydust.com.marketplace.api.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadActivityApi;
 import onlydust.com.marketplace.api.contract.model.PublicActivityPageResponse;
+import onlydust.com.marketplace.api.read.cache.Cache;
 import onlydust.com.marketplace.api.read.entities.RecentPublicActivityReadEntity;
-import onlydust.com.marketplace.api.read.properties.Cache;
 import onlydust.com.marketplace.api.read.repositories.RecentPublicActivityReadRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
-import static onlydust.com.marketplace.api.read.properties.Cache.S;
+import static onlydust.com.marketplace.api.read.cache.Cache.S;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 
 @RestController

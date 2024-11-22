@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadCountriesApi;
 import onlydust.com.marketplace.api.contract.model.CountriesResponse;
 import onlydust.com.marketplace.api.contract.model.CountryResponse;
+import onlydust.com.marketplace.api.read.cache.Cache;
 import onlydust.com.marketplace.api.read.entities.CountryReadEntity;
-import onlydust.com.marketplace.api.read.properties.Cache;
 import onlydust.com.marketplace.api.read.repositories.CountryReadRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
-import static onlydust.com.marketplace.api.read.properties.Cache.M;
+import static onlydust.com.marketplace.api.read.cache.Cache.M;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController

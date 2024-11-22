@@ -3,8 +3,8 @@ package onlydust.com.marketplace.api.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadContributionsApi;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.read.cache.Cache;
 import onlydust.com.marketplace.api.read.entities.bi.ContributionReadEntity;
-import onlydust.com.marketplace.api.read.properties.Cache;
 import onlydust.com.marketplace.api.read.repositories.ContributionReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import org.springframework.context.annotation.Profile;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
 
 import static onlydust.com.marketplace.api.contract.model.ContributionEventEnum.*;
-import static onlydust.com.marketplace.api.read.properties.Cache.XS;
+import static onlydust.com.marketplace.api.read.cache.Cache.XS;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
@@ -35,9 +35,7 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
         final var authenticatedUser = authenticatedAppUserService.tryGetAuthenticatedUser();
         final var contribution = findContribution(contributionUuid);
 
-        return ok()
-                .cacheControl(cache.whenAnonymous(authenticatedUser, XS))
-                .body(contribution.toDto(authenticatedUser));
+        return ok().body(contribution.toDto(authenticatedUser));
     }
 
     private ContributionReadEntity findContribution(UUID contributionUuid) {
@@ -55,14 +53,12 @@ public class ReadContributionsApiPostgresAdapter implements ReadContributionsApi
         final var authenticatedUser = authenticatedAppUserService.tryGetAuthenticatedUser();
         final var page = contributionReadRepository.findAll(q);
 
-        return ok()
-                .cacheControl(cache.whenAnonymous(authenticatedUser, XS))
-                .body(new ContributionActivityPageResponse()
-                        .contributions(page.stream().map(c -> c.toDto(authenticatedUser)).toList())
-                        .hasMore(hasMore(q.getPageIndex(), page.getTotalPages()))
-                        .nextPageIndex(nextPageIndex(q.getPageIndex(), page.getTotalPages()))
-                        .totalItemNumber((int) page.getTotalElements())
-                        .totalPageNumber(page.getTotalPages()));
+        return ok().body(new ContributionActivityPageResponse()
+                .contributions(page.stream().map(c -> c.toDto(authenticatedUser)).toList())
+                .hasMore(hasMore(q.getPageIndex(), page.getTotalPages()))
+                .nextPageIndex(nextPageIndex(q.getPageIndex(), page.getTotalPages()))
+                .totalItemNumber((int) page.getTotalElements())
+                .totalPageNumber(page.getTotalPages()));
     }
 
     @Override

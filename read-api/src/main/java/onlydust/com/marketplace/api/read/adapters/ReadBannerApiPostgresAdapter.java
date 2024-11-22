@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadBannerApi;
 import onlydust.com.marketplace.api.contract.model.BannerResponse;
-import onlydust.com.marketplace.api.read.properties.Cache;
+import onlydust.com.marketplace.api.read.cache.Cache;
 import onlydust.com.marketplace.api.read.repositories.BannerReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
-import static onlydust.com.marketplace.api.read.properties.Cache.S;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -37,11 +36,7 @@ public class ReadBannerApiPostgresAdapter implements ReadBannerApi {
                 bannerReadRepository.findMyFirstVisibleBanner(authenticatedUser.map(AuthenticatedUser::id).map(UserId::value).orElse(null))
                 : bannerReadRepository.findFirstVisibleBanner();
 
-        return banner.map(bannerReadEntity -> ok()
-                        .cacheControl(cache.whenAnonymous(authenticatedUser, S))
-                        .body(bannerReadEntity.toResponse()))
-                .orElseGet(() -> noContent()
-                        .cacheControl(cache.whenAnonymous(authenticatedUser, S))
-                        .build());
+        return banner.map(bannerReadEntity -> ok().body(bannerReadEntity.toResponse()))
+                .orElseGet(() -> noContent().build());
     }
 }
