@@ -142,7 +142,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final var filters = projectsPageItemFiltersRepository.findFilters(userId);
 
         return ok()
-                .cacheControl(cache.whenAnonymous(user, M))
+                .cacheControl(cache.whenAnonymous(user, M, M))
                 .body(new ProjectPageResponse()
                         .projects(projects.stream().map(p -> p.toDto(userId)).toList())
                         .categories(filters.categories().stream().sorted(comparing(ProjectCategoryResponse::getName)).toList())
@@ -166,7 +166,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 .orElseThrow(() -> notFound(format("Project %s not found", projectId)));
 
         return ok()
-                .cacheControl(cache.whenAnonymous(caller, M))
+                .cacheControl(cache.whenAnonymous(caller, M, ZERO))
                 .body(getProjectDetails(project, caller.orElse(null), includeAllAvailableRepos));
     }
 
@@ -182,7 +182,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 .orElseThrow(() -> notFound(format("Project %s not found", slug)));
 
         return ok()
-                .cacheControl(cache.whenAnonymous(caller, M))
+                .cacheControl(cache.whenAnonymous(caller, M, ZERO))
                 .body(getProjectDetails(project, caller.orElse(null), includeAllAvailableRepos));
     }
 
@@ -462,10 +462,10 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
         return response.getTotalPageNumber() > 1 ?
                 status(PARTIAL_CONTENT)
-                        .cacheControl(cache.whenAnonymous(authenticatedUser, S))
+                        .cacheControl(cache.whenAnonymous(authenticatedUser, S, S))
                         .body(response) :
                 ok()
-                        .cacheControl(cache.whenAnonymous(authenticatedUser, S))
+                        .cacheControl(cache.whenAnonymous(authenticatedUser, S, S))
                         .body(response);
     }
 

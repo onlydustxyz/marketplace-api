@@ -8,7 +8,6 @@ import org.springframework.http.CacheControl;
 
 import java.time.Duration;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import static java.lang.Math.min;
 
@@ -16,60 +15,34 @@ import static java.lang.Math.min;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Cache {
-    private long timeDivisor = 1L;
-    private boolean noCache = false;
-    private long defaultStaleWhileRevalidateSeconds = 10L;
-
+    public static final Duration ZERO = Duration.ZERO;
     public static final Duration XS = Duration.ofSeconds(1);
     public static final Duration S = Duration.ofSeconds(30);
     public static final Duration M = Duration.ofMinutes(5);
     public static final Duration L = Duration.ofMinutes(20);
     public static final Duration XL = Duration.ofHours(1);
+    private long timeDivisor = 1L;
+    private boolean noCache = false;
+    private long defaultStaleWhileRevalidateSeconds = 10L;
 
     /**
      * Add 'max-age' and 'stale-while-revalidate' headers when the user is anonymous, otherwise add 'max-age' and 'private' headers.
      * The 'private' header indicates that all or part of the response message is intended for a single user
      * and MUST NOT be cached by a shared cache.
      *
-     * @param user   authenticated user (empty if anonymous)
-     * @param maxAge max-age value
-     * @param unit   time unit
+     * @param user            authenticated user (empty if anonymous)
+     * @param publicDuration  max-age duration if the user is not authenticated (CDN cache)
+     * @param privateDuration max-age duration if the user is authenticated (browser cache)
      * @return CacheControl
      */
-    public CacheControl whenAnonymous(Optional<AuthenticatedUser> user, long maxAge, TimeUnit unit) {
+    public CacheControl whenAnonymous(Optional<AuthenticatedUser> user, Duration publicDuration, Duration privateDuration) {
         if (user.isEmpty()) {
-            return forEverybody(maxAge, unit);
+            return forEverybody(publicDuration);
         }
-        return sanitize(maxAge(maxAge, unit).cachePrivate());
-    }
-
-    /**
-     * Add 'max-age' and 'stale-while-revalidate' headers when the user is anonymous, otherwise add 'max-age' and 'private' headers.
-     * The 'private' header indicates that all or part of the response message is intended for a single user
-     * and MUST NOT be cached by a shared cache.
-     *
-     * @param user     authenticated user (empty if anonymous)
-     * @param duration max-age duration
-     * @return CacheControl
-     */
-    public CacheControl whenAnonymous(Optional<AuthenticatedUser> user, Duration duration) {
-        if (user.isEmpty()) {
-            return forEverybody(duration);
+        if (privateDuration.isZero()) {
+            return CacheControl.noStore();
         }
-        return sanitize(maxAge(duration).cachePrivate());
-    }
-
-    /**
-     * Add 'max-age' and 'stale-while-revalidate' headers.
-     *
-     * @param maxAge max-age value
-     * @param unit   time unit
-     * @return CacheControl
-     */
-    public CacheControl forEverybody(long maxAge, TimeUnit unit) {
-        return sanitize(maxAge(maxAge, unit)
-                .cachePublic()
-                .staleWhileRevalidate(Duration.ofSeconds(min(defaultStaleWhileRevalidateSeconds, unit.toSeconds(maxAge)))));
+        return sanitize(maxAge(privateDuration).cachePrivate());
     }
 
     /**
@@ -79,13 +52,12 @@ public class Cache {
      * @return CacheControl
      */
     public CacheControl forEverybody(Duration duration) {
+        if (duration.isZero()) {
+            return CacheControl.noStore();
+        }
         return sanitize(maxAge(duration)
                 .cachePublic()
                 .staleWhileRevalidate(Duration.ofSeconds(min(defaultStaleWhileRevalidateSeconds, duration.getSeconds()))));
-    }
-
-    private CacheControl maxAge(long maxAge, TimeUnit unit) {
-        return maxAge(Duration.ofSeconds(unit.toSeconds(maxAge)));
     }
 
     private CacheControl maxAge(Duration duration) {
