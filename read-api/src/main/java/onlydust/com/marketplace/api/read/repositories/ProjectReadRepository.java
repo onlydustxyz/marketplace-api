@@ -1,22 +1,19 @@
 package onlydust.com.marketplace.api.read.repositories;
 
-import jakarta.persistence.QueryHint;
+import onlydust.com.marketplace.api.read.cache.QueryCacheXS;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.Repository;
 
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.hibernate.annotations.QueryHints.CACHEABLE;
-
 public interface ProjectReadRepository extends Repository<ProjectReadEntity, UUID> {
     Optional<ProjectReadEntity> findById(UUID id);
 
-    @QueryHints(@QueryHint(name = CACHEABLE, value = "true"))
+    @QueryCacheXS
     Optional<ProjectReadEntity> findBySlug(String slug);
 
     @Query("""
