@@ -1677,11 +1677,27 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.totalPageNumber").isEqualTo(0);
 
+
+        // Given
+        final var label = "Awesome ODHack 42";
+        final var hackathon = Hackathon.builder()
+                .id(Hackathon.Id.of("e06aeec6-cec6-40e1-86cb-e741e0dacf25"))
+                .title("Hackathon 1")
+                .startDate(ZonedDateTime.now().minusDays(1))
+                .endDate(ZonedDateTime.now().plusDays(1))
+                .status(Hackathon.Status.PUBLISHED)
+                .build();
+        hackathon.githubLabels().add(label);
+        hackathon.projectIds().add(UUID.fromString("00490be6-2c03-4720-993b-aea3e07edd81"));
+        hackathonStoragePort.save(hackathon);
+        final var hackathonIssueId = githubHelper.createIssue(480776993L, ZonedDateTime.now().minusDays(3), null, "OPEN", antho);
+        githubHelper.addLabelToIssue(hackathonIssueId, label, ZonedDateTime.now().minusSeconds(10));
+
         // When
         client.get()
                 .uri(getApiURI(PROJECT_GOOD_FIRST_ISSUES.formatted("00490be6-2c03-4720-993b-aea3e07edd81"), Map.of(
                         "pageIndex", "0",
-                        "pageSize", "5",
+                        "pageSize", "10",
                         "direction", "DESC"
                 )))
                 // Then
@@ -1689,13 +1705,39 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.issues[0].id").isEqualTo(hackathonIssueId)
                 .json("""
                         {
                           "totalPageNumber": 1,
-                          "totalItemNumber": 4,
+                          "totalItemNumber": 5,
                           "hasMore": false,
                           "nextPageIndex": 0,
                           "issues": [
+                            {
+                              "status": "OPEN",
+                              "repo": {
+                                "id": 480776993,
+                                "owner": "onlydustxyz",
+                                "name": "starklings",
+                                "description": "An interactive tutorial to get you up and running with Starknet",
+                                "htmlUrl": "https://github.com/onlydustxyz/starklings"
+                              },
+                              "author": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                "isRegistered": true,
+                                "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4"
+                              },
+                              "closedAt": null,
+                              "labels": [
+                                {
+                                  "name": "Awesome ODHack 42"
+                                }
+                              ],
+                              "applicants": [],
+                              "assignees": []
+                            },
                             {
                               "id": 1270688337,
                               "number": 196,

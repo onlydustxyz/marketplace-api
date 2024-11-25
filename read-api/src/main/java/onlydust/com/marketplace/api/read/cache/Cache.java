@@ -15,7 +15,7 @@ import static java.lang.Math.min;
 public class Cache {
     public static final Duration ZERO = Duration.ZERO;
     public static final Duration XS = Duration.ofSeconds(1);
-    public static final Duration S = Duration.ofSeconds(30);
+    public static final Duration S = Duration.ofSeconds(10);
     public static final Duration M = Duration.ofMinutes(5);
     public static final Duration L = Duration.ofMinutes(20);
     public static final Duration XL = Duration.ofHours(1);
