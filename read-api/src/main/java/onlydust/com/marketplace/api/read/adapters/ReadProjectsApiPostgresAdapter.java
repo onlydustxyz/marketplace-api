@@ -110,6 +110,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                            final List<String> languageSlugs,
                                                            final List<String> categorySlugs,
                                                            final Boolean hasGoodFirstIssues,
+                                                           final Boolean hasGfiOrLiveHackathonIssues,
                                                            final ProjectListSort sort
     ) {
         final var user = authenticatedAppUserService.tryGetAuthenticatedUser();
@@ -128,6 +129,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 isNull(ecosystemSlugs) ? null : ecosystemSlugs.toArray(String[]::new),
                 isNull(tags) ? null : tags.stream().map(ProjectTag::name).toArray(String[]::new),
                 hasGoodFirstIssues,
+                hasGfiOrLiveHackathonIssues,
                 PageRequest.of(pageIndex, pageSize, isNull(sort) ? JpaSort.unsafe(ASC, "project_name") :
                         switch (sort) {
                             case RANK -> JpaSort.unsafe(DESC, "coalesce(is_invited_as_project_lead.value, false)")

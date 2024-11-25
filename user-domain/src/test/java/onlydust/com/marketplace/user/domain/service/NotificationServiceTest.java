@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.user.domain.service;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
@@ -31,6 +28,7 @@ class NotificationServiceTest {
     NotificationService notificationService = new NotificationService(notificationSettingsStoragePort, notificationStoragePort, userStoragePort,
             new AsyncNotificationEmailProcessor(notificationEmailSender, notificationStoragePort));
 
+    @SneakyThrows
     @Test
     void push() {
         // Given
@@ -44,6 +42,7 @@ class NotificationServiceTest {
         final var notification = notificationService.push(recipientId, new TestNotification(1, NotificationCategory.CONTRIBUTOR_REWARD));
 
         // Then
+        Thread.sleep(1000); // Wait for async processing
         verify(notificationStoragePort).save(eq(notification));
         verify(notificationEmailSender).send(any(SendableNotification.class));
         verify(notificationStoragePort).markAsSent(NotificationChannel.EMAIL, List.of(notification.id()));

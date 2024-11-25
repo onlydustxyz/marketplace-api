@@ -25,6 +25,6 @@ public class BiProjectContributionsDataRepository extends PseudoProjectionReposi
 
     @Trace(operationName = "pseudo_projection.refresh", resourceName = "refresh:bi.project_contributions_data:repo_id")
     public int refreshByRepo(final Long repoId) {
-        return refreshUnsafe("%d = any(repo_ids)".formatted(repoId));
+        return refreshUnsafe("project_id = (select pgr.project_id from project_github_repos pgr where pgr.github_repo_id = %d limit 1)".formatted(repoId));
     }
 }
