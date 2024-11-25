@@ -60,6 +60,9 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
               and (cast(:hasGoodFirstIssues as boolean) is null or
                    cast(:hasGoodFirstIssues as boolean) is true and pcd.good_first_issue_count > 0 or
                    cast(:hasGoodFirstIssues as boolean) is false and pcd.good_first_issue_count = 0)
+              and (cast(:hasGfiOrLiveHackathonIssues as boolean) is null or
+                   cast(:hasGfiOrLiveHackathonIssues as boolean) is true and (pcd.good_first_issue_count > 0 or pcd.live_hackathon_issue_count > 0) or
+                   cast(:hasGfiOrLiveHackathonIssues as boolean) is false and (pcd.good_first_issue_count = 0 and pcd.live_hackathon_issue_count = 0))
               and (cast(:search as text) is null or p.search ilike '%' || cast(:search as text) || '%')
             """, nativeQuery = true)
     Page<ProjectPageItemQueryEntity> findAll(UUID userId,
@@ -75,6 +78,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                              String[] ecosystemSlugs,
                                              String[] tags,
                                              Boolean hasGoodFirstIssues,
+                                             Boolean hasGfiOrLiveHackathonIssues,
                                              Pageable pageable);
 
 }

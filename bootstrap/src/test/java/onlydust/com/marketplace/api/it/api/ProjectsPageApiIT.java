@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.it.api;
 import onlydust.com.marketplace.api.contract.model.ProjectPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectPageResponse;
 import onlydust.com.marketplace.api.helper.DatabaseHelper;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategoryEntity;
@@ -16,14 +17,18 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectViewRepos
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiProjectGlobalDataRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.Project;
+import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -4154,130 +4159,57 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 0,
-                          "totalItemNumber": 0,
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 4,
                           "hasMore": false,
-                          "nextPageIndex": 0,
-                          "projects": [],
-                          "languages": [
-                            {
-                              "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
-                              "slug": "cairo",
-                              "name": "Cairo",
-                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
-                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
-                            },
-                            {
-                              "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
-                              "slug": "javascript",
-                              "name": "Javascript",
-                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
-                            },
-                            {
-                              "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
-                              "slug": "python",
-                              "name": "Python",
-                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
-                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
-                            },
-                            {
-                              "id": "e0321e59-8633-46ee-bfbc-b1d84d845f83",
-                              "slug": "ruby",
-                              "name": "Ruby",
-                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-ruby.png",
-                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-ruby.png"
-                            },
-                            {
-                              "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
-                              "slug": "rust",
-                              "name": "Rust",
-                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
-                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
-                            },
-                            {
-                              "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
-                              "slug": "solidity",
-                              "name": "Solidity",
-                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
-                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
-                            },
-                            {
-                              "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
-                              "slug": "typescript",
-                              "name": "Typescript",
-                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
-                            }
-                          ],
-                          "ecosystems": [
-                            {
-                              "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
-                              "name": "Aptos",
-                              "url": "https://aptosfoundation.org/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png",
-                              "bannerUrl": null,
-                              "slug": "aptos",
-                              "hidden": null
-                            },
-                            {
-                              "id": "397df411-045d-4d9f-8d65-8284c88f9208",
-                              "name": "Avail",
-                              "url": "https://www.availproject.org/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png",
-                              "bannerUrl": null,
-                              "slug": "avail",
-                              "hidden": null
-                            },
-                            {
-                              "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
-                              "name": "Aztec",
-                              "url": "https://aztec.network/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg",
-                              "bannerUrl": null,
-                              "slug": "aztec",
-                              "hidden": null
-                            },
-                            {
-                              "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
-                              "name": "Ethereum",
-                              "url": "https://ethereum.foundation/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png",
-                              "bannerUrl": null,
-                              "slug": "ethereum",
-                              "hidden": null
-                            },
-                            {
-                              "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
-                              "name": "Starknet",
-                              "url": "https://www.starknet.io/en",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
-                              "bannerUrl": null,
-                              "slug": "starknet",
-                              "hidden": null
-                            },
-                            {
-                              "id": "b599313c-a074-440f-af04-a466529ab2e7",
-                              "name": "Zama",
-                              "url": "https://www.zama.ai/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png",
-                              "bannerUrl": null,
-                              "slug": "zama",
-                              "hidden": null
-                            }
-                          ],
-                          "categories": [
-                            {
-                              "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
-                              "slug": "ai",
-                              "name": "AI",
-                              "description": "AI is cool",
-                              "iconSlug": "brain"
-                            }
-                          ]
+                          "nextPageIndex": 0
                         }
                         """);
     }
+
+    @Autowired
+    HackathonStoragePort hackathonStoragePort;
+    @Autowired
+    PostgresBiProjectorAdapter postgresBiProjectorAdapter;
+
+    @Test
+    @Order(16)
+    void should_get_projects_with_hasGfiOrLiveHackathonIssues() {
+        // Given
+        final var antho = userAuthHelper.authenticateAntho();
+        final var label = "Awesome ODHack 42";
+        final var hackathon = Hackathon.builder()
+                .id(Hackathon.Id.random())
+                .title("Hackathon 1")
+                .startDate(ZonedDateTime.now().minusDays(1))
+                .endDate(ZonedDateTime.now().plusDays(1))
+                .status(Hackathon.Status.PUBLISHED)
+                .build();
+        hackathon.githubLabels().add(label);
+        hackathon.projectIds().add(UUID.fromString("a0c91aee-9770-4000-a893-953ddcbd62a7"));
+        hackathonStoragePort.save(hackathon);
+        final var hackathonIssueId = githubHelper.createIssue(99600159L, ZonedDateTime.now().minusDays(3), null, "OPEN", antho);
+        githubHelper.addLabelToIssue(hackathonIssueId, label, ZonedDateTime.now().minusSeconds(10));
+        postgresBiProjectorAdapter.onContributionsChanged(99600159L, ContributionUUID.of(hackathonIssueId));
+
+        // When
+        client.get()
+                .uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "5", "hasGfiOrLiveHackathonIssues", "true")))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 5,
+                          "hasMore": false,
+                          "nextPageIndex": 0
+                        }
+                        """);
+    }
+
 
     private static final String GET_PROJECTS_AFTER_TAGS_UPDATE_JSON_RESPONSE = """
             {

@@ -2011,6 +2011,11 @@ paths:
           schema:
             type: boolean
         - in: query
+          name: hasGfiOrLiveHackathonIssues
+          required: false
+          schema:
+            type: boolean
+        - in: query
           name: sort
           description: Sort order
           schema:
