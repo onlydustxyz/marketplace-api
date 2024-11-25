@@ -24,4 +24,4 @@ FROM projects p
 GROUP BY p.id
 $$, 'project_id');
 
-create unique index on bi.p_project_contributions_data (project_id, contributor_count, good_first_issue_count);
+create unique index on bi.p_project_contributions_data (project_id, contributor_count, good_first_issue_count, live_hackathon_issue_count);
