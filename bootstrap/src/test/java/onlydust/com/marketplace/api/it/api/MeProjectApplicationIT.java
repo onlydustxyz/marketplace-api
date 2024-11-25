@@ -28,8 +28,10 @@ import org.springframework.http.MediaType;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static onlydust.com.marketplace.api.helper.ConcurrentTesting.runConcurrently;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -200,6 +202,51 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .isBadRequest();
+    }
+
+    @Test
+    void should_not_be_able_to_apply_twice_concurrently() throws InterruptedException {
+        // Given
+        final var user = userAuthHelper.authenticateOlivier();
+        final Long issueId = 1974127467L;
+        final var githubComment = faker.lorem().paragraph();
+        final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
+
+        final var request = new ProjectApplicationCreateRequest()
+                .projectId(projectId)
+                .issueId(issueId)
+                .githubComment(githubComment);
+
+        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/7/comments"))
+                .withRequestBody(equalToJson("""
+                        {
+                          "body": "%s"
+                        }
+                        """.formatted(githubComment))
+                )
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withBody("""
+                                {
+                                    "id": 123456789
+                                }
+                                """)));
+
+        // When
+        final var statuses = new ConcurrentHashMap<Integer, Integer>();
+        runConcurrently(20, threadId -> {
+            client.post()
+                    .uri(getApiURI(ME_APPLICATIONS))
+                    .header("Authorization", BEARER_PREFIX + user.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(request)
+                    // Then
+                    .exchange()
+                    .expectStatus().value(status -> statuses.put(threadId, status));
+        });
+        assertThat(statuses).hasSize(20);
+        assertThat(statuses.values()).containsOnlyOnce(200);
+        assertThat(statuses.values().stream().filter(status -> status == 400).count()).isEqualTo(19);
     }
 
     @Test
