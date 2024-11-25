@@ -2477,7 +2477,6 @@ paths:
 
   /api/v1/projects/{projectId}/good-first-issues:
     get:
-      deprecated: true
       security:
         - { }
       tags:

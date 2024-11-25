@@ -308,6 +308,8 @@ public class GithubHelper {
                         """,
                 issueLabelParameters
         );
+
+        postgresBiProjectorAdapter.onContributionsChanged(ContributionUUID.of(issueId));
     }
 
     public void assignIssueToContributor(Long issueId, Long contributorId) {

@@ -55,7 +55,7 @@ import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.contract.model.FinancialTransactionType.*;
-import static onlydust.com.marketplace.api.read.cache.Cache.XS;
+import static onlydust.com.marketplace.api.read.cache.Cache.S;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapRewardSettings;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
@@ -182,10 +182,11 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
     @Override
     public ResponseEntity<GithubIssuePageResponse> getProjectGoodFirstIssues(UUID projectId, Integer pageIndex, Integer pageSize) {
-        final var page = projectGithubIssueItemReadRepository.findIssuesOf(projectId, new String[]{IN_PROGRESS.name()}, false, null, true, true, false,
-                null, null, null, PageRequest.of(pageIndex, pageSize, Sort.by("i.created_at").descending()));
+        final var page = projectGithubIssueItemReadRepository.findIssuesOf(projectId, new String[]{IN_PROGRESS.name()}, false, null, true, null,
+                null, null, true, null, null, PageRequest.of(pageIndex, pageSize, Sort.by("i.created_at").descending()));
+
         return ok()
-                .cacheControl(cache.forEverybody(XS))
+                .cacheControl(cache.forEverybody(S))
                 .body(new GithubIssuePageResponse()
                         .issues(page.stream().map(ProjectGithubIssueItemReadEntity::toPageItemResponse).toList())
                         .totalPageNumber(page.getTotalPages())
@@ -226,6 +227,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 isGoodFirstIssue,
                 isIncludedInAnyHackathon,
                 hackathonId,
+                null,
                 isNull(languageIds) ? null : languageIds.stream().distinct().toArray(UUID[]::new),
                 search,
                 PageRequest.of(pageIndex, pageSize, Sort.by(direction == SortDirection.ASC ? ASC : DESC, switch (sort) {
@@ -233,7 +235,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                     case CLOSED_AT -> "i.closed_at";
                 })));
         return ok()
-                .cacheControl(cache.forEverybody(XS))
+                .cacheControl(cache.forEverybody(S))
                 .body(new GithubIssuePageResponse()
                         .issues(page.stream().map(ProjectGithubIssueItemReadEntity::toPageItemResponse).toList())
                         .totalPageNumber(page.getTotalPages())
