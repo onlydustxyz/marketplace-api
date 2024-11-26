@@ -24,6 +24,8 @@ import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.*;
+import onlydust.com.marketplace.project.domain.job.githubcommands.GithubCommandOutboxConsumer;
+import onlydust.com.marketplace.project.domain.job.githubcommands.GithubCreateCommentCommandConsumer;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
 import onlydust.com.marketplace.project.domain.observer.ApplicationObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.ContributionObserverComposite;
@@ -225,11 +227,16 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public OutboxConsumer githubCommandOutboxConsumer(final GithubApiPort githubApiPort,
-                                                      final GithubAuthenticationPort githubAuthenticationPort,
-                                                      final ProjectApplicationStoragePort projectApplicationStoragePort,
-                                                      final ApplicationObserverPort applicationObservers) {
-        return new GithubCommandOutboxConsumer(githubApiPort, githubAuthenticationPort, projectApplicationStoragePort, applicationObservers);
+    public GithubCreateCommentCommandConsumer githubCreateCommentCommandConsumer(final GithubApiPort githubApiPort,
+                                                                                 final GithubAuthenticationPort githubAuthenticationPort,
+                                                                                 final ProjectApplicationStoragePort projectApplicationStoragePort,
+                                                                                 final ApplicationObserverPort applicationObservers) {
+        return new GithubCreateCommentCommandConsumer(githubApiPort, githubAuthenticationPort, projectApplicationStoragePort, applicationObservers);
+    }
+
+    @Bean
+    public OutboxConsumer githubCommandOutboxConsumer(final GithubCreateCommentCommandConsumer githubCreateCommentCommandConsumer) {
+        return new GithubCommandOutboxConsumer(githubCreateCommentCommandConsumer);
     }
 
     @Bean

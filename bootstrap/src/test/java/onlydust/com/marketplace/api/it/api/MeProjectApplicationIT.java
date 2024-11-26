@@ -13,7 +13,6 @@ import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
 import onlydust.com.marketplace.api.read.repositories.ContributionReadRepository;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
@@ -35,7 +34,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static onlydust.com.marketplace.api.helper.ConcurrentTesting.runConcurrently;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
@@ -144,7 +142,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_reject_as_forbidden_upon_unauthorized_application() {
+    void should_cleanup_application_upon_unauthorized_github_comment() {
         // Given
         final var user = userAuthHelper.authenticateHayden();
         final Long issueId = 1974127467L;
@@ -158,7 +156,6 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
 
         final var existingApplicationCount = applicationRepository.count();
 
-        // When
         client.post()
                 .uri(getApiURI(ME_APPLICATIONS))
                 .header("Authorization", BEARER_PREFIX + user.jwt())
@@ -174,10 +171,11 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         githubWireMockServer.resetAll();
         githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/7/comments"))
                 .willReturn(unauthorized()));
-        assertThatThrownBy(() -> githubCommandOutboxJob.run())
-                .isInstanceOf(OnlyDustException.class)
-                .hasMessageContaining("Failed to process GithubCreateCommentCommand");
 
+        // When
+        githubCommandOutboxJob.run();
+
+        // Then
         assertThat(applicationRepository.count()).isEqualTo(existingApplicationCount);
     }
 

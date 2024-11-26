@@ -62,6 +62,9 @@ application:
     no-cache: ${API_CACHE_NO_CACHE}
     time-divisor: ${API_CACHE_TIME_DIVISOR}
     default-stale-while-revalidate-seconds: ${API_CACHE_DEFAULT_STALE_WHILE_REVALIDATE_SECONDS}
+  retryable:
+    github-command-consumers:
+      max-attempts: 5
 
 spring:
   autoconfigure:

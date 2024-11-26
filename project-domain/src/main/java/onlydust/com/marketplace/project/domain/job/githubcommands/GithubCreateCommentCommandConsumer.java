@@ -1,9 +1,7 @@
-package onlydust.com.marketplace.project.domain.job;
+package onlydust.com.marketplace.project.domain.job.githubcommands;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.kernel.model.Event;
-import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.event.GithubCreateCommentCommand;
 import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubApiPort;
@@ -18,24 +16,15 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 
 @Slf4j
 @AllArgsConstructor
-public class GithubCommandOutboxConsumer implements OutboxConsumer {
-
+public class GithubCreateCommentCommandConsumer {
     private final GithubApiPort githubApiPort;
     private final GithubAuthenticationPort githubAuthenticationPort;
     private final ProjectApplicationStoragePort projectApplicationStoragePort;
     private final ApplicationObserverPort applicationObserver;
 
-    @Override
+    @Retryable(maxAttemptsExpression = "${application.retryable.github-command-consumers.max-attempts}", backoff = @Backoff(delay = 500L, multiplier = 2.0))
     @Transactional
-    public void process(Event event) {
-        switch (event) {
-            case GithubCreateCommentCommand c -> processGithubCreateCommentCommand(c);
-            default -> throw internalServerError("Unexpected Github Command: " + event);
-        }
-    }
-
-    @Retryable(maxAttempts = 1, backoff = @Backoff(delay = 500L, multiplier = 2.0))
-    private void processGithubCreateCommentCommand(GithubCreateCommentCommand c) {
+    public void process(GithubCreateCommentCommand c) {
         final var application = projectApplicationStoragePort.findApplication(c.getApplicationId())
                 .orElseThrow(() -> internalServerError("Application %s not found".formatted(c.getApplicationId())));
         final var personalAccessToken = githubAuthenticationPort.getGithubPersonalToken(c.getGithubUserId());
@@ -49,9 +38,9 @@ public class GithubCommandOutboxConsumer implements OutboxConsumer {
     }
 
     @Recover
-    public void onGithubCreateCommentCommandFailure(Exception e, GithubCreateCommentCommand c) {
+    @Transactional
+    public void onFailure(Exception e, GithubCreateCommentCommand c) {
         LOGGER.error("Failed to process GithubCreateCommentCommand: %s. Deleting application...".formatted(c), e);
         projectApplicationStoragePort.deleteApplications(c.getApplicationId());
     }
-
 }
