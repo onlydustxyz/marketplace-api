@@ -57,3 +57,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000030_add_hackathon_issues_to_project_contributions_data.sql
   - include:
       file: db/changelog/changelogs/00000031_github_commands_outbox.sql
+  - include:
+      file: db/changelog/changelogs/00000032_remove_fk_applications_github_accounts.sql
