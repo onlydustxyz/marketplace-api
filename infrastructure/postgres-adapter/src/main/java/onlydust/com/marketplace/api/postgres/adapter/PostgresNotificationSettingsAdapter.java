@@ -31,7 +31,14 @@ public class PostgresNotificationSettingsAdapter implements NotificationSettings
     @Override
     @Transactional
     public void saveNotificationSettingsForProject(UserId userId, NotificationSettings.Project settings) {
-        notificationSettingsForProjectRepository.save(NotificationSettingsForProjectEntity.of(userId, settings));
+        final var entity = notificationSettingsForProjectRepository
+                .findById(new NotificationSettingsForProjectEntity.PrimaryKey(userId.value(), settings.projectId().value()))
+                .map(e -> {
+                    e.setOnGoodFirstIssueAdded(settings.onGoodFirstIssueAdded().orElse(null));
+                    return e;
+                })
+                .orElseGet(() -> NotificationSettingsForProjectEntity.of(userId, settings));
+        notificationSettingsForProjectRepository.save(entity);
     }
 
     @Override
