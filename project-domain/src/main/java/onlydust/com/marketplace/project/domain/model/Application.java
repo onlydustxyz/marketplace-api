@@ -31,10 +31,9 @@ public class Application {
     final ZonedDateTime appliedAt;
     @NonNull
     final GithubIssue.Id issueId;
-    @NonNull
-    final GithubComment.Id commentId;
     @Setter
-    @NonNull
+    GithubComment.Id commentId;
+    @Setter
     String commentBody;
     ZonedDateTime ignoredAt;
 
@@ -44,8 +43,8 @@ public class Application {
                        final @NonNull Origin origin,
                        final @NonNull ZonedDateTime appliedAt,
                        final @NonNull GithubIssue.Id issueId,
-                       final @NonNull GithubComment.Id commentId,
-                       final @NonNull String commentBody) {
+                       final GithubComment.Id commentId,
+                       final String commentBody) {
         this(id, projectId, applicantId, origin, appliedAt, issueId, commentId, commentBody, null);
     }
 
@@ -65,17 +64,15 @@ public class Application {
 
     public static Application fromMarketplace(@NonNull ProjectId projectId,
                                               @NonNull Long applicantId,
-                                              @NonNull GithubIssue.Id issueId,
-                                              @NonNull GithubComment.Id commentId,
-                                              @NonNull String commentBody) {
+                                              @NonNull GithubIssue.Id issueId) {
         return new Application(Id.random(),
                 projectId,
                 applicantId,
                 Origin.MARKETPLACE,
                 CurrentDateProvider.now().toInstant().atZone(ZoneOffset.UTC),
                 issueId,
-                commentId,
-                commentBody,
+                null,
+                null,
                 null);
     }
 

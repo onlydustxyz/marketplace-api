@@ -28,8 +28,10 @@ import org.springframework.http.MediaType;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static onlydust.com.marketplace.api.helper.ConcurrentTesting.runConcurrently;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -71,21 +73,6 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .issueId(issueId)
                 .githubComment(githubComment);
 
-        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/7/comments"))
-                .withRequestBody(equalToJson("""
-                        {
-                          "body": "%s"
-                        }
-                        """.formatted(githubComment))
-                )
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withBody("""
-                                {
-                                    "id": 123456789
-                                }
-                                """)));
-
         final var contributionBefore =
                 contributionReadRepository.findAll(new ContributionsQueryParams().ids(List.of(ContributionUUID.of(issueId).value()))).stream().findFirst().orElseThrow();
         assertThat(contributionBefore.applicants()).isNull();
@@ -103,11 +90,33 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .expectBody(ProjectApplicationCreateResponse.class)
                 .returnResult().getResponseBody().getId();
 
-        final var application = applicationRepository.findById(applicationId).orElseThrow();
+        var application = applicationRepository.findById(applicationId).orElseThrow();
         assertThat(application.projectId()).isEqualTo(projectId);
         assertThat(application.applicantId()).isEqualTo(user.user().getGithubUserId());
         assertThat(application.issueId()).isEqualTo(issueId);
         assertThat(application.origin()).isEqualTo(Application.Origin.MARKETPLACE);
+        assertThat(application.commentId()).isEqualTo(null);
+        assertThat(application.commentBody()).isEqualTo(null);
+
+        githubWireMockServer.resetAll();
+        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/7/comments"))
+                .withRequestBody(equalToJson("""
+                        {
+                          "body": "%s"
+                        }
+                        """.formatted(githubComment))
+                )
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withBody("""
+                                {
+                                    "id": 123456789
+                                }
+                                """)));
+
+        githubCommandOutboxJob.run();
+
+        application = applicationRepository.findById(applicationId).orElseThrow();
         assertThat(application.commentId()).isEqualTo(123456789L);
         assertThat(application.commentBody()).isEqualTo(githubComment);
 
@@ -133,9 +142,9 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_reject_as_forbidden_upon_unauthorized_application() {
+    void should_cleanup_application_upon_unauthorized_github_comment() {
         // Given
-        final var user = userAuthHelper.authenticateOlivier();
+        final var user = userAuthHelper.authenticateHayden();
         final Long issueId = 1974127467L;
         final var githubComment = faker.lorem().paragraph();
         final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
@@ -145,12 +154,8 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .issueId(issueId)
                 .githubComment(githubComment);
 
-        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/7/comments"))
-                .willReturn(unauthorized()));
-
         final var existingApplicationCount = applicationRepository.count();
 
-        // When
         client.post()
                 .uri(getApiURI(ME_APPLICATIONS))
                 .header("Authorization", BEARER_PREFIX + user.jwt())
@@ -159,8 +164,18 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .isForbidden();
+                .isOk();
 
+        assertThat(applicationRepository.count()).isEqualTo(existingApplicationCount + 1);
+
+        githubWireMockServer.resetAll();
+        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/7/comments"))
+                .willReturn(unauthorized()));
+
+        // When
+        githubCommandOutboxJob.run();
+
+        // Then
         assertThat(applicationRepository.count()).isEqualTo(existingApplicationCount);
     }
 
@@ -200,6 +215,36 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .isBadRequest();
+    }
+
+    @Test
+    void should_not_be_able_to_apply_twice_concurrently() throws InterruptedException {
+        // Given
+        final var user = userAuthHelper.authenticateOlivier();
+        final Long issueId = 1974127467L;
+        final var githubComment = faker.lorem().paragraph();
+        final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
+
+        final var request = new ProjectApplicationCreateRequest()
+                .projectId(projectId)
+                .issueId(issueId)
+                .githubComment(githubComment);
+
+        // When
+        final var statuses = new ConcurrentHashMap<Integer, Integer>();
+        runConcurrently(20, threadId -> {
+            client.post()
+                    .uri(getApiURI(ME_APPLICATIONS))
+                    .header("Authorization", BEARER_PREFIX + user.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(request)
+                    // Then
+                    .exchange()
+                    .expectStatus().value(status -> statuses.put(threadId, status));
+        });
+        assertThat(statuses).hasSize(20);
+        assertThat(statuses.values()).containsOnlyOnce(200);
+        assertThat(statuses.values().stream().filter(status -> status == 400).count()).isEqualTo(19);
     }
 
     @Test

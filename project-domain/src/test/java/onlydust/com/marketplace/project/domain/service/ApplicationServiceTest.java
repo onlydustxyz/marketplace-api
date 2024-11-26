@@ -32,6 +32,7 @@ public class ApplicationServiceTest {
     private final GithubUserPermissionsService githubUserPermissionsService = mock(GithubUserPermissionsService.class);
     private final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
     private final GithubApiPort githubApiPort = mock(GithubApiPort.class);
+    private final GithubCommandService githubCommandService = mock(GithubCommandService.class);
     private final GithubAuthenticationPort githubAuthenticationPort = mock(GithubAuthenticationPort.class);
     private final GithubAppService githubAppService = mock(GithubAppService.class);
 
@@ -43,6 +44,7 @@ public class ApplicationServiceTest {
             githubUserPermissionsService,
             githubStoragePort,
             githubApiPort,
+            githubCommandService,
             githubAuthenticationPort,
             githubAppService);
 
@@ -123,29 +125,19 @@ public class ApplicationServiceTest {
         // Given
         final var application = new Application(Application.Id.random(), projectId, githubUserId, Application.Origin.MARKETPLACE, ZonedDateTime.now(),
                 issue.id(), commentId, githubComment);
-        when(projectApplicationStoragePort.findApplication(githubUserId, projectId, issue.id())).thenReturn(Optional.of(application));
+        when(projectApplicationStoragePort.saveNew(application)).thenReturn(false);
 
         // When
         assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), githubComment))
                 // Then
-                .isInstanceOf(OnlyDustException.class).hasMessage("User already applied to this issue");
-    }
-
-    @Test
-    void should_reject_applications_if_project_does_not_exists() {
-        // Given
-        when(projectStoragePort.getById(projectId)).thenReturn(Optional.empty());
-
-        // When
-        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), githubComment))
-                // Then
-                .isInstanceOf(OnlyDustException.class).hasMessage("Project %s not found".formatted(projectId));
+                .isInstanceOf(OnlyDustException.class).hasMessage("User %d already applied to issue %s".formatted(githubUserId, issue.id()));
     }
 
     @Test
     void should_reject_applications_if_repo_does_not_belong_to_project() {
         // Given
         when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(Set.of(faker.number().randomNumber()));
+        when(projectApplicationStoragePort.saveNew(any())).thenReturn(true);
 
         // When
         assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), githubComment))
@@ -155,10 +147,8 @@ public class ApplicationServiceTest {
 
     @Test
     void should_apply_on_project() {
-        // Given
-        when(githubApiPort.createComment(eq(personalAccessToken), eq(issue), any())).thenReturn(commentId);
-
         // When
+        when(projectApplicationStoragePort.saveNew(any())).thenReturn(true);
         final var application = applicationService.applyOnProject(githubUserId, projectId, issue.id(), githubComment);
 
         // Then
@@ -168,12 +158,12 @@ public class ApplicationServiceTest {
         assertThat(application.appliedAt()).isEqualToIgnoringSeconds(ZonedDateTime.now());
         assertThat(application.origin()).isEqualTo(Application.Origin.MARKETPLACE);
         assertThat(application.issueId()).isEqualTo(issue.id());
-        assertThat(application.commentId()).isEqualTo(commentId);
-        assertThat(application.commentBody()).isEqualTo(githubComment);
+        assertThat(application.commentId()).isNull();
+        assertThat(application.commentBody()).isNull();
 
-        verify(projectApplicationStoragePort).save(application);
-        verify(applicationObserver).onApplicationCreated(application);
-        verify(githubApiPort).createComment(personalAccessToken, issue, githubComment);
+        verify(projectApplicationStoragePort).saveNew(application);
+        verify(applicationObserver, never()).onApplicationCreated(application);
+        verify(githubCommandService).createComment(application.id(), issue, githubUserId, githubComment);
     }
 
     @Test
@@ -196,9 +186,7 @@ public class ApplicationServiceTest {
         final var application = Application.fromMarketplace(
                 projectId,
                 faker.number().randomNumber(),
-                issue.id(),
-                GithubComment.Id.random(),
-                faker.lorem().sentence()
+                issue.id()
         );
 
         when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
@@ -217,9 +205,7 @@ public class ApplicationServiceTest {
         final var application = Application.fromMarketplace(
                 projectId,
                 githubUserId,
-                issue.id(),
-                GithubComment.Id.random(),
-                faker.lorem().sentence()
+                issue.id()
         );
 
         when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
@@ -265,9 +251,7 @@ public class ApplicationServiceTest {
         final var application = Application.fromMarketplace(
                 projectId,
                 githubUserId,
-                issue.id(),
-                GithubComment.Id.random(),
-                faker.lorem().sentence()
+                issue.id()
         );
 
         doThrow(forbidden("User is not authorized to delete this application")).when(githubApiPort).deleteComment(any(), any(), any());
@@ -290,9 +274,7 @@ public class ApplicationServiceTest {
         final var application = Application.fromMarketplace(
                 projectId,
                 faker.number().randomNumber(),
-                issue.id(),
-                GithubComment.Id.random(),
-                faker.lorem().sentence()
+                issue.id()
         );
 
         when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
@@ -317,9 +299,7 @@ public class ApplicationServiceTest {
         final Application application = Application.fromMarketplace(
                 projectId,
                 githubUserId,
-                issue.id(),
-                GithubComment.Id.random(),
-                faker.lorem().sentence()
+                issue.id()
         );
 
         final GithubAppAccessToken githubToken = new GithubAppAccessToken(faker.internet().password(), Map.of("issues", "write"));
@@ -399,9 +379,7 @@ public class ApplicationServiceTest {
             final Application refusedApplication = Application.fromMarketplace(
                     projectId,
                     githubUserId + 1,
-                    issue.id(),
-                    GithubComment.Id.random(),
-                    faker.lorem().sentence()
+                    issue.id()
             );
             when(projectApplicationStoragePort.findApplicationsOnIssueAndProject(application.issueId(), application.projectId()))
                     .thenReturn(List.of(application, refusedApplication));
@@ -419,9 +397,7 @@ public class ApplicationServiceTest {
         final Application application = Application.fromMarketplace(
                 projectId,
                 githubUserId,
-                issue.id(),
-                GithubComment.Id.random(),
-                faker.lorem().sentence()
+                issue.id()
         );
 
         @BeforeEach

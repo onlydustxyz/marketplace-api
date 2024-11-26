@@ -596,4 +596,9 @@ public class PostgresConfiguration {
                 userProjectRecommendationsRepository,
                 biApplicationDataRepository);
     }
+
+    @Bean
+    public PostgresOutboxAdapter<GithubCommandEntity> githubCommandOutbox(final GithubCommandRepository githubCommandRepository) {
+        return new PostgresOutboxAdapter<>(githubCommandRepository);
+    }
 }

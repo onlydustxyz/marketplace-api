@@ -29,6 +29,7 @@ public class JobScheduler {
     private final OutboxConsumerJob indexerOutboxJob;
     private final OutboxConsumerJob trackingOutboxJob;
     private final OutboxConsumerJob indexingEventsOutboxJob;
+    private final OutboxConsumerJob githubCommandOutboxJob;
     private final ProjectFacadePort projectFacadePort;
     private final CurrencyFacadePort currencyFacadePort;
     private final UserFacadePort userFacadePort;
@@ -60,6 +61,12 @@ public class JobScheduler {
     public void processPendingIndexingEvents() {
         LOGGER.info("Processing indexing events");
         indexingEventsOutboxJob.run();
+    }
+
+    @Scheduled(fixedDelayString = "${application.cron.github-commands-job-delay}")
+    public void processPendingGithubCommands() {
+        LOGGER.info("Processing pending Github commands");
+        githubCommandOutboxJob.run();
     }
 
     @Scheduled(fixedDelayString = "${application.cron.update-projects-ranking}")

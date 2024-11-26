@@ -24,6 +24,8 @@ import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.*;
+import onlydust.com.marketplace.project.domain.job.githubcommands.GithubCommandOutboxConsumer;
+import onlydust.com.marketplace.project.domain.job.githubcommands.GithubCreateCommentCommandConsumer;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
 import onlydust.com.marketplace.project.domain.observer.ApplicationObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.ContributionObserverComposite;
@@ -123,6 +125,11 @@ public class ProjectConfiguration {
     }
 
     @Bean
+    GithubCommandService githubCommandService(final OutboxPort githubCommandOutbox) {
+        return new GithubCommandService(githubCommandOutbox);
+    }
+
+    @Bean
     public ApplicationFacadePort applicationFacadePort(final PostgresUserAdapter postgresUserAdapter,
                                                        final PostgresProjectApplicationAdapter postgresProjectApplicationAdapter,
                                                        final ProjectStoragePort projectStoragePort,
@@ -130,6 +137,7 @@ public class ProjectConfiguration {
                                                        final GithubUserPermissionsService githubUserPermissionsService,
                                                        final GithubStoragePort githubStoragePort,
                                                        final GithubApiPort githubApiPort,
+                                                       final GithubCommandService githubCommandService,
                                                        final GithubAuthenticationPort githubAuthenticationPort,
                                                        final GithubAppService githubAppService
     ) {
@@ -141,6 +149,7 @@ public class ProjectConfiguration {
                 githubUserPermissionsService,
                 githubStoragePort,
                 githubApiPort,
+                githubCommandService,
                 githubAuthenticationPort,
                 githubAppService);
     }
@@ -205,10 +214,29 @@ public class ProjectConfiguration {
     }
 
     @Bean
+    public OutboxConsumerJob githubCommandOutboxJob(final OutboxPort githubCommandOutbox,
+                                                    final OutboxConsumer githubCommandOutboxConsumer) {
+        return new OutboxConsumerJob(githubCommandOutbox, githubCommandOutboxConsumer);
+    }
+
+    @Bean
     public OutboxConsumer trackingOutboxConsumer(final PosthogApiClientAdapter posthogApiClientAdapter,
                                                  final UserStoragePort userStoragePort,
                                                  final ProjectStoragePort projectStoragePort) {
         return new RetriedOutboxConsumer(new TrackingEventPublisherOutboxConsumer(posthogApiClientAdapter, userStoragePort, projectStoragePort));
+    }
+
+    @Bean
+    public GithubCreateCommentCommandConsumer githubCreateCommentCommandConsumer(final GithubApiPort githubApiPort,
+                                                                                 final GithubAuthenticationPort githubAuthenticationPort,
+                                                                                 final ProjectApplicationStoragePort projectApplicationStoragePort,
+                                                                                 final ApplicationObserverPort applicationObservers) {
+        return new GithubCreateCommentCommandConsumer(githubApiPort, githubAuthenticationPort, projectApplicationStoragePort, applicationObservers);
+    }
+
+    @Bean
+    public OutboxConsumer githubCommandOutboxConsumer(final GithubCreateCommentCommandConsumer githubCreateCommentCommandConsumer) {
+        return new GithubCommandOutboxConsumer(githubCreateCommentCommandConsumer);
     }
 
     @Bean

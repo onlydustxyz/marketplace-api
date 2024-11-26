@@ -125,6 +125,9 @@ application:
     no-cache: false
     time-divisor: 1
     default-stale-while-revalidate-seconds: 10
+  retryable:
+    github-command-consumers:
+      max-attempts: 1
 
 spring:
   main:

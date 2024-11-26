@@ -25,6 +25,7 @@ public class ApplicationService implements ApplicationFacadePort {
     private final GithubUserPermissionsService githubUserPermissionsService;
     private final GithubStoragePort githubStoragePort;
     private final GithubApiPort githubApiPort;
+    private final GithubCommandService githubCommandService;
     private final GithubAuthenticationPort githubAuthenticationPort;
     private final GithubAppService githubAppService;
 
@@ -98,24 +99,14 @@ public class ApplicationService implements ApplicationFacadePort {
         if (issue.isAssigned())
             throw badRequest("Issue %s is already assigned".formatted(issueId));
 
-        if (projectApplicationStoragePort.findApplication(githubUserId, projectId, issueId).isPresent())
-            throw badRequest("User already applied to this issue");
-
-        final var project = projectStoragePort.getById(projectId)
-                .orElseThrow(() -> notFound("Project %s not found".formatted(projectId)));
-
         if (!projectStoragePort.getProjectRepoIds(projectId).contains(issue.repoId()))
             throw badRequest("Issue %s does not belong to project %s".formatted(issueId, projectId));
 
-        final var personalAccessToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
+        final var application = Application.fromMarketplace(projectId, githubUserId, issueId);
+        if (!projectApplicationStoragePort.saveNew(application))
+            throw badRequest("User %d already applied to issue %s".formatted(githubUserId, issueId));
 
-        final var commentId = githubApiPort.createComment(personalAccessToken, issue, githubComment);
-
-        final var application = Application.fromMarketplace(projectId, githubUserId, issueId, commentId, githubComment);
-
-        projectApplicationStoragePort.save(application);
-        applicationObserver.onApplicationCreated(application);
-
+        githubCommandService.createComment(application.id(), issue, githubUserId, githubComment);
         return application;
     }
 
