@@ -123,6 +123,11 @@ public class ProjectConfiguration {
     }
 
     @Bean
+    GithubCommandService githubCommandService(final OutboxPort githubCommandOutbox) {
+        return new GithubCommandService(githubCommandOutbox);
+    }
+
+    @Bean
     public ApplicationFacadePort applicationFacadePort(final PostgresUserAdapter postgresUserAdapter,
                                                        final PostgresProjectApplicationAdapter postgresProjectApplicationAdapter,
                                                        final ProjectStoragePort projectStoragePort,
@@ -130,6 +135,7 @@ public class ProjectConfiguration {
                                                        final GithubUserPermissionsService githubUserPermissionsService,
                                                        final GithubStoragePort githubStoragePort,
                                                        final GithubApiPort githubApiPort,
+                                                       final GithubCommandService githubCommandService,
                                                        final GithubAuthenticationPort githubAuthenticationPort,
                                                        final GithubAppService githubAppService
     ) {
@@ -141,6 +147,7 @@ public class ProjectConfiguration {
                 githubUserPermissionsService,
                 githubStoragePort,
                 githubApiPort,
+                githubCommandService,
                 githubAuthenticationPort,
                 githubAppService);
     }
@@ -205,10 +212,24 @@ public class ProjectConfiguration {
     }
 
     @Bean
+    public OutboxConsumerJob githubCommandOutboxJob(final OutboxPort githubCommandOutbox,
+                                                    final OutboxConsumer githubCommandOutboxConsumer) {
+        return new OutboxConsumerJob(githubCommandOutbox, githubCommandOutboxConsumer);
+    }
+
+    @Bean
     public OutboxConsumer trackingOutboxConsumer(final PosthogApiClientAdapter posthogApiClientAdapter,
                                                  final UserStoragePort userStoragePort,
                                                  final ProjectStoragePort projectStoragePort) {
         return new RetriedOutboxConsumer(new TrackingEventPublisherOutboxConsumer(posthogApiClientAdapter, userStoragePort, projectStoragePort));
+    }
+
+    @Bean
+    public OutboxConsumer githubCommandOutboxConsumer(final GithubApiPort githubApiPort,
+                                                      final GithubAuthenticationPort githubAuthenticationPort,
+                                                      final ProjectApplicationStoragePort projectApplicationStoragePort,
+                                                      final ApplicationObserverPort applicationObservers) {
+        return new GithubCommandOutboxConsumer(githubApiPort, githubAuthenticationPort, projectApplicationStoragePort, applicationObservers);
     }
 
     @Bean

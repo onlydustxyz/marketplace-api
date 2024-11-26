@@ -22,6 +22,13 @@ public class PostgresProjectApplicationAdapter implements ProjectApplicationStor
     private final ApplicationRepository applicationRepository;
 
     @Override
+    public boolean saveNew(@NonNull Application application) {
+        applicationRepository.save(ApplicationEntity.fromDomain(application));
+        //TODO: return false if the application already exists
+        return true;
+    }
+
+    @Override
     @Transactional
     public void save(@NonNull Application... applications) {
         applicationRepository.saveAll(Arrays.stream(applications).map(ApplicationEntity::fromDomain).toList());

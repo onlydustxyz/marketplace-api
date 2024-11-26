@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
 import onlydust.com.marketplace.api.read.repositories.ContributionReadRepository;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
@@ -34,6 +35,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static onlydust.com.marketplace.api.helper.ConcurrentTesting.runConcurrently;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
@@ -73,21 +75,6 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .issueId(issueId)
                 .githubComment(githubComment);
 
-        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/7/comments"))
-                .withRequestBody(equalToJson("""
-                        {
-                          "body": "%s"
-                        }
-                        """.formatted(githubComment))
-                )
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withBody("""
-                                {
-                                    "id": 123456789
-                                }
-                                """)));
-
         final var contributionBefore =
                 contributionReadRepository.findAll(new ContributionsQueryParams().ids(List.of(ContributionUUID.of(issueId).value()))).stream().findFirst().orElseThrow();
         assertThat(contributionBefore.applicants()).isNull();
@@ -105,11 +92,33 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .expectBody(ProjectApplicationCreateResponse.class)
                 .returnResult().getResponseBody().getId();
 
-        final var application = applicationRepository.findById(applicationId).orElseThrow();
+        var application = applicationRepository.findById(applicationId).orElseThrow();
         assertThat(application.projectId()).isEqualTo(projectId);
         assertThat(application.applicantId()).isEqualTo(user.user().getGithubUserId());
         assertThat(application.issueId()).isEqualTo(issueId);
         assertThat(application.origin()).isEqualTo(Application.Origin.MARKETPLACE);
+        assertThat(application.commentId()).isEqualTo(null);
+        assertThat(application.commentBody()).isEqualTo(null);
+
+        githubWireMockServer.resetAll();
+        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/7/comments"))
+                .withRequestBody(equalToJson("""
+                        {
+                          "body": "%s"
+                        }
+                        """.formatted(githubComment))
+                )
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withBody("""
+                                {
+                                    "id": 123456789
+                                }
+                                """)));
+
+        githubCommandOutboxJob.run();
+
+        application = applicationRepository.findById(applicationId).orElseThrow();
         assertThat(application.commentId()).isEqualTo(123456789L);
         assertThat(application.commentBody()).isEqualTo(githubComment);
 
@@ -137,7 +146,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     @Test
     void should_reject_as_forbidden_upon_unauthorized_application() {
         // Given
-        final var user = userAuthHelper.authenticateOlivier();
+        final var user = userAuthHelper.authenticateHayden();
         final Long issueId = 1974127467L;
         final var githubComment = faker.lorem().paragraph();
         final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
@@ -146,9 +155,6 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .projectId(projectId)
                 .issueId(issueId)
                 .githubComment(githubComment);
-
-        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/7/comments"))
-                .willReturn(unauthorized()));
 
         final var existingApplicationCount = applicationRepository.count();
 
@@ -161,7 +167,16 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .isForbidden();
+                .isOk();
+
+        assertThat(applicationRepository.count()).isEqualTo(existingApplicationCount + 1);
+
+        githubWireMockServer.resetAll();
+        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/7/comments"))
+                .willReturn(unauthorized()));
+        assertThatThrownBy(() -> githubCommandOutboxJob.run())
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessageContaining("Failed to process GithubCreateCommentCommand");
 
         assertThat(applicationRepository.count()).isEqualTo(existingApplicationCount);
     }
@@ -216,21 +231,6 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .projectId(projectId)
                 .issueId(issueId)
                 .githubComment(githubComment);
-
-        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/7/comments"))
-                .withRequestBody(equalToJson("""
-                        {
-                          "body": "%s"
-                        }
-                        """.formatted(githubComment))
-                )
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withBody("""
-                                {
-                                    "id": 123456789
-                                }
-                                """)));
 
         // When
         final var statuses = new ConcurrentHashMap<Integer, Integer>();

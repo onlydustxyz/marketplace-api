@@ -11,6 +11,8 @@ import java.util.Optional;
 
 public interface ProjectApplicationStoragePort {
 
+    boolean saveNew(@NonNull Application application);
+
     void save(@NonNull Application... applications);
 
     Optional<Application> findApplication(Application.Id id);

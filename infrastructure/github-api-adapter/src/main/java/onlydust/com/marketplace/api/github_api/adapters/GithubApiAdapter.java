@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
 import onlydust.com.marketplace.api.github_api.dto.*;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
-import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.port.output.GithubApiPort;
 
 import java.util.List;
@@ -19,9 +18,9 @@ public class GithubApiAdapter implements GithubApiPort {
     private final GithubHttpClient client;
 
     @Override
-    public GithubComment.Id createComment(@NonNull String personalAccessToken, @NonNull GithubIssue issue, @NonNull String body) {
+    public GithubComment.Id createComment(@NonNull String personalAccessToken, @NonNull Long repoId, @NonNull Long githubIssueNumber, @NonNull String body) {
         final var request = new CommentRequest(body);
-        return client.post("/repositories/%d/issues/%d/comments".formatted(issue.repoId(), issue.number()), request, personalAccessToken, CommentResponse.class)
+        return client.post("/repositories/%d/issues/%d/comments".formatted(repoId, githubIssueNumber), request, personalAccessToken, CommentResponse.class)
                 .map(CommentResponse::id)
                 .map(GithubComment.Id::of)
                 .orElseThrow(() -> internalServerError("Failed to create comment"));

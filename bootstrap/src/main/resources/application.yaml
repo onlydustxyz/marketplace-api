@@ -46,6 +46,7 @@ application:
     refresh-project-recommendations-cron-expression: "0 0 0 * * *" # every day at 1:00am
     notify-good-first-issues-created-job-delay: 300000 # 5 minutes
     refresh-project-stats: 300000 # 5 minutes
+    github-commands-job-delay: 5000 # 5 seconds
   sumsub:
     webhook:
       secret: ${SUMSUB_WEBHOOK_SECRET}

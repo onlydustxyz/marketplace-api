@@ -306,6 +306,8 @@ public class AbstractMarketplaceApiIT {
     OutboxConsumerJob trackingOutboxJob;
     @Autowired
     OutboxConsumerJob billingProfileVerificationOutboxJob;
+    @Autowired
+    OutboxConsumerJob githubCommandOutboxJob;
 
 
     @Autowired

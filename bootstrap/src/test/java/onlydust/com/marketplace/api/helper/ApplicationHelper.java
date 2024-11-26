@@ -24,10 +24,10 @@ public class ApplicationHelper {
         final var application = Application.fromMarketplace(
                 projectId,
                 applicantId.value(),
-                issueId,
-                GithubComment.Id.random(),
-                faker.lorem().sentence()
+                issueId
         );
+        application.commentId(GithubComment.Id.random());
+        application.commentBody(faker.lorem().sentence());
         projectApplicationStoragePort.save(application);
         postgresBiProjectorAdapter.onApplicationCreated(application);
         return application;

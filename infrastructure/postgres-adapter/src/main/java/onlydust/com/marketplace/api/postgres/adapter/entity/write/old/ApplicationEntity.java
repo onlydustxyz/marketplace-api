@@ -11,6 +11,7 @@ import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -39,16 +40,14 @@ public class ApplicationEntity {
     @NonNull
     Long issueId;
 
-    @NonNull
     Long commentId;
-    @NonNull
     String commentBody;
 
     ZonedDateTime ignoredAt;
 
     public ApplicationEntity(@NonNull UUID id, @NonNull ZonedDateTime receivedAt, @NonNull UUID projectId, @NonNull Long applicantId,
-                             @NonNull Application.Origin origin, @NonNull Long issueId, @NonNull Long commentId,
-                             @NonNull String commentBody) {
+                             @NonNull Application.Origin origin, @NonNull Long issueId, Long commentId,
+                             String commentBody) {
         this.id = id;
         this.receivedAt = receivedAt;
         this.projectId = projectId;
@@ -67,7 +66,7 @@ public class ApplicationEntity {
                 .applicantId(application.applicantId())
                 .origin(application.origin())
                 .issueId(application.issueId().value())
-                .commentId(application.commentId().value())
+                .commentId(Optional.ofNullable(application.commentId()).map(GithubComment.Id::value).orElse(null))
                 .commentBody(application.commentBody())
                 .ignoredAt(application.ignoredAt())
                 .build();
