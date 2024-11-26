@@ -125,29 +125,19 @@ public class ApplicationServiceTest {
         // Given
         final var application = new Application(Application.Id.random(), projectId, githubUserId, Application.Origin.MARKETPLACE, ZonedDateTime.now(),
                 issue.id(), commentId, githubComment);
-        when(projectApplicationStoragePort.findApplication(githubUserId, projectId, issue.id())).thenReturn(Optional.of(application));
+        when(projectApplicationStoragePort.saveNew(application)).thenReturn(false);
 
         // When
         assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), githubComment))
                 // Then
-                .isInstanceOf(OnlyDustException.class).hasMessage("User already applied to this issue");
-    }
-
-    @Test
-    void should_reject_applications_if_project_does_not_exists() {
-        // Given
-        when(projectStoragePort.getById(projectId)).thenReturn(Optional.empty());
-
-        // When
-        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), githubComment))
-                // Then
-                .isInstanceOf(OnlyDustException.class).hasMessage("Project %s not found".formatted(projectId));
+                .isInstanceOf(OnlyDustException.class).hasMessage("User %d already applied to issue %s".formatted(githubUserId, issue.id()));
     }
 
     @Test
     void should_reject_applications_if_repo_does_not_belong_to_project() {
         // Given
         when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(Set.of(faker.number().randomNumber()));
+        when(projectApplicationStoragePort.saveNew(any())).thenReturn(true);
 
         // When
         assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), githubComment))
@@ -158,6 +148,7 @@ public class ApplicationServiceTest {
     @Test
     void should_apply_on_project() {
         // When
+        when(projectApplicationStoragePort.saveNew(any())).thenReturn(true);
         final var application = applicationService.applyOnProject(githubUserId, projectId, issue.id(), githubComment);
 
         // Then
@@ -170,8 +161,8 @@ public class ApplicationServiceTest {
         assertThat(application.commentId()).isNull();
         assertThat(application.commentBody()).isNull();
 
-        verify(projectApplicationStoragePort).save(application);
-        verify(applicationObserver).onApplicationCreated(application);
+        verify(projectApplicationStoragePort).saveNew(application);
+        verify(applicationObserver, never()).onApplicationCreated(application);
         verify(githubCommandService).createComment(application.id(), issue, githubUserId, githubComment);
     }
 
