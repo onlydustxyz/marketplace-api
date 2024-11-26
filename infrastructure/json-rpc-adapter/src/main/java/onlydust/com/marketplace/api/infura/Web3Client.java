@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 public class Web3Client {
@@ -66,7 +67,10 @@ public class Web3Client {
 
     protected EthBlock getBlockByHash(String hash, boolean fullTransactionObjects) {
         try {
-            return web3j.ethGetBlockByHash(hash, fullTransactionObjects).send();
+            final var response = web3j.ethGetBlockByHash(hash, fullTransactionObjects).send();
+            if (response.getBlock() == null)
+                throw badRequest("Unable to find block by hash %s".formatted(hash));
+            return response;
         } catch (IOException e) {
             throw internalServerError("Unable to fetch block by hash %s".formatted(hash), e);
         }
