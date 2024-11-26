@@ -241,7 +241,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,loggers
   info:
     git:
       enabled: true
@@ -252,3 +252,8 @@ management:
       enabled: false
     build:
       enabled: false
+  endpoint:
+    loggers:
+      enabled: true
+    info:
+      enabled: true

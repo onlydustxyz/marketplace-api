@@ -2853,6 +2853,7 @@ components:
       enum:
         - BO_FINANCIAL_ADMIN
         - BO_MARKETING_ADMIN
+        - BO_TECH_ADMIN
         - BO_ADMIN
         - BO_READER
 
