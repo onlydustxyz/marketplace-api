@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.kernel.model.ProjectId;
@@ -10,12 +11,14 @@ import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.port.output.ProjectApplicationStoragePort;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @AllArgsConstructor
 public class PostgresProjectApplicationAdapter implements ProjectApplicationStoragePort {
 
@@ -23,8 +26,12 @@ public class PostgresProjectApplicationAdapter implements ProjectApplicationStor
 
     @Override
     public boolean saveNew(@NonNull Application application) {
-        applicationRepository.save(ApplicationEntity.fromDomain(application));
-        //TODO: return false if the application already exists
+        try {
+            applicationRepository.saveAndFlush(ApplicationEntity.fromDomain(application));
+        } catch (DataIntegrityViolationException e) {
+            LOGGER.warn("Application %s already exists".formatted(application), e);
+            return false;
+        }
         return true;
     }
 

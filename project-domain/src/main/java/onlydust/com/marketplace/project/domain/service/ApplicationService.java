@@ -104,7 +104,7 @@ public class ApplicationService implements ApplicationFacadePort {
 
         final var application = Application.fromMarketplace(projectId, githubUserId, issueId);
         if (!projectApplicationStoragePort.saveNew(application))
-            throw badRequest("User already applied to this issue");
+            throw badRequest("User %d already applied to issue %s".formatted(githubUserId, issueId));
 
         githubCommandService.createComment(application.id(), issue, githubUserId, githubComment);
         return application;
