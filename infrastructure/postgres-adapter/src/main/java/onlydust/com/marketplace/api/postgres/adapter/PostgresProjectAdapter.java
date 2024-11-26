@@ -36,6 +36,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toSet;
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper.moreInfosToEntities;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
@@ -272,6 +273,11 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         }
 
         if (nonNull(contributorLabels)) {
+            if (project.getContributorLabels().stream()
+                    .anyMatch(pl -> contributorLabels.stream()
+                            .anyMatch(l -> pl.getName().equals(l.name()) && (l.id() == null || !pl.getId().equals(l.id().value()))))) {
+                throw badRequest("Contributor label with the same name already exists in the project");
+            }
             project.getContributorLabels().clear();
             project.getContributorLabels().addAll(contributorLabels.stream()
                     .map(ProjectContributorLabelEntity::fromDomain)

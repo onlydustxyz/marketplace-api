@@ -45,6 +45,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     private static GithubRepo repo1;
     private static GithubRepo repo2;
     private static GithubRepo repo3;
+    private static UUID label1Id;
 
 
     @Autowired
@@ -160,6 +161,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
         assertThat(response.getProjectSlug()).isEqualTo("super-project");
 
+        MutableObject<String> l1 = new MutableObject<>();
         // Then
         client.get()
                 .uri(getApiURI(PROJECTS_GET_BY_ID + "/" + response.getProjectId()))
@@ -206,6 +208,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.categories[1].name").isEqualTo("Tutorial")
                 .jsonPath("$.categorySuggestions[0]").isEqualTo("finance")
                 .jsonPath("$.contributorLabels[0].name").isEqualTo("l1")
+                .jsonPath("$.contributorLabels[0].id").value(l1::setValue)
                 .jsonPath("$.contributorLabels[1].name").isEqualTo("l2")
         ;
 
@@ -213,6 +216,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
         final var entity = projectRepository.findById(projectId).orElseThrow();
         assertThat(entity.isBotNotifyExternalApplications()).isTrue();
+        label1Id = UUID.fromString(l1.getValue());
     }
 
     @SneakyThrows
@@ -302,7 +306,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
     @SneakyThrows
     @Test
-    @Order(9)
+    @Order(8)
     public void should_fail_to_update_the_project_when_repos_belong_to_other_projects() {
         // Given
         indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
@@ -375,6 +379,78 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
     @SneakyThrows
     @Test
+    @Order(9)
+    public void should_fail_to_update_the_project_when_label_ids_are_missing() {
+        // Given
+        indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
+                .withRequestBody(WireMock.equalToJson("""
+                        {
+                          "linkedRepoIds": [452047076],
+                          "unlinkedRepoIds": [602953043]
+                        }
+                        """, true, false))
+                .willReturn(WireMock.noContent()));
+        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/16590657"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/43467246"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+        final var user = userAuthHelper.authenticatePierre();
+
+        // And When
+        client.put()
+                .uri(getApiURI(format(PROJECTS_PUT, projectId)))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Updated Project",
+                          "shortDescription": "This is a super updated project",
+                          "longDescription": "This is a super awesome updated project with a nice description",
+                          "moreInfos": [
+                            {
+                              "url": "https://t.me/foobar/updated",
+                              "value": "foobar-updated"
+                            },
+                            {
+                              "url": "https://foobar.com",
+                              "value": "foobar-updated2"
+                            }
+                          ],
+                          "isLookingForContributors": false,
+                          "inviteGithubUserIdsAsProjectLeads": [
+                            16590657, 43467246
+                          ],
+                          "projectLeadsToKeep": [
+                            "e461c019-ba23-4671-9b6c-3a5a18748af9"
+                          ],
+                          "githubRepoIds": [
+                            %d, %d
+                          ],
+                          "logoUrl": "https://avatars.githubusercontent.com/u/yyyyyyyyyyyy",
+                          "rewardSettings": {
+                            "ignorePullRequests": false,
+                            "ignoreIssues": true,
+                            "ignoreCodeReviews": true,
+                            "ignoreContributionsBefore": "2021-01-01T00:00:00Z"
+                          },
+                          "ecosystemIds": ["99b6c284-f9bb-4f89-8ce7-03771465ef8e","6ab7fa6c-c418-4997-9c5f-55fb021a8e5c"],
+                          "categoryIds": ["%s"],
+                          "categorySuggestions": ["defi"],
+                          "contributorLabels": [{"name": "l1"}, {"name": "l2"}]
+                        }
+                        """.formatted(repo1.getId(), repo3.getId(), cryptoCategory.id()))
+                .exchange()
+                // Then
+                .expectStatus()
+                .isBadRequest();
+    }
+
+    @SneakyThrows
+    @Test
     @Order(10)
     public void should_update_the_project() {
         // Given
@@ -435,9 +511,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           },
                           "ecosystemIds": ["99b6c284-f9bb-4f89-8ce7-03771465ef8e","6ab7fa6c-c418-4997-9c5f-55fb021a8e5c"],
                           "categoryIds": ["%s"],
-                          "categorySuggestions": ["defi"]
+                          "categorySuggestions": ["defi"],
+                          "contributorLabels": [{"id": "%s", "name": "l1"}, {"name": "l3"}]
                         }
-                        """.formatted(repo1.getId(), repo3.getId(), cryptoCategory.id()))
+                        """.formatted(repo1.getId(), repo3.getId(), cryptoCategory.id(), label1Id.toString()))
                 .exchange()
                 // Then
                 .expectStatus()
@@ -902,7 +979,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           ],
                           "logoUrl": "https://foo.bar",
                           "ecosystemIds" : ["b599313c-a074-440f-af04-a466529ab2e7"],
-                          "contributorLabels": [{"name": "l1"}, {"name": "l2"}]
+                          "contributorLabels": [{"name": "l1"}, {"name": "l2"}, {"name": "l3"}]
                         }
                         """)
                 .exchange()
