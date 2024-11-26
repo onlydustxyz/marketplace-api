@@ -10,7 +10,7 @@ import java.util.Set;
 
 public record BackofficeUser(@NonNull UserId id, @NonNull String email, @NonNull String name, @NonNull Set<Role> roles, String avatarUrl) {
     public enum Role {
-        BO_FINANCIAL_ADMIN, BO_MARKETING_ADMIN, BO_READER
+        BO_FINANCIAL_ADMIN, BO_MARKETING_ADMIN, BO_TECH_ADMIN, BO_READER
     }
 
     @Builder

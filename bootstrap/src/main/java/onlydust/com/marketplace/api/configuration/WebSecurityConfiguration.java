@@ -151,6 +151,7 @@ public class WebSecurityConfiguration {
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/actuator/health")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/actuator/info")).permitAll()
+                                .requestMatchers(antMatcher("/actuator/loggers")).hasAuthority(BO_TECH_ADMIN.name())
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/version")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/banner")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/bi/**")).permitAll()
