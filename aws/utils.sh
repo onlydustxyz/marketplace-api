@@ -1,6 +1,7 @@
 #!/bin/bash
 
-LOG_FILE=$0.log
+LOG_FILE=$(readlink -f "$0").log
+touch "$LOG_FILE"
 
 # Color
 RED='\033[1;91m'
@@ -110,7 +111,8 @@ execute() {
     return ${PIPESTATUS[0]}
 }
 
-check_command() {
-    command=$1
-    which $command > /dev/null || exit_error "'$command' not found. Please install it first."
+check_commands() {
+    for command in "$@"; do
+      which $command > /dev/null || exit_error "'$command' not found. Please install it first."
+    done
 }
