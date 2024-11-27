@@ -12383,10 +12383,13 @@ components:
       type: object
       required:
         - countryCode
+        - countryName
         - value
       properties:
         countryCode:
           $ref: '#/components/schemas/CountryCode'
+        countryName:
+          type: string
         value:
           type: number
           format: int64

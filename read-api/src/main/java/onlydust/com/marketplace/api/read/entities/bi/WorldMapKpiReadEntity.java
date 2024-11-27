@@ -27,8 +27,10 @@ public class WorldMapKpiReadEntity {
     BigDecimal value;
 
     public BiWorldMapItemResponse toListItemResponse() {
+        final var country = Country.fromIso3(countryCode);
         return new BiWorldMapItemResponse()
-                .countryCode(Country.fromIso3(countryCode).iso2Code())
+                .countryCode(country.iso2Code())
+                .countryName(country.display().orElse(country.iso2Code()))
                 .value(value);
     }
 }
