@@ -4,17 +4,10 @@ on:
   pull_request: ~
   push:
     branches:
-      - "main"
-      - "staging"
-      - "production"
-      - "perf"
-  workflow_dispatch:
-    inputs:
-      debug_enabled:
-        type: boolean
-        description: "Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)"
-        required: false
-        default: false
+      - main
+      - staging
+      - production
+      - perf
 
 jobs:
   unit_tests:

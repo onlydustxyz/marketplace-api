@@ -3,10 +3,10 @@ name: Backend CD
 on:
   push:
     branches:
-      - "main"
-      - "staging"
-      - "production"
-      - "perf"
+      - main
+      - staging
+      - production
+      - perf
 
 jobs:
   build_and_push_docker_image:
@@ -46,7 +46,7 @@ jobs:
         run: |
           echo SHA_SHORT=$(git rev-parse --short HEAD) >> "$GITHUB_ENV"
           echo ECR_REPOSITORY_URI=$(aws ecr describe-repositories --query "repositories[?contains(@.repositoryName, 'marketplacerepository') == \`true\`].repositoryUri" --output text) >> "$GITHUB_ENV"
-          echo CLUSTER_ARN=$(aws ecs list-clusters --query 'clusterArns[0]' --output text) >> "$GITHUB_ENV"
+          echo CLUSTER_ARN=$(aws ecs list-clusters --query "clusterArns[?contains(@, 'MarketplaceCoreStack-MarketplaceCluster') == \`true\`]" --output text) >> "$GITHUB_ENV"
           echo SERVICES=$(aws resourcegroupstaggingapi get-resources --tag-filters Key=repo,Values="$REPO_NAME" --resource-type-filters ecs:service --query 'ResourceTagMappingList[*].ResourceARN' --output text ) >> "$GITHUB_ENV"
 
       - name: Login to ECR
