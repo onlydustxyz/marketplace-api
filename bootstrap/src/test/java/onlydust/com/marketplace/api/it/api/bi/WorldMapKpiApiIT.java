@@ -136,14 +136,17 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
                             [
                               {
                                 "countryCode": "FR",
+                                "countryName": "France",
                                 "value": 2
                               },
                               {
                                 "countryCode": "GB",
+                                "countryName": "United Kingdom",
                                 "value": 3
                               },
                               {
                                 "countryCode": "MA",
+                                "countryName": "Morocco",
                                 "value": 2
                               }
                             ]
@@ -167,14 +170,17 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
                             [
                               {
                                 "countryCode": "FR",
+                                "countryName": "France",
                                 "value": 1
                               },
                               {
                                 "countryCode": "GB",
+                                "countryName": "United Kingdom",
                                 "value": 2
                               },
                               {
                                 "countryCode": "MA",
+                                "countryName": "Morocco",
                                 "value": 1
                               }
                             ]
@@ -197,14 +203,17 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
                             [
                               {
                                 "countryCode": "FR",
+                                "countryName": "France",
                                 "value": 2
                               },
                               {
                                 "countryCode": "GB",
+                                "countryName": "United Kingdom",
                                 "value": 3
                               },
                               {
                                 "countryCode": "MA",
+                                "countryName": "Morocco",
                                 "value": 1
                               }
                             ]
