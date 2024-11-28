@@ -41,8 +41,15 @@ public class UserAuthHelper {
     }
 
     public AuthenticatedUser create(String login) {
+        var githubUserId = faker.random().nextLong();
+        for (int n = 0; n < 100 && userRepository.findByGithubUserId(githubUserId).isPresent(); n++) {
+            githubUserId = faker.random().nextLong();
+        }
+        if (userRepository.findByGithubUserId(githubUserId).isPresent()) {
+            throw new IllegalStateException("Could not generate a githubUserId that is not already in use");
+        }
         return signUpUser(
-                faker.random().nextLong(10000),
+                githubUserId,
                 login,
                 "https://avatars.githubusercontent.com/u/%s".formatted(login),
                 false);
@@ -62,7 +69,7 @@ public class UserAuthHelper {
                         onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.ADMIN} :
                 new onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role[]{onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.USER});
         userRepository.saveAndFlush(user);
-        
+
         mockAuth0UserInfo(user);
         final var authenticatedUser = authenticateUser(user);
         githubHelper.createAccount(authenticatedUser);
