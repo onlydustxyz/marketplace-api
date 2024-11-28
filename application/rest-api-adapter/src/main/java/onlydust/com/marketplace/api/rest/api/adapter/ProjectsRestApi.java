@@ -4,12 +4,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.api.contract.ProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
+import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -18,6 +22,7 @@ import onlydust.com.marketplace.project.domain.model.ContributionType;
 import onlydust.com.marketplace.project.domain.model.CreateAndCloseIssueCommand;
 import onlydust.com.marketplace.project.domain.model.ProjectContributorLabel;
 import onlydust.com.marketplace.project.domain.port.input.*;
+import onlydust.com.marketplace.project.domain.service.PermissionService;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
@@ -37,6 +42,7 @@ import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapProjectBudgetsViewToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapCreateProjectCommandToDomain;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapUpdateProjectCommandToDomain;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static org.springframework.http.ResponseEntity.noContent;
@@ -55,6 +61,8 @@ public class ProjectsRestApi implements ProjectsApi {
     private final RewardFacadePort rewardFacadePort;
     private final ContributionFacadePort contributionsFacadePort;
     private final ProjectContributorLabelFacadePort projectContributorLabelFacadePort;
+    private final AccountingFacadePort accountingFacadePort;
+    private final PermissionService permissionService;
 
     @Override
     public ResponseEntity<CreateProjectResponse> createProject(CreateProjectRequest createProjectRequest) {
@@ -429,7 +437,16 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<Void> ungrantFundsFromProject(UUID projectId, UngrantRequest ungrantRequest) {
-        return ProjectsApi.super.ungrantFundsFromProject(projectId, ungrantRequest);
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        if (!permissionService.isUserProjectLead(ProjectId.of(projectId), authenticatedUser.id()))
+            throw forbidden("User %s is not authorized to ungrant funds from project %s".formatted(authenticatedUser.id(), projectId));
+
+        accountingFacadePort.ungrant(ProjectId.of(projectId),
+                ProgramId.of(ungrantRequest.getProgramId()),
+                PositiveAmount.of(ungrantRequest.getAmount()),
+                Currency.Id.of(ungrantRequest.getCurrencyId()));
+
+        return noContent().build();
     }
 
     @Override
