@@ -1,24 +1,29 @@
 package onlydust.com.marketplace.user.domain.model.rbac;
 
 public enum Roles {
-    BASIC(new Role()
-            .on(Resource.CONTRIBUTOR).can(Permission.READ)
+    CONTRIBUTOR_READER(new Role()
+            .on(Resource.CONTRIBUTOR).can(Permission.READ)),
+
+    CONTRIBUTOR_ADMIN(new Role().inherit(CONTRIBUTOR_READER.role)
+            .on(Resource.CONTRIBUTOR).can(
+                    Permission.READ_PRIVATE,
+                    Permission.WRITE)),
+
+    PROJECT_READER(new Role()
             .on(Resource.PROJECT).can(Permission.READ)),
 
-    CONTRIBUTOR(new Role().inherit(BASIC.role)
-            .on(Resource.CONTRIBUTOR).can(
-                    Permission.READ_SENSITIVE,
-                    Permission.WRITE,
-                    Permission.READ_FINANCIALS,
-                    Permission.WRITE_FINANCIALS)),
-
-    PROJECT_MAINTAINER(new Role().inherit(BASIC.role)
+    PROJECT_MAINTAINER(new Role().inherit(PROJECT_READER.role)
             .on(Resource.PROJECT).can(
-                    Permission.READ_SENSITIVE,
-                    Permission.WRITE,
-                    Permission.READ_FINANCIALS,
-                    Permission.WRITE_FINANCIALS)),
-    ;
+                    Permission.READ_PRIVATE,
+                    Permission.WRITE)),
+
+    PROGRAM_READER(new Role()
+            .on(Resource.PROGRAM).can(Permission.READ)),
+
+    PROGRAM_ADMIN(new Role().inherit(PROGRAM_READER.role)
+            .on(Resource.PROGRAM).can(
+                    Permission.READ_PRIVATE,
+                    Permission.WRITE));
 
     private final Role role;
 
