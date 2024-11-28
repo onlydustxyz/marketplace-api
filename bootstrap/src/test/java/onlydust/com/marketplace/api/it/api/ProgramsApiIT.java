@@ -72,7 +72,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                             """.formatted(programLead.user().getId()))
                     .exchange()
                     .expectStatus()
-                    .isUnauthorized();
+                    .isForbidden();
         }
 
         @Test
@@ -231,7 +231,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                     .exchange()
                     // Then
                     .expectStatus()
-                    .isUnauthorized();
+                    .isForbidden();
         }
     }
 
@@ -2987,7 +2987,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                     .exchange()
                     // Then
                     .expectStatus()
-                    .isUnauthorized();
+                    .isForbidden();
         }
 
         @Test
@@ -2999,7 +2999,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                     .exchange()
                     // Then
                     .expectStatus()
-                    .isUnauthorized();
+                    .isForbidden();
         }
 
         @Test
@@ -3011,7 +3011,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                     .exchange()
                     // Then
                     .expectStatus()
-                    .isUnauthorized();
+                    .isForbidden();
         }
 
         @Test
@@ -3023,7 +3023,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                     .exchange()
                     // Then
                     .expectStatus()
-                    .isUnauthorized();
+                    .isForbidden();
         }
 
         @Test
@@ -3042,7 +3042,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                     .exchange()
                     // Then
                     .expectStatus()
-                    .isUnauthorized();
+                    .isForbidden();
         }
     }
 }

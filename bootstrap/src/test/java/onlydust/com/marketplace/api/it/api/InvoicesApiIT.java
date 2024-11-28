@@ -1217,7 +1217,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .isUnauthorized()
+                .isForbidden()
                 .expectBody()
                 .jsonPath("$.message").isEqualTo("Cannot generate invoice on a disabled billing profile");
     }

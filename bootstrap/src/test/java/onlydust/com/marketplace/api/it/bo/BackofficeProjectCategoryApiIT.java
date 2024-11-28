@@ -49,7 +49,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                 // Then
                 .exchange()
                 .expectStatus()
-                .isUnauthorized();
+                .isForbidden();
 
         // When
         client.patch()
@@ -66,7 +66,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                 // Then
                 .exchange()
                 .expectStatus()
-                .isUnauthorized();
+                .isForbidden();
 
 
         // When
@@ -76,7 +76,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                 // Then
                 .exchange()
                 .expectStatus()
-                .isUnauthorized();
+                .isForbidden();
     }
 
 

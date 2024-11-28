@@ -236,7 +236,7 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                     .exchange()
                     .expectStatus()
-                    .isUnauthorized();
+                    .isForbidden();
 
             // When
             client.get()
@@ -5435,7 +5435,7 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .isUnauthorized();
+                .isForbidden();
     }
 
     @Test
@@ -5449,7 +5449,7 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .isUnauthorized();
+                .isForbidden();
     }
 
     @Test
@@ -5463,7 +5463,7 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .isUnauthorized();
+                .isForbidden();
     }
 
     @Test
@@ -5477,7 +5477,7 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .isUnauthorized();
+                .isForbidden();
     }
 
     @Test

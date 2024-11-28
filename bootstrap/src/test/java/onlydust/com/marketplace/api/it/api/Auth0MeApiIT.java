@@ -324,7 +324,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 )
                 .exchange()
                 // Then
-                .expectStatus().isUnauthorized();
+                .expectStatus().isForbidden();
     }
 
     @Test
@@ -361,6 +361,6 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 )
                 .exchange()
                 // Then
-                .expectStatus().isUnauthorized();
+                .expectStatus().isForbidden();
     }
 }

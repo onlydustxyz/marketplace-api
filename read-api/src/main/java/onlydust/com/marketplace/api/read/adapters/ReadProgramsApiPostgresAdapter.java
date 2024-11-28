@@ -59,7 +59,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.hasUserAccessToProgram(authenticatedUser.id(), ProgramId.of(programId)))
-            throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
+            throw forbidden("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
         final var program = programReadRepository.findById(programId)
                 .orElseThrow(() -> notFound("Program %s not found".formatted(programId)));
@@ -72,7 +72,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
-            throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
+            throw forbidden("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
         int index = sanitizePageIndex(pageIndex);
         int size = sanitizePageSize(pageSize);
@@ -93,7 +93,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
-            throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
+            throw forbidden("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
         final ProgramProjectResponse programProjectResponse = projectReadRepository.findStatsById(projectId)
                 .map(p -> p.toProgramProjectResponse(programId))
@@ -162,7 +162,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
-            throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
+            throw forbidden("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
 
         return allTransactionReadRepository.findAllForProgram(
@@ -187,7 +187,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
-            throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
+            throw forbidden("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
         final var comparison = switch (sort) {
             default -> comparing(BiFinancialsStatsResponse::getDate);
