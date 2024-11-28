@@ -106,7 +106,7 @@ public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .isForbidden();
+                .isUnauthorized();
 
         // When
         client.post()
@@ -118,7 +118,7 @@ public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .isForbidden();
+                .isUnauthorized();
 
         // When
         client.put()
@@ -130,7 +130,7 @@ public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .isForbidden();
+                .isUnauthorized();
 
         // When
         client.delete()
@@ -139,7 +139,7 @@ public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .isForbidden();
+                .isUnauthorized();
 
         // When
         client.post()
@@ -148,7 +148,7 @@ public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .isForbidden();
+                .isUnauthorized();
 
         // When
         client.delete()
@@ -157,7 +157,7 @@ public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .exchange()
                 // Then
                 .expectStatus()
-                .isForbidden();
+                .isUnauthorized();
     }
 
     @Test
