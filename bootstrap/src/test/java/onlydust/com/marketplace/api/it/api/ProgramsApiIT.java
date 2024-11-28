@@ -1,10 +1,7 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.api.contract.model.BiFinancialsStatsListResponse;
-import onlydust.com.marketplace.api.contract.model.FinancialTransactionType;
-import onlydust.com.marketplace.api.contract.model.GrantRequest;
-import onlydust.com.marketplace.api.contract.model.UngrantRequest;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.kernel.model.ProjectId;
@@ -2788,15 +2785,21 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
             }
 
             @Test
-            void should_fail_to_ungrant_more_than_received() {
+            void should_fail_to_ungrant_more_than_available() {
                 // Given
                 final var projectLead = userAuthHelper.create();
                 final var projectId = projectHelper.create(projectLead).getLeft();
                 final var sponsor = sponsorHelper.create(sponsorLead);
                 final var program = programHelper.create(sponsor.id(), caller);
-                accountingHelper.createSponsorAccount(sponsor.id(), 10, ETH);
+                final var anotherProgram = programHelper.create(sponsor.id(), caller);
+                final var recipient = userAuthHelper.create();
+                final var recipientId = GithubUserId.of(recipient.user().getGithubUserId());
+                accountingHelper.createSponsorAccount(sponsor.id(), 1000, ETH);
                 accountingHelper.allocate(sponsor.id(), program.id(), 10, ETH);
-                accountingHelper.grant(program.id(), projectId, 1, ETH);
+                accountingHelper.allocate(sponsor.id(), anotherProgram.id(), 500, ETH);
+                accountingHelper.grant(program.id(), projectId, 10, ETH);
+                accountingHelper.grant(anotherProgram.id(), projectId, 500, ETH);
+                rewardHelper.create(projectId, projectLead, recipientId, 5, ETH);
 
                 // When
                 client.post()
@@ -2804,7 +2807,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.signInUser(projectLead).jwt())
                         .bodyValue(new UngrantRequest()
                                 .programId(program.id().value())
-                                .amount(BigDecimal.valueOf(100))
+                                .amount(BigDecimal.valueOf(6))
                                 .currencyId(ETH.value()))
                         .exchange()
                         // Then
@@ -2819,7 +2822,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .expectStatus()
                         .isOk()
                         .expectBody()
-                        .jsonPath("$.totalAvailable.totalPerCurrency[?(@.currency.code == 'ETH')].amount").isEqualTo(9)
+                        .jsonPath("$.totalAvailable.totalPerCurrency[?(@.currency.code == 'ETH')].amount").isEqualTo(0)
                 ;
 
                 client.get()
@@ -2830,8 +2833,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .expectStatus()
                         .isOk()
                         .expectBody()
-                        .jsonPath("$.projects[?(@.id == '%s')].totalAvailable.totalPerCurrency[?(@.currency.code == 'ETH')].amount".formatted(projectId)).isEqualTo(1)
-                        .jsonPath("$.projects[?(@.id == '%s')].totalGranted.totalPerCurrency[?(@.currency.code == 'ETH')].amount".formatted(projectId)).isEqualTo(1)
+                        .jsonPath("$.projects[?(@.id == '%s')].totalAvailable.totalPerCurrency[?(@.currency.code == 'ETH')].amount".formatted(projectId)).isEqualTo(5)
+                        .jsonPath("$.projects[?(@.id == '%s')].totalGranted.totalPerCurrency[?(@.currency.code == 'ETH')].amount".formatted(projectId)).isEqualTo(10)
                 ;
             }
 
@@ -2853,6 +2856,106 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .bodyValue(new UngrantRequest()
                                 .programId(program.id().value())
                                 .amount(BigDecimal.valueOf(1))
+                                .currencyId(ETH.value()))
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isForbidden();
+            }
+
+            @Test
+            void should_unallocate_from_program() {
+                // Given
+                final var projectLead = userAuthHelper.create();
+                final var projectId = projectHelper.create(projectLead).getLeft();
+                final var sponsor = sponsorHelper.create(sponsorLead);
+                final var program = programHelper.create(sponsor.id(), caller);
+                accountingHelper.createSponsorAccount(sponsor.id(), 10, ETH);
+                accountingHelper.allocate(sponsor.id(), program.id(), 10, ETH);
+                accountingHelper.grant(program.id(), projectId, 1, ETH);
+
+                // When
+                client.post()
+                        .uri(getApiURI(PROGRAM_UNALLOCATE.formatted(program.id())))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.signInUser(caller).jwt())
+                        .bodyValue(new UnallocateRequest()
+                                .sponsorId(sponsor.id().value())
+                                .amount(BigDecimal.ONE)
+                                .currencyId(ETH.value()))
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isNoContent();
+
+                client.get()
+                        .uri(getApiURI(PROGRAM_BY_ID.formatted(program.id())))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.signInUser(caller).jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .jsonPath("$.totalAvailable.totalPerCurrency[?(@.currency.code == 'ETH')].amount").isEqualTo(8)
+                ;
+            }
+
+            @Test
+            void should_fail_to_unallocate_more_than_available() {
+                // Given
+                final var projectLead = userAuthHelper.create();
+                final var projectId = projectHelper.create(projectLead).getLeft();
+                final var sponsor = sponsorHelper.create(sponsorLead);
+                final var anotherSponsor = sponsorHelper.create(sponsorLead);
+                final var program = programHelper.create(sponsor.id(), caller);
+                accountingHelper.createSponsorAccount(sponsor.id(), 1000, ETH);
+                accountingHelper.createSponsorAccount(anotherSponsor.id(), 1000, ETH);
+                accountingHelper.allocate(sponsor.id(), program.id(), 10, ETH);
+                accountingHelper.allocate(anotherSponsor.id(), program.id(), 500, ETH);
+                accountingHelper.grant(program.id(), projectId, 5, ETH);
+
+                // When
+                client.post()
+                        .uri(getApiURI(PROGRAM_UNALLOCATE.formatted(program.id())))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.signInUser(caller).jwt())
+                        .bodyValue(new UnallocateRequest()
+                                .sponsorId(sponsor.id().value())
+                                .amount(BigDecimal.valueOf(6))
+                                .currencyId(ETH.value()))
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isBadRequest();
+
+                client.get()
+                        .uri(getApiURI(PROGRAM_BY_ID.formatted(program.id())))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.signInUser(caller).jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .jsonPath("$.totalAvailable.totalPerCurrency[?(@.currency.code == 'ETH')].amount").isEqualTo(505)
+                ;
+            }
+
+            @Test
+            void should_forbid_non_program_lead_to_unallocate_from_program() {
+                // Given
+                final var projectLead = userAuthHelper.create();
+                final var projectId = projectHelper.create(projectLead).getLeft();
+                final var sponsor = sponsorHelper.create(sponsorLead);
+                final var program = programHelper.create(sponsor.id(), caller);
+                accountingHelper.createSponsorAccount(sponsor.id(), 10, ETH);
+                accountingHelper.allocate(sponsor.id(), program.id(), 10, ETH);
+                accountingHelper.grant(program.id(), projectId, 1, ETH);
+
+                // When
+                client.post()
+                        .uri(getApiURI(PROGRAM_UNALLOCATE.formatted(program.id())))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.signInUser(sponsorLead).jwt())
+                        .bodyValue(new UnallocateRequest()
+                                .sponsorId(sponsor.id().value())
+                                .amount(BigDecimal.ONE)
                                 .currencyId(ETH.value()))
                         .exchange()
                         // Then

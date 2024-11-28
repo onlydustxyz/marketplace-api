@@ -25,8 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauthorized;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -59,7 +58,17 @@ public class ProgramsRestApi implements ProgramsApi {
 
     @Override
     public ResponseEntity<Void> unallocateFundsFromProgram(UUID programId, UnallocateRequest unallocateRequest) {
-        return ProgramsApi.super.unallocateFundsFromProgram(programId, unallocateRequest);
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
+            throw forbidden("User %s is not authorized to unallocate funds from program %s".formatted(authenticatedUser.id(), programId));
+
+        accountingFacadePort.unallocate(
+                ProgramId.of(programId),
+                SponsorId.of(unallocateRequest.getSponsorId()),
+                PositiveAmount.of(unallocateRequest.getAmount()),
+                Currency.Id.of(unallocateRequest.getCurrencyId()));
+
+        return noContent().build();
     }
 
     @Override
