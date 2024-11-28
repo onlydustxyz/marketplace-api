@@ -13,6 +13,11 @@ import onlydust.com.marketplace.user.domain.port.output.UserRoleStoragePort;
 public class RBACService {
     private final UserRoleStoragePort userRoleStoragePort;
 
+    public boolean canRead(UserId userId, Resource resource) {
+        final var roles = userRoleStoragePort.findRoles(userId, contributorId);
+        return roles.stream().anyMatch(r -> r.role().hasPermission(Resource.CONTRIBUTOR, permission));
+    }
+
     public boolean hasPermission(UserId userId, Long contributorId, Permission permission) {
         final var roles = userRoleStoragePort.findRoles(userId, contributorId);
         return roles.stream().anyMatch(r -> r.role().hasPermission(Resource.CONTRIBUTOR, permission));
