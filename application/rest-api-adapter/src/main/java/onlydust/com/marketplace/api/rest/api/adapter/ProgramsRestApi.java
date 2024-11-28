@@ -25,7 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -45,7 +46,7 @@ public class ProgramsRestApi implements ProgramsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
-            throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
+            throw forbidden("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
         accountingFacadePort.grant(
                 ProgramId.of(programId),
@@ -76,7 +77,7 @@ public class ProgramsRestApi implements ProgramsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(sponsorId)))
-            throw unauthorized("User %s is not authorized to create program for sponsor %s".formatted(authenticatedUser.id(), sponsorId));
+            throw forbidden("User %s is not authorized to create program for sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
         final var program = programFacadePort.create(request.getName(), SponsorId.of(sponsorId), request.getUrl(), request.getLogoUrl(),
                 request.getLeadIds().stream().map(UserId::of).toList());
@@ -89,7 +90,7 @@ public class ProgramsRestApi implements ProgramsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.hasUserAccessToProgram(authenticatedUser.id(), ProgramId.of(programId)))
-            throw unauthorized("User %s is not authorized to modify program %s".formatted(authenticatedUser.id(), programId));
+            throw forbidden("User %s is not authorized to modify program %s".formatted(authenticatedUser.id(), programId));
 
         programFacadePort.update(programId, request.getName(), request.getUrl(), request.getLogoUrl(),
                 request.getLeadIds().stream().map(UserId::of).toList());

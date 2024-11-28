@@ -1056,7 +1056,7 @@ class BillingProfileServiceTest {
 
         // Then
         assertTrue(exception instanceof OnlyDustException);
-        assertEquals(401, ((OnlyDustException) exception).getStatus());
+        assertEquals(403, ((OnlyDustException) exception).getStatus());
         assertEquals("User %s must be admin to edit payout info of billing profile %s".formatted(userIdNotAdmin.value(), billingProfileId.value()),
                 exception.getMessage());
     }

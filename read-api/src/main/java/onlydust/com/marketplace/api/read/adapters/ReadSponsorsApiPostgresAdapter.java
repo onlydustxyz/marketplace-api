@@ -63,7 +63,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
 
         final var sponsorId = SponsorId.of(deposit.sponsor().id());
         if (!permissionService.isUserSponsorLead(authenticatedUser.id(), sponsorId))
-            throw unauthorized("User %s is not admin of sponsor %s".formatted(authenticatedUser.id(), sponsorId));
+            throw forbidden("User %s is not admin of sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
         final var latestBillingInformation = depositReadRepository.findBySponsorIdOrderByTimestampDesc(sponsorId.value())
                 .map(DepositReadEntity::billingInformationResponse)
@@ -78,7 +78,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(sponsorId)))
-            throw unauthorized("User %s is not admin of sponsor %s".formatted(authenticatedUser.id(), sponsorId));
+            throw forbidden("User %s is not admin of sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
         final var sponsor = sponsorReadRepository.findById(sponsorId).orElseThrow(() -> notFound("Sponsor %s not found".formatted(sponsorId)));
 
@@ -147,7 +147,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(sponsorId)))
-            throw unauthorized("User %s is not authorized to access sponsor %s".formatted(authenticatedUser.id(), sponsorId));
+            throw forbidden("User %s is not authorized to access sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
 
         return allTransactionReadRepository.findAllForSponsor(sponsorId, DateMapper.parseNullable(fromDate),
@@ -164,7 +164,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(sponsorId)))
-            throw unauthorized("User %s is not authorized to access sponsor %s".formatted(authenticatedUser.id(), sponsorId));
+            throw forbidden("User %s is not authorized to access sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
         final var allTypes = List.of(FinancialTransactionType.DEPOSITED, FinancialTransactionType.ALLOCATED, FinancialTransactionType.UNALLOCATED);
         final var result = biFinancialMonthlyStatsReadRepository.findAll(sponsorId,
@@ -183,7 +183,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(sponsorId)))
-            throw unauthorized("User %s is not authorized to access sponsor %s".formatted(authenticatedUser.id(), sponsorId));
+            throw forbidden("User %s is not authorized to access sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
         int index = sanitizePageIndex(pageIndex);
         int size = sanitizePageSize(pageSize);

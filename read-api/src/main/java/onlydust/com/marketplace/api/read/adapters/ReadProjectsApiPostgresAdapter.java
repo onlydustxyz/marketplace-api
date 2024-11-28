@@ -525,7 +525,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         types = sanitizeTypes(types);
 
         if (!permissionService.isUserProjectLead(projectIdOrSlug, authenticatedUser.id()))
-            throw unauthorized("User %s is not authorized to access project %s".formatted(authenticatedUser.id(), projectIdOrSlug));
+            throw forbidden("User %s is not authorized to access project %s".formatted(authenticatedUser.id(), projectIdOrSlug));
 
         return allTransactionReadRepository.findAllForProject(
                 projectIdOrSlug.uuid().orElse(null),

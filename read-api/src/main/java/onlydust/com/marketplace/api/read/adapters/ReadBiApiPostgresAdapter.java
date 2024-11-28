@@ -373,20 +373,20 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
         switch (idGrouping) {
             case SPONSOR_ID -> {
                 if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(id)))
-                    throw unauthorized("User %s is not authorized to access sponsor %s".formatted(authenticatedUser.id(), id));
+                    throw forbidden("User %s is not authorized to access sponsor %s".formatted(authenticatedUser.id(), id));
             }
             case PROGRAM_ID -> {
                 if (!permissionService.hasUserAccessToProgram(authenticatedUser.id(), ProgramId.of(id)))
-                    throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), id));
+                    throw forbidden("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), id));
 
             }
             case PROJECT_ID -> {
                 if (!permissionService.isUserProjectLead(ProjectId.of(id), authenticatedUser.id()))
-                    throw unauthorized("User %s is not authorized to access project %s".formatted(authenticatedUser.id(), id));
+                    throw forbidden("User %s is not authorized to access project %s".formatted(authenticatedUser.id(), id));
             }
             case RECIPIENT_ID -> {
                 if (!recipientId.equals(authenticatedUser.githubUserId()))
-                    throw unauthorized("User %s is not authorized to access rewards of recipient %s".formatted(authenticatedUser.id(), recipientId));
+                    throw forbidden("User %s is not authorized to access rewards of recipient %s".formatted(authenticatedUser.id(), recipientId));
             }
         }
 

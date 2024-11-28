@@ -3283,7 +3283,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                     .exchange()
                     // Then
                     .expectStatus()
-                    .isUnauthorized();
+                    .isForbidden();
         }
 
         @Test
@@ -3295,7 +3295,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                     .exchange()
                     // Then
                     .expectStatus()
-                    .isUnauthorized();
+                    .isForbidden();
         }
 
         @Test
@@ -3307,7 +3307,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                     .exchange()
                     // Then
                     .expectStatus()
-                    .isUnauthorized();
+                    .isForbidden();
         }
     }
 }

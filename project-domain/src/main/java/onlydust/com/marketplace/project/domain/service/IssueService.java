@@ -28,7 +28,7 @@ public class IssueService implements IssueFacadePort {
     @Override
     public void updateIssue(UserId projectLeadId, UpdateIssueCommand updateIssueCommand) {
         if (!permissionPort.canUserUpdateContribution(projectLeadId, updateIssueCommand.id()))
-            throw unauthorized(String.format("User %s must be project lead to update issue %s linked to its projects", projectLeadId,
+            throw forbidden(String.format("User %s must be project lead to update issue %s linked to its projects", projectLeadId,
                     updateIssueCommand.id()));
 
         if (nonNull(updateIssueCommand.archived())) {
@@ -44,7 +44,7 @@ public class IssueService implements IssueFacadePort {
             if (githubAppAccessToken.canWriteIssues()) {
                 githubApiPort.closeIssue(githubAppAccessToken.token(), repoId, issue.number());
             } else {
-                throw unauthorized("Github app installed on repo %s has not the permission to write on issue".formatted(issue.repoId()));
+                throw forbidden("Github app installed on repo %s has not the permission to write on issue".formatted(issue.repoId()));
             }
         }
     }

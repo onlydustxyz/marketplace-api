@@ -21,6 +21,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauthorized;
+
 @Slf4j
 @AllArgsConstructor
 public class Auth0UserInfoService {
@@ -78,7 +80,7 @@ public class Auth0UserInfoService {
                     new String(Base64.getUrlDecoder().decode(decodedJwt.getPayload()), StandardCharsets.UTF_8),
                     Auth0JwtAccessToken.class);
         } catch (JsonProcessingException e) {
-            throw OnlyDustException.unauthorized("Could not decode access-token payload", e);
+            throw unauthorized("Could not decode access-token payload", e);
         }
         return payload.getExpiresAt();
     }

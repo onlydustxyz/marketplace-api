@@ -460,7 +460,7 @@ public class ProjectTransactionsApiIT extends AbstractMarketplaceApiIT {
                     .exchange()
                     // Then
                     .expectStatus()
-                    .isUnauthorized();
+                    .isForbidden();
         }
 
     }

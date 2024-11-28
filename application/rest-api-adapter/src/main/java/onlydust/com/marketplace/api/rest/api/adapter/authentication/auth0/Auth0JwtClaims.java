@@ -6,7 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauthorized;
 
 @Data
 @Builder
@@ -35,6 +36,6 @@ public class Auth0JwtClaims {
         } else if (sub.startsWith("google-oauth2")) {
             return Connection.GOOGLE;
         }
-        throw OnlyDustException.unauthorized("Unknown connection type: " + sub);
+        throw unauthorized("Unknown connection type: " + sub);
     }
 }
