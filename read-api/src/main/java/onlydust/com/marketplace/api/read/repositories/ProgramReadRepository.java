@@ -38,4 +38,13 @@ public interface ProgramReadRepository extends Repository<ProgramReadEntity, UUI
             (:search is null or element(p).name ilike concat('%', cast(:search as String), '%'))
             """)
     Page<ProgramReadEntity> findSponsorPrograms(final UUID sponsorId, final String search, final Pageable pageable);
+
+    @Query("""
+            select p
+            from ProjectReadEntity proj
+            join proj.grantingPrograms p
+            where proj.id = :projectId and
+            (:search is null or element(p).name ilike concat('%', cast(:search as String), '%'))
+            """)
+    Page<ProgramReadEntity> findProjectPrograms(final UUID projectId, final String search, final Pageable pageable);
 }

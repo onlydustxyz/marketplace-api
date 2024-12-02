@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import onlydust.com.backoffice.api.contract.model.ProgramLinkResponse;
+import onlydust.com.backoffice.api.contract.model.ProgramWithBudgetResponse;
 import onlydust.com.backoffice.api.contract.model.*;
-import onlydust.com.marketplace.api.contract.model.ProgramPageItemResponse;
-import onlydust.com.marketplace.api.contract.model.ProgramResponse;
-import onlydust.com.marketplace.api.contract.model.ProgramShortResponse;
-import onlydust.com.marketplace.api.contract.model.SponsorProgramPageItemResponse;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
+import onlydust.com.marketplace.api.read.entities.sponsor.SponsorStatPerCurrencyPerProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
 
@@ -76,6 +76,24 @@ public class ProgramReadEntity {
             inverseJoinColumns = @JoinColumn(name = "projectId")
     )
     Set<ProjectReadEntity> grantedProjects;
+
+    @OneToMany(mappedBy = "programId", fetch = FetchType.LAZY)
+    @NonNull
+    Set<ProgramStatPerCurrencyPerProjectReadEntity> perProjectStatsPerCurrency;
+
+    @ManyToMany
+    @NonNull
+    @JoinTable(
+            name = "sponsor_stats_per_currency_per_program",
+            schema = "bi",
+            joinColumns = @JoinColumn(name = "programId"),
+            inverseJoinColumns = @JoinColumn(name = "sponsorId")
+    )
+    Set<SponsorReadEntity> allocatingSponsors;
+
+    @OneToMany(mappedBy = "programId", fetch = FetchType.LAZY)
+    @NonNull
+    Set<SponsorStatPerCurrencyPerProgramReadEntity> perSponsorStatsPerCurrency;
 
     public ProgramStatReadEntity stats() {
         return stats.get(0);
@@ -143,7 +161,10 @@ public class ProgramReadEntity {
                         .toList());
     }
 
-    public SponsorProgramPageItemResponse toSponsorProgramPageItemResponse() {
+    public SponsorProgramPageItemResponse toSponsorProgramPageItemResponse(UUID sponsorId) {
+        final var statsPerCurrency = perSponsorStatsPerCurrency.stream()
+                .filter(s -> s.sponsorId().equals(sponsorId))
+                .toList();
         return new SponsorProgramPageItemResponse()
                 .id(id)
                 .name(name)
@@ -151,9 +172,23 @@ public class ProgramReadEntity {
                 .leads(leads.stream().map(AllUserReadEntity::toRegisteredUserResponse).toList())
                 .projectCount(stats().grantedProjectCount())
                 .userCount(stats().userCount())
-                .totalAvailable(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAvailable))
-                .totalGranted(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalGranted))
-                .totalReceived(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAllocated));
+                .totalAvailable(map(statsPerCurrency, SponsorStatPerCurrencyPerProgramReadEntity::totalAvailable))
+                .totalGranted(map(statsPerCurrency, SponsorStatPerCurrencyPerProgramReadEntity::totalGranted))
+                .totalAllocated(map(statsPerCurrency, SponsorStatPerCurrencyPerProgramReadEntity::totalAllocated));
+    }
+
+    public ProjectProgramPageItemResponse toProjectProgramPageItemResponse(final UUID projectId) {
+        final var statsPerCurrency = perProjectStatsPerCurrency.stream()
+                .filter(s -> s.projectId().equals(projectId))
+                .toList();
+        return new ProjectProgramPageItemResponse()
+                .id(id)
+                .name(name)
+                .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null))
+                .leads(leads.stream().map(AllUserReadEntity::toRegisteredUserResponse).toList())
+                .totalAvailable(map(statsPerCurrency, ProgramStatPerCurrencyPerProjectReadEntity::totalAvailable))
+                .totalGranted(map(statsPerCurrency, ProgramStatPerCurrencyPerProjectReadEntity::totalGranted))
+                .totalRewarded(map(statsPerCurrency, ProgramStatPerCurrencyPerProjectReadEntity::totalRewarded));
     }
 
     public ProgramDetailsResponse toBoDetailsResponse() {

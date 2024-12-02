@@ -91,6 +91,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     private final ProjectContributorQueryRepository projectContributorQueryRepository;
     private final ProjectCustomStatsReadRepository projectCustomStatsReadRepository;
     private final AllTransactionReadRepository allTransactionReadRepository;
+    private final ProgramReadRepository programReadRepository;
 
 
     private static @NonNull List<FinancialTransactionType> sanitizeTypes(List<FinancialTransactionType> types) {
@@ -198,8 +199,24 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     }
 
     @Override
-    public ResponseEntity<SponsorProgramPageResponse> getProjectPrograms(UUID projectId, Integer pageIndex, Integer pageSize, String search) {
-        return ReadProjectsApi.super.getProjectPrograms(projectId, pageIndex, pageSize, search);
+    public ResponseEntity<ProjectProgramPageResponse> getProjectPrograms(UUID projectId, Integer pageIndex, Integer pageSize, String search) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
+        if (!permissionService.isUserProjectLead(ProjectId.of(projectId), authenticatedUser.id()))
+            throw forbidden("User %s is not authorized to access project %s programs".formatted(authenticatedUser.id(), projectId));
+
+        int index = sanitizePageIndex(pageIndex);
+        int size = sanitizePageSize(pageSize);
+
+        final var page = programReadRepository.findProjectPrograms(projectId, search, PageRequest.of(index, size, Sort.by(Sort.Direction.ASC, "name")));
+        final var response = new ProjectProgramPageResponse()
+                .programs(page.getContent().stream().map(program -> program.toProjectProgramPageItemResponse(projectId)).toList())
+                .hasMore(hasMore(index, page.getTotalPages()))
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements())
+                .nextPageIndex(nextPageIndex(index, page.getTotalPages()));
+
+        return ok(response);
     }
 
     @Override

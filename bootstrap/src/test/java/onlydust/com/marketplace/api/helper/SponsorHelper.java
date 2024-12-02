@@ -30,7 +30,7 @@ public class SponsorHelper {
 
     public Sponsor create(String name, List<UserAuthHelper.AuthenticatedUser> leads) {
         return sponsorFacadePort.createSponsor(
-                name != null ? name : faker.lordOfTheRings().character() + " " + faker.random().nextLong(),
+                name != null ? name : faker.pokemon().name() + " " + faker.random().nextLong(),
                 URI.create(faker.internet().url()),
                 URI.create(faker.internet().url()),
                 leads.stream().map(UserAuthHelper.AuthenticatedUser::userId).toList());

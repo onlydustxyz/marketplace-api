@@ -27,4 +27,13 @@ public interface SponsorReadRepository extends Repository<SponsorReadEntity, UUI
             WHERE :search is null or lower(s.name) LIKE lower(concat('%', cast(:search as String), '%'))
             """)
     Page<SponsorReadEntity> findAllByName(String search, Pageable pageable);
+
+    @Query("""
+            select s
+            from ProgramReadEntity p
+            join p.allocatingSponsors s
+            where p.id = :programId and
+            (:search is null or element(s).name ilike concat('%', cast(:search as String), '%'))
+            """)
+    Page<SponsorReadEntity> findProgramSponsors(final UUID programId, final String search, final Pageable pageable);
 }

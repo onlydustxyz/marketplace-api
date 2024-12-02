@@ -2853,7 +2853,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                           }
                                         ]
                                       },
-                                      "totalReceived": {
+                                      "totalAllocated": {
                                         "totalUsdEquivalent": 22898.81,
                                         "totalPerCurrency": [
                                           {
@@ -2957,7 +2957,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                           }
                                         ]
                                       },
-                                      "totalReceived": {
+                                      "totalAllocated": {
                                         "totalUsdEquivalent": 1515.00,
                                         "totalPerCurrency": [
                                           {

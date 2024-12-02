@@ -6,7 +6,6 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.accounting.AllTransactionReadEntity;
 import onlydust.com.marketplace.api.read.entities.accounting.DepositReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.BiFinancialMonthlyStatsReadEntity;
-import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
@@ -190,7 +189,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
 
         final var page = programReadRepository.findSponsorPrograms(sponsorId, search, PageRequest.of(index, size, Sort.by(Sort.Direction.ASC, "name")));
         final var response = new SponsorProgramPageResponse()
-                .programs(page.getContent().stream().map(ProgramReadEntity::toSponsorProgramPageItemResponse).toList())
+                .programs(page.getContent().stream().map(program -> program.toSponsorProgramPageItemResponse(sponsorId)).toList())
                 .hasMore(hasMore(index, page.getTotalPages()))
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())

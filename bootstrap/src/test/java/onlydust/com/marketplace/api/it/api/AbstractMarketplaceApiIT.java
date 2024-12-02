@@ -115,6 +115,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_GET_BUDGETS = "/api/v1/projects/%s/budgets";
     protected static final String PROJECTS_POST = "/api/v1/projects";
     protected static final String PROJECTS_PUT = "/api/v1/projects/%s";
+    protected static final String PROJECT_PROGRAMS = "/api/v1/projects/%s/programs";
     protected static final String PROJECT_STATS = "/api/v1/projects/%s/stats";
     protected static final String PROJECT_FINANCIAL = "/api/v1/projects/%s/financial";
     protected static final String PROJECT_FINANCIAL_BY_SLUG = "/api/v1/projects/slug/%s/financial";
@@ -207,6 +208,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROGRAM_STATS_TRANSACTIONS = "/api/v1/programs/%s/stats/transactions";
     protected static final String PROGRAM_TRANSACTIONS = "/api/v1/programs/%s/transactions";
     protected static final String PROGRAM_PROJECTS = "/api/v1/programs/%s/projects";
+    protected static final String PROGRAM_SPONSORS = "/api/v1/programs/%s/sponsors";
     protected static final String PROGRAM_PROJECT = "/api/v1/programs/%s/projects/%s";
     protected static final String PROGRAM_GRANT = "/api/v1/programs/%s/grant";
     protected static final String PROJECT_UNGRANT = "/api/v1/projects/%s/ungrant";

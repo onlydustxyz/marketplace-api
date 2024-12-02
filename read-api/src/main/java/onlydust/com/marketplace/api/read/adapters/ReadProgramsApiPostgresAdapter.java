@@ -5,10 +5,7 @@ import onlydust.com.marketplace.api.contract.ReadProgramsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.accounting.AllTransactionReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.BiFinancialMonthlyStatsReadEntity;
-import onlydust.com.marketplace.api.read.repositories.AllTransactionReadRepository;
-import onlydust.com.marketplace.api.read.repositories.BiFinancialMonthlyStatsReadRepository;
-import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
-import onlydust.com.marketplace.api.read.repositories.ProjectReadRepository;
+import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.ProgramId;
@@ -53,6 +50,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     private final BiFinancialMonthlyStatsReadRepository biFinancialMonthlyStatsReadRepository;
     private final AllTransactionReadRepository allTransactionReadRepository;
     private final ProjectReadRepository projectReadRepository;
+    private final SponsorReadRepository sponsorReadRepository;
 
     @Override
     public ResponseEntity<ProgramResponse> getProgram(UUID programId) {
@@ -68,7 +66,28 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     }
 
     @Override
-    public ResponseEntity<ProgramProjectsPageResponse> getProgramProjects(UUID programId, Integer pageIndex, Integer pageSize, String search) {
+    public ResponseEntity<ProgramSponsorPageResponse> getProgramSponsors(UUID programId, Integer pageIndex, Integer pageSize, String search) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
+        if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
+            throw forbidden("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
+
+        int index = sanitizePageIndex(pageIndex);
+        int size = sanitizePageSize(pageSize);
+
+        final var page = sponsorReadRepository.findProgramSponsors(programId, search, PageRequest.of(index, size, Sort.by(Sort.Direction.ASC, "name")));
+        final var response = new ProgramSponsorPageResponse()
+                .sponsors(page.getContent().stream().map(p -> p.toProgramSponsorPageItemResponse(programId)).toList())
+                .hasMore(hasMore(index, page.getTotalPages()))
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements())
+                .nextPageIndex(nextPageIndex(index, page.getTotalPages()));
+
+        return ok(response);
+    }
+
+    @Override
+    public ResponseEntity<ProgramProjectPageResponse> getProgramProjects(UUID programId, Integer pageIndex, Integer pageSize, String search) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
@@ -78,7 +97,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         int size = sanitizePageSize(pageSize);
 
         final var page = projectReadRepository.findGrantedProjects(programId, search, PageRequest.of(index, size, Sort.by(Sort.Direction.ASC, "name")));
-        final var response = new ProgramProjectsPageResponse()
+        final var response = new ProgramProjectPageResponse()
                 .projects(page.getContent().stream().map(p -> p.toProgramProjectPageItemResponse(programId)).toList())
                 .hasMore(hasMore(index, page.getTotalPages()))
                 .totalPageNumber(page.getTotalPages())

@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.SponsorDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorPageItemResponse;
+import onlydust.com.marketplace.api.contract.model.ProgramSponsorPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.SponsorLinkResponse;
 import onlydust.com.marketplace.api.contract.model.SponsorResponse;
 import onlydust.com.marketplace.api.read.entities.accounting.DepositReadEntity;
@@ -19,6 +20,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -67,6 +69,20 @@ public class SponsorReadEntity {
     @SQLRestriction("status = 'PENDING'")
     Set<DepositReadEntity> pendingDeposits;
 
+    @ManyToMany
+    @NonNull
+    @JoinTable(
+            name = "sponsor_stats_per_currency_per_program",
+            schema = "bi",
+            joinColumns = @JoinColumn(name = "sponsorId"),
+            inverseJoinColumns = @JoinColumn(name = "programId")
+    )
+    Set<ProgramReadEntity> allocatedPrograms;
+
+    @OneToMany(mappedBy = "sponsorId", fetch = FetchType.LAZY)
+    @NonNull
+    Set<SponsorStatPerCurrencyPerProgramReadEntity> perProgramStatsPerCurrency;
+
     public SponsorResponse toResponse() {
         return new SponsorResponse()
                 .id(id)
@@ -84,6 +100,20 @@ public class SponsorReadEntity {
                 .id(id)
                 .name(name)
                 .logoUrl(logoUrl == null ? null : URI.create(logoUrl));
+    }
+
+    public ProgramSponsorPageItemResponse toProgramSponsorPageItemResponse(UUID programId) {
+        final var statsPerCurrency = perProgramStatsPerCurrency.stream()
+                .filter(s -> s.programId().equals(programId))
+                .toList();
+        return new ProgramSponsorPageItemResponse()
+                .id(id)
+                .name(name)
+                .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null))
+                .leads(leads.stream().map(AllUserReadEntity::toRegisteredUserResponse).toList())
+                .totalAvailable(map(statsPerCurrency, SponsorStatPerCurrencyPerProgramReadEntity::totalAvailable))
+                .totalGranted(map(statsPerCurrency, SponsorStatPerCurrencyPerProgramReadEntity::totalGranted))
+                .totalAllocated(map(statsPerCurrency, SponsorStatPerCurrencyPerProgramReadEntity::totalAllocated));
     }
 
     public SponsorDetailsResponse toBoDetailsResponse() {
