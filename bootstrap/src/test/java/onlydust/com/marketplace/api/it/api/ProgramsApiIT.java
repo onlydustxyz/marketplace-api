@@ -2739,25 +2739,11 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         }
                                       ],
                                       "totalAvailable": {
-                                        "totalUsdEquivalent": -13483.89,
+                                        "totalUsdEquivalent": 13483.89,
                                         "totalPerCurrency": [
                                           {
-                                            "amount": -1000,
-                                            "prettyAmount": -1000,
-                                            "currency": {
-                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                              "code": "USDC",
-                                              "name": "USD Coin",
-                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                              "decimals": 6
-                                            },
-                                            "usdEquivalent": -1010.00,
-                                            "usdConversionRate": 1.010001,
-                                            "ratio": 7
-                                          },
-                                          {
-                                            "amount": -7,
-                                            "prettyAmount": -7,
+                                            "amount": 7,
+                                            "prettyAmount": 7,
                                             "currency": {
                                               "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                               "code": "ETH",
@@ -2765,9 +2751,23 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "logoUrl": null,
                                               "decimals": 18
                                             },
-                                            "usdEquivalent": -12473.89,
+                                            "usdEquivalent": 12473.89,
                                             "usdConversionRate": 1781.983987,
                                             "ratio": 93
+                                          },
+                                          {
+                                            "amount": 1000,
+                                            "prettyAmount": 1000,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 1010.00,
+                                            "usdConversionRate": 1.010001,
+                                            "ratio": 7
                                           }
                                         ]
                                       },
