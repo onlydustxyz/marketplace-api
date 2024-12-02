@@ -168,6 +168,16 @@ public class ProjectReadEntity {
     @NonNull
     Set<ProgramStatPerCurrencyPerProjectReadEntity> perProgramStatsPerCurrency;
 
+    @ManyToMany
+    @NonNull
+    @JoinTable(
+            name = "program_stats_per_currency_per_project",
+            schema = "bi",
+            joinColumns = @JoinColumn(name = "projectId"),
+            inverseJoinColumns = @JoinColumn(name = "programId")
+    )
+    Set<ProgramReadEntity> grantingPrograms;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             schema = "public",
@@ -284,8 +294,6 @@ public class ProjectReadEntity {
                 .totalAvailable(totalAvailable)
                 .totalGranted(totalGranted)
                 .totalRewarded(totalRewarded);
-
-
     }
 
     private NumberKpi createKpi(int current, int last) {

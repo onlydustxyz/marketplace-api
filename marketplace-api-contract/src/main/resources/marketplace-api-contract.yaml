@@ -2772,7 +2772,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SponsorProgramPageResponse'
+                $ref: '#/components/schemas/ProjectProgramPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -7299,6 +7299,41 @@ components:
             totalGranted:
               $ref: '#/components/schemas/DetailedTotalMoney'
             totalReceived:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+
+    ProjectProgramPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - programs
+          properties:
+            programs:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectProgramPageItemResponse'
+
+    ProjectProgramPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProgramLinkResponse'
+        - type: object
+          required:
+            - leads
+            - projectCount
+            - userCount
+            - totalAvailable
+            - totalGranted
+            - totalRewarded
+          properties:
+            leads:
+              type: array
+              items:
+                $ref: '#/components/schemas/RegisteredUserResponse'
+            totalAvailable:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalGranted:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalRewarded:
               $ref: '#/components/schemas/DetailedTotalMoney'
 
     ProgramResponse:
