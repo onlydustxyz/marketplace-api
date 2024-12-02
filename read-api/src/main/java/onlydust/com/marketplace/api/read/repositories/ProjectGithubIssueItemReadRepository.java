@@ -53,7 +53,7 @@ public interface ProjectGithubIssueItemReadRepository extends Repository<Project
                 OR :isIncludedInAnyHackathon = TRUE AND h.id IS NOT NULL
                 OR :isIncludedInAnyHackathon = FALSE AND NOT exists(SELECT 1 FROM hackathon_issues h2 WHERE h2.issue_id = c.issue_id))
               AND (:hackathonId IS NULL OR h.id = :hackathonId)
-              AND (:isGoodFirstIssueOrIsInLiveHackathon IS NOT TRUE OR ((h.id is null AND c.is_good_first_issue) OR (h.start_date <= now() AND h.end_date >= now() AND h.status = 'PUBLISHED')))
+              AND (:isGoodFirstIssueOrIsInLiveHackathon IS NOT TRUE OR (c.is_good_first_issue OR (h.start_date <= now() AND h.end_date >= now() AND h.status = 'PUBLISHED')))
               AND (coalesce(:languageIds) IS NULL OR pgd.language_ids && cast(:languageIds as uuid[]))
               AND (coalesce(:search) IS NULL OR c.github_title ILIKE '%' || :search || '%')
             GROUP BY p.id, pgd.project_id, c.contribution_uuid, ccd.contribution_uuid, i.id
@@ -83,7 +83,7 @@ public interface ProjectGithubIssueItemReadRepository extends Repository<Project
                         OR :isIncludedInAnyHackathon = TRUE AND h.id IS NOT NULL
                         OR :isIncludedInAnyHackathon = FALSE AND NOT exists(SELECT 1 FROM hackathon_issues h2 WHERE h2.issue_id = c.issue_id))
                       AND (:hackathonId IS NULL OR h.id = :hackathonId)
-                      AND (:isGoodFirstIssueOrIsInLiveHackathon IS NOT TRUE OR ((h.id is null AND c.is_good_first_issue) OR (h.start_date <= now() AND h.end_date >= now() AND h.status = 'PUBLISHED')))
+                      AND (:isGoodFirstIssueOrIsInLiveHackathon IS NOT TRUE OR (c.is_good_first_issue OR (h.start_date <= now() AND h.end_date >= now() AND h.status = 'PUBLISHED')))
                       AND (coalesce(:languageIds) IS NULL OR pgd.language_ids && cast(:languageIds as uuid[]))
                       AND (coalesce(:search) IS NULL OR c.github_title ILIKE '%' || :search || '%')
                     GROUP BY p.id, c.contribution_uuid, ccd.contribution_uuid
