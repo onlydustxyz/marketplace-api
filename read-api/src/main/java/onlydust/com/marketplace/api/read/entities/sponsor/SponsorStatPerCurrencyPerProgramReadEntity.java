@@ -44,7 +44,7 @@ public class SponsorStatPerCurrencyPerProgramReadEntity implements ProgramTransa
     BigDecimal totalGranted;
 
     public BigDecimal totalAvailable() {
-        return totalGranted.subtract(totalAllocated);
+        return totalAllocated.subtract(totalGranted);
     }
 
     @EqualsAndHashCode
