@@ -63,3 +63,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000033_add_bo_user_role_tech_admin.sql
   - include:
       file: db/changelog/changelogs/00000034_update_project_stats_for_ranking_view.sql
+  - include:
+      file: db/changelog/changelogs/00000035_sponsor_stats_per_program.sql

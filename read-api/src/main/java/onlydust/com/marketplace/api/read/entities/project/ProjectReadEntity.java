@@ -164,10 +164,6 @@ public class ProjectReadEntity {
     @NonNull
     Set<ProjectStatPerCurrencyReadEntity> globalStatsPerCurrency;
 
-    @OneToMany(mappedBy = "projectId", fetch = FetchType.LAZY)
-    @NonNull
-    Set<ProgramStatPerCurrencyPerProjectReadEntity> perProgramStatsPerCurrency;
-
     @ManyToMany
     @NonNull
     @JoinTable(
@@ -177,6 +173,10 @@ public class ProjectReadEntity {
             inverseJoinColumns = @JoinColumn(name = "programId")
     )
     Set<ProgramReadEntity> grantingPrograms;
+
+    @OneToMany(mappedBy = "projectId", fetch = FetchType.LAZY)
+    @NonNull
+    Set<ProgramStatPerCurrencyPerProjectReadEntity> perProgramStatsPerCurrency;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -247,14 +247,14 @@ public class ProjectReadEntity {
                 .languages(languages.stream().map(LanguageReadEntity::toDto).toList());
     }
 
-    public ProgramProjectsPageItemResponse toProgramProjectPageItemResponse(UUID programId) {
+    public ProgramProjectPageItemResponse toProgramProjectPageItemResponse(UUID programId) {
         final var statsPerCurrency = perProgramStatsPerCurrency.stream()
                 .filter(s -> s.programId().equals(programId))
                 .toList();
         final var totalGranted = map(statsPerCurrency, ProgramStatPerCurrencyPerProjectReadEntity::totalGranted);
         final var totalRewarded = map(statsPerCurrency, ProgramStatPerCurrencyPerProjectReadEntity::totalRewarded);
 
-        return new ProgramProjectsPageItemResponse()
+        return new ProgramProjectPageItemResponse()
                 .id(id)
                 .slug(slug)
                 .name(name)

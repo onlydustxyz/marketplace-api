@@ -371,6 +371,28 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
         }
 
         @Test
+        void should_get_program_sponsors() {
+            // When
+            client.get()
+                    .uri(getApiURI(PROGRAM_SPONSORS.formatted(program.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .json("""
+                            {
+                              "totalPageNumber": 0,
+                              "totalItemNumber": 0,
+                              "hasMore": false,
+                              "nextPageIndex": 0,
+                              "sponsors": []
+                            }
+                            """);
+        }
+
+        @Test
         void should_upload_logo() throws MalformedURLException {
             when(imageStoragePort.storeImage(any(InputStream.class)))
                     .thenReturn(new URL("https://s3.amazon.com/logo.jpeg"));
@@ -2686,6 +2708,164 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .jsonPath("$.projects.size()").isEqualTo(1)
                         .jsonPath("$.projects[0].id").isEqualTo(project1.getId().toString())
                 ;
+            }
+
+            @Test
+            void should_get_program_sponsors() {
+                // When
+                client.get()
+                        .uri(getApiURI(PROGRAM_SPONSORS.formatted(program.id())))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .jsonPath("$.sponsors[0].id").isEqualTo(sponsor.id().toString())
+                        .json("""
+                                {
+                                  "totalPageNumber": 1,
+                                  "totalItemNumber": 1,
+                                  "hasMore": false,
+                                  "nextPageIndex": 0,
+                                  "sponsors": [
+                                    {
+                                      "leads": [
+                                        {
+                                          "githubUserId": 595505,
+                                          "login": "ofux",
+                                          "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                                          "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
+                                        }
+                                      ],
+                                      "totalAvailable": {
+                                        "totalUsdEquivalent": -13483.89,
+                                        "totalPerCurrency": [
+                                          {
+                                            "amount": -1000,
+                                            "prettyAmount": -1000,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": -1010.00,
+                                            "usdConversionRate": 1.010001,
+                                            "ratio": 7
+                                          },
+                                          {
+                                            "amount": -7,
+                                            "prettyAmount": -7,
+                                            "currency": {
+                                              "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                              "code": "ETH",
+                                              "name": "Ether",
+                                              "logoUrl": null,
+                                              "decimals": 18
+                                            },
+                                            "usdEquivalent": -12473.89,
+                                            "usdConversionRate": 1781.983987,
+                                            "ratio": 93
+                                          }
+                                        ]
+                                      },
+                                      "totalGranted": {
+                                        "totalUsdEquivalent": 9414.92,
+                                        "totalPerCurrency": [
+                                          {
+                                            "amount": 5,
+                                            "prettyAmount": 5,
+                                            "currency": {
+                                              "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                              "code": "ETH",
+                                              "name": "Ether",
+                                              "logoUrl": null,
+                                              "decimals": 18
+                                            },
+                                            "usdEquivalent": 8909.92,
+                                            "usdConversionRate": 1781.983987,
+                                            "ratio": 95
+                                          },
+                                          {
+                                            "amount": 500,
+                                            "prettyAmount": 500,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 505.00,
+                                            "usdConversionRate": 1.010001,
+                                            "ratio": 5
+                                          }
+                                        ]
+                                      },
+                                      "totalAllocated": {
+                                        "totalUsdEquivalent": 22898.81,
+                                        "totalPerCurrency": [
+                                          {
+                                            "amount": 12,
+                                            "prettyAmount": 12,
+                                            "currency": {
+                                              "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                              "code": "ETH",
+                                              "name": "Ether",
+                                              "logoUrl": null,
+                                              "decimals": 18
+                                            },
+                                            "usdEquivalent": 21383.81,
+                                            "usdConversionRate": 1781.983987,
+                                            "ratio": 93
+                                          },
+                                          {
+                                            "amount": 1500,
+                                            "prettyAmount": 1500,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 1515.00,
+                                            "usdConversionRate": 1.010001,
+                                            "ratio": 7
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                }
+                                """);
+            }
+
+            @Test
+            void should_search_program_sponsors_by_name() {
+                // When
+                client.get()
+                        .uri(getApiURI(PROGRAM_SPONSORS.formatted(program.id()), Map.of(
+                                "pageIndex", "0",
+                                "pageSize", "5",
+                                "search", sponsor.name().substring(0, 5)
+                        )))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .json("""
+                                {
+                                  "totalPageNumber": 1,
+                                  "totalItemNumber": 1,
+                                  "hasMore": false,
+                                  "nextPageIndex": 0
+                                }
+                                """);
             }
 
             @Test

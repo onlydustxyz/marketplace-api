@@ -208,6 +208,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROGRAM_STATS_TRANSACTIONS = "/api/v1/programs/%s/stats/transactions";
     protected static final String PROGRAM_TRANSACTIONS = "/api/v1/programs/%s/transactions";
     protected static final String PROGRAM_PROJECTS = "/api/v1/programs/%s/projects";
+    protected static final String PROGRAM_SPONSORS = "/api/v1/programs/%s/sponsors";
     protected static final String PROGRAM_PROJECT = "/api/v1/programs/%s/projects/%s";
     protected static final String PROGRAM_GRANT = "/api/v1/programs/%s/grant";
     protected static final String PROJECT_UNGRANT = "/api/v1/projects/%s/ungrant";

@@ -2755,7 +2755,7 @@ paths:
       summary: Get project programs
       operationId: getProjectPrograms
       description: |
-        Get the list of all programs that sponsored this project. 
+        Get the list of all programs that granted funds to the project. 
         Only project leaders can access this information.
       parameters:
         - in: path
@@ -4895,7 +4895,39 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProgramProjectsPageResponse'
+                $ref: '#/components/schemas/ProgramProjectPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/programs/{programId}/sponsors:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadPrograms
+      summary: Get program sponsors
+      operationId: getProgramSponsors
+      description: |
+        Get the list of all sponsors that allocated funds to the program.
+        Only program leaders can access this information.
+      parameters:
+        - in: path
+          name: programId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProgramId'
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/searchParam'
+      responses:
+        "200":
+          description: 'Program sponsors page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgramSponsorPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -7298,8 +7330,103 @@ components:
               $ref: '#/components/schemas/DetailedTotalMoney'
             totalGranted:
               $ref: '#/components/schemas/DetailedTotalMoney'
-            totalReceived:
+            totalAllocated:
               $ref: '#/components/schemas/DetailedTotalMoney'
+
+    ProgramSponsorPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - sponsors
+          properties:
+            sponsors:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProgramSponsorPageItemResponse'
+
+    ProgramSponsorPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProgramLinkResponse'
+        - type: object
+          required:
+            - leads
+            - totalAvailable
+            - totalGranted
+            - totalAllocated
+          properties:
+            leads:
+              type: array
+              items:
+                $ref: '#/components/schemas/RegisteredUserResponse'
+            totalAvailable:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalGranted:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalAllocated:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+
+    ProgramProjectPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - projects
+          properties:
+            projects:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProgramProjectPageItemResponse'
+
+    ProgramProjectPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProjectLinkResponse'
+        - type: object
+          required:
+            - shortDescription
+            - leads
+            - languages
+            - categories
+            - totalAvailable
+            - totalGranted
+            - totalRewarded
+            - percentUsedBudget
+            - averageRewardUsdAmount
+            - mergedPr
+            - newContributors
+            - contributors
+          properties:
+            shortDescription:
+              type: string
+            leads:
+              type: array
+              items:
+                $ref: '#/components/schemas/RegisteredUserResponse'
+            languages:
+              type: array
+              items:
+                $ref: '#/components/schemas/LanguageResponse'
+            categories:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectCategoryResponse'
+            totalAvailable:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalGranted:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalRewarded:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            percentUsedBudget:
+              type: number
+              description: The percentage of the total granted budget that has been rewarded.
+            averageRewardUsdAmount:
+              type: number
+            mergedPrCount:
+              $ref: '#/components/schemas/NumberKpi'
+            newContributorsCount:
+              $ref: '#/components/schemas/NumberKpi'
+            activeContributorsCount:
+              $ref: '#/components/schemas/NumberKpi'
 
     ProjectProgramPageResponse:
       allOf:
@@ -7319,8 +7446,6 @@ components:
         - type: object
           required:
             - leads
-            - projectCount
-            - userCount
             - totalAvailable
             - totalGranted
             - totalRewarded
@@ -10556,68 +10681,6 @@ components:
               $ref: '#/components/schemas/ContributorResponse'
         amount:
           $ref: '#/components/schemas/Money'
-
-    ProgramProjectsPageResponse:
-      allOf:
-        - $ref: '#/components/schemas/PageResponse'
-        - type: object
-          required:
-            - projects
-          properties:
-            projects:
-              type: array
-              items:
-                $ref: '#/components/schemas/ProgramProjectsPageItemResponse'
-
-    ProgramProjectsPageItemResponse:
-      allOf:
-        - $ref: '#/components/schemas/ProjectLinkResponse'
-        - type: object
-          required:
-            - shortDescription
-            - leads
-            - languages
-            - categories
-            - totalAvailable
-            - totalGranted
-            - totalRewarded
-            - percentUsedBudget
-            - averageRewardUsdAmount
-            - mergedPr
-            - newContributors
-            - contributors
-          properties:
-            shortDescription:
-              type: string
-            leads:
-              type: array
-              items:
-                $ref: '#/components/schemas/RegisteredUserResponse'
-            languages:
-              type: array
-              items:
-                $ref: '#/components/schemas/LanguageResponse'
-            categories:
-              type: array
-              items:
-                $ref: '#/components/schemas/ProjectCategoryResponse'
-            totalAvailable:
-              $ref: '#/components/schemas/DetailedTotalMoney'
-            totalGranted:
-              $ref: '#/components/schemas/DetailedTotalMoney'
-            totalRewarded:
-              $ref: '#/components/schemas/DetailedTotalMoney'
-            percentUsedBudget:
-              type: number
-              description: The percentage of the total granted budget that has been rewarded.
-            averageRewardUsdAmount:
-              type: number
-            mergedPrCount:
-              $ref: '#/components/schemas/NumberKpi'
-            newContributorsCount:
-              $ref: '#/components/schemas/NumberKpi'
-            activeContributorsCount:
-              $ref: '#/components/schemas/NumberKpi'
 
     ProgramProjectResponse:
       allOf:
