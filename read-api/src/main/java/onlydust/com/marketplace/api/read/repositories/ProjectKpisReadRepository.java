@@ -48,6 +48,7 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                          pb.percent_spent_budget_usd                                  as percent_spent_budget,
                          -- /// filtered & computed data /// --
                          coalesce(gd.total_granted_usd_amount, 0)                     as total_granted_usd_amount,
+                         gd.total_granted_per_currency                                as total_granted_per_currency,
                          coalesce(cd.completed_contribution_count, 0)                 as completed_contribution_count,
                          coalesce(cd.completed_issue_count, 0)                        as completed_issue_count,
                          coalesce(cd.completed_pr_count, 0)                           as completed_pr_count,
@@ -57,7 +58,9 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                          coalesce(rd.reward_count, 0)                                 as reward_count,
                          coalesce(rd.total_rewarded_usd_amount, 0)                    as total_rewarded_usd_amount,
                          coalesce(rd.average_reward_usd_amount, 0)                    as average_reward_usd_amount,
+                         rd.rewarded_per_currency                                     as rewarded_per_currency,
                          coalesce(gd.previous_period_total_granted_usd_amount, 0)     as previous_period_total_granted_usd_amount,
+                         gd.previous_period_total_granted_per_currency                as previous_period_total_granted_per_currency,
                          coalesce(cd.previous_period_completed_contribution_count, 0) as previous_period_completed_contribution_count,
                          coalesce(cd.previous_period_completed_issue_count, 0)        as previous_period_completed_issue_count,
                          coalesce(cd.previous_period_completed_pr_count, 0)           as previous_period_completed_pr_count,
@@ -67,8 +70,8 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                          coalesce(rd.previous_period_reward_count, 0)                 as previous_period_reward_count,
                          coalesce(rd.previous_period_total_rewarded_usd_amount, 0)    as previous_period_total_rewarded_usd_amount,
                          coalesce(rd.previous_period_average_reward_usd_amount, 0)    as previous_period_average_reward_usd_amount,
+                         rd.previous_period_rewarded_per_currency                     as previous_period_rewarded_per_currency,
                          engagement_status.value                                      as engagement_status
-            
                   FROM bi.p_project_global_data p
                            JOIN bi.p_project_budget_data pb on pb.project_id = p.project_id
             
@@ -96,29 +99,57 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                                       group by cd.project_id) cd
                                      on cd.project_id = p.project_id
             
-                           LEFT JOIN (select rd.project_id,
+                           LEFT JOIN (select rdpc.project_id,
+                                             sum(rdpc.reward_count)                                                                     as reward_count,
+                                             sum(rdpc.total_rewarded_usd_amount)                                                        as total_rewarded_usd_amount,
+                                             sum(rdpc.average_reward_usd_amount)                                                        as average_reward_usd_amount,
+                                             jsonb_agg(jsonb_build_object('currencyId', rdpc.currency_id,
+                                                                          'totalAmount', rdpc.total_rewarded_amount))                   as rewarded_per_currency,
+                                             sum(rdpc.previous_period_reward_count)                                                     as previous_period_reward_count,
+                                             sum(rdpc.previous_period_total_rewarded_usd_amount)                                        as previous_period_total_rewarded_usd_amount,
+                                             sum(rdpc.previous_period_average_reward_usd_amount)                                        as previous_period_average_reward_usd_amount,
+                                             jsonb_agg(jsonb_build_object('currencyId', rdpc.currency_id,
+                                                                          'totalAmount', rdpc.previous_period_total_rewarded_amount))   as previous_period_rewarded_per_currency
+                                      from (select rd.project_id,
+                                                   rd.currency_id,
             
-                                             count(rd.reward_id) filter ( where rd.timestamp >= :fromDate )             as reward_count,
-                                             coalesce(sum(rd.usd_amount) filter ( where rd.timestamp >= :fromDate ), 0) as total_rewarded_usd_amount,
-                                             coalesce(avg(rd.usd_amount) filter ( where rd.timestamp >= :fromDate ), 0) as average_reward_usd_amount,
+                                                   count(rd.reward_id) filter ( where rd.timestamp >= :fromDate )             as reward_count,
+                                                   coalesce(sum(rd.usd_amount) filter ( where rd.timestamp >= :fromDate ), 0) as total_rewarded_usd_amount,
+                                                   coalesce(avg(rd.usd_amount) filter ( where rd.timestamp >= :fromDate ), 0) as average_reward_usd_amount,
+                                                   coalesce(sum(rd.amount) filter ( where rd.timestamp >= :fromDate ), 0)     as total_rewarded_amount,
+                                                   coalesce(avg(rd.amount) filter ( where rd.timestamp >= :fromDate ), 0)     as average_reward_amount,
             
-                                             count(rd.reward_id) filter ( where rd.timestamp < :fromDate )              as previous_period_reward_count,
-                                             coalesce(sum(rd.usd_amount) filter ( where rd.timestamp < :fromDate ), 0)  as previous_period_total_rewarded_usd_amount,
-                                             coalesce(avg(rd.usd_amount) filter ( where rd.timestamp < :fromDate ), 0)  as previous_period_average_reward_usd_amount
-                                      from bi.p_reward_data rd
-                                      where (coalesce(:fromDatePreviousPeriod) is null or rd.timestamp >= :fromDatePreviousPeriod)
-                                        and (coalesce(:toDate) is null or rd.timestamp < :toDate)
-                                        and (not :filteredKpis or coalesce(:projectLeadIds) is null or rd.requestor_id = any (:projectLeadIds))
-                                        and (not :filteredKpis or coalesce(:languageIds) is null or rd.language_ids && :languageIds)
-                                      group by rd.project_id) rd on rd.project_id = p.project_id
+                                                   count(rd.reward_id) filter ( where rd.timestamp < :fromDate )              as previous_period_reward_count,
+                                                   coalesce(sum(rd.usd_amount) filter ( where rd.timestamp < :fromDate ), 0)  as previous_period_total_rewarded_usd_amount,
+                                                   coalesce(avg(rd.usd_amount) filter ( where rd.timestamp < :fromDate ), 0)  as previous_period_average_reward_usd_amount,
+                                                   coalesce(sum(rd.amount) filter ( where rd.timestamp < :fromDate ), 0)      as previous_period_total_rewarded_amount,
+                                                   coalesce(avg(rd.amount) filter ( where rd.timestamp < :fromDate ), 0)      as previous_period_average_reward_amount
+                                            from bi.p_reward_data rd
+                                            where (coalesce(:fromDatePreviousPeriod) is null or rd.timestamp >= :fromDatePreviousPeriod)
+                                              and (coalesce(:toDate) is null or rd.timestamp < :toDate)
+                                              and (not :filteredKpis or coalesce(:projectLeadIds) is null or rd.requestor_id = any (:projectLeadIds))
+                                              and (not :filteredKpis or coalesce(:languageIds) is null or rd.language_ids && :languageIds)
+                                            group by rd.project_id, rd.currency_id) rdpc
+                                      group by rdpc.project_id) rd on rd.project_id = p.project_id
             
-                           LEFT JOIN (select gd.project_id,
-                                             coalesce(sum(gd.usd_amount) filter ( where gd.timestamp >= :fromDate ), 0) as total_granted_usd_amount,
-                                             coalesce(sum(gd.usd_amount) filter ( where gd.timestamp < :fromDate ), 0)  as previous_period_total_granted_usd_amount
-                                      from bi.p_project_grants_data gd
-                                      where (coalesce(:fromDatePreviousPeriod) is null or gd.timestamp >= :fromDatePreviousPeriod)
-                                        and (coalesce(:toDate) is null or gd.timestamp < :toDate)
-                                      group by gd.project_id) gd on gd.project_id = p.project_id
+                           LEFT JOIN (select gdpc.project_id,
+                                             sum(gdpc.total_granted_usd_amount)                                                      as total_granted_usd_amount,
+                                             sum(gdpc.previous_period_total_granted_usd_amount)                                      as previous_period_total_granted_usd_amount,
+                                             jsonb_agg(jsonb_build_object('currencyId', gdpc.currency_id,
+                                                                          'totalAmount', gdpc.total_granted_amount))                 as total_granted_per_currency,
+                                             jsonb_agg(jsonb_build_object('currencyId', gdpc.currency_id,
+                                                                          'totalAmount', gdpc.previous_period_total_granted_amount)) as previous_period_total_granted_per_currency
+                                      from (select gd.project_id,
+                                                   gd.currency_id,
+                                                   coalesce(sum(gd.usd_amount) filter ( where gd.timestamp >= :fromDate ), 0) as total_granted_usd_amount,
+                                                   coalesce(sum(gd.usd_amount) filter ( where gd.timestamp < :fromDate ), 0)  as previous_period_total_granted_usd_amount,
+                                                   coalesce(sum(gd.amount) filter ( where gd.timestamp >= :fromDate ), 0)     as total_granted_amount,
+                                                   coalesce(sum(gd.amount) filter ( where gd.timestamp < :fromDate ), 0)      as previous_period_total_granted_amount
+                                            from bi.p_project_grants_data gd
+                                            where (coalesce(:fromDatePreviousPeriod) is null or gd.timestamp >= :fromDatePreviousPeriod)
+                                              and (coalesce(:toDate) is null or gd.timestamp < :toDate)
+                                            group by gd.project_id, gd.currency_id) gdpc
+                                      group by gdpc.project_id) gd on gd.project_id = p.project_id
             
                            LEFT JOIN LATERAL ( select cast(case
                                                                when coalesce(cd.previous_period_completed_contribution_count, 0) > 0 and

@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -190,33 +191,42 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     public ResponseEntity<String> exportBIProjects(BiProjectsQueryParams q) {
 
         final var page = findProjects(q);
+        final var allCurrencies = page.getContent().stream()
+                .flatMap(p -> p.budget().availableBudgetPerCurrency().stream().map(ProjectKpisReadEntity.AmountPerCurrency::currency))
+                .collect(Collectors.toSet());
+        final var columns = new ArrayList<>(List.of("project",
+                "leads",
+                "categories",
+                "languages",
+                "ecosystems",
+                "programs",
+                "available_budget_usd_amount",
+                "percent_used_budget",
+                "total_granted_usd_amount",
+                "total_rewarded_usd_amount",
+                "average_reward_usd_amount",
+                "onboarded_contributor_count",
+                "active_contributor_count",
+                "reward_count",
+                "issue_count",
+                "pr_count",
+                "code_review_count",
+                "contribution_count"));
+        columns.addAll(allCurrencies.stream()
+                .flatMap(c -> Stream.of(
+                        "available_budget_amount_%s".formatted(c.code()),
+                        "total_granted_amount_%s".formatted(c.code()),
+                        "total_rewarded_amount_%s".formatted(c.code())))
+                .toList());
         final var format = CSVFormat.DEFAULT.builder()
                 .setDelimiter(';')
                 .build();
         final var sw = new StringWriter();
 
         try (final var printer = new CSVPrinter(sw, format)) {
-            printer.printRecord("project",
-                    "leads",
-                    "categories",
-                    "languages",
-                    "ecosystems",
-                    "programs",
-                    "available_budget_usd_amount",
-                    "available_budgets",
-                    "percent_used_budget",
-                    "total_granted_usd_amount",
-                    "total_rewarded_usd_amount",
-                    "average_reward_usd_amount",
-                    "onboarded_contributor_count",
-                    "active_contributor_count",
-                    "reward_count",
-                    "issue_count",
-                    "pr_count",
-                    "code_review_count",
-                    "contribution_count");
+            printer.printRecord(columns);
             for (final var transaction : page.getContent())
-                transaction.toCsv(printer);
+                transaction.toCsv(printer, allCurrencies);
         } catch (final IOException e) {
             throw internalServerError("Error while exporting to CSV", e);
         }

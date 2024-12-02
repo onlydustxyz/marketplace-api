@@ -597,10 +597,18 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
 
             final var lines = Objects.requireNonNull(csv).split("\\R");
             assertThat(lines).hasSize(4);
-            assertThat(lines[0]).isEqualTo("project;leads;categories;languages;ecosystems;programs;available_budget_usd_amount;available_budgets;" +
-                                           "percent_used_budget;total_granted_usd_amount;total_rewarded_usd_amount;average_reward_usd_amount;" +
-                                           "onboarded_contributor_count;active_contributor_count;reward_count;issue_count;pr_count;code_review_count;" +
-                                           "contribution_count");
+            assertThat(lines[0]).isEqualTo("project;leads;categories;languages;ecosystems;programs;available_budget_usd_amount;percent_used_budget;" +
+                                           "total_granted_usd_amount;total_rewarded_usd_amount;average_reward_usd_amount;onboarded_contributor_count;" +
+                                           "active_contributor_count;reward_count;issue_count;pr_count;code_review_count;contribution_count;" +
+                                           "available_budget_amount_STRK;total_granted_amount_STRK;total_rewarded_amount_STRK;" +
+                                           "available_budget_amount_ETH;total_granted_amount_ETH;total_rewarded_amount_ETH");
+            assertThat(lines[1]).endsWith(";mehdi;Gaming;Cairo;Ethereum ecosystem,Starknet ecosystem,Universe ecosystem;Ethereum Granting Program,Starkware " +
+                                          "Exploration Team;3002.50;0.00;2000;0;0;1;1;0;0;4;0;4;10;0;0;1000;1000;0");
+            assertThat(lines[2]).endsWith(";hayden;;;Starknet ecosystem,Universe ecosystem;Starkware " +
+                                          "Exploration Team;27.50;0.00;60.0;0;0;0;0;0;0;0;0;0;110;120;0;0;0;0");
+            assertThat(lines[3]).endsWith(";pierre;DeFi;Java,Rust,Typescript;Universe ecosystem;Ethereum Granting Program," +
+                                          "Nethermind;96.25;0.04;100.0;5.0;1.25;3;3;4;1;6;1;8;85;100;10;25;25;0");
+
         }
 
         private void test_projects_stats(String queryParam, String value, Consumer<BiProjectsPageResponse> asserter, boolean assertNotEmpty) {
