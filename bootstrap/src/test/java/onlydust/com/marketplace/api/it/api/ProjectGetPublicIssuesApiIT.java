@@ -1663,21 +1663,6 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_get_good_first_issues() {
-        // When
-        client.get()
-                .uri(getApiURI(PROJECT_GOOD_FIRST_ISSUES.formatted(CAL_DOT_COM), Map.of(
-                        "pageIndex", "0",
-                        "pageSize", "5",
-                        "direction", "DESC"
-                )))
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.totalPageNumber").isEqualTo(0);
-
-
         // Given
         final var label = "Awesome ODHack 42";
         final var hackathon = Hackathon.builder()
@@ -1961,6 +1946,174 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               ],
                               "applicants": [],
                               "assignees": []
+                            }
+                          ]
+                        }
+                        """);
+
+
+        // And given
+        hackathon.githubLabels().add("good first issue");
+        hackathonStoragePort.save(hackathon);
+
+        // When
+        client.get()
+                .uri(getApiURI(PROJECT_GOOD_FIRST_ISSUES.formatted("00490be6-2c03-4720-993b-aea3e07edd81"), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10",
+                        "direction", "DESC"
+                )))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.issues[0].id").isEqualTo(hackathonIssueId)
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 5,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "issues": [
+                            {
+                              "labels": [
+                                {
+                                  "name": "Awesome ODHack 42"
+                                }
+                              ]
+                            },
+                            {
+                              "id": 1270688337,
+                              "labels": [
+                                {
+                                  "name": "Context: isolated",
+                                  "description": "no previous knowledge of the codebase required"
+                                },
+                                {
+                                  "name": "Difficulty: hard",
+                                  "description": "require extensive knowledge about the field"
+                                },
+                                {
+                                  "name": "Duration: few days",
+                                  "description": "will take a few days"
+                                },
+                                {
+                                  "name": "State: open",
+                                  "description": "ready for contribution"
+                                },
+                                {
+                                  "name": "Techno: cairo",
+                                  "description": "cairo"
+                                },
+                                {
+                                  "name": "Type: feature",
+                                  "description": "a new feature to implement"
+                                },
+                                {
+                                  "name": "good first issue",
+                                  "description": "Good for newcomers"
+                                }
+                              ]
+                            },
+                            {
+                              "id": 1270661065,
+                              "labels": [
+                                {
+                                  "name": "Context: isolated",
+                                  "description": "no previous knowledge of the codebase required"
+                                },
+                                {
+                                  "name": "Difficulty: intermediate",
+                                  "description": "mobilise some notions about the field, but can be learned while doing"
+                                },
+                                {
+                                  "name": "Duration: few days",
+                                  "description": "will take a few days"
+                                },
+                                {
+                                  "name": "State: open",
+                                  "description": "ready for contribution"
+                                },
+                                {
+                                  "name": "Techno: cairo",
+                                  "description": "cairo"
+                                },
+                                {
+                                  "name": "Type: feature",
+                                  "description": "a new feature to implement"
+                                },
+                                {
+                                  "name": "good first issue",
+                                  "description": "Good for newcomers"
+                                }
+                              ]
+                            },
+                            {
+                              "id": 1262933369,
+                              "labels": [
+                                {
+                                  "name": "Context: coupled",
+                                  "description": "interact with some parts of the codebase"
+                                },
+                                {
+                                  "name": "Difficulty: hard",
+                                  "description": "require extensive knowledge about the field"
+                                },
+                                {
+                                  "name": "Duration: few days",
+                                  "description": "will take a few days"
+                                },
+                                {
+                                  "name": "State: open",
+                                  "description": "ready for contribution"
+                                },
+                                {
+                                  "name": "Techno: js",
+                                  "description": "javascript/typescript"
+                                },
+                                {
+                                  "name": "Techno: python",
+                                  "description": "python"
+                                },
+                                {
+                                  "name": "Type: feature",
+                                  "description": "a new feature to implement"
+                                },
+                                {
+                                  "name": "good first issue",
+                                  "description": "Good for newcomers"
+                                }
+                              ]
+                            },
+                            {
+                              "id": 1243347024,
+                              "labels": [
+                                {
+                                  "name": "Difficulty: easy",
+                                  "description": "anybody can understand it"
+                                },
+                                {
+                                  "name": "Duration: under a day",
+                                  "description": "wil take up to one day"
+                                },
+                                {
+                                  "name": "State: open",
+                                  "description": "ready for contribution"
+                                },
+                                {
+                                  "name": "Techno: cairo",
+                                  "description": "cairo"
+                                },
+                                {
+                                  "name": "Type: feature",
+                                  "description": "a new feature to implement"
+                                },
+                                {
+                                  "name": "good first issue",
+                                  "description": "Good for newcomers"
+                                }
+                              ]
                             }
                           ]
                         }
