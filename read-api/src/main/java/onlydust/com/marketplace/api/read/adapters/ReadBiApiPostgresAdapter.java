@@ -264,10 +264,10 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     }
 
     @Override
-    public ResponseEntity<List<BiWorldMapItemResponse>> getBIWorldMap(WorldMapKpiEnum kpi,
-                                                                      String fromDate,
-                                                                      String toDate,
-                                                                      List<UUID> dataSourceIds) {
+    public ResponseEntity<BiWorldMapListResponse> getBIWorldMap(WorldMapKpiEnum kpi,
+                                                                String fromDate,
+                                                                String toDate,
+                                                                List<UUID> dataSourceIds) {
 
         final var kpis = switch (kpi) {
             case ACTIVE_CONTRIBUTORS -> worldMapKpiReadRepository.findActiveContributorCount(
@@ -276,10 +276,15 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                     getFilteredDataSourceIds(dataSourceIds).toArray(UUID[]::new)
             );
         };
-
-        return ok(kpis.stream()
+        final var countries = kpis.stream()
                 .map(WorldMapKpiReadEntity::toListItemResponse)
-                .toList());
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+        return ok(new BiWorldMapListResponse()
+                .totalContributorCount(kpis.stream().map(WorldMapKpiReadEntity::value).reduce(0, Integer::sum))
+                .totalContributorWithCountryCount(countries.stream().map(BiWorldMapItemResponse::getValue).reduce(0, Integer::sum))
+                .countries(countries));
     }
 
     private List<UUID> getFilteredDataSourceIds(List<UUID> dataSourceIds) {

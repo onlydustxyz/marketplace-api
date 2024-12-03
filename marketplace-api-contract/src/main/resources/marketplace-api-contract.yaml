@@ -12477,9 +12477,18 @@ components:
             $ref: '#/components/schemas/ContactInformation'
 
     BiWorldMapListResponse:
-      type: array
-      items:
-        $ref: '#/components/schemas/BiWorldMapItemResponse'
+      type: object
+      required:
+        - countries
+      properties:
+        totalContributorCount:
+          type: integer
+        totalContributorWithCountryCount:
+          type: integer
+        countries:
+          type: array
+          items:
+            $ref: '#/components/schemas/BiWorldMapItemResponse'
 
     BiWorldMapItemResponse:
       type: object
@@ -12493,8 +12502,7 @@ components:
         countryName:
           type: string
         value:
-          type: number
-          format: int64
+          type: integer
 
     ProjectContributorLabelRequest:
       type: object

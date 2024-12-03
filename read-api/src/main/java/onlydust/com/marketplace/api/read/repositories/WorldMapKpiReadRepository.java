@@ -11,18 +11,15 @@ import java.util.UUID;
 public interface WorldMapKpiReadRepository extends JpaRepository<WorldMapKpiReadEntity, String> {
 
     @Query(value = """
-            select
-                cd.contributor_country            as country_code,
-                count(distinct cd.contributor_id) as value
-            from bi.p_project_global_data p
-                join bi.p_per_contributor_contribution_data cd on cd.project_id = p.project_id and
-                                                (cast(:fromDate as text) is null or cd.timestamp >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) and
-                                                (cast(:toDate as text) is null or date_trunc('day', cd.timestamp) < to_date(cast(:toDate as text), 'YYYY-MM-DD'))
-                                       and cd.contributor_country is not null
-            where (coalesce(:dataSourceIds) is null or
-                     p.project_id = any(:dataSourceIds) or
-                     p.program_ids && cast(array[:dataSourceIds] as uuid[]) or
-                     p.ecosystem_ids && cast(array[:dataSourceIds] as uuid[]))
+            select coalesce(cd.contributor_country, 'NULL') as country_code,
+                   count(distinct cd.contributor_id)        as value
+            from bi.p_per_contributor_contribution_data cd
+            where (cast(:fromDate as text) is null or cd.timestamp >= to_date(cast(:fromDate as text), 'YYYY-MM-DD'))
+              and (cast(:toDate as text) is null or date_trunc('day', cd.timestamp) < to_date(cast(:toDate as text), 'YYYY-MM-DD'))
+              and (coalesce(:dataSourceIds) is null or
+                   cd.project_id = any (:dataSourceIds) or
+                   cd.program_ids && cast(array [:dataSourceIds] as uuid[]) or
+                   cd.ecosystem_ids && cast(array [:dataSourceIds] as uuid[]))
             group by cd.contributor_country
             order by cd.contributor_country
             """, nativeQuery = true)

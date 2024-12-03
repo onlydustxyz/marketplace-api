@@ -95,6 +95,7 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
             billingProfileHelper.verify(emma, Country.fromIso3("GBR"));
             final var james = userAuthHelper.create();
             billingProfileHelper.verify(james, Country.fromIso3("GBR"));
+            final var eric = userAuthHelper.create();
 
             at("2021-01-01T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho));
             at("2021-01-01T00:00:03Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
@@ -111,6 +112,7 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
             at("2021-02-01T00:00:06Z", () -> githubHelper.createPullRequest(madara_app, emma));
             at("2021-02-01T00:00:08Z", () -> githubHelper.createPullRequest(bridge_frontend, james));
             at("2021-02-01T00:00:08Z", () -> githubHelper.createPullRequest(bridge_api, james));
+            at("2021-02-01T00:00:08Z", () -> githubHelper.createPullRequest(bridge_api, eric));
 
             projectFacadePort.refreshStats();
         }
@@ -133,23 +135,27 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
                     .isOk()
                     .expectBody()
                     .json("""
-                            [
-                              {
-                                "countryCode": "FR",
-                                "countryName": "France",
-                                "value": 2
-                              },
-                              {
-                                "countryCode": "GB",
-                                "countryName": "United Kingdom",
-                                "value": 3
-                              },
-                              {
-                                "countryCode": "MA",
-                                "countryName": "Morocco",
-                                "value": 2
-                              }
-                            ]
+                            {
+                              "totalContributorCount": 8,
+                              "totalContributorWithCountryCount": 7,
+                              "countries": [
+                                {
+                                  "countryCode": "FR",
+                                  "countryName": "France",
+                                  "value": 2
+                                },
+                                {
+                                  "countryCode": "GB",
+                                  "countryName": "United Kingdom",
+                                  "value": 3
+                                },
+                                {
+                                  "countryCode": "MA",
+                                  "countryName": "Morocco",
+                                  "value": 2
+                                }
+                              ]
+                            }
                             """);
         }
 
@@ -167,23 +173,27 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
                     .isOk()
                     .expectBody()
                     .json("""
-                            [
-                              {
-                                "countryCode": "FR",
-                                "countryName": "France",
-                                "value": 1
-                              },
-                              {
-                                "countryCode": "GB",
-                                "countryName": "United Kingdom",
-                                "value": 2
-                              },
-                              {
-                                "countryCode": "MA",
-                                "countryName": "Morocco",
-                                "value": 1
-                              }
-                            ]
+                            {
+                              "totalContributorCount": 4,
+                              "totalContributorWithCountryCount": 4,
+                              "countries": [
+                                {
+                                  "countryCode": "FR",
+                                  "countryName": "France",
+                                  "value": 1
+                                },
+                                {
+                                  "countryCode": "GB",
+                                  "countryName": "United Kingdom",
+                                  "value": 2
+                                },
+                                {
+                                  "countryCode": "MA",
+                                  "countryName": "Morocco",
+                                  "value": 1
+                                }
+                              ]
+                            }
                             """);
         }
 
@@ -200,23 +210,27 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
                     .isOk()
                     .expectBody()
                     .json("""
-                            [
-                              {
-                                "countryCode": "FR",
-                                "countryName": "France",
-                                "value": 2
-                              },
-                              {
-                                "countryCode": "GB",
-                                "countryName": "United Kingdom",
-                                "value": 3
-                              },
-                              {
-                                "countryCode": "MA",
-                                "countryName": "Morocco",
-                                "value": 1
-                              }
-                            ]
+                            {
+                              "totalContributorCount": 7,
+                              "totalContributorWithCountryCount": 6,
+                              "countries": [
+                                {
+                                  "countryCode": "FR",
+                                  "countryName": "France",
+                                  "value": 2
+                                },
+                                {
+                                  "countryCode": "GB",
+                                  "countryName": "United Kingdom",
+                                  "value": 3
+                                },
+                                {
+                                  "countryCode": "MA",
+                                  "countryName": "Morocco",
+                                  "value": 1
+                                }
+                              ]
+                            }
                             """);
         }
     }
