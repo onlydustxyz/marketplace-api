@@ -114,6 +114,7 @@ public class UserService implements UserFacadePort {
     @Override
     @Transactional
     public void updateGithubProfile(Long githubUserId) {
+        //TODO: force re-indexing of user
         userStoragePort.saveUser(githubSearchPort.getUserProfile(githubUserId)
                 .orElseThrow(() -> notFound(String.format("Github user %s to update was not found", githubUserId))));
     }

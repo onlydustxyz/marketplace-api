@@ -504,7 +504,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackofficeAccountingManagement
+        - BackofficeAccountingRead
       summary: Export rewards in a CSV
       operationId: exportRewardsCSV
       description: |

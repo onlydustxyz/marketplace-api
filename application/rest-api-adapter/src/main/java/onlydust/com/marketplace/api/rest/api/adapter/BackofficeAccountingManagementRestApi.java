@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.map;
@@ -100,27 +99,6 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 payRewardRequest.getReference());
 
         return noContent().build();
-    }
-
-    @Override
-    public ResponseEntity<String> exportRewardsCSV(List<RewardStatusContract> statuses,
-                                                   List<UUID> billingProfiles,
-                                                   String fromRequestedAt,
-                                                   String toRequestedAt,
-                                                   String fromProcessedAt,
-                                                   String toProcessedAt) {
-        if (fromRequestedAt == null && toRequestedAt == null && fromProcessedAt == null && toProcessedAt == null)
-            throw badRequest("At least one of the date filters must be set");
-
-        final String csv = accountingRewardPort.exportRewardsCSV(
-                Optional.ofNullable(statuses).orElse(List.of()).stream().map(BackOfficeMapper::map).toList(),
-                billingProfiles != null ? billingProfiles.stream().map(BillingProfile.Id::of).toList() : null,
-                DateMapper.parseNullable(fromRequestedAt),
-                DateMapper.parseNullable(toRequestedAt),
-                DateMapper.parseNullable(fromProcessedAt),
-                DateMapper.parseNullable(toProcessedAt)
-        );
-        return ok(csv);
     }
 
     @Override

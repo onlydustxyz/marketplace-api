@@ -12,6 +12,7 @@ import onlydust.com.backoffice.api.contract.model.InvoiceLinkResponse;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfileReadEntity;
+import onlydust.com.marketplace.api.read.entities.user.IndexedUserReadEntity;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
@@ -36,9 +37,9 @@ public class InvoiceReadEntity {
     @Id
     @NonNull
     UUID id;
+
     @NonNull
     UUID billingProfileId;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "billingProfileId", referencedColumnName = "id", insertable = false, updatable = false)
     @NonNull
@@ -46,8 +47,13 @@ public class InvoiceReadEntity {
 
     @NonNull
     String number;
+
     @NonNull
     UUID createdBy;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "createdBy", referencedColumnName = "userId", insertable = false, updatable = false)
+    @NonNull
+    IndexedUserReadEntity createdByUser;
 
     @NonNull
     ZonedDateTime createdAt;

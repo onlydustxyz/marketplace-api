@@ -18,14 +18,11 @@ import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
 import onlydust.com.marketplace.kernel.model.*;
-import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.output.BoostedRewardStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
 import onlydust.com.marketplace.project.domain.view.ShortProjectRewardView;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -77,30 +74,6 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     @Transactional
     public void savePayment(Payment payment) {
         batchPaymentRepository.saveAndFlush(BatchPaymentEntity.fromDomain(payment));
-    }
-
-    @Override
-    @Transactional
-    public Page<RewardDetailsView> findRewards(int pageIndex, int pageSize,
-                                               @NonNull Set<RewardStatus.Input> statuses,
-                                               @NonNull List<BillingProfile.Id> billingProfileIds,
-                                               @NonNull List<GithubUserId> recipients,
-                                               Date fromRequestedAt, Date toRequestedAt,
-                                               Date fromProcessedAt, Date toProcessedAt) {
-        final var page = backofficeRewardViewRepository.findAllByStatusesAndDates(
-                statuses.stream().map(Enum::name).toList(),
-                billingProfileIds.stream().map(BillingProfile.Id::value).toList(),
-                recipients.stream().map(GithubUserId::value).toList(),
-                fromRequestedAt, toRequestedAt,
-                fromProcessedAt, toProcessedAt,
-                PageRequest.of(pageIndex, pageSize, Sort.by("requested_at").descending())
-        );
-
-        return Page.<RewardDetailsView>builder()
-                .content(page.getContent().stream().map(BoRewardQueryEntity::toDomain).toList())
-                .totalItemNumber((int) page.getTotalElements())
-                .totalPageNumber(page.getTotalPages())
-                .build();
     }
 
     @Override

@@ -2,15 +2,14 @@ package onlydust.com.marketplace.accounting.domain.port.out;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
-import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.view.EarningsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
-import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.kernel.model.UserId;
 
 import java.util.Date;
 import java.util.List;
@@ -22,13 +21,6 @@ public interface AccountingRewardStoragePort {
     Optional<Payment> findPayment(Payment.Id batchPaymentId);
 
     void savePayment(Payment updatedPayment);
-
-    Page<RewardDetailsView> findRewards(int pageIndex, int pageSize,
-                                        @NonNull Set<RewardStatus.Input> statuses,
-                                        @NonNull List<BillingProfile.Id> billingProfileIds,
-                                        @NonNull List<GithubUserId> recipients,
-                                        Date fromRequestedAt, Date toRequestedAt,
-                                        Date fromProcessedAt, Date toProcessedAt);
 
     EarningsView getEarnings(@NonNull Set<RewardStatus.Input> statuses,
                              @NonNull List<GithubUserId> recipientIds,
