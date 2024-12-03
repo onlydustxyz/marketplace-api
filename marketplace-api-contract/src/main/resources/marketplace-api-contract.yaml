@@ -8688,6 +8688,10 @@ components:
           required:
             - symbol
           properties:
+            networks:
+              type: array
+              items:
+                $ref: '#/components/schemas/NetworkContract'
             onlyDustWallets:
               type: array
               items:

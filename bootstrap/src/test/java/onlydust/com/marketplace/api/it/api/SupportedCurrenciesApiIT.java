@@ -37,6 +37,9 @@ public class SupportedCurrenciesApiIT extends AbstractMarketplaceApiIT {
                               "name": "Aptos Coin",
                               "logoUrl": null,
                               "decimals": 8,
+                              "networks": [
+                                "APTOS"
+                              ],
                               "onlyDustWallets": []
                             },
                             {
@@ -45,6 +48,7 @@ public class SupportedCurrenciesApiIT extends AbstractMarketplaceApiIT {
                               "name": "Bitcoin",
                               "logoUrl": null,
                               "decimals": 8,
+                              "networks": [],
                               "onlyDustWallets": []
                             },
                             {
@@ -53,6 +57,9 @@ public class SupportedCurrenciesApiIT extends AbstractMarketplaceApiIT {
                               "name": "Ether",
                               "logoUrl": null,
                               "decimals": 18,
+                              "networks": [
+                                "ETHEREUM"
+                              ],
                               "onlyDustWallets": [
                                 {
                                   "address": "0xb060429d14266d06a8be63281205668be823604f",
@@ -66,6 +73,9 @@ public class SupportedCurrenciesApiIT extends AbstractMarketplaceApiIT {
                               "name": "Euro",
                               "logoUrl": null,
                               "decimals": 2,
+                              "networks": [
+                                "SEPA"
+                              ],
                               "onlyDustWallets": []
                             },
                             {
@@ -74,6 +84,9 @@ public class SupportedCurrenciesApiIT extends AbstractMarketplaceApiIT {
                               "name": "Optimism",
                               "logoUrl": null,
                               "decimals": 18,
+                              "networks": [
+                                "OPTIMISM"
+                              ],
                               "onlyDustWallets": [
                                 {
                                   "address": "0xaEF011B2374D723652796BF25a9FEE9e81C45a36",
@@ -87,6 +100,9 @@ public class SupportedCurrenciesApiIT extends AbstractMarketplaceApiIT {
                               "name": "StarkNet Token",
                               "logoUrl": null,
                               "decimals": 18,
+                              "networks": [
+                                "ETHEREUM"
+                              ],
                               "onlyDustWallets": [
                                 {
                                   "address": "0xb060429d14266d06a8be63281205668be823604f",
@@ -100,6 +116,9 @@ public class SupportedCurrenciesApiIT extends AbstractMarketplaceApiIT {
                               "name": "US Dollar",
                               "logoUrl": null,
                               "decimals": 2,
+                              "networks": [
+                                "SEPA"
+                              ],
                               "onlyDustWallets": []
                             },
                             {
@@ -108,6 +127,10 @@ public class SupportedCurrenciesApiIT extends AbstractMarketplaceApiIT {
                               "name": "USD Coin",
                               "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                               "decimals": 6,
+                              "networks": [
+                                "ETHEREUM",
+                                "STELLAR"
+                              ],
                               "onlyDustWallets": [
                                 {
                                   "address": "0xb060429d14266d06a8be63281205668be823604f",
