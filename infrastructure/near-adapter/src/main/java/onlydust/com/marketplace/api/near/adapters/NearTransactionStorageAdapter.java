@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.near.adapters;
 
 import com.syntifi.near.api.common.exception.NearException;
-import com.syntifi.near.api.common.helper.Formats;
 import com.syntifi.near.api.rpc.model.transaction.TransactionStatus;
 import com.syntifi.near.api.rpc.model.transaction.TransferAction;
 import lombok.AllArgsConstructor;
@@ -54,7 +53,7 @@ public class NearTransactionStorageAdapter implements BlockchainTransactionStora
                 transactionStatus.getStatus().getSuccessValue() != null ? CONFIRMED : FAILED,
                 transactionStatus.getTransaction().getSignerId(),
                 transactionStatus.getTransaction().getReceiverId(),
-                new BigDecimal(Formats.formatNearAmount(action.getDeposit().toString(), 24)),
+                new BigDecimal(action.getDeposit(), 24),
                 null
         );
     }
