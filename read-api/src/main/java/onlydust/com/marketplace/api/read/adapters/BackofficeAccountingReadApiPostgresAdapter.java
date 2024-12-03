@@ -6,8 +6,10 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BatchPaymentReadEntity;
 import onlydust.com.marketplace.api.read.entities.reward.RewardReadEntity;
 import onlydust.com.marketplace.api.read.entities.reward.RewardStatusReadEntity;
+import onlydust.com.marketplace.api.read.mapper.RewardsExporter;
 import onlydust.com.marketplace.api.read.repositories.BatchPaymentReadRepository;
 import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
+import onlydust.com.marketplace.api.read.repositories.FullRewardStatusReadRepository;
 import onlydust.com.marketplace.api.read.repositories.RewardReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.springframework.context.annotation.Profile;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
@@ -35,6 +38,7 @@ public class BackofficeAccountingReadApiPostgresAdapter implements BackofficeAcc
     private final BatchPaymentReadRepository batchPaymentReadRepository;
     private final RewardReadRepository rewardReadRepository;
     private final BillingProfileReadRepository billingProfileReadRepository;
+    private final FullRewardStatusReadRepository fullRewardStatusReadRepository;
 
     @Override
     public ResponseEntity<BatchPaymentDetailsResponse> getBatchPayment(UUID batchPaymentId) {
@@ -96,5 +100,35 @@ public class BackofficeAccountingReadApiPostgresAdapter implements BackofficeAcc
                 .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()));
 
         return response.getHasMore() ? status(HttpStatus.PARTIAL_CONTENT).body(response) : ok(response);
+    }
+
+    @Override
+    public ResponseEntity<String> exportRewardsCSV(List<RewardStatusContract> statuses,
+                                                   List<UUID> billingProfiles,
+                                                   String fromRequestedAt,
+                                                   String toRequestedAt,
+                                                   String fromProcessedAt,
+                                                   String toProcessedAt) {
+        if (fromRequestedAt == null && toRequestedAt == null && fromProcessedAt == null && toProcessedAt == null)
+            throw badRequest("At least one of the date filters must be set");
+
+        final var page = fullRewardStatusReadRepository.find(
+                statuses == null ? null : statuses.stream().map(RewardStatusReadEntity::of).toList(),
+                billingProfiles,
+                null,
+                null,
+                DateMapper.parseZonedNullable(fromRequestedAt),
+                DateMapper.parseZonedNullable(toRequestedAt),
+                DateMapper.parseZonedNullable(fromProcessedAt),
+                DateMapper.parseZonedNullable(toProcessedAt),
+                PageRequest.of(0, 1_000_000, Sort.by("requestedAt").descending())
+        );
+
+        if (page.getTotalPages() > 1) {
+            throw badRequest("Too many rewards to export");
+        }
+
+        final String csv = RewardsExporter.csv(page.getContent());
+        return ok(csv);
     }
 }

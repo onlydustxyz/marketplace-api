@@ -3,12 +3,9 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoRewardQueryEntity;
 import org.intellij.lang.annotations.Language;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -87,22 +84,6 @@ public interface BackofficeRewardViewRepository extends JpaRepository<BoRewardQu
                                                 left join indexer_exp.github_issues gi on cast(gi.id as text) = ri.id
                                        group by ri.reward_id) g_urls on g_urls.reward_id = r.reward_id
             """;
-
-    @Query(value = SELECT + """
-            where (coalesce(:statuses) is null or cast(r.status as text) in (:statuses))
-                and (coalesce(:fromRequestedAt) is null or date_trunc('day', r.requested_at) >= cast(cast(:fromRequestedAt as text) as timestamp))
-                and (coalesce(:toRequestedAt)   is null or date_trunc('day', r.requested_at) <= cast(cast(:toRequestedAt   as text) as timestamp))
-                and (coalesce(:fromProcessedAt) is null or date_trunc('day', r.paid_at)  >= cast(cast(:fromProcessedAt as text) as timestamp))
-                and (coalesce(:toProcessedAt)   is null or date_trunc('day', r.paid_at)  <= cast(cast(:toProcessedAt   as text) as timestamp))
-                and (coalesce(:billingProfileIds) is null or i.billing_profile_id in (:billingProfileIds))
-                and (coalesce(:recipients) is null or r.recipient_id in (:recipients))
-            """, nativeQuery = true)
-    Page<BoRewardQueryEntity> findAllByStatusesAndDates(@NonNull List<String> statuses,
-                                                        @NonNull List<UUID> billingProfileIds,
-                                                        @NonNull List<Long> recipients,
-                                                        Date fromRequestedAt, Date toRequestedAt,
-                                                        Date fromProcessedAt, Date toProcessedAt,
-                                                        Pageable pageable);
 
     @Query(value = SELECT + """
             where r.reward_id in (:rewardIds)

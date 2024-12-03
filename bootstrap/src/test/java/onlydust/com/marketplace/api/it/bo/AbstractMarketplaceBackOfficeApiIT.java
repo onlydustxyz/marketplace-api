@@ -107,6 +107,8 @@ public class AbstractMarketplaceBackOfficeApiIT {
     DepositHelper depositHelper;
     @Autowired
     CurrencyHelper currencyHelper;
+    @Autowired
+    DatabaseHelper databaseHelper;
 
     @Autowired
     UserRepository userRepository;

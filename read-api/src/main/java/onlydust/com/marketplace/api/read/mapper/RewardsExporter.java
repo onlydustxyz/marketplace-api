@@ -1,7 +1,6 @@
-package onlydust.com.marketplace.accounting.domain.service;
+package onlydust.com.marketplace.api.read.mapper;
 
-import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.SponsorView;
+import onlydust.com.marketplace.api.read.entities.reward.FullRewardStatusReadEntity;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -19,6 +18,7 @@ public class RewardsExporter {
             "Invoice Creator email",
             "Invoice Creator name",
             "Recipient name",
+            "Recipient login",
             "Amount",
             "Currency",
             "Contributions",
@@ -29,7 +29,7 @@ public class RewardsExporter {
             "Payout information",
             "Pretty ID",
             "Sponsors",
-            "Recipient email",
+            "Programs",
             "Verification status",
             "Account type",
             "Invoice number",
@@ -39,7 +39,7 @@ public class RewardsExporter {
             "Dollar Amount"
     };
 
-    public static String csv(List<RewardDetailsView> rewards) {
+    public static String csv(List<FullRewardStatusReadEntity> rewards) {
         final CSVFormat csvFormat = CSVFormat.DEFAULT.builder()
                 .setHeader(HEADERS)
                 .build();
@@ -49,27 +49,30 @@ public class RewardsExporter {
             for (final var reward : rewards) {
                 csvPrinter.printRecord(
                         reward.project().name(),
-                        isNull(reward.invoice()) ? null : reward.invoice().createdBy().githubLogin(),
-                        isNull(reward.invoice()) ? null : reward.invoice().createdBy().email(),
-                        isNull(reward.invoice()) ? null : reward.invoice().createdBy().name(),
+                        isNull(reward.invoice()) ? null : reward.invoice().createdByUser().login(),
+                        isNull(reward.invoice()) ? null : reward.invoice().createdByUser().email(),
+                        isNull(reward.invoice()) || isNull(reward.invoice().createdByUser().kyc()) ? null :
+                                reward.invoice().createdByUser().kyc().firstName() + " " + reward.invoice().createdByUser().kyc().lastName(),
                         isNull(reward.billingProfile()) ? reward.recipient().login() : reward.billingProfile().subject(),
-                        reward.money().amount(),
-                        reward.money().currency().code(),
-                        reward.githubUrls(),
+                        reward.recipient().login(),
+                        reward.amount(),
+                        reward.currency().code(),
+                        reward.itemGithubUrls().stream().sorted().toList(),
                         reward.status(),
                         reward.requestedAt(),
-                        reward.processedAt(),
+                        reward.paidAt(),
                         reward.transactionReferences(),
                         reward.paidToAccountNumbers(),
-                        reward.id().pretty(),
-                        reward.sponsors().stream().map(SponsorView::name).toList(),
-                        isNull(reward.billingProfile()) ? null : reward.billingProfile().status(),
+                        reward.prettyId(),
+                        reward.sponsorNames().stream().sorted().toList(),
+                        reward.programNames().stream().sorted().toList(),
+                        isNull(reward.billingProfile()) ? null : reward.billingProfile().verificationStatus(),
                         isNull(reward.billingProfile()) ? null : reward.billingProfile().type(),
                         isNull(reward.invoice()) ? null : reward.invoice().number(),
                         isNull(reward.invoice()) ? null : reward.invoice().id(),
-                        "%s - %s".formatted(reward.project().name(), reward.money().currency().code()),
-                        reward.money().usdConversionRate().orElseThrow(() -> internalServerError("Dollars conversion rate not found for reward %s".formatted(reward.id().value()))),
-                        reward.money().dollarsEquivalent().orElseThrow(() -> internalServerError("Dollars equivalent not found for reward %s".formatted(reward.id().value())))
+                        "%s - %s".formatted(reward.project().name(), reward.currency().code()),
+                        reward.usdConversionRate(),
+                        reward.amountUsdEquivalent()
                 );
             }
         } catch (final Exception e) {
