@@ -65,3 +65,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000034_update_project_stats_for_ranking_view.sql
   - include:
       file: db/changelog/changelogs/00000035_sponsor_stats_per_program.sql
+  - include:
+      file: db/changelog/changelogs/00000036_add_index_for_world_map.sql
