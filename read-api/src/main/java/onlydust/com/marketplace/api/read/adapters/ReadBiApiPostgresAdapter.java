@@ -280,6 +280,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 .map(WorldMapKpiReadEntity::toListItemResponse)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
+                .sorted(comparing(BiWorldMapItemResponse::getValue).reversed())
                 .toList();
         return ok(new BiWorldMapListResponse()
                 .totalContributorCount(kpis.stream().map(WorldMapKpiReadEntity::value).reduce(0, Integer::sum))
