@@ -9,6 +9,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.GithubMembership;
@@ -47,6 +48,7 @@ public class UserServiceTest {
     private GithubSearchPort githubSearchPort;
     private ImageStoragePort imageStoragePort;
     private MetaBlockExplorer metaBlockExplorer;
+    private IndexerPort indexerPort;
     private UserService userService;
 
     @BeforeEach
@@ -56,8 +58,9 @@ public class UserServiceTest {
         githubSearchPort = mock(GithubSearchPort.class);
         imageStoragePort = mock(ImageStoragePort.class);
         metaBlockExplorer = mock(MetaBlockExplorer.class);
+        indexerPort = mock(IndexerPort.class);
 
-        userService = new UserService(userStoragePort, dateProvider, projectStoragePort, githubSearchPort, imageStoragePort, metaBlockExplorer);
+        userService = new UserService(userStoragePort, dateProvider, projectStoragePort, githubSearchPort, imageStoragePort, metaBlockExplorer, indexerPort);
     }
 
     @Test
@@ -479,6 +482,7 @@ public class UserServiceTest {
         // Then
         final ArgumentCaptor<GithubUserIdentity> userArgumentCaptor = ArgumentCaptor.forClass(GithubUserIdentity.class);
         verify(userStoragePort, times(1)).saveUser(userArgumentCaptor.capture());
+        verify(indexerPort, times(1)).indexUser(githubUserId);
         assertEquals(githubUserIdentity.login(), userArgumentCaptor.getValue().login());
         assertEquals(githubUserIdentity.avatarUrl(), userArgumentCaptor.getValue().avatarUrl());
         assertEquals(githubUserIdentity.email(), userArgumentCaptor.getValue().email());

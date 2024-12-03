@@ -118,14 +118,16 @@ public class ProjectConfiguration {
                                          final ProjectStoragePort projectStoragePort,
                                          final GithubSearchPort githubSearchPort,
                                          final ImageStoragePort imageStoragePort,
-                                         final MetaBlockExplorer blockExplorer) {
+                                         final MetaBlockExplorer blockExplorer,
+                                         final IndexerPort indexerPort) {
         return new UserService(
                 postgresUserAdapter,
                 dateProvider,
                 projectStoragePort,
                 githubSearchPort,
                 imageStoragePort,
-                blockExplorer);
+                blockExplorer,
+                indexerPort);
     }
 
     @Bean
