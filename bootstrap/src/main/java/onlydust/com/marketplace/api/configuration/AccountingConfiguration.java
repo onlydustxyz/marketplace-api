@@ -196,7 +196,9 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public DepositObserverPort depositObservers(SlackApiAdapter slackApiAdapter, AccountingNotifier accountingNotifier) {
-        return new DepositObserverComposite(slackApiAdapter, accountingNotifier);
+    public DepositObserverPort depositObservers(SlackApiAdapter slackApiAdapter,
+                                                AccountingNotifier accountingNotifier,
+                                                AccountBookProjector accountBookProjector) {
+        return new DepositObserverComposite(accountBookProjector, slackApiAdapter, accountingNotifier);
     }
 }

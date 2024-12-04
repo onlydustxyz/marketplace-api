@@ -67,3 +67,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000035_sponsor_stats_per_program.sql
   - include:
       file: db/changelog/changelogs/00000036_add_index_for_world_map.sql
+  - include:
+      file: db/changelog/changelogs/00000037_add_missing_deposits_to_all_transactions.sql
