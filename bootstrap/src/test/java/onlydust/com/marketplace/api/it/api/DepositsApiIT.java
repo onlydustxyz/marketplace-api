@@ -1,16 +1,23 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.backoffice.api.contract.model.DepositStatus;
+import onlydust.com.backoffice.api.contract.model.DepositUpdateRequest;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.OnlyDustWallets;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.DepositRepository;
+import onlydust.com.marketplace.api.rest.api.adapter.BackofficeSponsorManagementRestApi;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
+import onlydust.com.marketplace.project.domain.port.input.SponsorFacadePort;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -19,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
+
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.assertArg;
@@ -35,6 +44,15 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
     OnlyDustWallets onlyDustWallets;
 
     OnlyDustWallets originalOnlyDustWallets;
+
+    @Autowired
+    SponsorFacadePort sponsorFacadePort;
+    @Autowired
+    AccountingFacadePort accountingFacadePort;
+
+    private @NotNull BackofficeSponsorManagementRestApi getBackofficeSponsorManagementRestApi() {
+        return new BackofficeSponsorManagementRestApi(sponsorFacadePort, accountingFacadePort);
+    }
 
     @BeforeEach
     void setUp() {
@@ -55,12 +73,13 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
     @Nested
     class GivenMySponsor {
         Sponsor sponsor;
+        @Autowired
+        SlackApiAdapter slackApiAdapter;
 
         @BeforeEach
         void setUp() {
             sponsor = sponsorHelper.create(caller);
         }
-
 
         @Test
         void should_preview_a_deposit_of_eth_on_ethereum() {
@@ -624,17 +643,34 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                             """);
         }
 
-        @Autowired
-        SlackApiAdapter slackApiAdapter;
-
         @Test
         void should_update_deposit() {
-            // Given
-            final var deposit = depositHelper.preview(caller.userId(), sponsor.id(), Network.ETHEREUM);
+            // When
+            final var depositId = new MutableObject<String>();
+            client.post()
+                    .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "network": "ETHEREUM",
+                                "transactionReference": "%s"
+                            }
+                            """.formatted("0x" + faker.random().hex()))
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.id").value(depositId::setValue);
+
+            var lines = getSponsorTransactionsCsv().split("\\R");
+            assertThat(lines.length).isEqualTo(1);
+            assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,deposit_status,program_id,amount,currency,usd_amount");
 
             // When
             client.put()
-                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(deposit.id())))
+                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(depositId)))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue("""
@@ -658,7 +694,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                     .is2xxSuccessful();
 
             // Then
-            final var depositEntity = depositRepository.findById(deposit.id().value()).orElseThrow();
+            final var depositEntity = depositRepository.findById(UUID.fromString(depositId.getValue())).orElseThrow();
             assertThat(depositEntity.billingInformation().companyName()).isEqualTo("TechCorp Solutions");
             assertThat(depositEntity.status()).isEqualTo(Deposit.Status.PENDING);
             verify(slackApiAdapter).onDepositSubmittedByUser(eq(UserId.of(caller.user().getId())), assertArg((Deposit d) -> {
@@ -666,8 +702,14 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                 assertThat(d.status()).isEqualTo(Deposit.Status.PENDING);
             }));
 
+            lines = getSponsorTransactionsCsv().split("\\R");
+            assertThat(lines.length).isEqualTo(2);
+            assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,deposit_status,program_id,amount,currency,usd_amount");
+            assertThat(lines[1]).startsWith(depositId.getValue());
+            assertThat(lines[1]).endsWith(",DEPOSITED,PENDING,,0.029180771065409698,ETH,52.00");
+
             // When another preview is made, the latest billing information should be returned
-            final var depositId = new MutableObject<String>();
+            final var otherDepositId = new MutableObject<String>();
 
             client.post()
                     .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
@@ -684,10 +726,10 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isOk()
                     .expectBody()
-                    .jsonPath("$.id").value(depositId::setValue);
+                    .jsonPath("$.id").value(otherDepositId::setValue);
 
             client.get()
-                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(depositId)))
+                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(otherDepositId)))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                     .exchange()
                     // Then
@@ -715,6 +757,31 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                               }
                             }
                             """);
+
+            // When: approve deposit in BO
+            final var backofficeSponsorManagementRestApi = getBackofficeSponsorManagementRestApi();
+            backofficeSponsorManagementRestApi.updateDeposit(UUID.fromString(depositId.toString()),
+                    new DepositUpdateRequest().status(DepositStatus.COMPLETED));
+
+            lines = getSponsorTransactionsCsv().split("\\R");
+            assertThat(lines.length).isEqualTo(2);
+            assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,deposit_status,program_id,amount,currency,usd_amount");
+            assertThat(lines[1]).startsWith(depositId.getValue());
+            assertThat(lines[1]).endsWith(",DEPOSITED,COMPLETED,,0.029180771065409698,ETH,52.00");
+        }
+
+        private @Nullable String getSponsorTransactionsCsv() {
+            final var csv = client.get()
+                    .uri(getApiURI(SPONSOR_TRANSACTIONS.formatted(sponsor.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .header(HttpHeaders.ACCEPT, "text/csv")
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(String.class)
+                    .returnResult().getResponseBody();
+            return csv;
         }
 
         @Test
