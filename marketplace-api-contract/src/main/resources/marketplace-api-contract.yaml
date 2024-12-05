@@ -2032,6 +2032,65 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v2/projects:
+    get:
+      security:
+        - { }
+        - bearerAuth: [ ]
+      tags:
+        - ReadProjects
+      summary: Get all projects
+      operationId: getProjectsV2
+      description: |
+        Get the paginated list of all projects on the platform that are visible to the caller.
+      parameters:
+        - in: query
+          name: tags
+          description: Filter on project tags
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectTag'
+        - in: query
+          name: ecosystemSlugs
+          description: Ecosystem filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/EcosystemSlug'
+        - in: query
+          name: languageSlugs
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/LanguageSlug'
+        - in: query
+          name: categorySlugs
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectCategorySlug'
+        - in: query
+          name: sort
+          description: Sort order
+          schema:
+            $ref: "#/components/schemas/ProjectListSort"
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+      responses:
+        "200":
+          description: 'List of projects'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectPageResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
+
   /api/v1/projects/{projectId}/contributions/{contributionId}:
     get:
       tags:
@@ -2777,7 +2836,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  
+
   /api/v1/projects/{projectId}/stats:
     get:
       tags:
@@ -7792,6 +7851,25 @@ components:
           description: Direct URL to language's banner image
           example: 'https://rust.org/banner.png'
 
+    LanguageWithPercentageResponse:
+      type: object
+      required:
+        - id
+        - slug
+        - name
+        - percentage
+      properties:
+        id:
+          $ref: '#/components/schemas/LanguageId'
+        slug:
+          $ref: '#/components/schemas/LanguageSlug'
+        name:
+          type: string
+          description: Language name
+          example: Rust
+        percentage:
+          type: number
+
     CountriesResponse:
       type: object
       required:
@@ -7836,6 +7914,18 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ProjectCategoryResponse'
+
+    ProjectPageResponseV2:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - projects
+          properties:
+            projects:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectCardResponse'
 
     ProjectPageItemResponse:
       type: object
@@ -12927,3 +13017,31 @@ components:
           type: integer
         rewardCount:
           type: integer
+
+    ProjectCardResponse:
+      type: object
+      properties:
+        slug:
+          $ref: '#/components/schemas/ProjectSlug'
+        name:
+          type: string
+        shortDescription:
+          type: string
+        contributorsCount:
+          type: integer
+        starsCount:
+          type: integer
+        pullRequestsCount:
+          type: integer
+        issuesCount:
+          type: integer
+        goodFirstIssuesCount:
+          type: integer
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectCategoryResponse'
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageWithPercentageResponse'
