@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.OnlyDustWallets;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.DepositRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeSponsorManagementRestApi;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
@@ -29,6 +30,7 @@ import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
 
 import java.util.UUID;
 
+import static onlydust.com.marketplace.api.helper.CurrencyHelper.ETH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.ArgumentMatchers.eq;
@@ -49,6 +51,8 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
     SponsorFacadePort sponsorFacadePort;
     @Autowired
     AccountingFacadePort accountingFacadePort;
+    @Autowired
+    SponsorAccountRepository sponsorAccountRepository;
 
     private @NotNull BackofficeSponsorManagementRestApi getBackofficeSponsorManagementRestApi() {
         return new BackofficeSponsorManagementRestApi(sponsorFacadePort, accountingFacadePort);
@@ -701,6 +705,8 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                 assertThat(d.id().value()).isEqualTo(depositEntity.id());
                 assertThat(d.status()).isEqualTo(Deposit.Status.PENDING);
             }));
+            assertThat(depositEntity.transaction().id()).isNotNull();
+            final var transactionId = depositEntity.transaction().id();
 
             lines = getSponsorTransactionsCsv().split("\\R");
             assertThat(lines.length).isEqualTo(2);
@@ -758,6 +764,12 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                             }
                             """);
 
+            // Deposit has not been approved yet, so the sponsor account transaction should not have been created
+            {
+                final var sponsorAccounts = sponsorAccountRepository.findBySponsorIdAndCurrencyId(sponsor.id().value(), ETH.value());
+                assertThat(sponsorAccounts).hasSize(0);
+            }
+
             // When: approve deposit in BO
             final var backofficeSponsorManagementRestApi = getBackofficeSponsorManagementRestApi();
             backofficeSponsorManagementRestApi.updateDeposit(UUID.fromString(depositId.toString()),
@@ -768,6 +780,16 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
             assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,deposit_status,program_id,amount,currency,usd_amount");
             assertThat(lines[1]).startsWith(depositId.getValue());
             assertThat(lines[1]).endsWith(",DEPOSITED,COMPLETED,,0.029180771065409698,ETH,52.00");
+
+            // Deposit has been approved, so the sponsor account transaction should have been created with the appropriate transaction id
+            databaseHelper.executeInTransaction(() -> {
+                final var sponsorAccounts = sponsorAccountRepository.findBySponsorIdAndCurrencyId(sponsor.id().value(), ETH.value());
+                assertThat(sponsorAccounts).hasSize(1);
+                final var sponsorAccount = sponsorAccounts.get(0);
+                assertThat(sponsorAccount.getTransactions()).hasSize(1);
+                final var transaction = sponsorAccount.getTransactions().stream().findFirst().orElseThrow();
+                assertThat(transaction.getTransactionId()).isEqualTo(transactionId);
+            });
         }
 
         private @Nullable String getSponsorTransactionsCsv() {
