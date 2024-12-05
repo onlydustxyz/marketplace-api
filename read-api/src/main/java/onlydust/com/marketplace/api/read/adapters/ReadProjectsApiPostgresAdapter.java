@@ -48,6 +48,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -553,5 +554,58 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 types.stream().map(FinancialTransactionType::name).toList(),
                 PageRequest.of(index, size, Sort.by("timestamp").descending())
         );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ProjectPageResponseV2> getProjectsV2(Integer pageIndex, Integer pageSize, List<ProjectTag> tags, List<String> ecosystemSlugs,
+                                                               List<String> languageSlugs, List<String> categorySlugs, ProjectListSort sort) {
+        final var projects = projectsPageRepository.findAll(null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                isNull(categorySlugs) ? null : categorySlugs.toArray(String[]::new),
+                null,
+                isNull(languageSlugs) ? null : languageSlugs.toArray(String[]::new),
+                null,
+                isNull(ecosystemSlugs) ? null : ecosystemSlugs.toArray(String[]::new),
+                isNull(tags) ? null : tags.stream().map(ProjectTag::name).toArray(String[]::new),
+                null,
+                null,
+                PageRequest.of(pageIndex, pageSize, isNull(sort) ? JpaSort.unsafe(ASC, "project_name") :
+                        switch (sort) {
+                            case RANK -> JpaSort.unsafe(DESC, "coalesce(is_invited_as_project_lead.value, false)")
+                                    .and(JpaSort.unsafe(DESC, "coalesce(pr.rank, p.rank)"))
+                                    .and(JpaSort.unsafe(ASC, "project_name"));
+                            case NAME -> JpaSort.unsafe(ASC, "project_name");
+                            case REPO_COUNT -> JpaSort.unsafe(DESC, "coalesce(array_length(p.repo_ids, 1), 0)").and(JpaSort.unsafe(ASC, "project_name"));
+                            case CONTRIBUTOR_COUNT -> JpaSort.unsafe(DESC, "coalesce(pcd.contributor_count, 0)").and(JpaSort.unsafe(ASC, "project_name"));
+                        })
+        );
+        final List<ProjectShortResponseV2> projectShortResponseV2s = projects.stream()
+                .map(p -> new ProjectShortResponseV2()
+                        .name(p.name)
+                        .shortDescription(p.shortDescription)
+                        .id(p.id)
+                        .categories(p.categories)
+                        .languages(p.languages.stream().map(languageResponse -> new LanguageWithPercentageResponse()
+                                .id(languageResponse.getId())
+                                .name(languageResponse.getName())
+                                .percentage(BigDecimal.valueOf(22.3))
+                        ).toList())
+                        .issueCount(2)
+                        .goodFirstIssueCount(3)
+                        .starCount(230)
+                        .contributorCount(1234)
+                ).toList();
+
+        return ok().body(new ProjectPageResponseV2()
+                .projects(projectShortResponseV2s)
+                .totalPageNumber(projects.getTotalPages())
+                .totalItemNumber((int) projects.getTotalElements())
+                .hasMore(hasMore(pageIndex, projects.getTotalPages()))
+                .nextPageIndex(nextPageIndex(pageIndex, projects.getTotalPages())));
     }
 }

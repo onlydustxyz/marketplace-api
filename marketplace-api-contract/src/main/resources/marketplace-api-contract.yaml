@@ -1961,6 +1961,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
     get:
+      deprecated: true
       security:
         - { }
         - bearerAuth: [ ]
@@ -2085,7 +2086,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectPageResponse'
+                $ref: '#/components/schemas/ProjectPageResponseV2'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -7925,7 +7926,7 @@ components:
             projects:
               type: array
               items:
-                $ref: '#/components/schemas/ProjectCardResponse'
+                $ref: '#/components/schemas/ProjectShortResponseV2'
 
     ProjectPageItemResponse:
       type: object
@@ -13018,24 +13019,36 @@ components:
         rewardCount:
           type: integer
 
-    ProjectCardResponse:
+    ProjectShortResponseV2:
       type: object
+      required:
+        - id
+        - slug
+        - name
+        - shortDescription
+        - contributorCount
+        - starCount
+        - pullRequestCount
+        - issueCount
+        - goodFirstIssueCount
       properties:
+        id:
+          $ref: '#/components/schemas/ProjectId'
         slug:
           $ref: '#/components/schemas/ProjectSlug'
         name:
           type: string
         shortDescription:
           type: string
-        contributorsCount:
+        contributorCount:
           type: integer
-        starsCount:
+        starCount:
           type: integer
-        pullRequestsCount:
+        pullRequestCount:
           type: integer
-        issuesCount:
+        issueCount:
           type: integer
-        goodFirstIssuesCount:
+        goodFirstIssueCount:
           type: integer
         categories:
           type: array

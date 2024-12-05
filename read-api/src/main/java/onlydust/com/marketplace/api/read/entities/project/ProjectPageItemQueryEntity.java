@@ -23,7 +23,7 @@ import static java.util.Comparator.comparing;
 import static java.util.Objects.nonNull;
 
 @NoArgsConstructor(force = true)
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PUBLIC, makeFinal = true)
 @Immutable
 @Entity
 public class ProjectPageItemQueryEntity {
