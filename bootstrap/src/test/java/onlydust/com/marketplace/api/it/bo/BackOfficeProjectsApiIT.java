@@ -48,7 +48,7 @@ public class BackOfficeProjectsApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 Currency.Id.of(CurrencyHelper.STRK.value()), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
-                        faker.rickAndMorty().character(), faker.hacker().verb()));
+                        faker.rickAndMorty().character(), faker.hacker().verb(), null));
 
         final var programId = programHelper.create(sponsorId).id();
 

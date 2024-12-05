@@ -91,7 +91,7 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                 Currency.Id.of(usdc), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
-                        faker.rickAndMorty().character(), faker.hacker().verb()));
+                        faker.rickAndMorty().character(), faker.hacker().verb(), null));
         final var programId = programHelper.create(sponsorId).id();
         accountingService.allocate(sponsorId, programId, PositiveAmount.of(100000L), Currency.Id.of(usdc));
         accountingService.grant(programId, projectId, PositiveAmount.of(100000L), Currency.Id.of(usdc));

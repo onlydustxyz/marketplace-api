@@ -69,3 +69,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000036_add_index_for_world_map.sql
   - include:
       file: db/changelog/changelogs/00000037_add_missing_deposits_to_all_transactions.sql
+  - include:
+      file: db/changelog/changelogs/00000038_fix_deposits.sql

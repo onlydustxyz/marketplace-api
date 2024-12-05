@@ -52,6 +52,8 @@ public class SponsorAccountTransactionsEntity {
     String thirdPartyName;
     @NonNull
     String thirdPartyAccountNumber;
+    UUID transactionId;
+
 
     public SponsorAccount.Transaction toDomain() {
         return new SponsorAccount.Transaction(
@@ -62,7 +64,8 @@ public class SponsorAccountTransactionsEntity {
                 reference,
                 PositiveAmount.of(amount),
                 thirdPartyName,
-                thirdPartyAccountNumber);
+                thirdPartyAccountNumber,
+                transactionId);
     }
 
     public static SponsorAccountTransactionsEntity of(SponsorAccount.Id sponsorAccountId, SponsorAccount.Transaction transaction) {
@@ -76,6 +79,7 @@ public class SponsorAccountTransactionsEntity {
                 .reference(transaction.reference())
                 .thirdPartyAccountNumber(transaction.thirdPartyAccountNumber())
                 .thirdPartyName(transaction.thirdPartyName())
+                .transactionId(transaction.transactionId())
                 .build();
     }
 

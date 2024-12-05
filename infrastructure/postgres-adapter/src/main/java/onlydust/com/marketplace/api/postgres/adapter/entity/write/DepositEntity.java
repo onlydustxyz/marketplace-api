@@ -25,18 +25,18 @@ import java.util.UUID;
 public class DepositEntity {
     @Id
     @NonNull
-    UUID id;
+    final UUID id;
 
     @NonNull
     @OneToOne(optional = false, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    TransferTransactionEntity transaction;
+    final TransferTransactionEntity transaction;
 
     @NonNull
-    UUID sponsorId;
+    final UUID sponsorId;
 
     @NonNull
     @ManyToOne(optional = false)
-    CurrencyEntity currency;
+    final CurrencyEntity currency;
 
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
@@ -48,7 +48,7 @@ public class DepositEntity {
     public static DepositEntity of(Deposit deposit) {
         return DepositEntity.builder()
                 .id(deposit.id().value())
-                .transaction(TransferTransactionEntity.of(deposit.transaction()))
+                .transaction(TransferTransactionEntity.of(deposit.transactionId(), deposit.transaction()))
                 .sponsorId(deposit.sponsorId().value())
                 .currency(CurrencyEntity.of(deposit.currency()))
                 .status(deposit.status())
@@ -59,11 +59,17 @@ public class DepositEntity {
     public Deposit toDomain() {
         return Deposit.builder()
                 .id(Deposit.Id.of(id))
+                .transactionId(transaction.id())
                 .transaction(transaction.toDomain())
                 .sponsorId(SponsorId.of(sponsorId))
                 .currency(currency.toDomain())
                 .status(status)
                 .billingInformation(billingInformation)
                 .build();
+    }
+
+    public void update(Deposit deposit) {
+        this.status = deposit.status();
+        this.billingInformation = deposit.billingInformation();
     }
 }

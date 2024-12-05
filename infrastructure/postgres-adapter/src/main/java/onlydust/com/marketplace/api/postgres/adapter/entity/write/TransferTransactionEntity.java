@@ -54,9 +54,9 @@ public class TransferTransactionEntity {
 
     String contractAddress;
 
-    public static TransferTransactionEntity of(Blockchain.TransferTransaction transaction) {
+    public static TransferTransactionEntity of(UUID transactionId, Blockchain.TransferTransaction transaction) {
         return TransferTransactionEntity.builder()
-                .id(UUID.randomUUID())
+                .id(transactionId)
                 .timestamp(transaction.timestamp())
                 .reference(transaction.reference())
                 .blockchain(NetworkEnumEntity.valueOf(transaction.blockchain().name()))

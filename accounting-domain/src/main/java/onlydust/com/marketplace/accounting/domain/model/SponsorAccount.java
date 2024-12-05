@@ -131,15 +131,17 @@ public class SponsorAccount {
     public static class Transaction extends Payment.Reference {
         private final @NonNull PositiveAmount amount;
         private final @NonNull Id id;
-        final @NonNull Type type;
+        private final @NonNull Type type;
+        private final UUID transactionId;
 
         public Transaction(
                 final @NonNull Type type,
                 final @NonNull Payment.Reference paymentReference,
-                final @NonNull PositiveAmount amount
+                final @NonNull PositiveAmount amount,
+                final UUID transactionId
         ) {
             this(paymentReference.timestamp(), type, paymentReference.network(), paymentReference.reference(), amount, paymentReference.thirdPartyName(),
-                    paymentReference.thirdPartyAccountNumber());
+                    paymentReference.thirdPartyAccountNumber(), transactionId);
         }
 
         public Transaction(
@@ -149,9 +151,10 @@ public class SponsorAccount {
                 final @NonNull String reference,
                 final @NonNull PositiveAmount amount,
                 final @NonNull String thirdPartyName,
-                final @NonNull String thirdPartyAccountNumber
+                final @NonNull String thirdPartyAccountNumber,
+                final UUID transactionId
         ) {
-            this(Id.random(), timestamp, type, network, reference, amount, thirdPartyName, thirdPartyAccountNumber);
+            this(Id.random(), timestamp, type, network, reference, amount, thirdPartyName, thirdPartyAccountNumber, transactionId);
         }
 
         public Transaction(
@@ -162,16 +165,19 @@ public class SponsorAccount {
                 final @NonNull String reference,
                 final @NonNull PositiveAmount amount,
                 final @NonNull String thirdPartyName,
-                final @NonNull String thirdPartyAccountNumber
+                final @NonNull String thirdPartyAccountNumber,
+                final UUID transactionId
         ) {
             super(timestamp, network, reference, thirdPartyName, thirdPartyAccountNumber);
             this.amount = amount;
             this.id = id;
             this.type = type;
+            this.transactionId = transactionId;
         }
 
         public static @NonNull Transaction deposit(final @NonNull SponsorView sponsor,
-                                                   final @NonNull Blockchain.TransferTransaction transaction) {
+                                                   final @NonNull Blockchain.TransferTransaction transaction,
+                                                   final @NonNull UUID transactionId) {
             return new Transaction(
                     transaction.timestamp(),
                     Type.DEPOSIT,
@@ -179,7 +185,18 @@ public class SponsorAccount {
                     transaction.reference(),
                     PositiveAmount.of(transaction.amount()),
                     transaction.senderAddress(),
-                    sponsor.name());
+                    sponsor.name(),
+                    transactionId);
+        }
+
+        public enum Type {
+            DEPOSIT, // Money received from the sponsor
+            WITHDRAW, // Money refunded to the sponsor
+            SPEND; // Money spent to pay rewards
+
+            public boolean isDebit() {
+                return List.of(WITHDRAW, SPEND).contains(this);
+            }
         }
 
         @NoArgsConstructor(staticName = "random")
@@ -193,16 +210,6 @@ public class SponsorAccount {
             @JsonCreator
             public static Id of(@NonNull final String uuid) {
                 return Id.of(UUID.fromString(uuid));
-            }
-        }
-
-        public enum Type {
-            DEPOSIT, // Money received from the sponsor
-            WITHDRAW, // Money refunded to the sponsor
-            SPEND; // Money spent to pay rewards
-
-            public boolean isDebit() {
-                return List.of(WITHDRAW, SPEND).contains(this);
             }
         }
     }
