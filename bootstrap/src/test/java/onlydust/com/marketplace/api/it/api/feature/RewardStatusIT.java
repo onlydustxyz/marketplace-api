@@ -270,7 +270,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 Currency.Id.of(strkId), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
-                        faker.rickAndMorty().character(), faker.hacker().verb()));
+                        faker.rickAndMorty().character(), faker.hacker().verb(), null));
 
         accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(200000L), Currency.Id.of(strkId));
 
@@ -282,7 +282,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 Currency.Id.of(usdId), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.SEPA, faker.random().hex(),
                         PositiveAmount.of(100000L),
-                        faker.rickAndMorty().character(), faker.hacker().verb()));
+                        faker.rickAndMorty().character(), faker.hacker().verb(), null));
 
         accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(50000L), Currency.Id.of(usdId));
         accountingService.grant(programId, projectId1, PositiveAmount.of(50000L), Currency.Id.of(usdId));

@@ -97,17 +97,17 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
                 Currency.Id.of(CurrencyHelper.STRK.value()), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
-                        faker.rickAndMorty().character(), faker.hacker().verb()));
+                        faker.rickAndMorty().character(), faker.hacker().verb(), null));
         accountingService.createSponsorAccountWithInitialBalance(sponsorId,
                 Currency.Id.of(CurrencyHelper.ETH.value()), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
-                        faker.rickAndMorty().character(), faker.hacker().verb()));
+                        faker.rickAndMorty().character(), faker.hacker().verb(), null));
         accountingService.createSponsorAccountWithInitialBalance(sponsorId,
                 Currency.Id.of(CurrencyHelper.USD.value()), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.SEPA, faker.random().hex(),
                         PositiveAmount.of(200000L),
-                        faker.rickAndMorty().character(), faker.hacker().verb()));
+                        faker.rickAndMorty().character(), faker.hacker().verb(), null));
 
         accountingService.allocate(sponsorId, programId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.STRK.value()));
         accountingService.allocate(sponsorId, programId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.ETH.value()));

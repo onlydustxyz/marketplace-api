@@ -547,7 +547,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 Currency.Id.of(strkId), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
-                        faker.rickAndMorty().character(), faker.hacker().verb()));
+                        faker.rickAndMorty().character(), faker.hacker().verb(), null));
         accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(strkId));
         accountingService.grant(programId, projectId, PositiveAmount.of(100000L), Currency.Id.of(strkId));
 
@@ -556,7 +556,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 Currency.Id.of(ethId), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
-                        faker.rickAndMorty().character(), faker.hacker().verb()));
+                        faker.rickAndMorty().character(), faker.hacker().verb(), null));
         accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(ethId));
         accountingService.grant(programId, projectId, PositiveAmount.of(100000L), Currency.Id.of(ethId));
 
@@ -565,7 +565,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 Currency.Id.of(usdcId), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.STELLAR, faker.random().hex(),
                         PositiveAmount.of(200000L),
-                        faker.rickAndMorty().character(), faker.hacker().verb()));
+                        faker.rickAndMorty().character(), faker.hacker().verb(), null));
         accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(usdcId));
         accountingService.grant(programId, projectId, PositiveAmount.of(100000L), Currency.Id.of(usdcId));
 

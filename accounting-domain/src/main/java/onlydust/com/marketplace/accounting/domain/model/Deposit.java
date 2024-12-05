@@ -16,6 +16,7 @@ import java.util.UUID;
 public record Deposit(@NonNull Id id,
                       @NonNull SponsorId sponsorId,
                       @NonNull Blockchain.TransferTransaction transaction,
+                      @NonNull UUID transactionId,
                       @NonNull Currency currency,
                       @NonNull Status status,
                       BillingInformation billingInformation) {
@@ -23,7 +24,7 @@ public record Deposit(@NonNull Id id,
     public static Deposit preview(final @NonNull SponsorId sponsorId,
                                   final @NonNull Blockchain.TransferTransaction transaction,
                                   final @NonNull Currency currency) {
-        return new Deposit(Id.random(), sponsorId, transaction, currency, Status.DRAFT, null);
+        return new Deposit(Id.random(), sponsorId, transaction, UUID.randomUUID(), currency, Status.DRAFT, null);
     }
 
     public enum Status {

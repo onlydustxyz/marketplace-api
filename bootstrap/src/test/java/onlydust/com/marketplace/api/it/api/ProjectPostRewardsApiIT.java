@@ -179,7 +179,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                 Currency.Id.of(strkId), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
-                        faker.rickAndMorty().character(), faker.hacker().verb()));
+                        faker.rickAndMorty().character(), faker.hacker().verb(), null));
         final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final var programId = programHelper.randomId();
         accountingService.allocate(sponsorId, programId, PositiveAmount.of(100000L), Currency.Id.of(strkId));

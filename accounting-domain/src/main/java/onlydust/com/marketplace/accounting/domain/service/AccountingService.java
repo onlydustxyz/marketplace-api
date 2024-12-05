@@ -245,7 +245,7 @@ public class AccountingService implements AccountingFacadePort {
                 .entrySet()
                 .stream().map(e -> Map.entry(
                         mustGetSponsorAccount(e.getKey().sponsorAccountId()),
-                        new SponsorAccount.Transaction(SPEND, paymentReference, e.getValue())
+                        new SponsorAccount.Transaction(SPEND, paymentReference, e.getValue(), null)
                 ))
                 .filter(e -> paymentReference.network().equals(e.getKey().network().orElse(null)))
                 .collect(toMap(Map.Entry::getKey, Map.Entry::getValue))
@@ -414,7 +414,7 @@ public class AccountingService implements AccountingFacadePort {
 
             final var sponsorAccountNetwork = sponsorAccount.network().orElseThrow();
             sponsorAccount.add(new SponsorAccount.Transaction(ZonedDateTime.now(), SPEND, sponsorAccountNetwork, reward.id().toString(),
-                    reward.amount(), reward.recipientName(), reward.recipientWallet().toString()));
+                    reward.amount(), reward.recipientName(), reward.recipientWallet().toString(), null));
         }
 
         private PayableReward createPayableReward(SponsorAccount.Id sponsorAccountId, RewardId rewardId, PositiveAmount amount) {
@@ -577,7 +577,7 @@ public class AccountingService implements AccountingFacadePort {
         depositStoragePort.save(updatedDeposit);
 
         final var accountBook = getAccountBook(deposit.currency());
-        final var transaction = SponsorAccount.Transaction.deposit(sponsor, deposit.transaction());
+        final var transaction = SponsorAccount.Transaction.deposit(sponsor, deposit.transaction(), deposit.transactionId());
 
         sponsorAccountStorage.find(deposit.sponsorId(), deposit.currency().id())
                 .stream()

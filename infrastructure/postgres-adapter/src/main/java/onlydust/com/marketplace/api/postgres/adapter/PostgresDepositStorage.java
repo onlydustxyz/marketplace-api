@@ -17,7 +17,10 @@ public class PostgresDepositStorage implements DepositStoragePort {
     @Override
     @Transactional
     public void save(Deposit deposit) {
-        depositRepository.save(DepositEntity.of(deposit));
+        depositRepository.findById(deposit.id().value()).ifPresentOrElse(
+                entity -> entity.update(deposit),
+                () -> depositRepository.save(DepositEntity.of(deposit))
+        );
     }
 
     @Override
