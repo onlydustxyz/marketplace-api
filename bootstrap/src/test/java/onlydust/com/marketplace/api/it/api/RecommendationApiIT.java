@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.postgres.adapter.PostgresRecommenderSystemV1
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.MatchingAnswerEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.MatchingQuestionEntity;
 import onlydust.com.marketplace.api.suites.tags.TagRecommendation;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,9 +87,11 @@ public class RecommendationApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_save_single_choice_answer() {
-        // Given
-        final var chosenAnswerId = singleChoiceAnswers.get(1).getId();
+        testSaveAnswerSingle(singleChoiceAnswers.get(1).getId());
+        testSaveAnswerSingle(singleChoiceAnswers.get(0).getId());
+    }
 
+    private void testSaveAnswerSingle(UUID chosenAnswerId) {
         // When
         client.put()
                 .uri(getApiURI("/api/v1/me/reco/projects/matching-questions/%s/answers"
@@ -121,11 +124,16 @@ public class RecommendationApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_save_multiple_choice_answers() {
-        // Given
-        final var chosenAnswerIds = List.of(
+        testSaveAnswers(List.of(
                 multipleChoiceAnswers.get(0).getId(),
-                multipleChoiceAnswers.get(2).getId());
+                multipleChoiceAnswers.get(2).getId()));
+        testSaveAnswers(List.of(
+                multipleChoiceAnswers.get(1).getId(),
+                multipleChoiceAnswers.get(2).getId(),
+                multipleChoiceAnswers.get(3).getId()));
+    }
 
+    private void testSaveAnswers(List<@NotNull UUID> chosenAnswerIds) {
         // When
         client.put()
                 .uri(getApiURI("/api/v1/me/reco/projects/matching-questions/%s/answers"
@@ -152,7 +160,7 @@ public class RecommendationApiIT extends AbstractMarketplaceApiIT {
         final var question = response.getQuestions().get(1);
         assertThat(question.getAnswers())
                 .filteredOn(MatchingAnswerResponse::getChosen)
-                .hasSize(2)
+                .hasSize(chosenAnswerIds.size())
                 .extracting(MatchingAnswerResponse::getId)
                 .containsExactlyInAnyOrderElementsOf(
                         chosenAnswerIds.stream().toList());
