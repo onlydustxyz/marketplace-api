@@ -112,7 +112,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     }
 
     @Override
-    public ResponseEntity<RecommendedProjectsPageResponse> getRecommendedProjects(Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<RecommendedProjectsPageResponse> getRecommendedProjectsOld(Integer pageIndex, Integer pageSize) {
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
         final var pageRequest = PageRequest.of(sanitizePageIndex, sanitizePageSize);
