@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.MatchingQuestionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.UserAnswerEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RecommendationRepository;
@@ -18,6 +19,7 @@ import java.util.List;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toSet;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @Component
 @AllArgsConstructor
@@ -28,8 +30,15 @@ public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort
     private final UserAnswerRepository userAnswerRepository;
 
     @Override
+    public boolean isMultipleChoice(final @NonNull MatchingQuestion.Id questionId) {
+        final var question = recommendationRepository.findById(questionId.value())
+                .orElseThrow(() -> notFound("Question %s not found".formatted(questionId)));
+        return question.getMultipleChoice();
+    }
+
+    @Override
     @Transactional(readOnly = true)
-    public List<MatchingQuestion> getMatchingQuestions(UserId userId) {
+    public List<MatchingQuestion> getMatchingQuestions(final @NonNull UserId userId) {
         final var questions = recommendationRepository.findAllByMatchingSystemId(matchingSystemId).stream()
                 .sorted(comparing(MatchingQuestionEntity::getIndex))
                 .toList();
@@ -42,8 +51,9 @@ public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort
 
     @Override
     @Transactional
-    public void saveMatchingAnswers(UserId userId, MatchingQuestion.Id questionId,
-                                    List<MatchingAnswer.Id> chosenAnswerIds) {
+    public void saveMatchingAnswers(final @NonNull UserId userId,
+                                    final @NonNull MatchingQuestion.Id questionId,
+                                    final @NonNull List<MatchingAnswer.Id> chosenAnswerIds) {
         userAnswerRepository.deleteAllByUserIdAndQuestionId(userId.value(), questionId.value());
 
         chosenAnswerIds.forEach(answerId -> {
@@ -57,7 +67,7 @@ public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjectId> getRecommendedProjects(UserId userId) {
+    public List<ProjectId> getRecommendedProjects(final @NonNull UserId userId) {
         // TODO
         return List.of();
     }

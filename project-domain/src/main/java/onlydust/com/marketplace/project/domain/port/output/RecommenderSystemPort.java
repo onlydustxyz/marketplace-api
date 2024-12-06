@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.recommendation.MatchingAnswer;
@@ -8,9 +9,11 @@ import onlydust.com.marketplace.project.domain.model.recommendation.MatchingQues
 import java.util.List;
 
 public interface RecommenderSystemPort {
-    List<MatchingQuestion> getMatchingQuestions(UserId userId);
-    
-    void saveMatchingAnswers(UserId userId, MatchingQuestion.Id questionId, List<MatchingAnswer.Id> chosenAnswerIds);
+    boolean isMultipleChoice(@NonNull MatchingQuestion.Id questionId);
 
-    List<ProjectId> getRecommendedProjects(UserId userId);
+    List<MatchingQuestion> getMatchingQuestions(@NonNull UserId userId);
+
+    void saveMatchingAnswers(@NonNull UserId userId, @NonNull MatchingQuestion.Id questionId, @NonNull List<MatchingAnswer.Id> chosenAnswerIds);
+
+    List<ProjectId> getRecommendedProjects(@NonNull UserId userId);
 }
