@@ -43,6 +43,23 @@ public class DatabaseHelper {
         }
     }
 
+    public <Result> Result executeReadListQuery(@Language("PostgreSQL") final @NonNull String query, final Map<String, Object> parameters) {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        Result result = null;
+        try {
+            em.getTransaction().begin();
+            final var q = em.createNativeQuery(query);
+            parameters.forEach(q::setParameter);
+            return (Result) q.getResultList();
+        } finally {
+            em.flush();
+            em.getTransaction().commit();
+            em.close();
+        }
+    }
+
+
+
 
     @Transactional
     public void executeInTransaction(Runnable runnable) {

@@ -225,6 +225,9 @@ infrastructure:
     api-key: ${NODE_GUARDIANS_API_KEY}
   block-explorer:
     environment: ${BLOCKCHAIN_ENVIRONMENT}
+  elasticsearch:
+    api-key: ${ELASTICSEARCH_API_KEY}
+    url: ${ELASTICSEARCH_URL}
 
 global:
   app-base-url: ${APP_BASE_URL}
