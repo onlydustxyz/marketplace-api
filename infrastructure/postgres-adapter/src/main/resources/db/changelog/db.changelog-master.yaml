@@ -71,3 +71,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000037_add_missing_deposits_to_all_transactions.sql
   - include:
       file: db/changelog/changelogs/00000038_fix_deposits.sql
+  - include:
+      file: db/changelog/changelogs/00000039_init_recommendation_tables.sql

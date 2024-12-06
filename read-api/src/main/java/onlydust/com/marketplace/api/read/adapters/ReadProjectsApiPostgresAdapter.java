@@ -16,10 +16,7 @@ import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.accounting.AllTransactionReadEntity;
 import onlydust.com.marketplace.api.read.entities.github.ProjectGithubIssueItemReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectCategorySuggestionReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectContributorLabelReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectCustomStatReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.*;
 import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
 import onlydust.com.marketplace.api.read.mapper.UserMapper;
 import onlydust.com.marketplace.api.read.repositories.*;
@@ -48,7 +45,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -585,21 +581,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         })
         );
         final List<ProjectShortResponseV2> projectShortResponseV2s = projects.stream()
-                .map(p -> new ProjectShortResponseV2()
-                        .name(p.name)
-                        .shortDescription(p.shortDescription)
-                        .id(p.id)
-                        .categories(p.categories)
-                        .languages(p.languages.stream().map(languageResponse -> new LanguageWithPercentageResponse()
-                                .id(languageResponse.getId())
-                                .name(languageResponse.getName())
-                                .percentage(BigDecimal.valueOf(22.3))
-                        ).toList())
-                        .issueCount(2)
-                        .goodFirstIssueCount(3)
-                        .starCount(230)
-                        .contributorCount(1234)
-                ).toList();
+                .map(ProjectPageItemQueryEntity::toShortResponseV2).toList();
 
         return ok().body(new ProjectPageResponseV2()
                 .projects(projectShortResponseV2s)

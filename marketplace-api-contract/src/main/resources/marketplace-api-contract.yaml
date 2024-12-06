@@ -14,6 +14,98 @@ servers:
     description: Production
 
 paths:
+
+  /api/v1/me/reco/projects/matching-questions:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Recommendations
+      summary: Get matching questions
+      operationId: getMatchingQuestions
+      description: |
+        Get the list of questions used to match users with projects
+      parameters:
+        - in: query
+          name: v
+          description: Version of the recommender system to use
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 'List of questions'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchingQuestionsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/me/reco/projects/matching-questions/{questionId}/answers:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Recommendations
+      summary: Save answers for a given question
+      operationId: saveMatchingQuestionAnswers
+      description: |
+        Save the selected answers for a given matching question
+      parameters:
+        - in: path
+          name: questionId
+          required: true
+          schema:
+            $ref: '#/components/schemas/MatchingQuestionId'
+      requestBody:
+        description: 'Selected answers'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveMatchingAnswersRequest'
+      responses:
+        "204":
+          description: 'Answers saved successfully'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/me/reco/projects:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadRecommendations
+      summary: Get recommended projects
+      operationId: getRecommendedProjects
+      description: |
+        Get the list of projects recommended for the caller based on their matching answers
+      parameters:
+        - in: query
+          name: v
+          description: Version of the recommender system to use
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 'List of recommended projects'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendedProjectsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
   /api/v1/bi/stats/projects:
     get:
       tags:
@@ -1543,7 +1635,7 @@ paths:
       tags:
         - ReadMe
       summary: Get some recommended projects for the caller
-      operationId: getRecommendedProjects
+      operationId: getRecommendedProjectsOld
       description: |
         Get a paginated list of recommended projects for the caller
       parameters:
@@ -6249,6 +6341,16 @@ components:
       type: string
       description: The transaction reference
       example: 0x1234567890abcdef
+
+    MatchingQuestionId:
+      type: string
+      format: uuid
+      description: Question ID
+
+    MatchingAnswerId:
+      type: string
+      format: uuid
+      description: Answer ID
 
     Money:
       type: object
@@ -13271,3 +13373,70 @@ components:
       properties:
         value:
           type: string
+
+
+    MatchingQuestionsResponse:
+      type: object
+      required:
+        - questions
+      properties:
+        questions:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchingQuestionResponse'
+
+    MatchingQuestionResponse:
+      type: object
+      required:
+        - id
+        - body
+        - description
+        - multipleChoice
+        - answers
+      properties:
+        id:
+          $ref: '#/components/schemas/MatchingQuestionId'
+        body:
+          type: string
+        description:
+          type: string
+        multipleChoice:
+          type: boolean
+        answers:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchingAnswerResponse'
+
+    MatchingAnswerResponse:
+      type: object
+      required:
+        - id
+        - body
+        - chosen
+      properties:
+        id:
+          $ref: '#/components/schemas/MatchingAnswerId'
+        body:
+          type: string
+        chosen:
+          type: boolean
+
+    SaveMatchingAnswersRequest:
+      type: object
+      required:
+        - answerIds
+      properties:
+        answerIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchingAnswerId'
+
+    RecommendedProjectsResponse:
+      type: object
+      required:
+        - projects
+      properties:
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectShortResponseV2'
