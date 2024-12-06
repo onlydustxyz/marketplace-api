@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.recommendation;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,7 +29,7 @@ public class MatchingQuestionEntity {
     private String description;
     private Boolean multipleChoice;
 
-    @OneToMany(mappedBy = "question")
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<MatchingAnswerEntity> possibleAnswers;
 
     public MatchingQuestion toDomain(Set<UUID> chosenAnswerIds) {

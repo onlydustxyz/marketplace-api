@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.MatchingQuestionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.UserAnswerEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RecommendationRepository;
@@ -21,14 +22,15 @@ import static java.util.stream.Collectors.toSet;
 @Component
 @AllArgsConstructor
 public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort {
-    private final String MATCHING_SYSTEM_ID;
+    @Getter
+    private final String matchingSystemId;
     private final RecommendationRepository recommendationRepository;
     private final UserAnswerRepository userAnswerRepository;
 
     @Override
     @Transactional(readOnly = true)
     public List<MatchingQuestion> getMatchingQuestions(UserId userId) {
-        final var questions = recommendationRepository.findAllByMatchingSystemId(MATCHING_SYSTEM_ID).stream()
+        final var questions = recommendationRepository.findAllByMatchingSystemId(matchingSystemId).stream()
                 .sorted(comparing(MatchingQuestionEntity::getIndex))
                 .toList();
         final var userAnswers = userAnswerRepository
