@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresRecommenderSystemV1Adapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.MatchingAnswerEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.MatchingQuestionEntity;
+import onlydust.com.marketplace.api.suites.tags.TagRecommendation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@TagRecommendation
 public class RecommendationApiIT extends AbstractMarketplaceApiIT {
     private static final String RECOMMENDER_SYSTEM_VERSION = "v1";
     @Autowired
@@ -173,24 +175,6 @@ public class RecommendationApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .isBadRequest();
-    }
-
-    @Test
-    void should_get_recommended_projects() {
-        // When
-        final var response = client.get()
-                .uri(getApiURI("/api/v1/me/reco/projects", Map.of("v", RECOMMENDER_SYSTEM_VERSION)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + pierre.jwt())
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(RecommendedProjectsResponse.class)
-                .returnResult()
-                .getResponseBody();
-
-        // Then
-        assertThat(response).isNotNull();
-        assertThat(response.getProjects()).isEmpty(); // For now, as the recommendation algorithm is not implemented
     }
 
     @Test

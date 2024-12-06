@@ -36,6 +36,8 @@ create trigger reco_matching_answers_set_tech_updated_at
     for each row
 execute procedure public.set_tech_updated_at();
 
+create unique index idx_matching_answers_question_id_index on reco.matching_answers (question_id, index);
+
 CREATE TABLE reco.user_answers
 (
     user_id         UUID                      NOT NULL REFERENCES iam.users (id),
