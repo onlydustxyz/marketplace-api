@@ -9,6 +9,7 @@ import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.GithubMembership;
@@ -44,6 +45,7 @@ public class UserService implements UserFacadePort {
     private final GithubSearchPort githubSearchPort;
     private final ImageStoragePort imageStoragePort;
     private final MetaBlockExplorer blockExplorer;
+    private final IndexerPort indexerPort;
 
 
     @Override
@@ -114,9 +116,9 @@ public class UserService implements UserFacadePort {
     @Override
     @Transactional
     public void updateGithubProfile(Long githubUserId) {
-        //TODO: force re-indexing of user
         userStoragePort.saveUser(githubSearchPort.getUserProfile(githubUserId)
                 .orElseThrow(() -> notFound(String.format("Github user %s to update was not found", githubUserId))));
+        indexerPort.indexUser(githubUserId);
     }
 
     @Override
