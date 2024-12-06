@@ -10,10 +10,7 @@ import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.Type;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -123,6 +120,11 @@ public class UserProfileInfoEntity {
                 .lastName(lastName)
                 .contacts(contactInformations.stream().map(ContactInformationEntity::toDomain).toList())
                 .contactEmail(contactEmail)
+                .preferredLanguageIds(isNull(preferredLanguageIds) ? null : List.of(preferredLanguageIds))
+                .preferredCategoriesIds(isNull(preferredCategoryIds) ? null : List.of(preferredCategoryIds))
+                .contactEmail(contactEmail)
+                .joiningGoal(joiningGoal)
+                .joiningReason(joiningReason)
                 .build();
     }
 }
