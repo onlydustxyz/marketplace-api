@@ -604,7 +604,8 @@ public class PostgresConfiguration {
 
     @Bean
     public PostgresRecommenderSystemV1Adapter postgresRecommenderSystemV1Adapter(final RecommendationRepository recommendationRepository,
-                                                                                 final UserAnswerRepository userAnswerRepository) {
-        return new PostgresRecommenderSystemV1Adapter("matching-v1", recommendationRepository, userAnswerRepository);
+                                                                                 final UserAnswerRepository userAnswerRepository,
+                                                                                 final ProjectViewRepository projectViewRepository) {
+        return new PostgresRecommenderSystemV1Adapter("matching-v1", recommendationRepository, userAnswerRepository, projectViewRepository);
     }
 }

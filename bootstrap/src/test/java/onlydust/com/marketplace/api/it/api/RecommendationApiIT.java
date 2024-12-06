@@ -227,4 +227,23 @@ public class RecommendationApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isNotFound();
     }
+
+    @Test
+    void should_get_recommended_projects_based_on_answers() {
+
+        // When
+        final var response = client.get()
+                .uri(getApiURI("/api/v1/me/reco/projects", Map.of("v", RECOMMENDER_SYSTEM_VERSION)))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + pierre.jwt())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(RecommendedProjectsResponse.class)
+                .returnResult()
+                .getResponseBody();
+
+        // Then
+        assertThat(response).isNotNull();
+        assertThat(response.getProjects()).isNotEmpty();
+    }
 }

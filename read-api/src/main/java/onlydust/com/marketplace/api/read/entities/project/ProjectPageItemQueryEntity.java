@@ -97,6 +97,23 @@ public class ProjectPageItemQueryEntity {
                 .hasMissingGithubAppInstallation(isProjectLead ? hasReposWithoutGithubAppInstalled : null);
     }
 
+    public ProjectShortResponseV2 toShortResponseV2() {
+        return new ProjectShortResponseV2()
+                .name(name)
+                .shortDescription(shortDescription)
+                .id(id)
+                .categories(categories())
+                .languages(languages().stream().map(languageResponse -> new LanguageWithPercentageResponse()
+                        .id(languageResponse.getId())
+                        .name(languageResponse.getName())
+                        .percentage(BigDecimal.valueOf(22.3))
+                ).toList())
+                .issueCount(2)
+                .goodFirstIssueCount(3)
+                .starCount(230)
+                .contributorCount(1234);
+    }
+
     @EqualsAndHashCode(onlyExplicitlyIncluded = true)
     @Getter
     @Accessors(fluent = true)

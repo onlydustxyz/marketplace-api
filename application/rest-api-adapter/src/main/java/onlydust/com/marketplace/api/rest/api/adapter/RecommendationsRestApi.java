@@ -4,7 +4,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.RecommendationsApi;
-import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.contract.model.MatchingAnswerResponse;
+import onlydust.com.marketplace.api.contract.model.MatchingQuestionResponse;
+import onlydust.com.marketplace.api.contract.model.MatchingQuestionsResponse;
+import onlydust.com.marketplace.api.contract.model.SaveMatchingAnswersRequest;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.project.domain.model.recommendation.MatchingAnswer;
 import onlydust.com.marketplace.project.domain.model.recommendation.MatchingQuestion;
@@ -51,13 +54,5 @@ public class RecommendationsRestApi implements RecommendationsApi {
         recommendationFacadePort.saveMatchingAnswers(authenticatedUser.id(), MatchingQuestion.Id.of(questionId),
                 request.getAnswerIds().stream().map(MatchingAnswer.Id::of).toList());
         return ResponseEntity.noContent().build();
-    }
-
-    @Override
-    public ResponseEntity<RecommendedProjectsResponse> getRecommendedProjects(String version) {
-        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var recommendedProjectIds = recommendationFacadePort.getRecommendedProjects(authenticatedUser.id(), version);
-        // TODO: retrieve projects from recommendedProjectIds
-        return ResponseEntity.ok(new RecommendedProjectsResponse());
     }
 }

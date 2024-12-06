@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.MatchingQuestionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.UserAnswerEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RecommendationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserAnswerRepository;
 import onlydust.com.marketplace.kernel.model.ProjectId;
@@ -12,6 +13,7 @@ import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.recommendation.MatchingAnswer;
 import onlydust.com.marketplace.project.domain.model.recommendation.MatchingQuestion;
 import onlydust.com.marketplace.project.domain.port.output.RecommenderSystemPort;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,7 @@ public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort
     private final String matchingSystemId;
     private final RecommendationRepository recommendationRepository;
     private final UserAnswerRepository userAnswerRepository;
+    private final ProjectViewRepository projectViewRepository;
 
     @Override
     public boolean isMultipleChoice(final @NonNull MatchingQuestion.Id questionId) {
@@ -68,7 +71,8 @@ public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort
     @Override
     @Transactional(readOnly = true)
     public List<ProjectId> getRecommendedProjects(final @NonNull UserId userId) {
-        // TODO
-        return List.of();
+        return projectViewRepository.findAllOrderByRank(PageRequest.of(0, 10)).stream()
+                .map(projectView -> ProjectId.of(projectView.getId()))
+                .toList();
     }
 } 
