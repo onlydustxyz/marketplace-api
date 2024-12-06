@@ -601,4 +601,10 @@ public class PostgresConfiguration {
     public PostgresOutboxAdapter<GithubCommandEntity> githubCommandOutbox(final GithubCommandRepository githubCommandRepository) {
         return new PostgresOutboxAdapter<>(githubCommandRepository);
     }
+
+    @Bean
+    public PostgresRecommenderSystemV1Adapter postgresRecommenderSystemV1Adapter(final RecommendationRepository recommendationRepository,
+                                                                                 final UserAnswerRepository userAnswerRepository) {
+        return new PostgresRecommenderSystemV1Adapter("matching-v1", recommendationRepository, userAnswerRepository);
+    }
 }
