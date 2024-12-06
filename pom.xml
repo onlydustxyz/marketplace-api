@@ -15,6 +15,7 @@
         <module>accounting-domain</module>
         <module>user-domain</module>
         <module>infrastructure/project-adapter</module>
+        <module>search-indexer</module>
     </modules>
 
     <parent>

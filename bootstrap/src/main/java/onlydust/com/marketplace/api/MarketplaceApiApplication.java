@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api;
 
 import com.onlydust.marketplace.api.cron.JobScheduler;
 import jakarta.annotation.PostConstruct;
+import com.onlydust.marketplace.indexer.SearchIndexerConfiguration;
 import onlydust.com.marketplace.api.postgres.adapter.configuration.PostgresConfiguration;
 import onlydust.com.marketplace.api.read.ReadApiConfiguration;
 import onlydust.com.marketplace.api.rest.api.adapter.AppRestApi;
@@ -25,7 +26,7 @@ import java.util.TimeZone;
 @EnableScheduling
 @EnableRetry
 @EnableAsync
-@Import({PostgresConfiguration.class, JobScheduler.class, ReadApiConfiguration.class})
+@Import({PostgresConfiguration.class, JobScheduler.class, ReadApiConfiguration.class, SearchIndexerConfiguration.class})
 public class MarketplaceApiApplication {
 
     public static void main(String[] args) {
