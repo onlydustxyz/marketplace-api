@@ -5838,6 +5838,57 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/search:
+    post:
+      tags:
+        - ReadSearch
+      summary: search projects and contributors
+      operationId: search
+      description: search projects and contributors given filters
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchPostRequest'
+      responses:
+        "200":
+          description: 'Search results'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /api/v1/suggest:
+    post:
+      tags:
+        - ReadSearch
+      summary: suggest projects and contributors
+      operationId: suggest
+      description: suggest projects and contributors given filters
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuggestPostRequest'
+      responses:
+        "200":
+          description: 'Suggest result'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuggestResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 
 components:
   securitySchemes:
@@ -13058,3 +13109,165 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/LanguageWithPercentageResponse'
+
+    SearchPostRequest:
+      type: object
+      properties:
+        value:
+          type: string
+        languages:
+          type: array
+          items:
+            type: string
+        ecosystems:
+          type: array
+          items:
+            type: string
+        categories:
+          type: array
+          items:
+            type: string
+
+    SuggestPostRequest:
+      type: object
+      required:
+        - value
+      properties:
+        value:
+          type: string
+        languages:
+          type: array
+          items:
+            type: string
+        ecosystems:
+          type: array
+          items:
+            type: string
+        categories:
+          type: array
+          items:
+            type: string
+
+    SuggestResult:
+      type: object
+      properties:
+        value:
+          type: string
+          description: is null if no suggestion
+
+    SearchResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - results
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/SearchItemResponse'
+            facets:
+              type: array
+              items:
+                $ref: '#/components/schemas/SearchFacetResponse'
+
+
+    ProjectAdvancedSearchResponse:
+      type: object
+      required:
+        - name
+        - slug
+        - id
+        - shortDescription
+      properties:
+        name:
+          type: string
+        slug:
+          $ref: '#/components/schemas/ProjectSlug'
+        id:
+          $ref: '#/components/schemas/ProjectId'
+        shortDescription:
+          type: string
+        contributorCount:
+          type: integer
+        starCount:
+          type: string
+        forkCount:
+          type: string
+        languages:
+          type: array
+          items:
+            type: string
+        categories:
+          type: array
+          items:
+            type: string
+        ecosystems:
+          type: array
+          items:
+            type: string
+
+    ContributorAdvancedSearchResponse:
+      type: object
+      required:
+        - githubLogin
+        - githubId
+      properties:
+        githubLogin:
+          type: string
+        githubId:
+          $ref: '#/components/schemas/GithubUserId'
+        bio:
+          type: string
+        contributionCount:
+          type: integer
+        projectCount:
+          type: integer
+        pullRequestCount:
+          type: integer
+        issueCount:
+          type: integer
+
+    SearchItemType:
+      enum:
+        - PROJECT
+        - CONTRIBUTOR
+
+    SearchItemResponse:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          $ref: '#/components/schemas/SearchItemType'
+        project:
+          $ref: '#/components/schemas/ProjectAdvancedSearchResponse'
+        contributor:
+          $ref: '#/components/schemas/ContributorAdvancedSearchResponse'
+
+    SearchFacetResponse:
+      type: object
+      required:
+        - name
+        - count
+        - type
+      properties:
+        name:
+          type: string
+        count:
+          type: integer
+        type:
+          $ref: '#/components/schemas/SearchFacetType'
+
+    SearchFacetType:
+      type: object
+      enum:
+        - LANGUAGE
+        - ECOSYSTEM
+        - CATEGORY
+
+    SuggestResponse:
+      type: object
+      properties:
+        value:
+          type: string
