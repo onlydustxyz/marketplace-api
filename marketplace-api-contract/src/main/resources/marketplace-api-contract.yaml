@@ -13135,6 +13135,18 @@ components:
       properties:
         value:
           type: string
+        languages:
+          type: array
+          items:
+            type: string
+        ecosystems:
+          type: array
+          items:
+            type: string
+        categories:
+          type: array
+          items:
+            type: string
 
     SuggestResult:
       type: object
@@ -13238,11 +13250,21 @@ components:
       required:
         - name
         - count
+        - type
       properties:
         name:
           type: string
         count:
           type: integer
+        type:
+          $ref: '#/components/schemas/SearchFacetType'
+
+    SearchFacetType:
+      type: object
+      enum:
+        - LANGUAGE
+        - ECOSYSTEM
+        - CATEGORY
 
     SuggestResponse:
       type: object
