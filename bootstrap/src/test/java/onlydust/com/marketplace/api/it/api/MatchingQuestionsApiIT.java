@@ -23,7 +23,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TagRecommendation
-public class RecommendationApiIT extends AbstractMarketplaceApiIT {
+public class MatchingQuestionsApiIT extends AbstractMarketplaceApiIT {
     private static final String RECOMMENDER_SYSTEM_VERSION = "v1";
     @Autowired
     MatchingHelper matchingHelper;
