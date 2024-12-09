@@ -1,5 +1,27 @@
 package onlydust.com.marketplace.api.it.api.bi;
 
+import static java.util.Comparator.comparing;
+import static onlydust.com.marketplace.api.contract.model.EngagementStatus.INACTIVE;
+import static onlydust.com.marketplace.api.helper.CurrencyHelper.ETH;
+import static onlydust.com.marketplace.api.helper.CurrencyHelper.STRK;
+import static onlydust.com.marketplace.api.helper.CurrencyHelper.USD;
+import static onlydust.com.marketplace.api.helper.DateHelper.at;
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
@@ -14,25 +36,6 @@ import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-
-import static java.util.Comparator.comparing;
-import static onlydust.com.marketplace.api.contract.model.EngagementStatus.INACTIVE;
-import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
-import static onlydust.com.marketplace.api.helper.DateHelper.at;
-import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @TagBI
 public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
@@ -792,6 +795,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .is2xxSuccessful()
                     .expectBody()
+                    .jsonPath("$.contributor.followerCount").value(count -> assertThat((Integer) count).isGreaterThan(1))
                     .json("""
                             {
                               "contributor": {

@@ -22,6 +22,7 @@ FROM (SELECT c.*,
                                               'bio', u.bio,
                                               'signedUpAt', u.signed_up_at,
                                               'signedUpOnGithubAt', u.signed_up_on_github_at,
+                                              'followerCount', coalesce(ga.follower_count, 0),
                                               'globalRank', gur.rank,
                                               'globalRankPercentile', gur.rank_percentile,
                                               'globalRankCategory', case
@@ -42,6 +43,7 @@ FROM (SELECT c.*,
 
                     from iam.all_users u
                              left join global_users_ranks gur on gur.github_user_id = u.github_user_id
+                             left join indexer_exp.github_accounts ga on ga.id = u.github_user_id
                     where u.github_user_id = c.contributor_id)       as contributor,
 
                    (select jsonb_agg(jsonb_build_object('id', p.id,
