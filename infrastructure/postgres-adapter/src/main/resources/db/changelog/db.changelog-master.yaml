@@ -75,3 +75,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000039_init_recommendation_tables.sql
   - include:
       file: db/changelog/changelogs/00000040_insert_matching_questions_v1.sql
+  - include:
+      file: db/changelog/changelogs/00000041_add_follower_count_to_bi_view.sql
