@@ -13178,6 +13178,7 @@ components:
         - id
         - slug
         - name
+        - logoUrl
         - shortDescription
         - contributorCount
         - starCount
@@ -13190,6 +13191,8 @@ components:
         slug:
           $ref: '#/components/schemas/ProjectSlug'
         name:
+          type: string
+        logoUrl:
           type: string
         shortDescription:
           type: string

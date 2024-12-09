@@ -102,6 +102,7 @@ public class ProjectPageItemQueryEntity {
                 .name(name)
                 .shortDescription(shortDescription)
                 .id(id)
+                .logoUrl(logoUrl)
                 .categories(categories())
                 .languages(languages().stream().map(languageResponse -> new LanguageWithPercentageResponse()
                         .id(languageResponse.getId())
@@ -109,6 +110,7 @@ public class ProjectPageItemQueryEntity {
                         .percentage(BigDecimal.valueOf(22.3))
                 ).toList())
                 .issueCount(2)
+                .pullRequestCount(47)
                 .goodFirstIssueCount(3)
                 .starCount(230)
                 .contributorCount(1234);
