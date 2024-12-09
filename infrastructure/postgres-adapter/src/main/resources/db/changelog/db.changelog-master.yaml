@@ -73,3 +73,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000038_fix_deposits.sql
   - include:
       file: db/changelog/changelogs/00000039_init_recommendation_tables.sql
+  - include:
+      file: db/changelog/changelogs/00000040_insert_matching_questions_v1.sql
