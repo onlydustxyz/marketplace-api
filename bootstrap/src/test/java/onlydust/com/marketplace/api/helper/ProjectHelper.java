@@ -2,11 +2,9 @@ package onlydust.com.marketplace.api.helper;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
+import onlydust.com.marketplace.kernel.model.EcosystemId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.project.domain.model.CreateProjectCommand;
-import onlydust.com.marketplace.project.domain.model.Project;
-import onlydust.com.marketplace.project.domain.model.ProjectCategory;
-import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectCategoryStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
@@ -91,6 +89,63 @@ public class ProjectHelper {
                 "projectId", projectId.value(),
                 "categoryId", categoryId.value()
         ));
+    }
+
+    public void addEcosystem(ProjectId projectId, EcosystemId ecosystemId) {
+        databaseHelper.executeQuery("""
+                insert into projects_ecosystems(project_id, ecosystem_id)
+                values (:projectId, :ecosystemId);
+                """, Map.of(
+                "projectId", projectId.value(),
+                "ecosystemId", ecosystemId.value()
+        ));
+    }
+
+    public void addLanguages(ProjectId projectId, List<Language.Id> languageIds) {
+        final Long githubRepoId = databaseHelper.executeReadQuery(
+                """
+                                select github_repo_id
+                                from project_github_repos
+                                where project_id = :projectId
+                                limit 1
+                        """, Map.of("projectId", projectId.value())
+        );
+        final List<String> languageExtensions = databaseHelper.executeReadListQuery("""
+                select extension from language_file_extensions where cast(language_id as text) in :languageIds
+                """, Map.of("languageIds", languageIds.stream().map(id -> id.value().toString()).toList()));
+        databaseHelper.executeQuery("""
+                insert into indexer_exp.github_pull_requests
+                select id +1 ,
+                       :repoId,
+                       number,
+                       title,
+                       status,
+                       created_at,
+                       closed_at,
+                       merged_at,
+                       author_id,
+                       html_url,
+                       body,
+                       comments_count,
+                       tech_created_at,
+                       tech_updated_at,
+                       draft,
+                       repo_owner_login,
+                       repo_name,
+                       repo_html_url,
+                       author_login,
+                       author_html_url,
+                       author_avatar_url,
+                       review_state,
+                       commit_count,
+                       array[:languageExtensions],
+                       updated_at,
+                       indexer.uuid_of(cast(id + 1 as text))
+                from indexer_exp.github_pull_requests order by id desc limit 1
+                """, Map.of("repoId", githubRepoId, "languageExtensions", String.join(",", languageExtensions)));
+        databaseHelper.executeQuery("""
+                    REFRESH MATERIALIZED VIEW project_languages
+                """, Map.of());
     }
 
     public void inviteProjectLead(ProjectId projectId, UserAuthHelper.AuthenticatedUser lead) {
