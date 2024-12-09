@@ -1,6 +1,16 @@
 package onlydust.com.marketplace.api.helper;
 
+import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.github.javafaker.Faker;
+
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
@@ -8,14 +18,6 @@ import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.GithubAccount;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @Service
 public class GithubHelper {
@@ -50,14 +52,15 @@ public class GithubHelper {
                 .build();
 
         databaseHelper.executeQuery("""
-                insert into indexer_exp.github_accounts(id, login, type, html_url, avatar_url, name, bio, location, website, twitter, linkedin, telegram)
-                values(:id, :login, 'USER', :htmlUrl, :avatarUrl, null, null, null, null, null, null, null)
+                insert into indexer_exp.github_accounts(id, login, type, html_url, avatar_url, name, bio, location, website, twitter, linkedin, telegram, follower_count)
+                values(:id, :login, 'USER', :htmlUrl, :avatarUrl, null, null, null, null, null, null, null, :followerCount)
                 on conflict do nothing;
                 """, Map.of(
                 "id", account.getId(),
                 "login", account.getLogin(),
                 "htmlUrl", account.getHtmlUrl(),
-                "avatarUrl", account.getAvatarUrl()
+                "avatarUrl", account.getAvatarUrl(),
+                "followerCount", faker.number().numberBetween(1, 1000)
         ));
 
         return account;

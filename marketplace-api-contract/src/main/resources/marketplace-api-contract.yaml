@@ -12715,6 +12715,9 @@ components:
           type: string
           format: date-time
           description: When the user signed up on OnlyDust
+        followerCount:
+          type: integer
+          description: Number of followers on Github
         contacts:
           type: array
           items:

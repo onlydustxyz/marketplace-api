@@ -33,7 +33,8 @@ create table indexer_exp.github_accounts
     twitter         text,
     linkedin        text,
     telegram        text,
-    created_at      timestamp
+    created_at      timestamp,
+    follower_count  integer
 );
 
 create unique index github_accounts_login_uidx
