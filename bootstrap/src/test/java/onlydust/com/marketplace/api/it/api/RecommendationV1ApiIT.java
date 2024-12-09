@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.api.contract.model.MatchingAnswerResponse;
 import onlydust.com.marketplace.api.contract.model.MatchingQuestionsResponse;
+import onlydust.com.marketplace.api.contract.model.RecommendedProjectsResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagRecommendation;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,5 +62,24 @@ public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
         assertThat(blockchainQuestion.getMultipleChoice()).isTrue();
         assertThat(blockchainQuestion.getAnswers()).extracting(MatchingAnswerResponse::getBody).containsExactlyInAnyOrder("Ethereum", "Solana", "Polkadot",
                 "Cosmos", "Avalanche", "Bitcoin", "Don't know");
+    }
+
+    @Test
+    void should_get_recommended_projects_based_on_answers() {
+
+        // When
+        final var response = client.get()
+                .uri(getApiURI("/api/v1/me/reco/projects", Map.of("v", RECOMMENDER_SYSTEM_VERSION)))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + pierre.jwt())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(RecommendedProjectsResponse.class)
+                .returnResult()
+                .getResponseBody();
+
+        // Then
+        assertThat(response).isNotNull();
+        assertThat(response.getProjects()).hasSize(6);
     }
 }

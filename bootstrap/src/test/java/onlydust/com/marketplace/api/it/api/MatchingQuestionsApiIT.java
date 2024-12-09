@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.api.contract.model.MatchingAnswerResponse;
 import onlydust.com.marketplace.api.contract.model.MatchingQuestionsResponse;
-import onlydust.com.marketplace.api.contract.model.RecommendedProjectsResponse;
 import onlydust.com.marketplace.api.contract.model.SaveMatchingAnswersRequest;
 import onlydust.com.marketplace.api.helper.MatchingHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
@@ -218,24 +217,5 @@ public class MatchingQuestionsApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .isNotFound();
-    }
-
-    @Test
-    void should_get_recommended_projects_based_on_answers() {
-
-        // When
-        final var response = client.get()
-                .uri(getApiURI("/api/v1/me/reco/projects", Map.of("v", RECOMMENDER_SYSTEM_VERSION)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + pierre.jwt())
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(RecommendedProjectsResponse.class)
-                .returnResult()
-                .getResponseBody();
-
-        // Then
-        assertThat(response).isNotNull();
-        assertThat(response.getProjects()).isNotEmpty();
     }
 }

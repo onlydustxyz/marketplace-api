@@ -4,20 +4,21 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.MatchingQuestionEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.ProjectRecommendationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.UserAnswerEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.MatchingQuestionRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRecommendationV1Repository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserAnswerRepository;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.recommendation.MatchingAnswer;
 import onlydust.com.marketplace.project.domain.model.recommendation.MatchingQuestion;
 import onlydust.com.marketplace.project.domain.port.output.RecommenderSystemPort;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toSet;
@@ -30,7 +31,7 @@ public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort
     private final String matchingSystemId;
     private final MatchingQuestionRepository matchingQuestionRepository;
     private final UserAnswerRepository userAnswerRepository;
-    private final ProjectViewRepository projectViewRepository;
+    private final ProjectRecommendationV1Repository projectRecommendationV1Repository;
 
     @Override
     public boolean isMultipleChoice(final @NonNull MatchingQuestion.Id questionId) {
@@ -71,8 +72,10 @@ public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort
     @Override
     @Transactional(readOnly = true)
     public List<ProjectId> getRecommendedProjects(final @NonNull UserId userId) {
-        return projectViewRepository.findAllOrderByRank(PageRequest.of(0, 10)).stream()
-                .map(projectView -> ProjectId.of(projectView.getId()))
+        return Stream.concat(projectRecommendationV1Repository.findTopProjects(3).stream(),
+                        projectRecommendationV1Repository.findLastActiveProjects(3).stream())
+                .map(ProjectRecommendationEntity::getProjectId)
+                .map(ProjectId::of)
                 .toList();
     }
 } 
