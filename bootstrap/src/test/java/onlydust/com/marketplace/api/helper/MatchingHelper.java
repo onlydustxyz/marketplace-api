@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.helper;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.MatchingAnswerEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.MatchingQuestionEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.RecommendationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.MatchingQuestionRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserAnswerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @Service
 @AllArgsConstructor
 public class MatchingHelper {
-    private final RecommendationRepository recommendationRepository;
+    private final MatchingQuestionRepository matchingQuestionRepository;
     private final UserAnswerRepository userAnswerRepository;
 
     @Transactional
@@ -30,7 +30,7 @@ public class MatchingHelper {
                 .possibleAnswers(new ArrayList<>())
                 .build();
 
-        return recommendationRepository.save(question);
+        return matchingQuestionRepository.save(question);
     }
 
     @Transactional
@@ -46,7 +46,7 @@ public class MatchingHelper {
             answers.add(answer);
         }
         question.setPossibleAnswers(answers);
-        recommendationRepository.save(question);
+        matchingQuestionRepository.save(question);
         return answers;
     }
 
@@ -61,6 +61,6 @@ public class MatchingHelper {
     @Transactional
     public void cleanup() {
         userAnswerRepository.deleteAll();
-        recommendationRepository.deleteAll();
+        matchingQuestionRepository.deleteAll();
     }
 }

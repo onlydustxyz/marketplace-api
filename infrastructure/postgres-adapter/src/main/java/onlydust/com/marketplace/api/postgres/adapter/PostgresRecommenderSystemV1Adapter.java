@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.MatchingQuestionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.UserAnswerEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.MatchingQuestionRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectViewRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.RecommendationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserAnswerRepository;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
@@ -28,13 +28,13 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort {
     @Getter
     private final String matchingSystemId;
-    private final RecommendationRepository recommendationRepository;
+    private final MatchingQuestionRepository matchingQuestionRepository;
     private final UserAnswerRepository userAnswerRepository;
     private final ProjectViewRepository projectViewRepository;
 
     @Override
     public boolean isMultipleChoice(final @NonNull MatchingQuestion.Id questionId) {
-        final var question = recommendationRepository.findById(questionId.value())
+        final var question = matchingQuestionRepository.findById(questionId.value())
                 .orElseThrow(() -> notFound("Question %s not found".formatted(questionId)));
         return question.getMultipleChoice();
     }
@@ -42,7 +42,7 @@ public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort
     @Override
     @Transactional(readOnly = true)
     public List<MatchingQuestion> getMatchingQuestions(final @NonNull UserId userId) {
-        final var questions = recommendationRepository.findAllByMatchingSystemId(matchingSystemId).stream()
+        final var questions = matchingQuestionRepository.findAllByMatchingSystemId(matchingSystemId).stream()
                 .sorted(comparing(MatchingQuestionEntity::getIndex))
                 .toList();
         final var userAnswers = userAnswerRepository
