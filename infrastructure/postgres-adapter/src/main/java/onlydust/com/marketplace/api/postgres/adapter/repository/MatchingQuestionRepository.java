@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface RecommendationRepository extends JpaRepository<MatchingQuestionEntity, UUID> {
+public interface MatchingQuestionRepository extends JpaRepository<MatchingQuestionEntity, UUID> {
     List<MatchingQuestionEntity> findAllByMatchingSystemId(String matchingSystemId);
 
 } 
