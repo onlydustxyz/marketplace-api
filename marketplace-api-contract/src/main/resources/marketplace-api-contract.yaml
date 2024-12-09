@@ -13217,9 +13217,17 @@ components:
 
     SearchPostRequest:
       type: object
+      required:
+        - keyword
+        - pageSize
+        - pageIndex
       properties:
-        value:
+        keyword:
           type: string
+        pageSize:
+          type: integer
+        pageIndex:
+          type: integer
         languages:
           type: array
           items:
@@ -13236,10 +13244,16 @@ components:
     SuggestPostRequest:
       type: object
       required:
-        - value
+        - keyword
+        - pageSize
+        - pageIndex
       properties:
-        value:
+        keyword:
           type: string
+        pageSize:
+          type: integer
+        pageIndex:
+          type: integer
         languages:
           type: array
           items:

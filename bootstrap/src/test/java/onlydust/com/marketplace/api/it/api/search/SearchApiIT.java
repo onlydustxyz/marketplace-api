@@ -7,10 +7,12 @@ import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.suites.tags.TagSearch;
 import onlydust.com.marketplace.kernel.model.EcosystemId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.model.Language;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 
@@ -36,14 +38,20 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
         elasticsearchContainer.stop();
     }
 
+//    @DynamicPropertySource
+//    static void updateProperties(DynamicPropertyRegistry registry) {
+//        registry.add("infrastructure.elasticsearch.url", () -> "http://" + elasticsearchContainer.getHttpHostAddress());
+//    }
+
     @Autowired
     SearchIndexationService searchIndexationService;
     @Autowired
     ElasticSearchAdapter elasticSearchAdapter;
 
-    final WebTestClient elasticksearchWebTestClient = WebTestClient.bindToServer()
+    final WebTestClient elasticSearchWebTestClient = WebTestClient.bindToServer()
             .baseUrl("http://" + elasticsearchContainer.getHttpHostAddress())
             .build();
+
 
     @BeforeEach
     void setUp() {
@@ -64,7 +72,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
 
         // Then
         Thread.sleep(3000);
-        elasticksearchWebTestClient.get()
+        elasticSearchWebTestClient.get()
                 .uri("/_all/_search")
                 .exchange()
                 .expectStatus()
@@ -72,6 +80,31 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .consumeWith(System.out::println)
                 .jsonPath("$.hits.total.value").isEqualTo(75);
+    }
+
+//    @Test
+//    @Order(2)
+    void should_search_projects() {
+        // Given
+        final String keyword = "cat";
+
+        // When
+        client.post()
+                .uri(getApiURI(POST_SEARCH))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "keyword": "%s",
+                          "pageSize": 10,
+                          "pageIndex": 0
+                        }
+                        """.formatted(keyword))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println);
     }
 
     private void setupProjectsWithData() {

@@ -75,6 +75,7 @@
         <datasource-proxy-spring-boot-starter.version>1.9.1</datasource-proxy-spring-boot-starter.version>
         <mockito-junit-jupiter.version>5.14.2</mockito-junit-jupiter.version>
         <assertj-core.version>3.26.3</assertj-core.version>
+        <marketplace-kernel.version>0.49.0</marketplace-kernel.version>
     </properties>
 
     <dependencyManagement>
@@ -128,7 +129,7 @@
             <dependency>
                 <groupId>onlydust.com.marketplace.kernel</groupId>
                 <artifactId>marketplace-kernel</artifactId>
-                <version>0.49.0</version>
+                <version>${marketplace-kernel.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>

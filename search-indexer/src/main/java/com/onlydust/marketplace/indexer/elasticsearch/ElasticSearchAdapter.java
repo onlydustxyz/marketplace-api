@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.onlydust.marketplace.indexer.elasticsearch.properties.ElasticSearchProperties;
 import com.onlydust.marketplace.indexer.postgres.entity.SearchProjectEntity;
+import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.SneakyThrows;

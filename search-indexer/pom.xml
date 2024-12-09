@@ -40,6 +40,11 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>onlydust.com.marketplace.kernel</groupId>
+            <artifactId>marketplace-kernel</artifactId>
+            <version>${marketplace-kernel.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
