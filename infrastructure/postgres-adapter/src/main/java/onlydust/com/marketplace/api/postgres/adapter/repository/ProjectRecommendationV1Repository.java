@@ -12,7 +12,8 @@ import java.util.UUID;
 public interface ProjectRecommendationV1Repository extends JpaRepository<ProjectRecommendationEntity, UUID> {
 
     @Query(value = """
-            SELECT *
+            SELECT project_id   as project_id,
+                   0            as score
             FROM (SELECT DISTINCT ON (project_id) cd.project_id, cd.timestamp
                   FROM bi.p_contribution_data cd
                   WHERE cd.contribution_type = 'PULL_REQUEST'
@@ -25,7 +26,8 @@ public interface ProjectRecommendationV1Repository extends JpaRepository<Project
     List<ProjectRecommendationEntity> findLastActiveProjects(int limit);
 
     @Query(value = """
-            SELECT p.id, p.rank
+            SELECT p.id     as project_id,
+                   p.rank   as score
             FROM projects p
             ORDER BY p.rank DESC
             LIMIT :limit

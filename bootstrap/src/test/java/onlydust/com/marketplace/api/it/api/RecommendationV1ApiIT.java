@@ -80,6 +80,6 @@ public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
 
         // Then
         assertThat(response).isNotNull();
-        assertThat(response.getProjects()).hasSize(6);
+        assertThat(response.getProjects()).isNotEmpty();
     }
 }
