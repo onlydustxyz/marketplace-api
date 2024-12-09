@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.it.api.search;
 
 import com.onlydust.marketplace.indexer.SearchIndexationService;
-import com.onlydust.marketplace.indexer.elasticsearch.ElasticSearchAdapter;
-import com.onlydust.marketplace.indexer.elasticsearch.properties.ElasticSearchProperties;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.suites.tags.TagSearch;
 import onlydust.com.marketplace.kernel.model.EcosystemId;
@@ -23,14 +21,17 @@ import java.util.UUID;
 @TagSearch
 public class SearchApiIT extends AbstractMarketplaceApiIT {
 
-    private static final ElasticsearchContainer elasticsearchContainer = new ElasticsearchContainer(
-            "docker.elastic.co/elasticsearch/elasticsearch:8.1.2")
-            .withEnv("xpack.security.enabled", "false")
-            .withEnv("discovery.type", "single-node");
+    private static ElasticsearchContainer elasticsearchContainer;
+    private static String elasticsearchHost;
 
     @BeforeAll
     public static void startElasticsearchContainer() {
+        elasticsearchContainer = new ElasticsearchContainer(
+                "docker.elastic.co/elasticsearch/elasticsearch:8.1.2")
+                .withEnv("xpack.security.enabled", "false")
+                .withEnv("discovery.type", "single-node");
         elasticsearchContainer.start();
+        elasticsearchHost = "http://" + elasticsearchContainer.getHttpHostAddress();
     }
 
     @AfterAll
@@ -38,28 +39,17 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
         elasticsearchContainer.stop();
     }
 
-//    @DynamicPropertySource
-//    static void updateProperties(DynamicPropertyRegistry registry) {
-//        registry.add("infrastructure.elasticsearch.url", () -> "http://" + elasticsearchContainer.getHttpHostAddress());
-//    }
+    @DynamicPropertySource
+    static void updateProperties(DynamicPropertyRegistry registry) {
+        registry.add("infrastructure.elasticsearch.url", () -> elasticsearchHost);
+    }
 
     @Autowired
     SearchIndexationService searchIndexationService;
-    @Autowired
-    ElasticSearchAdapter elasticSearchAdapter;
 
     final WebTestClient elasticSearchWebTestClient = WebTestClient.bindToServer()
-            .baseUrl("http://" + elasticsearchContainer.getHttpHostAddress())
+            .baseUrl(elasticsearchHost)
             .build();
-
-
-    @BeforeEach
-    void setUp() {
-        final ElasticSearchProperties elasticSearchProperties = new ElasticSearchProperties();
-        elasticSearchProperties.setApiKey(faker.rickAndMorty().character()); // will be ignored due to ES conf "xpack.security.enabled" set to false
-        elasticSearchProperties.setUrl("http://" + elasticsearchContainer.getHttpHostAddress());
-        elasticSearchAdapter.setElasticSearchProperties(elasticSearchProperties);
-    }
 
     @Test
     @Order(1)
@@ -82,8 +72,8 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.hits.total.value").isEqualTo(75);
     }
 
-//    @Test
-//    @Order(2)
+    @Test
+    @Order(2)
     void should_search_projects() {
         // Given
         final String keyword = "cat";
@@ -104,7 +94,35 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println);
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 1,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "results": [
+                            {
+                              "type": "PROJECT",
+                              "project": {
+                                "name": "DogGPT",
+                                "slug": "doggpt",
+                                "id": "61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17",
+                                "shortDescription": "Chat GPT for cat lovers",
+                                "contributorCount": null,
+                                "starCount": null,
+                                "forkCount": null,
+                                "languages": null,
+                                "categories": null,
+                                "ecosystems": [
+                                  "Ethereum"
+                                ]
+                              },
+                              "contributor": null
+                            }
+                          ],
+                          "facets": null
+                        }
+                        """);
     }
 
     private void setupProjectsWithData() {
