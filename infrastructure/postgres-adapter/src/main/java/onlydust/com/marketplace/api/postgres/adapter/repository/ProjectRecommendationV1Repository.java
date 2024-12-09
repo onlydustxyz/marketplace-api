@@ -23,4 +23,12 @@ public interface ProjectRecommendationV1Repository extends JpaRepository<Project
             LIMIT :limit
             """, nativeQuery = true)
     List<ProjectRecommendationEntity> findLastActiveProjects(int limit);
+
+    @Query(value = """
+            SELECT p.id, p.rank
+            FROM projects p
+            ORDER BY p.rank DESC
+            LIMIT :limit
+            """, nativeQuery = true)
+    List<ProjectRecommendationEntity> findTopProjects(int limit);
 } 
