@@ -20,7 +20,10 @@ public class ReadSearchApiElasticSearchAdapter implements ReadSearchApi {
 
     @Override
     public ResponseEntity<SearchResponse> search(SearchPostRequest searchPostRequest) {
-        final SearchResponse searchResponse = searchRepository.searchAll(searchPostRequest.getKeyword(),
+        final SearchResponse searchResponse = searchRepository.searchAll(
+                searchPostRequest.getKeyword(),
+                searchPostRequest.getType(),
+                null,
                 searchPostRequest.getPageIndex() * searchPostRequest.getPageSize(),
                 searchPostRequest.getPageSize());
         return ResponseEntity.ok(searchResponse);

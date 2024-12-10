@@ -14,7 +14,7 @@ public class SearchIndexationService {
     public void indexAllProjects() {
         LOGGER.info("Starting full indexation of projects");
         final var projects = readProjectIndexRepository.findAll();
-        elasticSearchAdapter.bulkIndex(projects);
+        elasticSearchAdapter.bulkIndexation(projects);
         LOGGER.info("Finished indexing {} projects", projects.size());
     }
 }

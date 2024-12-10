@@ -13,6 +13,7 @@ public interface ReadProjectIndexRepository extends JpaRepository<SearchProjectE
                        p.name,
                        p.short_description,
                        p.long_description,
+                       p.slug,
                        (select distinct jsonb_agg(jsonb_build_object('name', l.name))
                         from project_github_repos pgr
                                  join repo_languages rl on rl.repo_id = pgr.github_repo_id

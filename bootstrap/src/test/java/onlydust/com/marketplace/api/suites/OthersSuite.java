@@ -15,6 +15,7 @@ import org.junit.platform.suite.api.ExcludeTags;
         TagLLM.VALUE,
         TagBI.VALUE,
         TagRecommendation.VALUE,
+        TagSearch.VALUE,
 })
 public class OthersSuite {
 }

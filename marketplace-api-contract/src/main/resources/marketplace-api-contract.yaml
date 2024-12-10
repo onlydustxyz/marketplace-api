@@ -13227,6 +13227,8 @@ components:
       properties:
         keyword:
           type: string
+        type:
+          $ref: '#/components/schemas/SearchItemType'
         pageSize:
           type: integer
         pageIndex:
@@ -13248,15 +13250,11 @@ components:
       type: object
       required:
         - keyword
-        - pageSize
-        - pageIndex
       properties:
         keyword:
           type: string
-        pageSize:
-          type: integer
-        pageIndex:
-          type: integer
+        type:
+          $ref: '#/components/schemas/SearchItemType'
         languages:
           type: array
           items:
@@ -13382,7 +13380,6 @@ components:
           $ref: '#/components/schemas/SearchFacetType'
 
     SearchFacetType:
-      type: object
       enum:
         - LANGUAGE
         - ECOSYSTEM

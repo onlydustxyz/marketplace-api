@@ -47,6 +47,7 @@ application:
     notify-good-first-issues-created-job-delay: 300000 # 5 minutes
     refresh-project-stats: 300000 # 5 minutes
     github-commands-job-delay: 5000 # 5 seconds
+    index-searchable-documents-job-delay: 86400000 # Every 24H : launch an indexation by restarting jobs app
   sumsub:
     webhook:
       secret: ${SUMSUB_WEBHOOK_SECRET}
@@ -227,7 +228,7 @@ infrastructure:
     environment: ${BLOCKCHAIN_ENVIRONMENT}
   elasticsearch:
     api-key: ${ELASTICSEARCH_API_KEY}
-    url: ${ELASTICSEARCH_URL}
+    base-uri: ${ELASTICSEARCH_BASE_URI}
 
 global:
   app-base-url: ${APP_BASE_URL}

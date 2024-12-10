@@ -35,7 +35,7 @@ public class SearchIndexerConfiguration {
     }
 
     @Bean
-    public ElasticSearchAdapter elasticSearchAdapter(final ElasticSearchProperties elasticSearchProperties) {
-        return new ElasticSearchAdapter(elasticSearchProperties);
+    public ElasticSearchAdapter elasticSearchAdapter(final ElasticSearchHttpClient elasticSearchHttpClient) {
+        return new ElasticSearchAdapter(elasticSearchHttpClient);
     }
 }

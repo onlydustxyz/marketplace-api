@@ -1,6 +1,7 @@
 package com.onlydust.marketplace.api.cron;
 
 import com.onlydust.marketplace.api.cron.properties.NodeGuardiansBoostProperties;
+import com.onlydust.marketplace.indexer.SearchIndexationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
@@ -44,6 +45,7 @@ public class JobScheduler {
     private final BillingProfileFacadePort billingProfileFacadePort;
     private final NotificationSummaryEmailJob notificationSummaryEmailJob;
     private final GoodFirstIssueCreatedNotifierJob goodFirstIssueCreatedNotifierJob;
+    private final SearchIndexationService searchIndexationService;
 
     @Scheduled(fixedDelayString = "${application.cron.indexer-sync-job-delay}")
     public void processPendingIndexerApiCalls() {
@@ -165,6 +167,12 @@ public class JobScheduler {
     public void notifyGoodFirstIssuesCreated() {
         LOGGER.info("Notify good first issues created");
         goodFirstIssueCreatedNotifierJob.run();
+    }
+
+    @Scheduled(fixedDelayString = "${application.cron.index-searchable-documents-job-delay}")
+    public void indexSearchableDocumentsJob() {
+        LOGGER.info("Index searchable documents");
+        searchIndexationService.indexAllProjects();
     }
 
 }

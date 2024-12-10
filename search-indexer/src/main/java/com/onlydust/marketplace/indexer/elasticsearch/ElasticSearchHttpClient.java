@@ -10,7 +10,7 @@ import java.net.http.HttpRequest;
 @AllArgsConstructor
 public class ElasticSearchHttpClient extends HttpClient {
 
-    private final ElasticSearchProperties elasticSearchProperties;
+    public final ElasticSearchProperties elasticSearchProperties;
 
     @Override
     protected HttpRequest.Builder builder() {
@@ -20,6 +20,6 @@ public class ElasticSearchHttpClient extends HttpClient {
 
     @Override
     protected URI uri(String path) {
-        return URI.create(elasticSearchProperties.getUrl() + path);
+        return URI.create(elasticSearchProperties.getBaseUri() + path);
     }
 }
