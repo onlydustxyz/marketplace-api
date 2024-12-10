@@ -210,98 +210,98 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 6,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "results": [
-                            {
-                              "type": "CONTRIBUTOR",
-                              "project": null,
-                              "contributor": {
-                                "githubLogin": "pinonpierre",
-                                "githubId": 4507910,
-                                "htmlUrl": "https://github.com/pinonpierre",
-                                "bio": null,
-                                "contributionCount": 0,
-                                "projectCount": 0,
-                                "pullRequestCount": null,
-                                "issueCount": 0
-                              }
-                            },
-                            {
-                              "type": "CONTRIBUTOR",
-                              "project": null,
-                              "contributor": {
-                                "githubLogin": "carllapierre",
-                                "githubId": 10599421,
-                                "htmlUrl": "https://github.com/carllapierre",
-                                "bio": "Software Development Lead @Osedea ",
-                                "contributionCount": 0,
-                                "projectCount": 1,
-                                "pullRequestCount": null,
-                                "issueCount": 0
-                              }
-                            },
-                            {
-                              "type": "CONTRIBUTOR",
-                              "project": null,
-                              "contributor": {
-                                "githubLogin": "PierreOucif",
-                                "githubId": 16590657,
-                                "htmlUrl": "https://github.com/PierreOucif",
-                                "bio": null,
-                                "contributionCount": 314,
-                                "projectCount": 6,
-                                "pullRequestCount": null,
-                                "issueCount": 2
-                              }
-                            },
-                            {
-                              "type": "CONTRIBUTOR",
-                              "project": null,
-                              "contributor": {
-                                "githubLogin": "lemoinepierre",
-                                "githubId": 57217210,
-                                "htmlUrl": "https://github.com/lemoinepierre",
-                                "bio": null,
-                                "contributionCount": 0,
-                                "projectCount": 0,
-                                "pullRequestCount": null,
-                                "issueCount": 0
-                              }
-                            },
-                            {
-                              "type": "CONTRIBUTOR",
-                              "project": null,
-                              "contributor": {
-                                "githubLogin": "pierrejn-git",
-                                "githubId": 57374061,
-                                "htmlUrl": "https://github.com/pierrejn-git",
-                                "bio": null,
-                                "contributionCount": 0,
-                                "projectCount": 0,
-                                "pullRequestCount": null,
-                                "issueCount": 0
-                              }
-                            },
-                            {
-                              "type": "CONTRIBUTOR",
-                              "project": null,
-                              "contributor": {
-                                "githubLogin": "PierreBastiani",
-                                "githubId": 59787523,
-                                "htmlUrl": "https://github.com/PierreBastiani",
-                                "bio": null,
-                                "contributionCount": 0,
-                                "projectCount": 1,
-                                "pullRequestCount": null,
-                                "issueCount": 0
-                              }
-                            }
-                          ],
-                          "facets": null
-                        }
+                           "totalPageNumber": 1,
+                           "totalItemNumber": 6,
+                           "hasMore": false,
+                           "nextPageIndex": 0,
+                           "results": [
+                             {
+                               "type": "CONTRIBUTOR",
+                               "project": null,
+                               "contributor": {
+                                 "githubLogin": "pinonpierre",
+                                 "githubId": 4507910,
+                                 "htmlUrl": "https://github.com/pinonpierre",
+                                 "bio": null,
+                                 "contributionCount": 0,
+                                 "projectCount": 0,
+                                 "pullRequestCount": 0,
+                                 "issueCount": 0
+                               }
+                             },
+                             {
+                               "type": "CONTRIBUTOR",
+                               "project": null,
+                               "contributor": {
+                                 "githubLogin": "carllapierre",
+                                 "githubId": 10599421,
+                                 "htmlUrl": "https://github.com/carllapierre",
+                                 "bio": "Software Development Lead @Osedea ",
+                                 "contributionCount": 0,
+                                 "projectCount": 1,
+                                 "pullRequestCount": 0,
+                                 "issueCount": 0
+                               }
+                             },
+                             {
+                               "type": "CONTRIBUTOR",
+                               "project": null,
+                               "contributor": {
+                                 "githubLogin": "PierreOucif",
+                                 "githubId": 16590657,
+                                 "htmlUrl": "https://github.com/PierreOucif",
+                                 "bio": null,
+                                 "contributionCount": 314,
+                                 "projectCount": 6,
+                                 "pullRequestCount": 121,
+                                 "issueCount": 2
+                               }
+                             },
+                             {
+                               "type": "CONTRIBUTOR",
+                               "project": null,
+                               "contributor": {
+                                 "githubLogin": "lemoinepierre",
+                                 "githubId": 57217210,
+                                 "htmlUrl": "https://github.com/lemoinepierre",
+                                 "bio": null,
+                                 "contributionCount": 0,
+                                 "projectCount": 0,
+                                 "pullRequestCount": 0,
+                                 "issueCount": 0
+                               }
+                             },
+                             {
+                               "type": "CONTRIBUTOR",
+                               "project": null,
+                               "contributor": {
+                                 "githubLogin": "pierrejn-git",
+                                 "githubId": 57374061,
+                                 "htmlUrl": "https://github.com/pierrejn-git",
+                                 "bio": null,
+                                 "contributionCount": 0,
+                                 "projectCount": 0,
+                                 "pullRequestCount": 0,
+                                 "issueCount": 0
+                               }
+                             },
+                             {
+                               "type": "CONTRIBUTOR",
+                               "project": null,
+                               "contributor": {
+                                 "githubLogin": "PierreBastiani",
+                                 "githubId": 59787523,
+                                 "htmlUrl": "https://github.com/PierreBastiani",
+                                 "bio": null,
+                                 "contributionCount": 0,
+                                 "projectCount": 1,
+                                 "pullRequestCount": 0,
+                                 "issueCount": 0
+                               }
+                             }
+                           ],
+                           "facets": null
+                         }
                         """);
     }
 
