@@ -3,12 +3,11 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.MatchingQuestionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.ProjectRecommendationEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.UserAnswerEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.MatchingQuestionRepository;
+import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.UserAnswersV1Entity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.MatchingQuestionV1Repository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRecommendationV1Repository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.UserAnswerRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.UserAnswersV1Repository;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.recommendation.MatchingAnswer;
@@ -18,10 +17,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Stream;
 
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toSet;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @Component
@@ -29,13 +28,13 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort {
     @Getter
     private final String matchingSystemId;
-    private final MatchingQuestionRepository matchingQuestionRepository;
-    private final UserAnswerRepository userAnswerRepository;
+    private final MatchingQuestionV1Repository matchingQuestionV1Repository;
+    private final UserAnswersV1Repository userAnswersV1Repository;
     private final ProjectRecommendationV1Repository projectRecommendationV1Repository;
 
     @Override
     public boolean isMultipleChoice(final @NonNull MatchingQuestion.Id questionId) {
-        final var question = matchingQuestionRepository.findById(questionId.value())
+        final var question = matchingQuestionV1Repository.findById(questionId.value())
                 .orElseThrow(() -> notFound("Question %s not found".formatted(questionId)));
         return question.getMultipleChoice();
     }
@@ -43,14 +42,13 @@ public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort
     @Override
     @Transactional(readOnly = true)
     public List<MatchingQuestion> getMatchingQuestions(final @NonNull UserId userId) {
-        final var questions = matchingQuestionRepository.findAllByMatchingSystemId(matchingSystemId).stream()
-                .sorted(comparing(MatchingQuestionEntity::getIndex))
-                .toList();
-        final var userAnswers = userAnswerRepository
-                .findAllByUserIdAndQuestionIdIn(userId.value(), questions.stream().map(MatchingQuestionEntity::getId).toList())
-                .stream().map(UserAnswerEntity::getAnswerId).collect(toSet());
+        final var userAnswers = userAnswersV1Repository.findById(userId.value())
+                .map(UserAnswersV1Entity::allAnswerIds)
+                .orElse(Set.of());
 
-        return questions.stream().map(question -> question.toDomain(userAnswers)).toList();
+        return matchingQuestionV1Repository.findAllByOrderByIndex().stream()
+                .map(q -> q.toDomain(userAnswers))
+                .toList();
     }
 
     @Override
@@ -58,15 +56,27 @@ public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort
     public void saveMatchingAnswers(final @NonNull UserId userId,
                                     final @NonNull MatchingQuestion.Id questionId,
                                     final @NonNull List<MatchingAnswer.Id> chosenAnswerIds) {
-        userAnswerRepository.deleteAllByUserIdAndQuestionId(userId.value(), questionId.value());
+        final var question = matchingQuestionV1Repository.findById(questionId.value())
+                .orElseThrow(() -> notFound("Question %s not found".formatted(questionId)));
 
-        chosenAnswerIds.forEach(answerId -> {
-            userAnswerRepository.save(UserAnswerEntity.builder()
-                    .userId(userId.value())
-                    .questionId(questionId.value())
-                    .answerId(answerId.value())
-                    .build());
-        });
+        final var userAnswers = userAnswersV1Repository.findById(userId.value())
+                .orElse(UserAnswersV1Entity.builder().userId(userId.value()).build());
+
+        updateUserAnswers(userAnswers, question.getIndex(), chosenAnswerIds.stream().map(MatchingAnswer.Id::value).toList());
+        userAnswersV1Repository.save(userAnswers);
+    }
+
+    private void updateUserAnswers(UserAnswersV1Entity userAnswers, int questionIndex, List<UUID> answerIds) {
+        switch (questionIndex) {
+            case 0 -> userAnswers.setPrimaryGoals(answerIds);
+            case 1 -> userAnswers.setLearningPreference(answerIds.getFirst());
+            case 2 -> userAnswers.setExperienceLevel(answerIds.getFirst());
+            case 3 -> userAnswers.setLanguages(answerIds);
+            case 4 -> userAnswers.setEcosystems(answerIds);
+            case 5 -> userAnswers.setProjectMaturity(answerIds.getFirst());
+            case 6 -> userAnswers.setCommunityImportance(answerIds.getFirst());
+            case 7 -> userAnswers.setLongTermInvolvement(answerIds.getFirst());
+        }
     }
 
     @Override
@@ -78,4 +88,4 @@ public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort
                 .map(ProjectId::of)
                 .toList();
     }
-} 
+}
