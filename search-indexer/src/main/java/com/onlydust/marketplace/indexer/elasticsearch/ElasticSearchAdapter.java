@@ -42,6 +42,7 @@ public class ElasticSearchAdapter {
         elasticSearchHttpClient.sendHttpRequest(HttpRequest.newBuilder()
                 .uri(URI.create(elasticSearchHttpClient.elasticSearchProperties.getBaseUri() + "/_bulk?pretty"))
                 .header("Content-Type", "application/x-ndjson")
+                .header("Authorization", "ApiKey %s".formatted(elasticSearchHttpClient.elasticSearchProperties.getApiKey()))
                 .POST(HttpRequest.BodyPublishers.ofString(bulkRequestBody.toString()))
                 .build());
 
