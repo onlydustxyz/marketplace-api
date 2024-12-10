@@ -13311,9 +13311,9 @@ components:
         contributorCount:
           type: integer
         starCount:
-          type: string
+          type: integer
         forkCount:
-          type: string
+          type: integer
         languages:
           type: array
           items:
@@ -13332,11 +13332,14 @@ components:
       required:
         - githubLogin
         - githubId
+        - htmlUrl
       properties:
         githubLogin:
           type: string
         githubId:
           $ref: '#/components/schemas/GithubUserId'
+        htmlUrl:
+          type: string
         bio:
           type: string
         contributionCount:

@@ -173,6 +173,7 @@ public class JobScheduler {
     public void indexSearchableDocumentsJob() {
         LOGGER.info("Index searchable documents");
         searchIndexationService.indexAllProjects();
+        searchIndexationService.indexAllContributors();
     }
 
 }
