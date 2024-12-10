@@ -12,12 +12,12 @@ import java.util.UUID;
 @Value
 @Builder
 @Accessors(fluent = true)
-public class MatchingQuestion {
+public class MatchingQuestion<T> {
     Id id;
     String body;
     String description;
     boolean multipleChoice;
-    List<MatchingAnswer> answers;
+    List<MatchingAnswer<T>> answers;
 
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)

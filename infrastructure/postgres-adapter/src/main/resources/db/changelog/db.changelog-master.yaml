@@ -77,3 +77,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000040_insert_matching_questions_v1.sql
   - include:
       file: db/changelog/changelogs/00000041_add_follower_count_to_bi_view.sql
+  - include:
+      file: db/changelog/changelogs/00000042_refactor_matching_v1_storage.sql

@@ -6347,11 +6347,6 @@ components:
       format: uuid
       description: Question ID
 
-    MatchingAnswerId:
-      type: string
-      format: uuid
-      description: Answer ID
-
     Money:
       type: object
       description: Money value object
@@ -13434,8 +13429,8 @@ components:
         - body
         - chosen
       properties:
-        id:
-          $ref: '#/components/schemas/MatchingAnswerId'
+        index:
+          type: integer
         body:
           type: string
         chosen:
@@ -13444,12 +13439,12 @@ components:
     SaveMatchingAnswersRequest:
       type: object
       required:
-        - answerIds
+        - answerIndexes
       properties:
-        answerIds:
+        answerIndexes:
           type: array
           items:
-            $ref: '#/components/schemas/MatchingAnswerId'
+            type: integer
 
     RecommendedProjectsResponse:
       type: object

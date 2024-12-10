@@ -9,14 +9,15 @@ import onlydust.com.marketplace.api.contract.model.MatchingQuestionResponse;
 import onlydust.com.marketplace.api.contract.model.MatchingQuestionsResponse;
 import onlydust.com.marketplace.api.contract.model.SaveMatchingAnswersRequest;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
-import onlydust.com.marketplace.project.domain.model.recommendation.MatchingAnswer;
 import onlydust.com.marketplace.project.domain.model.recommendation.MatchingQuestion;
 import onlydust.com.marketplace.project.domain.port.input.RecommendationFacadePort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashSet;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 @RestController
 @Tags(@Tag(name = "Recommendations"))
@@ -39,20 +40,21 @@ public class RecommendationsRestApi implements RecommendationsApi {
                                 .body(q.body())
                                 .description(q.description())
                                 .multipleChoice(q.multipleChoice())
-                                .answers(q.answers().stream()
-                                        .map(a -> new MatchingAnswerResponse()
-                                                .id(a.id().value())
-                                                .body(a.body())
-                                                .chosen(a.chosen()))
-                                        .toList()))
+                                .answers(IntStream.range(0, q.answers().size())
+                                        .mapToObj(i -> {
+                                            final var a = q.answers().get(i);
+                                            return new MatchingAnswerResponse()
+                                                    .index(i)
+                                                    .body(a.body())
+                                                    .chosen(a.chosen());
+                                        }).toList()))
                         .toList()));
     }
 
     @Override
     public ResponseEntity<Void> saveMatchingQuestionAnswers(UUID questionId, SaveMatchingAnswersRequest request) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        recommendationFacadePort.saveMatchingAnswers(authenticatedUser.id(), MatchingQuestion.Id.of(questionId),
-                request.getAnswerIds().stream().map(MatchingAnswer.Id::of).toList());
+        recommendationFacadePort.saveMatchingAnswers(authenticatedUser.id(), MatchingQuestion.Id.of(questionId), new HashSet<>(request.getAnswerIndexes()));
         return ResponseEntity.noContent().build();
     }
 }
