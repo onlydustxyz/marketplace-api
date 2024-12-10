@@ -40,7 +40,7 @@ public class ElasticSearchAdapter {
         }
 
         elasticSearchHttpClient.sendHttpRequest(HttpRequest.newBuilder()
-                .uri(URI.create(elasticSearchHttpClient.elasticSearchProperties.getUrl() + "/_bulk?pretty"))
+                .uri(URI.create(elasticSearchHttpClient.elasticSearchProperties.getBaseUri() + "/_bulk?pretty"))
                 .header("Content-Type", "application/x-ndjson")
                 .POST(HttpRequest.BodyPublishers.ofString(bulkRequestBody.toString()))
                 .build());

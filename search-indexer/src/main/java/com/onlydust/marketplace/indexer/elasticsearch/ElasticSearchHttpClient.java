@@ -20,6 +20,6 @@ public class ElasticSearchHttpClient extends HttpClient {
 
     @Override
     protected URI uri(String path) {
-        return URI.create(elasticSearchProperties.getUrl() + path);
+        return URI.create(elasticSearchProperties.getBaseUri() + path);
     }
 }

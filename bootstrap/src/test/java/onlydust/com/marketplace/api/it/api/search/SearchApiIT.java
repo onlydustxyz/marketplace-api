@@ -41,7 +41,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
 
     @DynamicPropertySource
     static void updateProperties(DynamicPropertyRegistry registry) {
-        registry.add("infrastructure.elasticsearch.url", () -> elasticsearchHost);
+        registry.add("infrastructure.elasticsearch.base-uri", () -> elasticsearchHost);
     }
 
     @Autowired

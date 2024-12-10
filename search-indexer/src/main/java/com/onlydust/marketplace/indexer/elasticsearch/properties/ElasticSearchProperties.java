@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class ElasticSearchProperties {
-    String url;
+    String baseUri;
     String apiKey;
 }

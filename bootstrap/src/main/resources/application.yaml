@@ -228,7 +228,7 @@ infrastructure:
     environment: ${BLOCKCHAIN_ENVIRONMENT}
   elasticsearch:
     api-key: ${ELASTICSEARCH_API_KEY}
-    url: ${ELASTICSEARCH_URL}
+    base-uri: ${ELASTICSEARCH_BASE_URI}
 
 global:
   app-base-url: ${APP_BASE_URL}
