@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadSearchApi;
 import onlydust.com.marketplace.api.contract.model.SearchPostRequest;
 import onlydust.com.marketplace.api.contract.model.SearchResponse;
-import onlydust.com.marketplace.api.read.repositories.SearchRepository;
+import onlydust.com.marketplace.api.contract.model.SuggestPostRequest;
+import onlydust.com.marketplace.api.contract.model.SuggestResponse;
+import onlydust.com.marketplace.api.read.repositories.elasticsearch.SearchRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,5 +29,11 @@ public class ReadSearchApiElasticSearchAdapter implements ReadSearchApi {
                 searchPostRequest.getPageIndex() * searchPostRequest.getPageSize(),
                 searchPostRequest.getPageSize());
         return ResponseEntity.ok(searchResponse);
+    }
+
+    @Override
+    public ResponseEntity<SuggestResponse> suggest(SuggestPostRequest suggestPostRequest) {
+        final SuggestResponse SuggestResponse = searchRepository.suggest(suggestPostRequest.getKeyword(), suggestPostRequest.getType());
+        return ResponseEntity.ok(SuggestResponse);
     }
 }

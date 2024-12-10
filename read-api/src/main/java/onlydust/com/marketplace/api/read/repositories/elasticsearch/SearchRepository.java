@@ -1,10 +1,11 @@
-package onlydust.com.marketplace.api.read.repositories;
+package onlydust.com.marketplace.api.read.repositories.elasticsearch;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.onlydust.marketplace.indexer.elasticsearch.ElasticSearchAdapter;
 import com.onlydust.marketplace.indexer.elasticsearch.ElasticSearchHttpClient;
@@ -49,21 +50,82 @@ public class SearchRepository {
                                     final Map<Facet, String> facets,
                                     final Integer from,
                                     final Integer size) {
-        final String index = isNull(searchItemType) ? "od-*" : switch (searchItemType) {
-            case PROJECT -> ElasticSearchAdapter.PROJECTS_INDEX;
-            case CONTRIBUTOR -> ElasticSearchAdapter.CONTRIBUTORS_INDEX;
-        };
+        final String index = getIndexFromType(searchItemType);
         return elasticSearchHttpClient.send("/%s/_search".formatted(index), HttpMethod.POST,
-                        buildQuery(keyword, searchItemType, facets, from, size), JsonNode.class)
+                        buildSearchQuery(keyword, searchItemType, facets, from, size), JsonNode.class)
                 .map(jsonNode -> searchResponseFromJsonNode(jsonNode, from, size))
                 .orElseGet(EMPTY_RESPONSE);
     }
 
-    private static ElasticSearchQuery<QueryString> buildQuery(final String keyword,
-                                                              final SearchItemType searchItemType,
-                                                              final Map<Facet, String> facets,
-                                                              final Integer from,
-                                                              final Integer size) {
+    public SuggestResponse suggest(String keyword, SearchItemType type) {
+        final String index = getIndexFromType(type);
+        return elasticSearchHttpClient.send("/%s/_search".formatted(index), HttpMethod.POST,
+                        buildSuggestQuery(keyword, type), JsonNode.class)
+                .map(this::suggestResponseFromJsonNode)
+                .orElseGet(SuggestResponse::new);
+    }
+
+    private SuggestResponse suggestResponseFromJsonNode(final JsonNode jsonNode) {
+        if (jsonNode.get("hits").get("total").get("value").asInt() == 0) {
+            return new SuggestResponse();
+        }
+        final JsonNode firstDocument = jsonNode.get("hits").get("hits").get(0);
+        final String index = firstDocument.get("_index").textValue();
+        return switch (index) {
+            case "od-projects" -> new SuggestResponse().value(firstDocument.get("_source").get("name").textValue());
+            case "od-contributors" -> new SuggestResponse().value(firstDocument.get("_source").get("githubLogin").textValue());
+            case null, default -> new SuggestResponse();
+        };
+    }
+
+    public static ElasticSearchQuery<JsonNode> buildSuggestQuery(final String keyword, final SearchItemType type) {
+        final ObjectNode query = objectMapper.createObjectNode();
+        if (isNull(type)) {
+            final ObjectNode bool = objectMapper.createObjectNode();
+            final ArrayNode should = bool.putArray("should");
+
+            final ObjectNode projectPrefix = objectMapper.createObjectNode();
+            final ObjectNode projectNamePrefix = objectMapper.createObjectNode();
+            projectNamePrefix.put("name", keyword);
+            projectPrefix.put("prefix", projectNamePrefix);
+
+            final ObjectNode contributorGithubLoginPrefix = objectMapper.createObjectNode();
+            final ObjectNode contributorPrefix = objectMapper.createObjectNode();
+            contributorGithubLoginPrefix.put("githubLogin", keyword);
+            contributorPrefix.put("prefix", contributorGithubLoginPrefix);
+
+            should.add(projectPrefix);
+            should.add(contributorPrefix);
+            query.put("bool", bool);
+        } else if (type == SearchItemType.PROJECT) {
+            final ObjectNode prefix = objectMapper.createObjectNode();
+            prefix.put("name", keyword);
+            query.put("prefix", prefix);
+        } else if (type == SearchItemType.CONTRIBUTOR) {
+            final ObjectNode prefix = objectMapper.createObjectNode();
+            prefix.put("githubLogin", keyword);
+            query.put("prefix", prefix);
+        }
+        return ElasticSearchQuery.<JsonNode>builder()
+                .query(query)
+                .from(0)
+                .size(1)
+                .build();
+    }
+
+
+    private static String getIndexFromType(SearchItemType searchItemType) {
+        return isNull(searchItemType) ? "od-*" : switch (searchItemType) {
+            case PROJECT -> ElasticSearchAdapter.PROJECTS_INDEX;
+            case CONTRIBUTOR -> ElasticSearchAdapter.CONTRIBUTORS_INDEX;
+        };
+    }
+
+    private static ElasticSearchQuery<QueryString> buildSearchQuery(final String keyword,
+                                                                    final SearchItemType searchItemType,
+                                                                    final Map<Facet, String> facets,
+                                                                    final Integer from,
+                                                                    final Integer size) {
         ElasticSearchQuery<QueryString> query = ElasticSearchQuery.<QueryString>builder()
                 .from(from)
                 .size(size)
