@@ -63,20 +63,38 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
         // Then
         Thread.sleep(3000);
         elasticSearchWebTestClient.get()
-                .uri("/_all/_search")
+                .uri("/od-projects/_search")
                 .exchange()
                 .expectStatus()
                 .isOk()
                 .expectBody()
                 .consumeWith(System.out::println)
-                .jsonPath("$.hits.total.value").isEqualTo(75);
+                .jsonPath("$.hits.total.value").isEqualTo(74);
     }
 
     @Test
     @Order(2)
+    void should_index_all_contributors() throws InterruptedException {
+        // When
+        searchIndexationService.indexAllContributors();
+
+        // Then
+        Thread.sleep(3000);
+        elasticSearchWebTestClient.get()
+                .uri("/od-contributors/_search")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.hits.total.value").isEqualTo(10000); // ad "track_total_hits": true to bypass 10 000 total limitation
+    }
+
+
+    @Test
+    @Order(10)
     void should_search_projects() {
         // Given
-        final String keyword = "cat";
+        final String keyword = "Bretzel";
 
         // When
         client.post()
@@ -95,43 +113,198 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
+                .json("""
+                        {
+                           "totalPageNumber": 1,
+                           "totalItemNumber": 2,
+                           "hasMore": false,
+                           "nextPageIndex": 0,
+                           "results": [
+                             {
+                               "type": "PROJECT",
+                               "project": {
+                                 "name": "Bretzel 196",
+                                 "slug": "bretzel-196",
+                                 "id": "247ac542-762d-44cb-b8d4-4d6199c916be",
+                                 "shortDescription": "bretzel gives you wings",
+                                 "contributorCount": 0,
+                                 "starCount": 0,
+                                 "forkCount": 0,
+                                 "languages": null,
+                                 "categories": null,
+                                 "ecosystems": null
+                               },
+                               "contributor": null
+                             },
+                             {
+                               "type": "PROJECT",
+                               "project": {
+                                 "name": "Bretzel",
+                                 "slug": "bretzel",
+                                 "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                 "shortDescription": "A project for people who love fruits",
+                                 "contributorCount": 6,
+                                 "starCount": 0,
+                                 "forkCount": 1,
+                                 "languages": [
+                                   "Typescript"
+                                 ],
+                                 "categories": null,
+                                 "ecosystems": [
+                                   "Ethereum",
+                                   "Aptos",
+                                   "Zama"
+                                 ]
+                               },
+                               "contributor": null
+                             }
+                           ],
+                           "facets": [
+                             {
+                               "name": "Aptos",
+                               "count": 1,
+                               "type": "ECOSYSTEM"
+                             },
+                             {
+                               "name": "Ethereum",
+                               "count": 1,
+                               "type": "ECOSYSTEM"
+                             },
+                             {
+                               "name": "Zama",
+                               "count": 1,
+                               "type": "ECOSYSTEM"
+                             },
+                             {
+                               "name": "Typescript",
+                               "count": 1,
+                               "type": "LANGUAGE"
+                             }
+                           ]
+                         }
+                        """);
+    }
+
+    @Test
+    @Order(20)
+    void should_search_contributors() {
+        // Given
+        final String keyword = "pierre";
+
+        // When
+        client.post()
+                .uri(getApiURI(POST_SEARCH))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "keyword": "%s",
+                          "pageSize": 10,
+                          "pageIndex": 0,
+                          "type": "CONTRIBUTOR"
+                        }
+                        """.formatted(keyword))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
                 .json("""
                         {
                           "totalPageNumber": 1,
-                          "totalItemNumber": 1,
+                          "totalItemNumber": 6,
                           "hasMore": false,
                           "nextPageIndex": 0,
                           "results": [
                             {
-                              "type": "PROJECT",
-                              "project": {
-                                "name": "DogGPT",
-                                "slug": "doggpt",
-                                "id": "61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17",
-                                "shortDescription": "Chat GPT for cat lovers",
-                                "contributorCount": null,
-                                "starCount": null,
-                                "forkCount": null,
-                                "languages": null,
-                                "categories": null,
-                                "ecosystems": [
-                                  "Ethereum"
-                                ]
-                              },
-                              "contributor": null
+                              "type": "CONTRIBUTOR",
+                              "project": null,
+                              "contributor": {
+                                "githubLogin": "pinonpierre",
+                                "githubId": 4507910,
+                                "htmlUrl": "https://github.com/pinonpierre",
+                                "bio": null,
+                                "contributionCount": 0,
+                                "projectCount": 0,
+                                "pullRequestCount": null,
+                                "issueCount": 0
+                              }
+                            },
+                            {
+                              "type": "CONTRIBUTOR",
+                              "project": null,
+                              "contributor": {
+                                "githubLogin": "carllapierre",
+                                "githubId": 10599421,
+                                "htmlUrl": "https://github.com/carllapierre",
+                                "bio": "Software Development Lead @Osedea ",
+                                "contributionCount": 0,
+                                "projectCount": 1,
+                                "pullRequestCount": null,
+                                "issueCount": 0
+                              }
+                            },
+                            {
+                              "type": "CONTRIBUTOR",
+                              "project": null,
+                              "contributor": {
+                                "githubLogin": "PierreOucif",
+                                "githubId": 16590657,
+                                "htmlUrl": "https://github.com/PierreOucif",
+                                "bio": null,
+                                "contributionCount": 314,
+                                "projectCount": 6,
+                                "pullRequestCount": null,
+                                "issueCount": 2
+                              }
+                            },
+                            {
+                              "type": "CONTRIBUTOR",
+                              "project": null,
+                              "contributor": {
+                                "githubLogin": "lemoinepierre",
+                                "githubId": 57217210,
+                                "htmlUrl": "https://github.com/lemoinepierre",
+                                "bio": null,
+                                "contributionCount": 0,
+                                "projectCount": 0,
+                                "pullRequestCount": null,
+                                "issueCount": 0
+                              }
+                            },
+                            {
+                              "type": "CONTRIBUTOR",
+                              "project": null,
+                              "contributor": {
+                                "githubLogin": "pierrejn-git",
+                                "githubId": 57374061,
+                                "htmlUrl": "https://github.com/pierrejn-git",
+                                "bio": null,
+                                "contributionCount": 0,
+                                "projectCount": 0,
+                                "pullRequestCount": null,
+                                "issueCount": 0
+                              }
+                            },
+                            {
+                              "type": "CONTRIBUTOR",
+                              "project": null,
+                              "contributor": {
+                                "githubLogin": "PierreBastiani",
+                                "githubId": 59787523,
+                                "htmlUrl": "https://github.com/PierreBastiani",
+                                "bio": null,
+                                "contributionCount": 0,
+                                "projectCount": 1,
+                                "pullRequestCount": null,
+                                "issueCount": 0
+                              }
                             }
                           ],
-                          "facets": [
-                              {
-                                "name": "Ethereum",
-                                "count": 1,
-                                "type": "ECOSYSTEM"
-                              }
-                            ]
+                          "facets": null
                         }
                         """);
     }
+
 
     private void setupProjectsWithData() {
         // Add ecosystems to projects

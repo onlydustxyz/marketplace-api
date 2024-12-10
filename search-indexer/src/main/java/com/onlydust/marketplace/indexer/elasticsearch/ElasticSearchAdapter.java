@@ -2,6 +2,7 @@ package com.onlydust.marketplace.indexer.elasticsearch;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onlydust.marketplace.indexer.postgres.entity.SearchContributorEntity;
 import com.onlydust.marketplace.indexer.postgres.entity.SearchProjectEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,21 +20,29 @@ import java.util.List;
 public class ElasticSearchAdapter {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private final ElasticSearchHttpClient elasticSearchHttpClient;
-    public static String PROJECTS_INDEX = "projects";
-    public static String CONTRIBUTORS_INDEX = "contributors";
+    public static String PROJECTS_INDEX = "od-projects";
+    public static String CONTRIBUTORS_INDEX = "od-contributors";
 
-    public void bulkIndexation(List<SearchProjectEntity> projects) {
+    public void indexAllProjects(final List<SearchProjectEntity> projects) {
+        indexAllDocuments(projects, PROJECTS_INDEX);
+    }
+
+    public void indexAllContributors(final List<SearchContributorEntity> contributors) {
+        indexAllDocuments(contributors, CONTRIBUTORS_INDEX);
+    }
+
+    private <Id, Document extends ElasticSearchDocument<Id>> void indexAllDocuments(final List<Document> documents, final String indexName) {
         final var bulkRequestBody = new StringBuilder();
 
-        for (SearchProjectEntity project : projects) {
+        for (ElasticSearchDocument<Id> document : documents) {
             final var action = objectMapper.createObjectNode();
             final var index = objectMapper.createObjectNode();
-            index.put("_index", PROJECTS_INDEX);
-            index.put("_id", project.getId().toString());
+            index.put("_index", indexName);
+            index.put("_id", document.getDocumentId().toString());
             action.set("index", index);
             try {
                 bulkRequestBody.append(objectMapper.writeValueAsString(action)).append("\n");
-                bulkRequestBody.append(objectMapper.writeValueAsString(project)).append("\n");
+                bulkRequestBody.append(objectMapper.writeValueAsString(document)).append("\n");
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -45,7 +54,5 @@ public class ElasticSearchAdapter {
                 .header("Authorization", "ApiKey %s".formatted(elasticSearchHttpClient.elasticSearchProperties.getApiKey()))
                 .POST(HttpRequest.BodyPublishers.ofString(bulkRequestBody.toString()))
                 .build());
-
-        LOGGER.info("Successfully indexed {} documents", projects.size());
     }
 }

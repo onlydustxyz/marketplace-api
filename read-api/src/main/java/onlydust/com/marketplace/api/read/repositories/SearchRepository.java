@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.onlydust.marketplace.indexer.elasticsearch.ElasticSearchAdapter;
 import com.onlydust.marketplace.indexer.elasticsearch.ElasticSearchHttpClient;
+import com.onlydust.marketplace.indexer.postgres.entity.SearchContributorEntity;
 import com.onlydust.marketplace.indexer.postgres.entity.SearchProjectEntity;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
@@ -48,7 +49,7 @@ public class SearchRepository {
                                     final Map<Facet, String> facets,
                                     final Integer from,
                                     final Integer size) {
-        final String index = isNull(searchItemType) ? "_all" : switch (searchItemType) {
+        final String index = isNull(searchItemType) ? "od-*" : switch (searchItemType) {
             case PROJECT -> ElasticSearchAdapter.PROJECTS_INDEX;
             case CONTRIBUTOR -> ElasticSearchAdapter.CONTRIBUTORS_INDEX;
         };
@@ -58,19 +59,15 @@ public class SearchRepository {
                 .orElseGet(EMPTY_RESPONSE);
     }
 
-    private static ElasticSearchQuery<SimpleQueryString> buildQuery(final String keyword,
-                                                                    final SearchItemType searchItemType,
-                                                                    final Map<Facet, String> facets,
-                                                                    final Integer from,
-                                                                    final Integer size) {
-        ElasticSearchQuery<SimpleQueryString> query = ElasticSearchQuery.<SimpleQueryString>builder()
+    private static ElasticSearchQuery<QueryString> buildQuery(final String keyword,
+                                                              final SearchItemType searchItemType,
+                                                              final Map<Facet, String> facets,
+                                                              final Integer from,
+                                                              final Integer size) {
+        ElasticSearchQuery<QueryString> query = ElasticSearchQuery.<QueryString>builder()
                 .from(from)
                 .size(size)
-                .query(SimpleQueryString.builder()
-                        .simpleQueryString(Query.builder()
-                                .query(keyword)
-                                .build())
-                        .build())
+                .query(QueryString.fromKeyword(keyword))
                 .build();
         if (searchItemType == SearchItemType.PROJECT) {
             query = query.withFacets();
@@ -88,11 +85,15 @@ public class SearchRepository {
             mapPagination(from, size, total, searchResponse);
             final JsonNode documents = jsonNode.get("hits").get("hits");
             for (JsonNode document : documents) {
-                if (document.get("_index").textValue().equals("projects")) {
+                final String index = document.get("_index").textValue();
+                if (index.equals(ElasticSearchAdapter.PROJECTS_INDEX)) {
                     mapProject(document, searchResponse);
 
+                } else if (index.equals(ElasticSearchAdapter.CONTRIBUTORS_INDEX)) {
+                    mapContributors(document, searchResponse);
+
                 } else {
-                    LOGGER.warn("Unexpected index %s".formatted(document.get("_index").textValue()));
+                    LOGGER.warn("Unexpected index %s".formatted(index));
                 }
             }
             if (jsonNode.has("aggregations")) {
@@ -120,24 +121,51 @@ public class SearchRepository {
         return facets.stream().sorted(Comparator.comparing(SearchFacetResponse::getCount).reversed()).toList();
     }
 
-    private static void mapProject(JsonNode document, SearchResponse searchResponse) throws JsonProcessingException {
-        final SearchProjectEntity searchProjectEntity = objectMapper.treeToValue(document.get("_source"), SearchProjectEntity.class);
-        searchResponse.addResultsItem(new SearchItemResponse()
-                .type(SearchItemType.PROJECT)
-                .project(
-                        new ProjectAdvancedSearchResponse()
-                                .id(searchProjectEntity.getId())
-                                .name(searchProjectEntity.getName())
-                                .slug(searchProjectEntity.getSlug())
-                                .shortDescription(searchProjectEntity.getShortDescription())
-                                .categories(isNull(searchProjectEntity.getCategories()) ? null :
-                                        searchProjectEntity.getCategories().stream().map(SearchProjectEntity.Category::getName).toList())
-                                .ecosystems(isNull(searchProjectEntity.getEcosystems()) ? null :
-                                        searchProjectEntity.getEcosystems().stream().map(SearchProjectEntity.Ecosystem::getName).toList())
-                                .languages(isNull(searchProjectEntity.getLanguages()) ? null :
-                                        searchProjectEntity.getLanguages().stream().map(SearchProjectEntity.Languages::getName).toList())
+    private static void mapProject(JsonNode document, SearchResponse searchResponse) {
+        try {
+            final SearchProjectEntity searchProjectEntity = objectMapper.treeToValue(document.get("_source"), SearchProjectEntity.class);
+            searchResponse.addResultsItem(new SearchItemResponse()
+                    .type(SearchItemType.PROJECT)
+                    .project(
+                            new ProjectAdvancedSearchResponse()
+                                    .id(searchProjectEntity.getId())
+                                    .name(searchProjectEntity.getName())
+                                    .slug(searchProjectEntity.getSlug())
+                                    .shortDescription(searchProjectEntity.getShortDescription())
+                                    .forkCount(searchProjectEntity.getForkCount())
+                                    .starCount(searchProjectEntity.getStarCount())
+                                    .contributorCount(searchProjectEntity.getContributorCount())
+                                    .categories(isNull(searchProjectEntity.getCategories()) ? null :
+                                            searchProjectEntity.getCategories().stream().map(SearchProjectEntity.Category::getName).toList())
+                                    .ecosystems(isNull(searchProjectEntity.getEcosystems()) ? null :
+                                            searchProjectEntity.getEcosystems().stream().map(SearchProjectEntity.Ecosystem::getName).toList())
+                                    .languages(isNull(searchProjectEntity.getLanguages()) ? null :
+                                            searchProjectEntity.getLanguages().stream().map(SearchProjectEntity.Languages::getName).toList())
 
-                ));
+                    ));
+        } catch (JsonProcessingException e) {
+            LOGGER.error("Failed to deserialize project {} from ElasticSearch", document);
+        }
+    }
+
+    private static void mapContributors(JsonNode document, SearchResponse searchResponse) {
+        try {
+            final SearchContributorEntity searchContributorEntity = objectMapper.treeToValue(document.get("_source"), SearchContributorEntity.class);
+            searchResponse.addResultsItem(new SearchItemResponse()
+                    .type(SearchItemType.CONTRIBUTOR)
+                    .contributor(new ContributorAdvancedSearchResponse()
+                            .githubId(searchContributorEntity.getGithubId())
+                            .githubLogin(searchContributorEntity.getGithubLogin())
+                            .bio(searchContributorEntity.getBio())
+                            .issueCount(searchContributorEntity.getIssueCount())
+                            .projectCount(searchContributorEntity.getProjectCount())
+                            .contributionCount(searchContributorEntity.getContributionCount())
+                            .htmlUrl(searchContributorEntity.getHtmlUrl())
+                    )
+            );
+        } catch (JsonProcessingException e) {
+            LOGGER.error("Failed to deserialize contributors {} from ElasticSearch", document);
+        }
     }
 
     private static void mapPagination(Integer from, Integer size, int total, SearchResponse searchResponse) {
@@ -170,9 +198,17 @@ public class SearchRepository {
 
     @Builder
     @Data
-    public static final class SimpleQueryString {
-        @JsonProperty("simple_query_string")
-        Query simpleQueryString;
+    public static final class QueryString {
+        @JsonProperty("query_string")
+        Query queryString;
+
+        public static QueryString fromKeyword(String keyword) {
+            return QueryString.builder()
+                    .queryString(Query.builder()
+                            .query("*%s*".formatted(keyword))
+                            .build())
+                    .build();
+        }
     }
 
     @Builder

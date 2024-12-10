@@ -43,7 +43,7 @@ public class SearchRepositoryTest {
 
         // When
         when(elasticSearchHttpClient.send("/_all/_search", HttpMethod.POST,
-                SearchRepository.ElasticSearchQuery.<SearchRepository.SimpleQueryString>builder().from(from).size(size).query(SearchRepository.SimpleQueryString.builder().simpleQueryString(SearchRepository.Query.builder().query(keyword).build()).build()).build(), JsonNode.class)).thenReturn(Optional.of(objectMapper.readTree("""
+                SearchRepository.ElasticSearchQuery.<SearchRepository.QueryString>builder().from(from).size(size).query(SearchRepository.QueryString.builder().queryString(SearchRepository.Query.builder().query(keyword).build()).build()).build(), JsonNode.class)).thenReturn(Optional.of(objectMapper.readTree("""
                 {
                    "took": 18,
                    "timed_out": false,
@@ -76,54 +76,62 @@ public class SearchRepositoryTest {
     }
 
     @Test
-    void should_map_simple_query() throws JsonProcessingException {
+    void should_map_simple_project_query() throws JsonProcessingException {
         // Given
         final String keyword = faker.rickAndMorty().character();
-        final int from = faker.number().numberBetween(0, 1000);
-        final int size = faker.number().numberBetween(0, 1000);
+        final int from = 0;
+        final int size = 10;
 
         // When
-        when(elasticSearchHttpClient.send("/_all/_search", HttpMethod.POST,
-                SearchRepository.ElasticSearchQuery.<SearchRepository.SimpleQueryString>builder().from(from).size(size).query(SearchRepository.SimpleQueryString.builder().simpleQueryString(SearchRepository.Query.builder().query(keyword).build()).build()).build(), JsonNode.class)).thenReturn(Optional.of(objectMapper.readTree("""
-                {
-                    "took": 13,
-                    "timed_out": false,
-                    "_shards": {
-                        "total": 1,
-                        "successful": 1,
-                        "skipped": 0,
-                        "failed": 0
-                    },
-                    "hits": {
-                        "total": {
-                            "value": 1,
-                            "relation": "eq"
-                        },
-                        "max_score": 3.916677,
-                        "hits": [
-                            {
-                                "_index": "projects",
-                                "_id": "61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17",
-                                "_score": 3.916677,
-                                "_source": {
-                                    "id": "61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17",
-                                    "name": "DogGPT",
-                                    "slug": "doggpt",
-                                    "shortDescription": "Chat GPT for cat lovers",
-                                    "longDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-                                    "languages": null,
-                                    "ecosystems": [
-                                        {
-                                            "name": "Ethereum"
+        when(elasticSearchHttpClient.send("/od-*/_search", HttpMethod.POST,
+                SearchRepository.ElasticSearchQuery.<SearchRepository.QueryString>builder()
+                        .from(from)
+                        .size(size)
+                        .query(SearchRepository.QueryString.fromKeyword(keyword))
+                        .build(), JsonNode.class))
+                .thenReturn(Optional.of(objectMapper.readTree("""
+                        {
+                            "took": 13,
+                            "timed_out": false,
+                            "_shards": {
+                                "total": 1,
+                                "successful": 1,
+                                "skipped": 0,
+                                "failed": 0
+                            },
+                            "hits": {
+                                "total": {
+                                    "value": 1,
+                                    "relation": "eq"
+                                },
+                                "max_score": 3.916677,
+                                "hits": [
+                                    {
+                                        "_index": "od-projects",
+                                        "_id": "61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17",
+                                        "_score": 3.916677,
+                                        "_source": {
+                                            "id": "61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17",
+                                            "name": "DogGPT",
+                                            "slug": "doggpt",
+                                            "shortDescription": "Chat GPT for cat lovers",
+                                            "longDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                                            "languages": null,
+                                            "forkCount": 13,
+                                            "starCount": 234,
+                                            "contributorCount": 432,
+                                            "ecosystems": [
+                                                {
+                                                    "name": "Ethereum"
+                                                }
+                                            ],
+                                            "categories": null
                                         }
-                                    ],
-                                    "categories": null
-                                }
+                                    }
+                                ]
                             }
-                        ]
-                    }
-                }
-                """)));
+                        }
+                        """)));
         final SearchResponse searchResponse = searchRepository.searchAll(keyword, null, null, from, size);
 
         // Then
@@ -137,7 +145,87 @@ public class SearchRepositoryTest {
         assertNull(searchItemResponse.getProject().getCategories());
         assertEquals(1, searchItemResponse.getProject().getEcosystems().size());
         assertEquals("Ethereum", searchItemResponse.getProject().getEcosystems().get(0));
+        assertEquals(13, searchItemResponse.getProject().getForkCount());
+        assertEquals(234, searchItemResponse.getProject().getStarCount());
+        assertEquals(432, searchItemResponse.getProject().getContributorCount());
     }
+
+    @Test
+    void should_map_simple_contributor_query() throws JsonProcessingException {
+        // Given
+        final String keyword = faker.rickAndMorty().character();
+        final int from = 0;
+        final int size = 10;
+
+        // When
+        when(elasticSearchHttpClient.send("/od-*/_search", HttpMethod.POST,
+                SearchRepository.ElasticSearchQuery.<SearchRepository.QueryString>builder()
+                        .from(from)
+                        .size(size)
+                        .query(SearchRepository.QueryString.fromKeyword(keyword))
+                        .build(), JsonNode.class))
+                .thenReturn(Optional.of(objectMapper.readTree("""
+                        {
+                            "took": 13,
+                            "timed_out": false,
+                            "_shards": {
+                                "total": 1,
+                                "successful": 1,
+                                "skipped": 0,
+                                "failed": 0
+                            },
+                            "hits": {
+                                "total": {
+                                    "value": 1,
+                                    "relation": "eq"
+                                },
+                                "max_score": 3.916677,
+                                "hits": [
+                                    {
+                                        "_index": "od-projects",
+                                        "_id": "61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17",
+                                        "_score": 3.916677,
+                                        "_source": {
+                                            "id": "61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17",
+                                            "name": "DogGPT",
+                                            "slug": "doggpt",
+                                            "shortDescription": "Chat GPT for cat lovers",
+                                            "longDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+                                            "languages": null,
+                                            "forkCount": 13,
+                                            "starCount": 234,
+                                            "contributorCount": 432,
+                                            "ecosystems": [
+                                                {
+                                                    "name": "Ethereum"
+                                                }
+                                            ],
+                                            "categories": null
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                        """)));
+        final SearchResponse searchResponse = searchRepository.searchAll(keyword, null, null, from, size);
+
+        // Then
+        assertNotNull(searchResponse);
+        final SearchItemResponse searchItemResponse = searchResponse.getResults().get(0);
+        assertEquals(UUID.fromString("61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17"), searchItemResponse.getProject().getId());
+        assertEquals("DogGPT", searchItemResponse.getProject().getName());
+        assertEquals("doggpt", searchItemResponse.getProject().getSlug());
+        assertEquals("Chat GPT for cat lovers", searchItemResponse.getProject().getShortDescription());
+        assertNull(searchItemResponse.getProject().getLanguages());
+        assertNull(searchItemResponse.getProject().getCategories());
+        assertEquals(1, searchItemResponse.getProject().getEcosystems().size());
+        assertEquals("Ethereum", searchItemResponse.getProject().getEcosystems().get(0));
+        assertEquals(13, searchItemResponse.getProject().getForkCount());
+        assertEquals(234, searchItemResponse.getProject().getStarCount());
+        assertEquals(432, searchItemResponse.getProject().getContributorCount());
+    }
+
+
 
     @Test
     void should_map_pagination() throws JsonProcessingException {
@@ -159,32 +247,32 @@ public class SearchRepositoryTest {
 
         // Then
         final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-        final ArgumentCaptor<SearchRepository.ElasticSearchQuery<SearchRepository.SimpleQueryString>> elasticSearchQueryArgumentCaptor =
+        final ArgumentCaptor<SearchRepository.ElasticSearchQuery<SearchRepository.QueryString>> elasticSearchQueryArgumentCaptor =
                 ArgumentCaptor.forClass(SearchRepository.ElasticSearchQuery.class);
         final ArgumentCaptor<Class> classArgumentCaptor = ArgumentCaptor.forClass(Class.class);
         final ArgumentCaptor<HttpMethod> httpMethodArgumentCaptor = ArgumentCaptor.forClass(HttpMethod.class);
         verify(elasticSearchHttpClient).send(stringArgumentCaptor.capture(), httpMethodArgumentCaptor.capture(), elasticSearchQueryArgumentCaptor.capture(),
                 classArgumentCaptor.capture());
-        assertEquals("/projects/_search", stringArgumentCaptor.getValue());
-        final SearchRepository.ElasticSearchQuery<SearchRepository.SimpleQueryString> query = elasticSearchQueryArgumentCaptor.getValue();
-        assertEquals(keyword, query.query.simpleQueryString.query);
+        assertEquals("/od-projects/_search", stringArgumentCaptor.getValue());
+        final SearchRepository.ElasticSearchQuery<SearchRepository.QueryString> query = elasticSearchQueryArgumentCaptor.getValue();
+        assertEquals("*%s*".formatted(keyword), query.query.queryString.query);
         assertEquals(from, query.from);
         assertEquals(size, query.size);
         assertEquals("""
                 {
                   "ecosystems_facet" : {
                     "terms" : {
-                      "field" : "ecosystems.name.enum"
+                      "field" : "ecosystems.name.keyword"
                     }
                   },
                   "languages_facet" : {
                     "terms" : {
-                      "field" : "languages.name.enum"
+                      "field" : "languages.name.keyword"
                     }
                   },
                   "categories_facet" : {
                     "terms" : {
-                      "field" : "categories.name.enum"
+                      "field" : "categories.name.keyword"
                     }
                   }
                 }""", query.aggs.toPrettyString());
@@ -202,15 +290,15 @@ public class SearchRepositoryTest {
 
         // Then
         final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-        final ArgumentCaptor<SearchRepository.ElasticSearchQuery<SearchRepository.SimpleQueryString>> elasticSearchQueryArgumentCaptor =
+        final ArgumentCaptor<SearchRepository.ElasticSearchQuery<SearchRepository.QueryString>> elasticSearchQueryArgumentCaptor =
                 ArgumentCaptor.forClass(SearchRepository.ElasticSearchQuery.class);
         final ArgumentCaptor<Class> classArgumentCaptor = ArgumentCaptor.forClass(Class.class);
         final ArgumentCaptor<HttpMethod> httpMethodArgumentCaptor = ArgumentCaptor.forClass(HttpMethod.class);
         verify(elasticSearchHttpClient).send(stringArgumentCaptor.capture(), httpMethodArgumentCaptor.capture(), elasticSearchQueryArgumentCaptor.capture(),
                 classArgumentCaptor.capture());
-        assertEquals("/_all/_search", stringArgumentCaptor.getValue());
-        final SearchRepository.ElasticSearchQuery<SearchRepository.SimpleQueryString> query = elasticSearchQueryArgumentCaptor.getValue();
-        assertEquals(keyword, query.query.simpleQueryString.query);
+        assertEquals("/od-*/_search", stringArgumentCaptor.getValue());
+        final SearchRepository.ElasticSearchQuery<SearchRepository.QueryString> query = elasticSearchQueryArgumentCaptor.getValue();
+        assertEquals("*%s*".formatted(keyword), query.query.queryString.query);
         assertEquals(from, query.from);
         assertEquals(size, query.size);
         assertNull(query.aggs);
@@ -228,15 +316,15 @@ public class SearchRepositoryTest {
 
         // Then
         final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-        final ArgumentCaptor<SearchRepository.ElasticSearchQuery<SearchRepository.SimpleQueryString>> elasticSearchQueryArgumentCaptor =
+        final ArgumentCaptor<SearchRepository.ElasticSearchQuery<SearchRepository.QueryString>> elasticSearchQueryArgumentCaptor =
                 ArgumentCaptor.forClass(SearchRepository.ElasticSearchQuery.class);
         final ArgumentCaptor<Class> classArgumentCaptor = ArgumentCaptor.forClass(Class.class);
         final ArgumentCaptor<HttpMethod> httpMethodArgumentCaptor = ArgumentCaptor.forClass(HttpMethod.class);
         verify(elasticSearchHttpClient).send(stringArgumentCaptor.capture(), httpMethodArgumentCaptor.capture(), elasticSearchQueryArgumentCaptor.capture(),
                 classArgumentCaptor.capture());
-        assertEquals("/contributors/_search", stringArgumentCaptor.getValue());
-        final SearchRepository.ElasticSearchQuery<SearchRepository.SimpleQueryString> query = elasticSearchQueryArgumentCaptor.getValue();
-        assertEquals(keyword, query.query.simpleQueryString.query);
+        assertEquals("/od-contributors/_search", stringArgumentCaptor.getValue());
+        final SearchRepository.ElasticSearchQuery<SearchRepository.QueryString> query = elasticSearchQueryArgumentCaptor.getValue();
+        assertEquals("*%s*".formatted(keyword), query.query.queryString.query);
         assertEquals(from, query.from);
         assertEquals(size, query.size);
         assertNull(query.aggs);
@@ -251,18 +339,12 @@ public class SearchRepositoryTest {
         final int size = 10;
 
         // When
-        final SearchRepository.ElasticSearchQuery<SearchRepository.SimpleQueryString> query = SearchRepository.ElasticSearchQuery
-                .<SearchRepository.SimpleQueryString>builder()
+        final SearchRepository.ElasticSearchQuery<SearchRepository.QueryString> query = SearchRepository.ElasticSearchQuery.<SearchRepository.QueryString>builder()
                 .from(from)
                 .size(size)
-                .query(SearchRepository.SimpleQueryString
-                        .builder().simpleQueryString(SearchRepository.Query
-                                .builder()
-                                .query(keyword)
-                                .build())
-                        .build())
+                .query(SearchRepository.QueryString.fromKeyword(keyword))
                 .build().withFacets();
-        when(elasticSearchHttpClient.send("/projects/_search", HttpMethod.POST,
+        when(elasticSearchHttpClient.send("/od-projects/_search", HttpMethod.POST,
                 query, JsonNode.class)).thenReturn(Optional.of(objectMapper.readTree("""
                 {
                    "took": 13,
@@ -376,16 +458,11 @@ public class SearchRepositoryTest {
         final String keyword = faker.rickAndMorty().character();
 
         // When
-        when(elasticSearchHttpClient.send("/_all/_search", HttpMethod.POST,
-                SearchRepository.ElasticSearchQuery.<SearchRepository.SimpleQueryString>builder()
+        when(elasticSearchHttpClient.send("/od-*/_search", HttpMethod.POST,
+                SearchRepository.ElasticSearchQuery.<SearchRepository.QueryString>builder()
                         .from(from)
                         .size(size)
-                        .query(SearchRepository.SimpleQueryString
-                                .builder().simpleQueryString(SearchRepository.Query
-                                        .builder()
-                                        .query(keyword)
-                                        .build())
-                                .build())
+                        .query(SearchRepository.QueryString.fromKeyword(keyword))
                         .build(), JsonNode.class)).thenReturn(Optional.of(objectMapper.readTree("""
                 {
                     "took": 13,

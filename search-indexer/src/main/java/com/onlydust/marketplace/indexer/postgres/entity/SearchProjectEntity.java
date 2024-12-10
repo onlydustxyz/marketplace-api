@@ -1,8 +1,8 @@
 package com.onlydust.marketplace.indexer.postgres.entity;
 
+import com.onlydust.marketplace.indexer.elasticsearch.ElasticSearchDocument;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.Data;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -11,21 +11,22 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "projects")
 @Data
-public class SearchProjectEntity {
+public class SearchProjectEntity implements ElasticSearchDocument<UUID> {
     @Id
     private UUID id;
     private String slug;
     private String name;
     private String shortDescription;
-    private String longDescription;
     @JdbcTypeCode(SqlTypes.JSON)
     private Set<Languages> languages;
     @JdbcTypeCode(SqlTypes.JSON)
     private Set<Ecosystem> ecosystems;
     @JdbcTypeCode(SqlTypes.JSON)
     private Set<Category> categories;
+    private Integer contributorCount;
+    private Integer starCount;
+    private Integer forkCount;
 
     @Data
     public static class Languages {
@@ -42,5 +43,8 @@ public class SearchProjectEntity {
         private String name;
     }
 
-
+    @Override
+    public UUID getDocumentId() {
+        return id;
+    }
 }
