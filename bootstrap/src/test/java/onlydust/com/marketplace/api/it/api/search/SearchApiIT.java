@@ -94,6 +94,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .consumeWith(System.out::println)
                 .json("""
                         {
                           "totalPageNumber": 1,
