@@ -115,7 +115,6 @@ public class SearchRepositoryTest {
                                             "name": "DogGPT",
                                             "slug": "doggpt",
                                             "shortDescription": "Chat GPT for cat lovers",
-                                            "longDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
                                             "languages": null,
                                             "forkCount": 13,
                                             "starCount": 234,
@@ -158,7 +157,7 @@ public class SearchRepositoryTest {
         final int size = 10;
 
         // When
-        when(elasticSearchHttpClient.send("/od-*/_search", HttpMethod.POST,
+        when(elasticSearchHttpClient.send("/od-contributors/_search", HttpMethod.POST,
                 SearchRepository.ElasticSearchQuery.<SearchRepository.QueryString>builder()
                         .from(from)
                         .size(size)
@@ -166,65 +165,56 @@ public class SearchRepositoryTest {
                         .build(), JsonNode.class))
                 .thenReturn(Optional.of(objectMapper.readTree("""
                         {
-                            "took": 13,
-                            "timed_out": false,
-                            "_shards": {
-                                "total": 1,
-                                "successful": 1,
-                                "skipped": 0,
-                                "failed": 0
+                          "took": 39,
+                          "timed_out": false,
+                          "_shards": {
+                            "total": 1,
+                            "successful": 1,
+                            "skipped": 0,
+                            "failed": 0
+                          },
+                          "hits": {
+                            "total": {
+                              "value": 10000,
+                              "relation": "gte"
                             },
-                            "hits": {
-                                "total": {
-                                    "value": 1,
-                                    "relation": "eq"
-                                },
-                                "max_score": 3.916677,
-                                "hits": [
-                                    {
-                                        "_index": "od-projects",
-                                        "_id": "61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17",
-                                        "_score": 3.916677,
-                                        "_source": {
-                                            "id": "61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17",
-                                            "name": "DogGPT",
-                                            "slug": "doggpt",
-                                            "shortDescription": "Chat GPT for cat lovers",
-                                            "longDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-                                            "languages": null,
-                                            "forkCount": 13,
-                                            "starCount": 234,
-                                            "contributorCount": 432,
-                                            "ecosystems": [
-                                                {
-                                                    "name": "Ethereum"
-                                                }
-                                            ],
-                                            "categories": null
-                                        }
-                                    }
-                                ]
-                            }
+                            "max_score": 1.0,
+                            "hits": [
+                              {
+                                "_index": "od-contributors",
+                                "_id": "117",
+                                "_score": 1.0,
+                                "_source": {
+                                  "githubId": 117,
+                                  "githubLogin": "grempe",
+                                  "bio": "CEO @truestamp\\r\\n; interested in coding, cryptography, data security & integrity: ex silicon valley startups VP Eng, ex @accenture",
+                                  "contributionCount": 1,
+                                  "projectCount": 2,
+                                  "pullRequestCount": 3,
+                                  "issueCount": 4,
+                                  "htmlUrl": "https://github.com/grempe"
+                                }
+                              }
+                            ]
+                          }
                         }
                         """)));
-        final SearchResponse searchResponse = searchRepository.searchAll(keyword, null, null, from, size);
+        final SearchResponse searchResponse = searchRepository.searchAll(keyword, SearchItemType.CONTRIBUTOR, null, from, size);
 
         // Then
         assertNotNull(searchResponse);
         final SearchItemResponse searchItemResponse = searchResponse.getResults().get(0);
-        assertEquals(UUID.fromString("61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17"), searchItemResponse.getProject().getId());
-        assertEquals("DogGPT", searchItemResponse.getProject().getName());
-        assertEquals("doggpt", searchItemResponse.getProject().getSlug());
-        assertEquals("Chat GPT for cat lovers", searchItemResponse.getProject().getShortDescription());
-        assertNull(searchItemResponse.getProject().getLanguages());
-        assertNull(searchItemResponse.getProject().getCategories());
-        assertEquals(1, searchItemResponse.getProject().getEcosystems().size());
-        assertEquals("Ethereum", searchItemResponse.getProject().getEcosystems().get(0));
-        assertEquals(13, searchItemResponse.getProject().getForkCount());
-        assertEquals(234, searchItemResponse.getProject().getStarCount());
-        assertEquals(432, searchItemResponse.getProject().getContributorCount());
-    }
+        assertEquals(117L, searchItemResponse.getContributor().getGithubId());
+        assertEquals("grempe", searchItemResponse.getContributor().getGithubLogin());
+        assertEquals("CEO @truestamp\r\n; interested in coding, cryptography, data security & integrity: ex silicon valley startups VP Eng, ex @accenture",
+                searchItemResponse.getContributor().getBio());
+        assertEquals(1, searchItemResponse.getContributor().getContributionCount());
+        assertEquals(2, searchItemResponse.getContributor().getProjectCount());
+        assertEquals(4, searchItemResponse.getContributor().getIssueCount());
+        assertEquals(3, searchItemResponse.getContributor().getPullRequestCount());
+        assertEquals("https://github.com/grempe", searchItemResponse.getContributor().getHtmlUrl());
 
+    }
 
 
     @Test
@@ -339,7 +329,8 @@ public class SearchRepositoryTest {
         final int size = 10;
 
         // When
-        final SearchRepository.ElasticSearchQuery<SearchRepository.QueryString> query = SearchRepository.ElasticSearchQuery.<SearchRepository.QueryString>builder()
+        final SearchRepository.ElasticSearchQuery<SearchRepository.QueryString> query =
+                SearchRepository.ElasticSearchQuery.<SearchRepository.QueryString>builder()
                 .from(from)
                 .size(size)
                 .query(SearchRepository.QueryString.fromKeyword(keyword))
@@ -363,7 +354,7 @@ public class SearchRepositoryTest {
                      "max_score": 3.916677,
                      "hits": [
                        {
-                         "_index": "projects",
+                         "_index": "od-projects",
                          "_id": "61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17",
                          "_score": 3.916677,
                          "_source": {
@@ -371,7 +362,6 @@ public class SearchRepositoryTest {
                            "name": "DogGPT",
                            "slug": "doggpt",
                            "shortDescription": "Chat GPT for cat lovers",
-                           "longDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
                            "languages": [
                              {
                                "name": "Java"
@@ -481,7 +471,7 @@ public class SearchRepositoryTest {
                         "max_score": 3.916677,
                         "hits": [
                             {
-                                "_index": "projects",
+                                "_index": "od-projects",
                                 "_id": "61ef7d3a-81a2-4baf-bdb0-e7ae5e165d17",
                                 "_score": 3.916677,
                                 "_source": {
@@ -489,7 +479,6 @@ public class SearchRepositoryTest {
                                     "name": "DogGPT",
                                     "slug": "doggpt",
                                     "shortDescription": "Chat GPT for cat lovers",
-                                    "longDescription": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
                                     "languages": null,
                                     "ecosystems": [
                                         {

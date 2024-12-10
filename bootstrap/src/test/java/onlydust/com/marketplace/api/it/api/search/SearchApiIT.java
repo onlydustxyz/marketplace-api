@@ -68,7 +68,6 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .jsonPath("$.hits.total.value").isEqualTo(74);
     }
 
@@ -86,6 +85,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isOk()
                 .expectBody()
+                .consumeWith(System.out::println)
                 .jsonPath("$.hits.total.value").isEqualTo(10000); // ad "track_total_hits": true to bypass 10 000 total limitation
     }
 

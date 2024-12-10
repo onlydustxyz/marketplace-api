@@ -160,6 +160,7 @@ public class SearchRepository {
                             .issueCount(searchContributorEntity.getIssueCount())
                             .projectCount(searchContributorEntity.getProjectCount())
                             .contributionCount(searchContributorEntity.getContributionCount())
+                            .pullRequestCount(searchContributorEntity.getPullRequestCount())
                             .htmlUrl(searchContributorEntity.getHtmlUrl())
                     )
             );
