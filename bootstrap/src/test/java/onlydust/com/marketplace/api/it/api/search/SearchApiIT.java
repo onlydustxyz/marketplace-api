@@ -122,7 +122,13 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                               "contributor": null
                             }
                           ],
-                          "facets": []
+                          "facets": [
+                              {
+                                "name": "Ethereum",
+                                "count": 1,
+                                "type": "ECOSYSTEM"
+                              }
+                            ]
                         }
                         """);
     }

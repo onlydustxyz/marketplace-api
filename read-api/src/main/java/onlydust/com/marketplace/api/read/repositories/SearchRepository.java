@@ -184,9 +184,9 @@ public class SearchRepository {
 
     @AllArgsConstructor
     public enum Facet {
-        ECOSYSTEMS("ecosystems_facet", "ecosystems.name.enum", SearchFacetType.ECOSYSTEM),
-        LANGUAGES("languages_facet", "languages.name.enum", SearchFacetType.LANGUAGE),
-        CATEGORIES("categories_facet", "categories.name.enum", SearchFacetType.CATEGORY);
+        ECOSYSTEMS("ecosystems_facet", "ecosystems.name.keyword", SearchFacetType.ECOSYSTEM),
+        LANGUAGES("languages_facet", "languages.name.keyword", SearchFacetType.LANGUAGE),
+        CATEGORIES("categories_facet", "categories.name.keyword", SearchFacetType.CATEGORY);
 
         private String aggregationName;
         private String fieldName;
