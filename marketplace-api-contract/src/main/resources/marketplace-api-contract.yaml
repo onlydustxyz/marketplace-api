@@ -13383,7 +13383,6 @@ components:
           $ref: '#/components/schemas/SearchFacetType'
 
     SearchFacetType:
-      type: object
       enum:
         - LANGUAGE
         - ECOSYSTEM

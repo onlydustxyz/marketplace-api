@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.onlydust.marketplace.indexer.elasticsearch.ElasticSearchAdapter;
 import com.onlydust.marketplace.indexer.elasticsearch.ElasticSearchHttpClient;
 import com.onlydust.marketplace.indexer.postgres.entity.SearchProjectEntity;
 import io.netty.handler.codec.http.HttpMethod;
@@ -13,14 +14,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.api.contract.model.ProjectAdvancedSearchResponse;
-import onlydust.com.marketplace.api.contract.model.SearchItemResponse;
-import onlydust.com.marketplace.api.contract.model.SearchItemType;
-import onlydust.com.marketplace.api.contract.model.SearchResponse;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -49,8 +49,8 @@ public class SearchRepository {
                                     final Integer from,
                                     final Integer size) {
         final String index = isNull(searchItemType) ? "_all" : switch (searchItemType) {
-            case PROJECT -> "projects";
-            case CONTRIBUTOR -> "contributors";
+            case PROJECT -> ElasticSearchAdapter.PROJECTS_INDEX;
+            case CONTRIBUTOR -> ElasticSearchAdapter.CONTRIBUTORS_INDEX;
         };
         return elasticSearchHttpClient.send("/%s/_search".formatted(index), HttpMethod.POST,
                         buildQuery(keyword, searchItemType, facets, from, size), JsonNode.class)
@@ -90,14 +90,34 @@ public class SearchRepository {
             for (JsonNode document : documents) {
                 if (document.get("_index").textValue().equals("projects")) {
                     mapProject(document, searchResponse);
+
                 } else {
                     LOGGER.warn("Unexpected index %s".formatted(document.get("_index").textValue()));
                 }
+            }
+            if (jsonNode.has("aggregations")) {
+                searchResponse.facets(mapAggregationsToFacets(jsonNode.get("aggregations")));
             }
             return searchResponse;
         } catch (Exception e) {
             throw OnlyDustException.internalServerError(e.getMessage());
         }
+    }
+
+    private List<SearchFacetResponse> mapAggregationsToFacets(JsonNode aggregations) {
+        final List<SearchFacetResponse> facets = new ArrayList<>();
+        for (Facet facet : Facet.values()) {
+            if (aggregations.has(facet.aggregationName)) {
+                aggregations.get(facet.aggregationName).get("buckets").iterator().forEachRemaining(bucket -> {
+                    facets.add(new SearchFacetResponse()
+                            .name(bucket.get("key").textValue())
+                            .type(facet.searchFacetType)
+                            .count(bucket.get("doc_count").asInt())
+                    );
+                });
+            }
+        }
+        return facets.stream().sorted(Comparator.comparing(SearchFacetResponse::getCount).reversed()).toList();
     }
 
     private static void mapProject(JsonNode document, SearchResponse searchResponse) throws JsonProcessingException {
@@ -164,11 +184,12 @@ public class SearchRepository {
 
     @AllArgsConstructor
     public enum Facet {
-        ECOSYSTEMS("ecosystems_facet", "ecosystems.name.enum"),
-        LANGUAGES("languages_facet", "languages.name.enum"),
-        CATEGORIES("categories_facet", "categories.name.enum");
+        ECOSYSTEMS("ecosystems_facet", "ecosystems.name.enum", SearchFacetType.ECOSYSTEM),
+        LANGUAGES("languages_facet", "languages.name.enum", SearchFacetType.LANGUAGE),
+        CATEGORIES("categories_facet", "categories.name.enum", SearchFacetType.CATEGORY);
 
         private String aggregationName;
         private String fieldName;
+        private SearchFacetType searchFacetType;
     }
 }

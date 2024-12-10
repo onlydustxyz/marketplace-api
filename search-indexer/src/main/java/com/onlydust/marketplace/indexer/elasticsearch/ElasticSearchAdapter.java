@@ -19,6 +19,8 @@ import java.util.List;
 public class ElasticSearchAdapter {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private final ElasticSearchHttpClient elasticSearchHttpClient;
+    public static String PROJECTS_INDEX = "projects";
+    public static String CONTRIBUTORS_INDEX = "contributors";
 
     public void bulkIndexation(List<SearchProjectEntity> projects) {
         final var bulkRequestBody = new StringBuilder();
@@ -26,7 +28,7 @@ public class ElasticSearchAdapter {
         for (SearchProjectEntity project : projects) {
             final var action = objectMapper.createObjectNode();
             final var index = objectMapper.createObjectNode();
-            index.put("_index", "projects");
+            index.put("_index", PROJECTS_INDEX);
             index.put("_id", project.getId().toString());
             action.set("index", index);
             try {

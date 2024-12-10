@@ -86,7 +86,8 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                         {
                           "keyword": "%s",
                           "pageSize": 10,
-                          "pageIndex": 0
+                          "pageIndex": 0,
+                          "type": "PROJECT"
                         }
                         """.formatted(keyword))
                 // Then
@@ -121,7 +122,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                               "contributor": null
                             }
                           ],
-                          "facets": null
+                          "facets": []
                         }
                         """);
     }
