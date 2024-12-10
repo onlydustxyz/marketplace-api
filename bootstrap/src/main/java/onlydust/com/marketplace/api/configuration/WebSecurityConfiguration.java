@@ -157,6 +157,7 @@ public class WebSecurityConfiguration {
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/bi/**")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/sumsub/webhook")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/search")).permitAll()
+                                .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/suggest")).permitAll()
                                 .anyRequest().authenticated())
 
                 .addFilterBefore(authenticationFilter, AnonymousAuthenticationFilter.class)

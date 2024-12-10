@@ -85,7 +85,6 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .jsonPath("$.hits.total.value").isEqualTo(10000); // ad "track_total_hits": true to bypass 10 000 total limitation
     }
 
@@ -303,6 +302,63 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                            "facets": null
                          }
                         """);
+    }
+
+//    @Test
+//    @Order(30)
+    void should_suggest() {
+        // When
+        client.post()
+                .uri(getApiURI(POST_SUGGEST))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "keyword": "bre",
+                          "type": "PROJECT"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {"value":"Bretzel 196"}""");
+
+        // When
+        client.post()
+                .uri(getApiURI(POST_SUGGEST))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "keyword": "p",
+                          "type": "CONTRIBUTOR"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {"value":"pvande"}""");
+
+        // When
+        client.post()
+                .uri(getApiURI(POST_SUGGEST))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "keyword": "o"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {"value":"orestis"}""");
     }
 
 
