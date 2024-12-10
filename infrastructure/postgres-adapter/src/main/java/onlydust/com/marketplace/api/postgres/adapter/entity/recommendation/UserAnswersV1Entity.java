@@ -10,8 +10,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -26,34 +24,53 @@ public class UserAnswersV1Entity {
     private UUID userId;
 
     @JdbcTypeCode(SqlTypes.ARRAY)
-    private List<UUID> primaryGoals;
+    private Integer[] primaryGoals;
 
-    private UUID learningPreference;
+    private Integer learningPreference;
 
-    private UUID experienceLevel;
-
-    @JdbcTypeCode(SqlTypes.ARRAY)
-    private List<UUID> languages;
+    private Integer experienceLevel;
 
     @JdbcTypeCode(SqlTypes.ARRAY)
-    private List<UUID> ecosystems;
+    private UUID[] languages;
 
-    private UUID projectMaturity;
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    private UUID[] ecosystems;
 
-    private UUID communityImportance;
+    private Integer projectMaturity;
 
-    private UUID longTermInvolvement;
+    private Integer communityImportance;
 
-    public Set<UUID> allAnswerIds() {
-        final var answerIds = new HashSet<UUID>();
-        if (primaryGoals != null) answerIds.addAll(primaryGoals);
-        if (learningPreference != null) answerIds.add(learningPreference);
-        if (experienceLevel != null) answerIds.add(experienceLevel);
-        if (languages != null) answerIds.addAll(languages);
-        if (ecosystems != null) answerIds.addAll(ecosystems);
-        if (projectMaturity != null) answerIds.add(projectMaturity);
-        if (communityImportance != null) answerIds.add(communityImportance);
-        if (longTermInvolvement != null) answerIds.add(longTermInvolvement);
-        return answerIds;
+    private Integer longTermInvolvement;
+
+    public Set<Integer> primaryGoals() {
+        return primaryGoals == null ? Set.of() : Set.of(primaryGoals);
+    }
+
+    public Set<Integer> learningPreference() {
+        return learningPreference == null ? Set.of() : Set.of(learningPreference);
+    }
+
+    public Set<Integer> experienceLevel() {
+        return experienceLevel == null ? Set.of() : Set.of(experienceLevel);
+    }
+
+    public Set<UUID> languages() {
+        return languages == null ? Set.of() : Set.of(languages);
+    }
+
+    public Set<UUID> ecosystems() {
+        return ecosystems == null ? Set.of() : Set.of(ecosystems);
+    }
+
+    public Set<Integer> projectMaturity() {
+        return projectMaturity == null ? Set.of() : Set.of(projectMaturity);
+    }
+
+    public Set<Integer> communityImportance() {
+        return communityImportance == null ? Set.of() : Set.of(communityImportance);
+    }
+
+    public Set<Integer> longTermInvolvement() {
+        return longTermInvolvement == null ? Set.of() : Set.of(longTermInvolvement);
     }
 }

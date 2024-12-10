@@ -60,8 +60,8 @@ public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
         assertThat(blockchainQuestion.getBody()).isEqualTo("Which blockchain ecosystems are you interested in or curious about?");
         assertThat(blockchainQuestion.getDescription()).contains("match you with projects in your preferred blockchain ecosystems");
         assertThat(blockchainQuestion.getMultipleChoice()).isTrue();
-        assertThat(blockchainQuestion.getAnswers()).extracting(MatchingAnswerResponse::getBody).containsExactlyInAnyOrder("Ethereum", "Solana", "Polkadot",
-                "Cosmos", "Avalanche", "Bitcoin", "Don't know");
+        assertThat(blockchainQuestion.getAnswers()).extracting(MatchingAnswerResponse::getBody).contains("Aptos", "Avail", "Aztec", "Ethereum", "Lava",
+                "Optimism", "Starknet", "Zama", "Don't know");
     }
 
     @Test
