@@ -13247,17 +13247,11 @@ components:
       type: object
       required:
         - keyword
-        - pageSize
-        - pageIndex
       properties:
         keyword:
           type: string
         type:
           $ref: '#/components/schemas/SearchItemType'
-        pageSize:
-          type: integer
-        pageIndex:
-          type: integer
         languages:
           type: array
           items:
