@@ -13227,6 +13227,8 @@ components:
       properties:
         keyword:
           type: string
+        type:
+          $ref: '#/components/schemas/SearchItemType'
         pageSize:
           type: integer
         pageIndex:
@@ -13253,6 +13255,8 @@ components:
       properties:
         keyword:
           type: string
+        type:
+          $ref: '#/components/schemas/SearchItemType'
         pageSize:
           type: integer
         pageIndex:

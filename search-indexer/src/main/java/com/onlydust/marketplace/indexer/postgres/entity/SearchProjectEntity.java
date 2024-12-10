@@ -16,6 +16,7 @@ import java.util.UUID;
 public class SearchProjectEntity {
     @Id
     private UUID id;
+    private String slug;
     private String name;
     private String shortDescription;
     private String longDescription;

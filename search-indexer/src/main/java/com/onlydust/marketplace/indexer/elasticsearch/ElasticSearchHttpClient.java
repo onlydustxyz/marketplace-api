@@ -10,7 +10,7 @@ import java.net.http.HttpRequest;
 @AllArgsConstructor
 public class ElasticSearchHttpClient extends HttpClient {
 
-    private final ElasticSearchProperties elasticSearchProperties;
+    public final ElasticSearchProperties elasticSearchProperties;
 
     @Override
     protected HttpRequest.Builder builder() {
