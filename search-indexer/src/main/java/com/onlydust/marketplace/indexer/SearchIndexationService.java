@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Slf4j
 public class SearchIndexationService {
-    private static final int PAGE_SIZE = 10000;
+    private static final int PAGE_SIZE = 1000;
     private final ElasticSearchAdapter elasticSearchAdapter;
     private final ReadSearchProjectRepository readSearchProjectRepository;
     private final ReadSearchContributorRepository readSearchContributorRepository;
@@ -31,7 +31,7 @@ public class SearchIndexationService {
         var contributors = indexContributors(offset);
         elasticSearchAdapter.indexAllContributors(contributors);
         total += contributors.size();
-        while (contributors.size() <= PAGE_SIZE) {
+        while (contributors.size() == PAGE_SIZE) {
             offset += PAGE_SIZE;
             contributors = indexContributors(offset);
             total += contributors.size();
@@ -41,7 +41,7 @@ public class SearchIndexationService {
 
     private List<SearchContributorEntity> indexContributors(int offset) {
         LOGGER.info("Starting to index contributors from {} to {}", offset, offset + PAGE_SIZE);
-        List<SearchContributorEntity> contributors = readSearchContributorRepository.findAll(offset, offset + PAGE_SIZE);
+        List<SearchContributorEntity> contributors = readSearchContributorRepository.findAll(offset, PAGE_SIZE);
         elasticSearchAdapter.indexAllContributors(contributors);
         LOGGER.info("Contributors from {} to {} where indexed", offset, offset + PAGE_SIZE);
         return contributors;

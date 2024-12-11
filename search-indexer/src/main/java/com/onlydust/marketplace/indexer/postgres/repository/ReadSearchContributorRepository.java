@@ -22,7 +22,7 @@ public interface ReadSearchContributorRepository extends JpaRepository<SearchCon
                    count(c.id)                                          contribution_count
             from indexer_exp.github_accounts ga
                      left join indexer_exp.contributions c on c.contributor_id = ga.id
-            where ga.type = 'USER'
+            where ga.type = 'USER' and ga.id >= 0
             group by ga.id, ga.login, ga.bio, ga.html_url
             offset :offset limit :limit
             """, nativeQuery = true)
