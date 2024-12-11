@@ -1,14 +1,8 @@
 package onlydust.com.marketplace.api.github_api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.netty.handler.codec.http.HttpMethod;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
+import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 import java.io.IOException;
 import java.net.URI;
@@ -18,9 +12,16 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.netty.handler.codec.http.HttpMethod;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @AllArgsConstructor
@@ -138,7 +139,7 @@ public class GithubHttpClient {
                     yield fetch(method, URI.create(location).getPath(), bodyPublisher, personalAccessToken, responseClass);
                 }
                 case 404 -> {
-                    LOGGER.warn("Github API returned http status %s with an empy body".formatted(httpResponse.statusCode()));
+                    LOGGER.warn("Github API returned http status %s with an empty body".formatted(httpResponse.statusCode()));
                     yield Optional.empty();
                 }
                 case 401, 403 ->
