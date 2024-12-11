@@ -79,3 +79,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000041_add_follower_count_to_bi_view.sql
   - include:
       file: db/changelog/changelogs/00000042_refactor_matching_v1_storage.sql
+  - include:
+      file: db/changelog/changelogs/00000043_remove_private_repos.sql
