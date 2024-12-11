@@ -1,5 +1,14 @@
 package onlydust.com.marketplace.project.domain.service;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -9,11 +18,6 @@ import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.port.input.ApplicationFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.*;
-import org.springframework.transaction.annotation.Transactional;
-
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
 @AllArgsConstructor
 @Slf4j
@@ -107,6 +111,7 @@ public class ApplicationService implements ApplicationFacadePort {
             throw badRequest("User %d already applied to issue %s".formatted(githubUserId, issueId));
 
         githubCommandService.createComment(application.id(), issue, githubUserId, githubComment);
+        applicationObserver.onApplicationCreationStarted(application);
         return application;
     }
 

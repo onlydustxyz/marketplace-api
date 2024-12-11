@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.project.domain.observer;
 
+import java.util.List;
+
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPort;
-
-import java.util.List;
 
 public class ApplicationObserverComposite implements ApplicationObserverPort {
     private final List<ApplicationObserverPort> observers;
@@ -16,6 +16,16 @@ public class ApplicationObserverComposite implements ApplicationObserverPort {
     @Override
     public void onApplicationCreated(Application application) {
         observers.forEach(observer -> observer.onApplicationCreated(application));
+    }
+
+    @Override
+    public void onApplicationCreationStarted(Application application) {
+        observers.forEach(observer -> observer.onApplicationCreationStarted(application));
+    }
+
+    @Override
+    public void onApplicationCreationCompleted(Application application) {
+        observers.forEach(observer -> observer.onApplicationCreationCompleted(application));
     }
 
     @Override

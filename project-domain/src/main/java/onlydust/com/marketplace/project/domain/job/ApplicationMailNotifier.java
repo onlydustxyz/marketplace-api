@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.project.domain.job;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.UserId;
@@ -16,8 +18,6 @@ import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
-
 @AllArgsConstructor
 public class ApplicationMailNotifier implements ApplicationObserverPort {
     private final ProjectStoragePort projectStoragePort;
@@ -26,7 +26,11 @@ public class ApplicationMailNotifier implements ApplicationObserverPort {
     private final NotificationPort notificationPort;
 
     @Override
-    public void onApplicationCreated(Application application) {
+    public void onApplicationCreationStarted(Application application) {
+    }
+
+    @Override
+    public void onApplicationCreationCompleted(Application application) {
         final var project = projectStoragePort.getById(application.projectId())
                 .orElseThrow(() -> notFound("Project %s not found".formatted(application.projectId())));
         final var issue = githubStoragePort.findIssueById(application.issueId())

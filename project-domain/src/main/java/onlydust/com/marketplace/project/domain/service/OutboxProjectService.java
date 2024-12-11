@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.project.domain.service;
 
+import java.util.Set;
+
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.kernel.model.ProjectId;
@@ -10,8 +12,6 @@ import onlydust.com.marketplace.project.domain.model.event.OnApplicationCreated;
 import onlydust.com.marketplace.project.domain.model.event.ProjectLinkedReposChanged;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPort;
-
-import java.util.Set;
 
 @AllArgsConstructor
 public class OutboxProjectService implements ProjectObserverPort, ApplicationObserverPort {
@@ -40,7 +40,11 @@ public class OutboxProjectService implements ProjectObserverPort, ApplicationObs
     }
 
     @Override
-    public void onApplicationCreated(Application application) {
+    public void onApplicationCreationStarted(Application application) {
+    }
+
+    @Override
+    public void onApplicationCreationCompleted(Application application) {
         trackingOutbox.push(OnApplicationCreated.of(application));
     }
 

@@ -1,5 +1,17 @@
 package onlydust.com.marketplace.api;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.onlydust.customer.io.adapter.CustomerIOAdapter;
 import com.onlydust.customer.io.adapter.client.CustomerIOHttpClient;
@@ -10,8 +22,8 @@ import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.SlackApiException;
 import com.slack.api.methods.request.chat.ChatPostMessageRequest;
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
+
 import jakarta.annotation.PostConstruct;
-import onlydust.com.marketplace.accounting.domain.port.out.DepositStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.api.helper.Auth0ApiClientStub;
 import onlydust.com.marketplace.api.helper.JwtVerifierStub;
@@ -28,15 +40,6 @@ import onlydust.com.marketplace.user.domain.port.output.NotificationSender;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSettingsStoragePort;
 import onlydust.com.marketplace.user.domain.port.output.NotificationStoragePort;
 import onlydust.com.marketplace.user.domain.service.NotificationService;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
-
-import java.io.IOException;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @SpringBootApplication
 public class MarketplaceApiApplicationIT {
@@ -94,11 +97,9 @@ public class MarketplaceApiApplicationIT {
                                            final UserStoragePort userStoragePort,
                                            final ProjectStoragePort projectStoragePort,
                                            final HackathonStoragePort hackathonStoragePort,
-                                           final DepositStoragePort depositStoragePort,
                                            final SponsorStoragePort sponsorStoragePort,
                                            final MetaBlockExplorer blockExplorer) {
-        return spy(new SlackApiAdapter(slackProperties, slackApiClient, userStoragePort, projectStoragePort, hackathonStoragePort, depositStoragePort,
-                sponsorStoragePort, blockExplorer));
+        return spy(new SlackApiAdapter(slackProperties, slackApiClient, userStoragePort, projectStoragePort, hackathonStoragePort, sponsorStoragePort, blockExplorer));
     }
 
     @Bean

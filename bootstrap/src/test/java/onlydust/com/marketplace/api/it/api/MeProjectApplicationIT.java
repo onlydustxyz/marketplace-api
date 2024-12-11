@@ -1,6 +1,26 @@
 package onlydust.com.marketplace.api.it.api;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static onlydust.com.marketplace.api.helper.ConcurrentTesting.runConcurrently;
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
+
 import onlydust.com.marketplace.api.contract.model.ContributionsQueryParams;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateRequest;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateResponse;
@@ -18,24 +38,6 @@ import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
 import onlydust.com.marketplace.kernel.model.event.OnGithubIssueDeleted;
 import onlydust.com.marketplace.project.domain.model.Application;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static onlydust.com.marketplace.api.helper.ConcurrentTesting.runConcurrently;
-import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 
 @TagMe
 public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
@@ -154,9 +156,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .issueId(issueId)
                 .githubComment(githubComment);
 
-        final var existingApplicationCount = applicationRepository.count();
-
-        client.post()
+        final var applicationId = client.post()
                 .uri(getApiURI(ME_APPLICATIONS))
                 .header("Authorization", BEARER_PREFIX + user.jwt())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -164,9 +164,12 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .isOk();
+                .isOk()
+                .expectBody(ProjectApplicationCreateResponse.class)
+                .returnResult().getResponseBody()
+                .getId();
 
-        assertThat(applicationRepository.count()).isEqualTo(existingApplicationCount + 1);
+        assertThat(applicationRepository.findById(applicationId)).isPresent();
 
         githubWireMockServer.resetAll();
         githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/7/comments"))
@@ -176,7 +179,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         githubCommandOutboxJob.run();
 
         // Then
-        assertThat(applicationRepository.count()).isEqualTo(existingApplicationCount);
+        assertThat(applicationRepository.findById(applicationId)).isEmpty();
     }
 
     @Test
@@ -221,7 +224,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     void should_not_be_able_to_apply_twice_concurrently() throws InterruptedException {
         // Given
         final var user = userAuthHelper.authenticateOlivier();
-        final Long issueId = 1974127467L;
+        final Long issueId = 1974457041L;
         final var githubComment = faker.lorem().paragraph();
         final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
 
