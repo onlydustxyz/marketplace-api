@@ -3,11 +3,13 @@ package onlydust.com.marketplace.api.it.api.search;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.onlydust.marketplace.indexer.SearchIndexationService;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.api.helper.DatabaseHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.suites.tags.TagSearch;
 import onlydust.com.marketplace.kernel.model.EcosystemId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Language;
+import org.hibernate.type.descriptor.java.DataHelper;
 import org.junit.jupiter.api.*;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,7 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,7 +40,6 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 "docker.elastic.co/elasticsearch/elasticsearch:8.1.2")
                 .withEnv("xpack.security.enabled", "false")
                 .withEnv("discovery.type", "single-node");
-        elasticsearchContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger("ELASTICSEARCH")));
         elasticsearchContainer.start();
         elasticsearchHost = "http://" + elasticsearchContainer.getHttpHostAddress();
     }
@@ -227,6 +229,282 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                           "pageSize": 10,
                           "pageIndex": 0,
                           "type": "PROJECT",
+                          "languages": ["Javascript"]
+                        }
+                        """.formatted(keyword))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                        .json("""
+                                {
+                                  "totalPageNumber": 2,
+                                  "totalItemNumber": 13,
+                                  "hasMore": true,
+                                  "nextPageIndex": 1,
+                                  "results": [
+                                    {
+                                      "type": "PROJECT",
+                                      "project": {
+                                        "name": "Apibara",
+                                        "slug": "apibara",
+                                        "id": "2073b3b2-60f4-488c-8a0a-ab7121ed850c",
+                                        "shortDescription": "Listen to starknet events using gRPC and build your own node",
+                                        "contributorCount": 3,
+                                        "starCount": 0,
+                                        "forkCount": 1,
+                                        "languages": [
+                                          "Javascript"
+                                        ],
+                                        "categories": null,
+                                        "ecosystems": null
+                                      },
+                                      "contributor": null
+                                    },
+                                    {
+                                      "type": "PROJECT",
+                                      "project": {
+                                        "name": "kaaper",
+                                        "slug": "kaaper",
+                                        "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                        "shortDescription": "Documentation generator for Cairo projects.",
+                                        "contributorCount": 17,
+                                        "starCount": 31,
+                                        "forkCount": 16,
+                                        "languages": [
+                                          "Typescript",
+                                          "Rust",
+                                          "Javascript",
+                                          "Cairo"
+                                        ],
+                                        "categories": null,
+                                        "ecosystems": null
+                                      },
+                                      "contributor": null
+                                    },
+                                    {
+                                      "type": "PROJECT",
+                                      "project": {
+                                        "name": "Zero title 11",
+                                        "slug": "zero-title-11",
+                                        "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
+                                        "shortDescription": "Missing short description",
+                                        "contributorCount": 14,
+                                        "starCount": 23315,
+                                        "forkCount": 11724,
+                                        "languages": [
+                                          "Solidity",
+                                          "Javascript"
+                                        ],
+                                        "categories": null,
+                                        "ecosystems": [
+                                          "Starknet"
+                                        ]
+                                      },
+                                      "contributor": null
+                                    },
+                                    {
+                                      "type": "PROJECT",
+                                      "project": {
+                                        "name": "Zero title 19",
+                                        "slug": "zero-title-19",
+                                        "id": "4f7bcc3e-3d3d-4a8f-8280-bb6df33382da",
+                                        "shortDescription": "Missing short description",
+                                        "contributorCount": 0,
+                                        "starCount": 0,
+                                        "forkCount": 1,
+                                        "languages": [
+                                          "Javascript"
+                                        ],
+                                        "categories": null,
+                                        "ecosystems": null
+                                      },
+                                      "contributor": null
+                                    },
+                                    {
+                                      "type": "PROJECT",
+                                      "project": {
+                                        "name": "Mooooooonlight",
+                                        "slug": "mooooooonlight",
+                                        "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                        "shortDescription": "hello la team",
+                                        "contributorCount": 7,
+                                        "starCount": 2909,
+                                        "forkCount": 188,
+                                        "languages": [
+                                          "Typescript",
+                                          "Rust",
+                                          "Javascript"
+                                        ],
+                                        "categories": null,
+                                        "ecosystems": [
+                                          "Aztec",
+                                          "Starknet"
+                                        ]
+                                      },
+                                      "contributor": null
+                                    },
+                                    {
+                                      "type": "PROJECT",
+                                      "project": {
+                                        "name": "No sponsors",
+                                        "slug": "no-sponsors",
+                                        "id": "90fb751a-1137-4815-b3c4-54927a5db059",
+                                        "shortDescription": "afsasdas",
+                                        "contributorCount": 0,
+                                        "starCount": 18,
+                                        "forkCount": 11,
+                                        "languages": [
+                                          "Typescript",
+                                          "Rust",
+                                          "Javascript"
+                                        ],
+                                        "categories": null,
+                                        "ecosystems": [
+                                          "Avail"
+                                        ]
+                                      },
+                                      "contributor": null
+                                    },
+                                    {
+                                      "type": "PROJECT",
+                                      "project": {
+                                        "name": "Aiolia du Lion",
+                                        "slug": "aiolia-du-lion",
+                                        "id": "98873240-31df-431a-81dc-7d6fe01143a0",
+                                        "shortDescription": "An interactive tutorial to get you up and running with Starknet",
+                                        "contributorCount": 0,
+                                        "starCount": 0,
+                                        "forkCount": 1,
+                                        "languages": [
+                                          "Javascript"
+                                        ],
+                                        "categories": null,
+                                        "ecosystems": null
+                                      },
+                                      "contributor": null
+                                    },
+                                    {
+                                      "type": "PROJECT",
+                                      "project": {
+                                        "name": "OnlyDust Marketplace",
+                                        "slug": "onlydust-marketplace",
+                                        "id": "a852e8fd-de3c-4a14-813e-4b592af40d54",
+                                        "shortDescription": "afsasdas",
+                                        "contributorCount": 10,
+                                        "starCount": 690,
+                                        "forkCount": 122,
+                                        "languages": [
+                                          "Javascript"
+                                        ],
+                                        "categories": null,
+                                        "ecosystems": null
+                                      },
+                                      "contributor": null
+                                    },
+                                    {
+                                      "type": "PROJECT",
+                                      "project": {
+                                        "name": "Paco's project",
+                                        "slug": "pacos-project",
+                                        "id": "b0f54343-3732-4118-8054-dba40f1ffb85",
+                                        "shortDescription": "A special project for Paco",
+                                        "contributorCount": 0,
+                                        "starCount": 26206,
+                                        "forkCount": 11901,
+                                        "languages": [
+                                          "Solidity",
+                                          "Javascript"
+                                        ],
+                                        "categories": null,
+                                        "ecosystems": null
+                                      },
+                                      "contributor": null
+                                    },
+                                    {
+                                      "type": "PROJECT",
+                                      "project": {
+                                        "name": "Zero title 4",
+                                        "slug": "zero-title-4",
+                                        "id": "dc60d963-4b5f-4a96-928c-8440b4657138",
+                                        "shortDescription": "Missing short description",
+                                        "contributorCount": 0,
+                                        "starCount": 1,
+                                        "forkCount": 1,
+                                        "languages": [
+                                          "Javascript"
+                                        ],
+                                        "categories": null,
+                                        "ecosystems": null
+                                      },
+                                      "contributor": null
+                                    }
+                                  ],
+                                  "projectFacets": {
+                                    "ecosystems": [
+                                      {
+                                        "name": "Starknet",
+                                        "count": 2
+                                      },
+                                      {
+                                        "name": "Avail",
+                                        "count": 1
+                                      },
+                                      {
+                                        "name": "Aztec",
+                                        "count": 1
+                                      }
+                                    ],
+                                    "categories": [],
+                                    "languages": [
+                                      {
+                                        "name": "Javascript",
+                                        "count": 13
+                                      },
+                                      {
+                                        "name": "Rust",
+                                        "count": 4
+                                      },
+                                      {
+                                        "name": "Typescript",
+                                        "count": 4
+                                      },
+                                      {
+                                        "name": "Solidity",
+                                        "count": 2
+                                      },
+                                      {
+                                        "name": "Cairo",
+                                        "count": 1
+                                      },
+                                      {
+                                        "name": "Ruby",
+                                        "count": 1
+                                      }
+                                    ]
+                                  },
+                                  "typeFacets": {
+                                    "types": [
+                                      {
+                                        "name": "Projects",
+                                        "count": 13
+                                      }
+                                    ]
+                                  }
+                                }
+                                """);
+
+        // When
+        client.post()
+                .uri(getApiURI(POST_SEARCH))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "keyword": "a",
+                          "pageSize": 10,
+                          "pageIndex": 0,
+                          "type": "PROJECT",
                           "categories": ["AI"]
                         }
                         """.formatted(keyword))
@@ -237,76 +515,85 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                            "totalPageNumber": 1,
-                            "totalItemNumber": 3,
-                            "hasMore": false,
-                            "nextPageIndex": 0,
-                            "results": [
-                              {
-                                "type": "PROJECT",
-                                "project": {
-                                  "name": "Marketplace",
-                                  "slug": "marketplace",
-                                  "id": "45ca43d6-130e-4bf7-9776-2b1eb1dcb782",
-                                  "shortDescription": "Our marketplace",
-                                  "contributorCount": 0,
-                                  "languages": null,
-                                  "categories": [
-                                    "AI"
-                                  ],
-                                  "ecosystems": null
-                                },
-                                "contributor": null
-                              },
-                              {
-                                "type": "PROJECT",
-                                "project": {
-                                  "name": "Red bull",
-                                  "slug": "red-bull",
-                                  "id": "c6940f66-d64e-4b29-9a7f-07abf5c3e0ed",
-                                  "shortDescription": "Red bull gives you wings!",
-                                  "contributorCount": 0,
-                                  "languages": null,
-                                  "categories": [
-                                    "AI"
-                                  ],
-                                  "ecosystems": null
-                                },
-                                "contributor": null
-                              },
-                              {
-                                "type": "PROJECT",
-                                "project": {
-                                  "name": "Watermelon",
-                                  "slug": "watermelon",
-                                  "id": "fd10776c-3e09-45f0-998b-8537992a3726",
-                                  "shortDescription": "A projects for those who love water and melon",
-                                  "contributorCount": 0,
-                                  "languages": null,
-                                  "categories": [
-                                    "AI"
-                                  ],
-                                  "ecosystems": null
-                                },
-                                "contributor": null
-                              }
-                            ],
-                            "projectFacets": {
-                              "ecosystems": [],
-                              "categories": [
-                                {
-                                  "name": "AI",
-                                  "count": 3
-                                }
-                              ],
-                              "languages": []
-                            },
-                            "typeFacets": {
-                              "types": null
-                            }
-                          }""");
-
-
+                           "totalPageNumber": 1,
+                           "totalItemNumber": 3,
+                           "hasMore": false,
+                           "nextPageIndex": 0,
+                           "results": [
+                             {
+                               "type": "PROJECT",
+                               "project": {
+                                 "name": "Marketplace",
+                                 "slug": "marketplace",
+                                 "id": "45ca43d6-130e-4bf7-9776-2b1eb1dcb782",
+                                 "shortDescription": "Our marketplace",
+                                 "contributorCount": 0,
+                                 "starCount": 11,
+                                 "forkCount": 74,
+                                 "languages": null,
+                                 "categories": [
+                                   "AI"
+                                 ],
+                                 "ecosystems": null
+                               },
+                               "contributor": null
+                             },
+                             {
+                               "type": "PROJECT",
+                               "project": {
+                                 "name": "Red bull",
+                                 "slug": "red-bull",
+                                 "id": "c6940f66-d64e-4b29-9a7f-07abf5c3e0ed",
+                                 "shortDescription": "Red bull gives you wings!",
+                                 "contributorCount": 0,
+                                 "starCount": 28,
+                                 "forkCount": 2,
+                                 "languages": null,
+                                 "categories": [
+                                   "AI"
+                                 ],
+                                 "ecosystems": null
+                               },
+                               "contributor": null
+                             },
+                             {
+                               "type": "PROJECT",
+                               "project": {
+                                 "name": "Watermelon",
+                                 "slug": "watermelon",
+                                 "id": "fd10776c-3e09-45f0-998b-8537992a3726",
+                                 "shortDescription": "A projects for those who love water and melon",
+                                 "contributorCount": 0,
+                                 "starCount": 53,
+                                 "forkCount": 18,
+                                 "languages": null,
+                                 "categories": [
+                                   "AI"
+                                 ],
+                                 "ecosystems": null
+                               },
+                               "contributor": null
+                             }
+                           ],
+                           "projectFacets": {
+                             "ecosystems": [],
+                             "categories": [
+                               {
+                                 "name": "AI",
+                                 "count": 3
+                               }
+                             ],
+                             "languages": []
+                           },
+                           "typeFacets": {
+                             "types": [
+                               {
+                                 "name": "Projects",
+                                 "count": 3
+                               }
+                             ]
+                           }
+                         }""");
     }
 
     @Test
@@ -464,7 +751,6 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
 
 
     }
-
 
 
     @Test

@@ -34,10 +34,10 @@ public class ReadSearchApiElasticSearchAdapter implements ReadSearchApi {
             facets.put(ProjectFacet.CATEGORIES, searchPostRequest.getCategories());
         }
         if (nonNull(searchPostRequest.getLanguages())){
-            facets.put(ProjectFacet.LANGUAGES, searchPostRequest.getCategories());
+            facets.put(ProjectFacet.LANGUAGES, searchPostRequest.getLanguages());
         }
         if (nonNull(searchPostRequest.getEcosystems())){
-            facets.put(ProjectFacet.ECOSYSTEMS, searchPostRequest.getCategories());
+            facets.put(ProjectFacet.ECOSYSTEMS, searchPostRequest.getEcosystems());
         }
         final SearchResponse searchResponse = searchRepository.searchAll(
                 searchPostRequest.getKeyword(),
@@ -55,10 +55,10 @@ public class ReadSearchApiElasticSearchAdapter implements ReadSearchApi {
             facets.put(ProjectFacet.CATEGORIES, suggestPostRequest.getCategories());
         }
         if (nonNull(suggestPostRequest.getLanguages())){
-            facets.put(ProjectFacet.LANGUAGES, suggestPostRequest.getCategories());
+            facets.put(ProjectFacet.LANGUAGES, suggestPostRequest.getLanguages());
         }
         if (nonNull(suggestPostRequest.getEcosystems())){
-            facets.put(ProjectFacet.ECOSYSTEMS, suggestPostRequest.getCategories());
+            facets.put(ProjectFacet.ECOSYSTEMS, suggestPostRequest.getEcosystems());
         }
         final SuggestResponse SuggestResponse = searchRepository.suggest(suggestPostRequest.getKeyword(), suggestPostRequest.getType(), facets);
         return ResponseEntity.ok(SuggestResponse);
