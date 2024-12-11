@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.it.api.search;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.onlydust.marketplace.indexer.SearchIndexationService;
+import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.suites.tags.TagSearch;
 import onlydust.com.marketplace.kernel.model.EcosystemId;
@@ -17,8 +19,11 @@ import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @TagSearch
+@Slf4j
 public class SearchApiIT extends AbstractMarketplaceApiIT {
 
     private static ElasticsearchContainer elasticsearchContainer;
@@ -78,21 +83,31 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
         searchIndexationService.indexAllContributors();
 
         // Then
-        Thread.sleep(5000);
-        elasticSearchWebTestClient.post()
-                .uri("/od-contributors/_search")
-                .contentType(MediaType.APPLICATION_JSON)
-                // "track_total_hits": true to bypass 10 000 total limitation
-                .bodyValue("""
-                        {
-                         "track_total_hits": true
-                        }
-                        """)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.hits.total.value").isEqualTo(23964);
+        boolean isIndexationCompleted = false;
+        for (int i = 0; i < 20; i++) {
+            Thread.sleep(3000);
+            final JsonNode responseBody = elasticSearchWebTestClient.post()
+                    .uri("/od-contributors/_search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    // "track_total_hits": true to bypass 10 000 total limitation
+                    .bodyValue("""
+                            {
+                             "track_total_hits": true
+                            }
+                            """)
+                    .exchange()
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(JsonNode.class)
+                    .returnResult().getResponseBody();
+            final int totalIndexed = responseBody.get("hits").get("total").get("value").asInt();
+            LOGGER.info("{} contributors are indexed", totalIndexed);
+            if (totalIndexed == 23964) {
+                isIndexationCompleted = true;
+                break;
+            }
+        }
+        assertTrue(isIndexationCompleted);
     }
 
 
@@ -426,7 +441,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .consumeWith(System.out::println)
-                .jsonPath("$.value").value(o -> Assertions.assertTrue(o.toString().toLowerCase().startsWith("bre")));
+                .jsonPath("$.value").value(o -> assertTrue(o.toString().toLowerCase().startsWith("bre")));
 
         // When
         client.post()
@@ -443,7 +458,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.value").value(o -> Assertions.assertTrue(o.toString().toLowerCase().startsWith("p")));
+                .jsonPath("$.value").value(o -> assertTrue(o.toString().toLowerCase().startsWith("p")));
 
         // When
         client.post()
@@ -459,7 +474,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.value").value(o -> Assertions.assertTrue(o.toString().toLowerCase().startsWith("o")));
+                .jsonPath("$.value").value(o -> assertTrue(o.toString().toLowerCase().startsWith("o")));
     }
 
 
