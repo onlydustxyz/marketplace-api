@@ -1,11 +1,12 @@
 package onlydust.com.marketplace.api.read.repositories;
 
-import lombok.NonNull;
-import onlydust.com.marketplace.api.read.entities.bi.ContributorReadEntity;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
-import java.util.Optional;
+import lombok.NonNull;
+import onlydust.com.marketplace.api.read.entities.bi.ContributorReadEntity;
 
 public interface ContributorReadRepository extends Repository<ContributorReadEntity, Long> {
 

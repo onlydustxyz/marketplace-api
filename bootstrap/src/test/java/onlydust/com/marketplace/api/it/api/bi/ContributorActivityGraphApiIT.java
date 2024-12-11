@@ -1,5 +1,24 @@
 package onlydust.com.marketplace.api.it.api.bi;
 
+import static onlydust.com.marketplace.api.helper.CurrencyHelper.ETH;
+import static onlydust.com.marketplace.api.helper.CurrencyHelper.STRK;
+import static onlydust.com.marketplace.api.helper.CurrencyHelper.USD;
+import static onlydust.com.marketplace.api.helper.DateHelper.at;
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.time.temporal.WeekFields;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.contract.model.ContributorActivityGraphResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
@@ -8,22 +27,6 @@ import onlydust.com.marketplace.api.suites.tags.TagBI;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.time.temporal.WeekFields;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
-import static onlydust.com.marketplace.api.helper.DateHelper.at;
-import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @TagBI
 public class ContributorActivityGraphApiIT extends AbstractMarketplaceApiIT {
@@ -35,7 +38,6 @@ public class ContributorActivityGraphApiIT extends AbstractMarketplaceApiIT {
     void setup() {
         caller = userAuthHelper.authenticateOlivier();
     }
-
 
     @Test
     public void should_get_activity_graph() {
@@ -121,10 +123,12 @@ public class ContributorActivityGraphApiIT extends AbstractMarketplaceApiIT {
             final var other_repo = githubHelper.createRepo(otherProject);
 
             final var not_in_onlydust_repo = githubHelper.createRepo();
+            final var private_repo = githubHelper.createPrivateRepo("private-repo");
 
             final var prUUID = at(today.minusDays(1), () -> githubHelper.createPullRequest(marketplace_api, antho));
             at(today.minusDays(1), () -> githubHelper.createPullRequest(other_repo, antho));
             at(today.minusDays(1), () -> githubHelper.createPullRequest(not_in_onlydust_repo, antho));
+            at(today.minusDays(1), () -> githubHelper.createPullRequest(private_repo, antho));
             at(today.minusDays(1), () -> githubHelper.createPullRequest(marketplace_api, mehdi));
 
             at(today.minusDays(2), () -> {

@@ -84,11 +84,19 @@ public class GithubHelper {
 
     public GithubRepo createRepo(final @NonNull String name) {
         final var owner = createAccount();
-        return createRepo(name, owner.getLogin());
+        return createRepo(name, owner.getLogin(), true);
+    }
+
+    public GithubRepo createPrivateRepo(final @NonNull String name) {
+        final var owner = createAccount();
+        return createRepo(name, owner.getLogin(), false);
     }
 
     public GithubRepo createRepo(final @NonNull String name, final String ownerLogin) {
+        return createRepo(name, ownerLogin, true);
+    }
 
+    public GithubRepo createRepo(final @NonNull String name, final String ownerLogin, boolean isPublic) {
         final var repo = GithubRepo.builder()
                 .id(faker.random().nextLong())
                 .owner(ownerLogin)
@@ -104,7 +112,7 @@ public class GithubHelper {
 
         databaseHelper.executeQuery("""
                 insert into indexer_exp.github_repos(id, owner_id, name, html_url, updated_at, description, stars_count, forks_count, has_issues, parent_id, owner_login, visibility)
-                values(:id, :ownerId, :name, :htmlUrl, now(), :description, :starsCount, :forksCount, false, null, :ownerLogin, 'PUBLIC');
+                values(:id, :ownerId, :name, :htmlUrl, now(), :description, :starsCount, :forksCount, false, null, :ownerLogin, cast(:visibility as indexer_exp.github_repo_visibility));
                 """, Map.of(
                 "id", repo.getId(),
                 "ownerId", ownerId,
@@ -113,7 +121,8 @@ public class GithubHelper {
                 "description", repo.getDescription(),
                 "starsCount", repo.getStarsCount(),
                 "forksCount", repo.getForksCount(),
-                "ownerLogin", ownerLogin
+                "ownerLogin", ownerLogin,
+                "visibility", isPublic ? "PUBLIC" : "PRIVATE"
         ));
 
         return repo;
