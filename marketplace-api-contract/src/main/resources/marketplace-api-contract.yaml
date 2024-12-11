@@ -13281,11 +13281,34 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/SearchItemResponse'
-            facets:
-              type: array
-              items:
-                $ref: '#/components/schemas/SearchFacetResponse'
+            projectFacets:
+              $ref: '#/components/schemas/ProjectFacetsResponse'
+            typeFacets:
+              $ref: '#/components/schemas/TypesFacetResponse'
 
+    TypesFacetResponse:
+      type: object
+      properties:
+        types:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchFacetResponse'
+
+    ProjectFacetsResponse:
+      type: object
+      properties:
+        ecosystems:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchFacetResponse'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchFacetResponse'
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchFacetResponse'
 
     ProjectAdvancedSearchResponse:
       type: object
@@ -13368,20 +13391,11 @@ components:
       required:
         - name
         - count
-        - type
       properties:
         name:
           type: string
         count:
           type: integer
-        type:
-          $ref: '#/components/schemas/SearchFacetType'
-
-    SearchFacetType:
-      enum:
-        - LANGUAGE
-        - ECOSYSTEM
-        - CATEGORY
 
     SuggestResponse:
       type: object

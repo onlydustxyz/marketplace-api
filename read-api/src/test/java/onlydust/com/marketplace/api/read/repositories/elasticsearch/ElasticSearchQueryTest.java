@@ -141,10 +141,11 @@ public class ElasticSearchQueryTest {
 
         // When
         final JsonNode query = ElasticSearchQuery.builder()
-                .withMultipleTerms(ElasticSearchQuery.MultipleTerm.builder()
+                .withMultipleTerms(List.of(ElasticSearchQuery.MultipleTerm.builder()
                         .field(field)
                         .terms(List.of(term1, term2))
                         .build())
+                )
                 .build();
 
         // Then
@@ -190,7 +191,7 @@ public class ElasticSearchQueryTest {
 
         // When
         final JsonNode query = ElasticSearchQuery.builder()
-                .withMultipleTerms(multipleTerm1, multipleTerm2)
+                .withMultipleTerms(List.of(multipleTerm1, multipleTerm2))
                 .build();
 
         // Then
@@ -242,7 +243,7 @@ public class ElasticSearchQueryTest {
 
         // When
         final JsonNode query = ElasticSearchQuery.builder()
-                .withMultipleTerms(multipleTerm1, multipleTerm2)
+                .withMultipleTerms(List.of(multipleTerm1, multipleTerm2))
                 .withQueryString(keyword)
                 .build();
 
@@ -265,7 +266,7 @@ public class ElasticSearchQueryTest {
 
         // When
         final JsonNode query = ElasticSearchQuery.builder()
-                .withAggregations(aggregation1, aggregation2)
+                .withAggregations(List.of(aggregation1, aggregation2))
                 .build();
 
         // Then

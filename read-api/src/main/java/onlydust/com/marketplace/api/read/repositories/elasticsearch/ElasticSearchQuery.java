@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import lombok.Builder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,13 +46,13 @@ public class ElasticSearchQuery {
             return this;
         }
 
-        public Builder withMultipleTerms(final MultipleTerm... multipleTerms) {
-            this.multipleTerms = Arrays.stream(multipleTerms).toList();
+        public Builder withMultipleTerms(final List<MultipleTerm> multipleTerms) {
+            this.multipleTerms = multipleTerms;
             return this;
         }
 
-        public Builder withAggregations(final Aggregation... aggregations) {
-            this.aggregations = Arrays.stream(aggregations).toList();
+        public Builder withAggregations(final List<Aggregation> aggregations) {
+            this.aggregations = aggregations;
             return this;
         }
 
@@ -81,14 +80,14 @@ public class ElasticSearchQuery {
         }
 
         private void addQuery(ObjectNode parentNode) {
-            if (nonNull(queryStringKeyword) && nonNull(multipleTerms)) {
+            if (nonNull(queryStringKeyword) && nonNull(multipleTerms) && !multipleTerms.isEmpty()) {
                 final List<ObjectNode> queriesToCombine = new ArrayList<>();
                 queriesToCombine.add(buildQueryStringNode(queryStringKeyword));
                 queriesToCombine.addAll(multipleTerms.stream().map(this::buildTermsNode).toList());
                 parentNode.set("query", buildMustNode(queriesToCombine));
             } else if (nonNull(queryStringKeyword)) {
                 parentNode.set("query", buildQueryStringNode(queryStringKeyword));
-            } else if (nonNull(multipleTerms)) {
+            } else if (nonNull(multipleTerms) && !multipleTerms.isEmpty()) {
                 if (multipleTerms.size() == 1) {
                     final MultipleTerm multipleTerm = multipleTerms.get(0);
                     final ObjectNode queryNode = buildTermsNode(multipleTerm);
@@ -96,7 +95,7 @@ public class ElasticSearchQuery {
                 } else {
                     parentNode.set("query", buildMustNode(multipleTerms.stream().map(this::buildTermsNode).toList()));
                 }
-            } else if (nonNull(prefixes)) {
+            } else if (nonNull(prefixes) && !prefixes.isEmpty()) {
                 if (prefixes.size() == 1) {
                     final Prefix prefix = prefixes.get(0);
                     final ObjectNode queryNode = buildPrefixNode(prefix);
