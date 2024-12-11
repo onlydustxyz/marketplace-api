@@ -24,6 +24,7 @@ public interface ReadSearchContributorRepository extends JpaRepository<SearchCon
                      left join indexer_exp.contributions c on c.contributor_id = ga.id
             where ga.type = 'USER'
             group by ga.id, ga.login, ga.bio, ga.html_url
+            offset :offset limit :limit
             """, nativeQuery = true)
-    List<SearchContributorEntity> findAll();
+    List<SearchContributorEntity> findAll(final int offset, final int limit);
 }
