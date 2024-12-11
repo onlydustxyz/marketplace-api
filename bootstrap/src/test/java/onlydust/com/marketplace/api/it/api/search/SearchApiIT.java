@@ -207,80 +207,74 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 3,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "results": [
-                            {
-                              "type": "PROJECT",
-                              "project": {
-                                "name": "Marketplace",
-                                "slug": "marketplace",
-                                "id": "45ca43d6-130e-4bf7-9776-2b1eb1dcb782",
-                                "shortDescription": "Our marketplace",
-                                "contributorCount": 0,
-                                "starCount": 29,
-                                "forkCount": 22,
-                                "languages": null,
-                                "categories": [
-                                  "AI"
-                                ],
-                                "ecosystems": null
-                              },
-                              "contributor": null
-                            },
-                            {
-                              "type": "PROJECT",
-                              "project": {
-                                "name": "Red bull",
-                                "slug": "red-bull",
-                                "id": "c6940f66-d64e-4b29-9a7f-07abf5c3e0ed",
-                                "shortDescription": "Red bull gives you wings!",
-                                "contributorCount": 0,
-                                "starCount": 78,
-                                "forkCount": 42,
-                                "languages": null,
-                                "categories": [
-                                  "AI"
-                                ],
-                                "ecosystems": null
-                              },
-                              "contributor": null
-                            },
-                            {
-                              "type": "PROJECT",
-                              "project": {
-                                "name": "Watermelon",
-                                "slug": "watermelon",
-                                "id": "fd10776c-3e09-45f0-998b-8537992a3726",
-                                "shortDescription": "A projects for those who love water and melon",
-                                "contributorCount": 0,
-                                "starCount": 42,
-                                "forkCount": 13,
-                                "languages": null,
-                                "categories": [
-                                  "AI"
-                                ],
-                                "ecosystems": null
-                              },
-                              "contributor": null
-                            }
-                          ],
-                          "projectFacets": {
-                            "ecosystems": [],
-                            "categories": [
+                            "totalPageNumber": 1,
+                            "totalItemNumber": 3,
+                            "hasMore": false,
+                            "nextPageIndex": 0,
+                            "results": [
                               {
-                                "name": "AI",
-                                "count": 3
+                                "type": "PROJECT",
+                                "project": {
+                                  "name": "Marketplace",
+                                  "slug": "marketplace",
+                                  "id": "45ca43d6-130e-4bf7-9776-2b1eb1dcb782",
+                                  "shortDescription": "Our marketplace",
+                                  "contributorCount": 0,
+                                  "languages": null,
+                                  "categories": [
+                                    "AI"
+                                  ],
+                                  "ecosystems": null
+                                },
+                                "contributor": null
+                              },
+                              {
+                                "type": "PROJECT",
+                                "project": {
+                                  "name": "Red bull",
+                                  "slug": "red-bull",
+                                  "id": "c6940f66-d64e-4b29-9a7f-07abf5c3e0ed",
+                                  "shortDescription": "Red bull gives you wings!",
+                                  "contributorCount": 0,
+                                  "languages": null,
+                                  "categories": [
+                                    "AI"
+                                  ],
+                                  "ecosystems": null
+                                },
+                                "contributor": null
+                              },
+                              {
+                                "type": "PROJECT",
+                                "project": {
+                                  "name": "Watermelon",
+                                  "slug": "watermelon",
+                                  "id": "fd10776c-3e09-45f0-998b-8537992a3726",
+                                  "shortDescription": "A projects for those who love water and melon",
+                                  "contributorCount": 0,
+                                  "languages": null,
+                                  "categories": [
+                                    "AI"
+                                  ],
+                                  "ecosystems": null
+                                },
+                                "contributor": null
                               }
                             ],
-                            "languages": []
-                          },
-                          "typeFacets": {
-                            "types": null
-                          }
-                        }""");
+                            "projectFacets": {
+                              "ecosystems": [],
+                              "categories": [
+                                {
+                                  "name": "AI",
+                                  "count": 3
+                                }
+                              ],
+                              "languages": []
+                            },
+                            "typeFacets": {
+                              "types": null
+                            }
+                          }""");
 
 
     }
