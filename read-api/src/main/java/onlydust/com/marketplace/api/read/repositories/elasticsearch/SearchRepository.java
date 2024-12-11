@@ -104,6 +104,12 @@ public class SearchRepository {
                     .withAggregations(ProjectFacet.toAggregations())
                     .withMultipleTerms(projectFacetsToMultiTerms(facets))
                     .build();
+        }else if (isNull(searchItemType)) {
+            return ElasticSearchQuery.builder()
+                    .withPagination(from, size)
+                    .withQueryString(keyword)
+                    .withAggregations(List.of(TypeFacet.INDEXES.toAggregation()))
+                    .build();
         } else {
             return ElasticSearchQuery.builder()
                     .withPagination(from, size)

@@ -9,11 +9,13 @@ import onlydust.com.marketplace.kernel.model.EcosystemId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Language;
 import org.junit.jupiter.api.*;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 
 import java.util.List;
@@ -35,6 +37,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 "docker.elastic.co/elasticsearch/elasticsearch:8.1.2")
                 .withEnv("xpack.security.enabled", "false")
                 .withEnv("discovery.type", "single-node");
+        elasticsearchContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger("ELASTICSEARCH")));
         elasticsearchContainer.start();
         elasticsearchHost = "http://" + elasticsearchContainer.getHttpHostAddress();
     }
@@ -300,6 +303,164 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
 
 
     }
+
+    @Test
+    @Order(15)
+    void should_search_all() {
+        // Given
+        final String keyword = "a";
+
+        // When
+        client.post()
+                .uri(getApiURI(POST_SEARCH))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "keyword": "%s",
+                          "pageSize": 1,
+                          "pageIndex": 0
+                        }
+                        """.formatted(keyword))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1000,
+                          "totalItemNumber": 10000,
+                          "hasMore": true,
+                          "nextPageIndex": 1,
+                          "results": [
+                            {
+                              "type": "CONTRIBUTOR",
+                              "project": null,
+                              "contributor": {
+                                "githubLogin": "dina.goldner",
+                                "githubId": -8110820419337795549,
+                                "htmlUrl": "https://github.com/dina.goldner",
+                                "bio": null,
+                                "contributionCount": 0,
+                                "projectCount": 0,
+                                "pullRequestCount": 0,
+                                "issueCount": 0
+                              }
+                            }
+                          ],
+                          "projectFacets": {
+                            "ecosystems": null,
+                            "categories": null,
+                            "languages": null
+                          },
+                          "typeFacets": {
+                            "types": [
+                              {
+                                "name": "Contributors",
+                                "count": 17997
+                              },
+                              {
+                                "name": "Projects",
+                                "count": 72
+                              }
+                            ]
+                          }
+                        }
+                        """);
+
+        // When
+        client.post()
+                .uri(getApiURI(POST_SEARCH))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "keyword": "a",
+                          "pageSize": 10,
+                          "pageIndex": 0,
+                          "type": "PROJECT",
+                          "categories": ["AI"]
+                        }
+                        """.formatted(keyword))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                            "totalPageNumber": 1,
+                            "totalItemNumber": 3,
+                            "hasMore": false,
+                            "nextPageIndex": 0,
+                            "results": [
+                              {
+                                "type": "PROJECT",
+                                "project": {
+                                  "name": "Marketplace",
+                                  "slug": "marketplace",
+                                  "id": "45ca43d6-130e-4bf7-9776-2b1eb1dcb782",
+                                  "shortDescription": "Our marketplace",
+                                  "contributorCount": 0,
+                                  "languages": null,
+                                  "categories": [
+                                    "AI"
+                                  ],
+                                  "ecosystems": null
+                                },
+                                "contributor": null
+                              },
+                              {
+                                "type": "PROJECT",
+                                "project": {
+                                  "name": "Red bull",
+                                  "slug": "red-bull",
+                                  "id": "c6940f66-d64e-4b29-9a7f-07abf5c3e0ed",
+                                  "shortDescription": "Red bull gives you wings!",
+                                  "contributorCount": 0,
+                                  "languages": null,
+                                  "categories": [
+                                    "AI"
+                                  ],
+                                  "ecosystems": null
+                                },
+                                "contributor": null
+                              },
+                              {
+                                "type": "PROJECT",
+                                "project": {
+                                  "name": "Watermelon",
+                                  "slug": "watermelon",
+                                  "id": "fd10776c-3e09-45f0-998b-8537992a3726",
+                                  "shortDescription": "A projects for those who love water and melon",
+                                  "contributorCount": 0,
+                                  "languages": null,
+                                  "categories": [
+                                    "AI"
+                                  ],
+                                  "ecosystems": null
+                                },
+                                "contributor": null
+                              }
+                            ],
+                            "projectFacets": {
+                              "ecosystems": [],
+                              "categories": [
+                                {
+                                  "name": "AI",
+                                  "count": 3
+                                }
+                              ],
+                              "languages": []
+                            },
+                            "typeFacets": {
+                              "types": null
+                            }
+                          }""");
+
+
+    }
+
+
 
     @Test
     @Order(20)
