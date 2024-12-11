@@ -78,7 +78,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
         searchIndexationService.indexAllContributors();
 
         // Then
-        Thread.sleep(3000);
+        Thread.sleep(5000);
         elasticSearchWebTestClient.post()
                 .uri("/od-contributors/_search")
                 .contentType(MediaType.APPLICATION_JSON)
