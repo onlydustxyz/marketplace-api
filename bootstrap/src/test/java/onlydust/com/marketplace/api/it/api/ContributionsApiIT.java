@@ -1,7 +1,27 @@
 package onlydust.com.marketplace.api.it.api;
 
+import static java.util.Comparator.comparing;
+import static onlydust.com.marketplace.api.helper.DateHelper.at;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.assertj.core.api.AbstractListAssert;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+
+import onlydust.com.marketplace.api.contract.model.ContributionActivityPageItemResponse;
+import onlydust.com.marketplace.api.contract.model.ContributionActivityPageResponse;
+import onlydust.com.marketplace.api.contract.model.ContributionActivityStatus;
 import onlydust.com.marketplace.api.contract.model.ContributionType;
-import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.contract.model.ProjectLinkResponse;
 import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
@@ -12,22 +32,6 @@ import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.ProjectContributorLabelFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.PullRequestFacadePort;
-import org.assertj.core.api.AbstractListAssert;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static java.util.Comparator.comparing;
-import static onlydust.com.marketplace.api.helper.DateHelper.at;
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 @TagProject
@@ -68,6 +72,9 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         final var fooRepo = githubHelper.createRepo("foo");
         newIssueId = at("2024-01-01T00:00:00Z", () -> githubHelper.createIssue(fooRepo.getId(), ZonedDateTime.parse("2024-01-01T00:00:00Z"), null, "OPEN",
                 projectLead));
+
+        final var privateRepo = githubHelper.createPrivateRepo("private-repo");
+        at("2024-01-01T00:00:00Z", () -> githubHelper.createPullRequest(privateRepo, projectLead, List.of("java")));
 
         rewardId = rewardHelper.create(kaaper, projectLead, recipient.githubUserId(), 123, CurrencyHelper.USDC, List.of(
                 RequestRewardCommand.Item.builder()
@@ -559,8 +566,8 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 4695,
-                          "totalItemNumber": 4695,
+                          "totalPageNumber": 3864,
+                          "totalItemNumber": 3864,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "contributions": [

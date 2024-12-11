@@ -96,7 +96,7 @@ select c.contribution_uuid                                                      
               string_agg(i.number || ' ' || i.title, ' ')
        )                                                                                                        as search
 from indexer_exp.grouped_contributions c
-         left join indexer_exp.github_repos gr on gr.id = c.repo_id
+         join indexer_exp.github_repos gr on gr.id = c.repo_id and gr.visibility = 'PUBLIC'
          left join ranked_project_github_repos_relationship pgr on pgr.github_repo_id = c.repo_id and pgr.row_number = 1
          left join projects p on p.id = pgr.project_id
          left join language_file_extensions lfe on lfe.extension = any (c.main_file_extensions)

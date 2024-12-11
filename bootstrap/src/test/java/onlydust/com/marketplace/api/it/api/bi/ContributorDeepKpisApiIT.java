@@ -154,11 +154,11 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             final var madara_app = githubHelper.createRepo(madara);
 
 
-            final var private_repo = githubHelper.createPrivateRepo("private-repo");
+            final var privateRepo = githubHelper.createPrivateRepo("private-repo");
 
             at("2021-01-01T00:00:00Z", () -> {
                 githubHelper.createPullRequest(marketplace_api, antho, List.of("java"));
-                githubHelper.createPullRequest(private_repo, antho, List.of("java"));
+                githubHelper.createPullRequest(privateRepo, antho, List.of("java"));
             });
 
             final var issueId1 = at("2021-01-01T00:00:03Z", () -> githubHelper.createIssue(marketplace_frontend, mehdi));
