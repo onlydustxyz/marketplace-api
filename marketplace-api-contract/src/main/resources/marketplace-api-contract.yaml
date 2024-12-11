@@ -9485,6 +9485,8 @@ components:
           $ref: '#/components/schemas/ContributorResponse'
         project:
           $ref: '#/components/schemas/ProjectLinkResponse'
+        issue:
+          $ref: '#/components/schemas/GithubIssueLinkResponse'
         githubComment:
           type: string
           description: The github comment

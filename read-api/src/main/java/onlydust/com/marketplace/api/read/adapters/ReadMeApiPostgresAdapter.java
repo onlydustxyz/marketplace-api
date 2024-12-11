@@ -1,5 +1,29 @@
 package onlydust.com.marketplace.api.read.adapters;
 
+import static onlydust.com.marketplace.api.read.entities.user.NotificationReadEntity.isReadFromContract;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
+import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.status;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RestController;
+
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadMeApi;
 import onlydust.com.marketplace.api.contract.model.*;
@@ -21,26 +45,6 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.Authenticate
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.project.domain.port.input.GithubUserPermissionsFacadePort;
-import org.springframework.context.annotation.Profile;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.JpaSort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static onlydust.com.marketplace.api.read.entities.user.NotificationReadEntity.isReadFromContract;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
-import static org.springframework.http.ResponseEntity.ok;
-import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @AllArgsConstructor

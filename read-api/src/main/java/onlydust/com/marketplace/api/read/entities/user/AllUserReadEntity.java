@@ -1,5 +1,19 @@
 package onlydust.com.marketplace.api.read.entities.user;
 
+import static java.math.BigDecimal.ZERO;
+import static java.util.Optional.ofNullable;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
+
+import java.net.URI;
+import java.time.ZoneId;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
+import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -18,19 +32,6 @@ import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectCategoryReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
-import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.SQLRestriction;
-
-import java.net.URI;
-import java.time.ZoneId;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-
-import static java.math.BigDecimal.ZERO;
-import static java.util.Optional.ofNullable;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
 
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -123,7 +124,7 @@ public class AllUserReadEntity {
     Set<ProgramReadEntity> programs;
 
     @OneToMany(mappedBy = "applicantId", fetch = FetchType.LAZY)
-    @SQLRestriction("origin = 'GITHUB' and not exists(select 1 from indexer_exp.github_issues_assignees gia where gia.issue_id = issue_id)")
+    @SQLRestriction("not exists(select 1 from indexer_exp.github_issues_assignees gia where gia.issue_id = issue_id)")
     @NonNull
     Set<ApplicationReadEntity> pendingApplications;
 

@@ -1,5 +1,10 @@
 package onlydust.com.marketplace.api.read.entities.project;
 
+import java.time.ZonedDateTime;
+import java.util.UUID;
+
+import org.hibernate.annotations.Immutable;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,10 +16,6 @@ import onlydust.com.marketplace.api.contract.model.ProjectApplicationResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationShortResponse;
 import onlydust.com.marketplace.api.read.entities.github.GithubIssueReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
-import org.hibernate.annotations.Immutable;
-
-import java.time.ZonedDateTime;
-import java.util.UUID;
 
 
 @Entity
@@ -64,6 +65,7 @@ public class ApplicationReadEntity {
                 .applicant(applicant.toContributorResponse())
                 .githubComment(commentBody)
                 .project(project.toLinkResponse())
+                .issue(issue.toLinkDto())
                 ;
     }
 
