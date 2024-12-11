@@ -79,13 +79,20 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
 
         // Then
         Thread.sleep(3000);
-        elasticSearchWebTestClient.get()
+        elasticSearchWebTestClient.post()
                 .uri("/od-contributors/_search")
+                .contentType(MediaType.APPLICATION_JSON)
+                // "track_total_hits": true to bypass 10 000 total limitation
+                .bodyValue("""
+                        {
+                         "track_total_hits": true
+                        }
+                        """)
                 .exchange()
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.hits.total.value").isEqualTo(10000); // ad "track_total_hits": true to bypass 10 000 total limitation
+                .jsonPath("$.hits.total.value").isEqualTo(23964);
     }
 
 
