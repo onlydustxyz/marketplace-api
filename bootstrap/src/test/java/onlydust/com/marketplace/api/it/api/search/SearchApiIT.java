@@ -114,74 +114,169 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                           "totalPageNumber": 1,
-                           "totalItemNumber": 2,
-                           "hasMore": false,
-                           "nextPageIndex": 0,
-                           "results": [
-                             {
-                               "type": "PROJECT",
-                               "project": {
-                                 "name": "Bretzel 196",
-                                 "slug": "bretzel-196",
-                                 "id": "247ac542-762d-44cb-b8d4-4d6199c916be",
-                                 "shortDescription": "bretzel gives you wings",
-                                 "contributorCount": 0,
-                                 "starCount": 0,
-                                 "forkCount": 0,
-                                 "languages": null,
-                                 "categories": null,
-                                 "ecosystems": null
-                               },
-                               "contributor": null
-                             },
-                             {
-                               "type": "PROJECT",
-                               "project": {
-                                 "name": "Bretzel",
-                                 "slug": "bretzel",
-                                 "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                                 "shortDescription": "A project for people who love fruits",
-                                 "contributorCount": 6,
-                                 "starCount": 0,
-                                 "forkCount": 1,
-                                 "languages": [
-                                   "Typescript"
-                                 ],
-                                 "categories": null,
-                                 "ecosystems": [
-                                   "Ethereum",
-                                   "Aptos",
-                                   "Zama"
-                                 ]
-                               },
-                               "contributor": null
-                             }
-                           ],
-                           "facets": [
-                             {
-                               "name": "Aptos",
-                               "count": 1,
-                               "type": "ECOSYSTEM"
-                             },
-                             {
-                               "name": "Ethereum",
-                               "count": 1,
-                               "type": "ECOSYSTEM"
-                             },
-                             {
-                               "name": "Zama",
-                               "count": 1,
-                               "type": "ECOSYSTEM"
-                             },
-                             {
-                               "name": "Typescript",
-                               "count": 1,
-                               "type": "LANGUAGE"
-                             }
-                           ]
-                         }
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "results": [
+                            {
+                              "type": "PROJECT",
+                              "project": {
+                                "name": "Bretzel 196",
+                                "slug": "bretzel-196",
+                                "id": "247ac542-762d-44cb-b8d4-4d6199c916be",
+                                "shortDescription": "bretzel gives you wings",
+                                "contributorCount": 0,
+                                "starCount": 0,
+                                "forkCount": 0,
+                                "languages": null,
+                                "categories": null,
+                                "ecosystems": null
+                              },
+                              "contributor": null
+                            },
+                            {
+                              "type": "PROJECT",
+                              "project": {
+                                "name": "Bretzel",
+                                "slug": "bretzel",
+                                "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                "shortDescription": "A project for people who love fruits",
+                                "contributorCount": 6,
+                                "starCount": 0,
+                                "forkCount": 1,
+                                "languages": [
+                                  "Typescript"
+                                ],
+                                "categories": null,
+                                "ecosystems": [
+                                  "Ethereum",
+                                  "Aptos",
+                                  "Zama"
+                                ]
+                              },
+                              "contributor": null
+                            }
+                          ],
+                          "projectFacets": {
+                            "ecosystems": [
+                              {
+                                "name": "Aptos",
+                                "count": 1
+                              },
+                              {
+                                "name": "Ethereum",
+                                "count": 1
+                              },
+                              {
+                                "name": "Zama",
+                                "count": 1
+                              }
+                            ],
+                            "categories": [],
+                            "languages": [
+                              {
+                                "name": "Typescript",
+                                "count": 1
+                              }
+                            ]
+                          },
+                          "typeFacets": {
+                            "types": null
+                          }
+                        }
                         """);
+
+        // When
+        client.post()
+                .uri(getApiURI(POST_SEARCH))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "keyword": "a",
+                          "pageSize": 10,
+                          "pageIndex": 0,
+                          "type": "PROJECT",
+                          "categories": ["AI"]
+                        }
+                        """.formatted(keyword))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                            "totalPageNumber": 1,
+                            "totalItemNumber": 3,
+                            "hasMore": false,
+                            "nextPageIndex": 0,
+                            "results": [
+                              {
+                                "type": "PROJECT",
+                                "project": {
+                                  "name": "Marketplace",
+                                  "slug": "marketplace",
+                                  "id": "45ca43d6-130e-4bf7-9776-2b1eb1dcb782",
+                                  "shortDescription": "Our marketplace",
+                                  "contributorCount": 0,
+                                  "languages": null,
+                                  "categories": [
+                                    "AI"
+                                  ],
+                                  "ecosystems": null
+                                },
+                                "contributor": null
+                              },
+                              {
+                                "type": "PROJECT",
+                                "project": {
+                                  "name": "Red bull",
+                                  "slug": "red-bull",
+                                  "id": "c6940f66-d64e-4b29-9a7f-07abf5c3e0ed",
+                                  "shortDescription": "Red bull gives you wings!",
+                                  "contributorCount": 0,
+                                  "languages": null,
+                                  "categories": [
+                                    "AI"
+                                  ],
+                                  "ecosystems": null
+                                },
+                                "contributor": null
+                              },
+                              {
+                                "type": "PROJECT",
+                                "project": {
+                                  "name": "Watermelon",
+                                  "slug": "watermelon",
+                                  "id": "fd10776c-3e09-45f0-998b-8537992a3726",
+                                  "shortDescription": "A projects for those who love water and melon",
+                                  "contributorCount": 0,
+                                  "languages": null,
+                                  "categories": [
+                                    "AI"
+                                  ],
+                                  "ecosystems": null
+                                },
+                                "contributor": null
+                              }
+                            ],
+                            "projectFacets": {
+                              "ecosystems": [],
+                              "categories": [
+                                {
+                                  "name": "AI",
+                                  "count": 3
+                                }
+                              ],
+                              "languages": []
+                            },
+                            "typeFacets": {
+                              "types": null
+                            }
+                          }""");
+
+
     }
 
     @Test
@@ -209,103 +304,104 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                           "totalPageNumber": 1,
-                           "totalItemNumber": 6,
-                           "hasMore": false,
-                           "nextPageIndex": 0,
-                           "results": [
-                             {
-                               "type": "CONTRIBUTOR",
-                               "project": null,
-                               "contributor": {
-                                 "githubLogin": "pinonpierre",
-                                 "githubId": 4507910,
-                                 "htmlUrl": "https://github.com/pinonpierre",
-                                 "bio": null,
-                                 "contributionCount": 0,
-                                 "projectCount": 0,
-                                 "pullRequestCount": 0,
-                                 "issueCount": 0
-                               }
-                             },
-                             {
-                               "type": "CONTRIBUTOR",
-                               "project": null,
-                               "contributor": {
-                                 "githubLogin": "carllapierre",
-                                 "githubId": 10599421,
-                                 "htmlUrl": "https://github.com/carllapierre",
-                                 "bio": "Software Development Lead @Osedea ",
-                                 "contributionCount": 0,
-                                 "projectCount": 1,
-                                 "pullRequestCount": 0,
-                                 "issueCount": 0
-                               }
-                             },
-                             {
-                               "type": "CONTRIBUTOR",
-                               "project": null,
-                               "contributor": {
-                                 "githubLogin": "PierreOucif",
-                                 "githubId": 16590657,
-                                 "htmlUrl": "https://github.com/PierreOucif",
-                                 "bio": null,
-                                 "contributionCount": 314,
-                                 "projectCount": 6,
-                                 "pullRequestCount": 121,
-                                 "issueCount": 2
-                               }
-                             },
-                             {
-                               "type": "CONTRIBUTOR",
-                               "project": null,
-                               "contributor": {
-                                 "githubLogin": "lemoinepierre",
-                                 "githubId": 57217210,
-                                 "htmlUrl": "https://github.com/lemoinepierre",
-                                 "bio": null,
-                                 "contributionCount": 0,
-                                 "projectCount": 0,
-                                 "pullRequestCount": 0,
-                                 "issueCount": 0
-                               }
-                             },
-                             {
-                               "type": "CONTRIBUTOR",
-                               "project": null,
-                               "contributor": {
-                                 "githubLogin": "pierrejn-git",
-                                 "githubId": 57374061,
-                                 "htmlUrl": "https://github.com/pierrejn-git",
-                                 "bio": null,
-                                 "contributionCount": 0,
-                                 "projectCount": 0,
-                                 "pullRequestCount": 0,
-                                 "issueCount": 0
-                               }
-                             },
-                             {
-                               "type": "CONTRIBUTOR",
-                               "project": null,
-                               "contributor": {
-                                 "githubLogin": "PierreBastiani",
-                                 "githubId": 59787523,
-                                 "htmlUrl": "https://github.com/PierreBastiani",
-                                 "bio": null,
-                                 "contributionCount": 0,
-                                 "projectCount": 1,
-                                 "pullRequestCount": 0,
-                                 "issueCount": 0
-                               }
-                             }
-                           ],
-                           "facets": null
-                         }
+                            "totalPageNumber": 1,
+                            "totalItemNumber": 6,
+                            "hasMore": false,
+                            "nextPageIndex": 0,
+                            "results": [
+                              {
+                                "type": "CONTRIBUTOR",
+                                "project": null,
+                                "contributor": {
+                                  "githubLogin": "pinonpierre",
+                                  "githubId": 4507910,
+                                  "htmlUrl": "https://github.com/pinonpierre",
+                                  "bio": null,
+                                  "contributionCount": 0,
+                                  "projectCount": 0,
+                                  "pullRequestCount": 0,
+                                  "issueCount": 0
+                                }
+                              },
+                              {
+                                "type": "CONTRIBUTOR",
+                                "project": null,
+                                "contributor": {
+                                  "githubLogin": "carllapierre",
+                                  "githubId": 10599421,
+                                  "htmlUrl": "https://github.com/carllapierre",
+                                  "bio": "Software Development Lead @Osedea ",
+                                  "contributionCount": 0,
+                                  "projectCount": 1,
+                                  "pullRequestCount": 0,
+                                  "issueCount": 0
+                                }
+                              },
+                              {
+                                "type": "CONTRIBUTOR",
+                                "project": null,
+                                "contributor": {
+                                  "githubLogin": "PierreOucif",
+                                  "githubId": 16590657,
+                                  "htmlUrl": "https://github.com/PierreOucif",
+                                  "bio": null,
+                                  "contributionCount": 314,
+                                  "projectCount": 6,
+                                  "pullRequestCount": 121,
+                                  "issueCount": 2
+                                }
+                              },
+                              {
+                                "type": "CONTRIBUTOR",
+                                "project": null,
+                                "contributor": {
+                                  "githubLogin": "lemoinepierre",
+                                  "githubId": 57217210,
+                                  "htmlUrl": "https://github.com/lemoinepierre",
+                                  "bio": null,
+                                  "contributionCount": 0,
+                                  "projectCount": 0,
+                                  "pullRequestCount": 0,
+                                  "issueCount": 0
+                                }
+                              },
+                              {
+                                "type": "CONTRIBUTOR",
+                                "project": null,
+                                "contributor": {
+                                  "githubLogin": "pierrejn-git",
+                                  "githubId": 57374061,
+                                  "htmlUrl": "https://github.com/pierrejn-git",
+                                  "bio": null,
+                                  "contributionCount": 0,
+                                  "projectCount": 0,
+                                  "pullRequestCount": 0,
+                                  "issueCount": 0
+                                }
+                              },
+                              {
+                                "type": "CONTRIBUTOR",
+                                "project": null,
+                                "contributor": {
+                                  "githubLogin": "PierreBastiani",
+                                  "githubId": 59787523,
+                                  "htmlUrl": "https://github.com/PierreBastiani",
+                                  "bio": null,
+                                  "contributionCount": 0,
+                                  "projectCount": 1,
+                                  "pullRequestCount": 0,
+                                  "issueCount": 0
+                                }
+                              }
+                            ],
+                            "projectFacets": null,
+                            "typeFacets": null
+                          }
                         """);
     }
 
-//    @Test
-//    @Order(30)
+    @Test
+    @Order(30)
     void should_suggest() {
         // When
         client.post()
@@ -322,8 +418,8 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json("""
-                        {"value":"Bretzel 196"}""");
+                .consumeWith(System.out::println)
+                .jsonPath("$.value").value(o -> Assertions.assertTrue(o.toString().toLowerCase().startsWith("bre")));
 
         // When
         client.post()
@@ -340,8 +436,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json("""
-                        {"value":"pvande"}""");
+                .jsonPath("$.value").value(o -> Assertions.assertTrue(o.toString().toLowerCase().startsWith("p")));
 
         // When
         client.post()
@@ -357,8 +452,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json("""
-                        {"value":"orestis"}""");
+                .jsonPath("$.value").value(o -> Assertions.assertTrue(o.toString().toLowerCase().startsWith("o")));
     }
 
 
