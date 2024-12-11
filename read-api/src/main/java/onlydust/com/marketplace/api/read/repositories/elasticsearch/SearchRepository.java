@@ -98,22 +98,19 @@ public class SearchRepository {
                                              final Integer from,
                                              final Integer size) {
         if (searchItemType == SearchItemType.PROJECT) {
+            final List<ElasticSearchQuery.Aggregation> aggregations = new ArrayList<>(ProjectFacet.toAggregations());
+            aggregations.add(TypeFacet.INDEXES.toAggregation());
             return ElasticSearchQuery.builder()
                     .withPagination(from, size)
                     .withQueryString(keyword)
-                    .withAggregations(ProjectFacet.toAggregations())
+                    .withAggregations(aggregations)
                     .withMultipleTerms(projectFacetsToMultiTerms(facets))
-                    .build();
-        }else if (isNull(searchItemType)) {
-            return ElasticSearchQuery.builder()
-                    .withPagination(from, size)
-                    .withQueryString(keyword)
-                    .withAggregations(List.of(TypeFacet.INDEXES.toAggregation()))
                     .build();
         } else {
             return ElasticSearchQuery.builder()
                     .withPagination(from, size)
                     .withQueryString(keyword)
+                    .withAggregations(List.of(TypeFacet.INDEXES.toAggregation()))
                     .build();
         }
     }
