@@ -71,7 +71,6 @@ public interface ContributorReadRepository extends Repository<ContributorReadEnt
                                              sum(cd.is_code_review) filter ( where cd.contribution_status = 'COMPLETED' )      as completed_code_review_count,
                                              sum(cd.is_issue) filter ( where cd.contribution_status = 'IN_PROGRESS' )          as in_progress_issue_count
                                       from bi.p_per_contributor_contribution_data cd
-                                        join indexer_exp.github_repos gr on gr.id = cd.repo_id and gr.visibility = 'PUBLIC'
                                       where (:onlyDustContributionsOnly is false or cd.project_id is not null)
                                       group by cd.contributor_id, cd.repo_id) cd_per_repo
                                 group by cd_per_repo.contributor_id) cd on cd.contributor_id = c.contributor_id
