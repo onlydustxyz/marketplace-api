@@ -1,27 +1,32 @@
 package onlydust.com.marketplace.project.domain.service;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.within;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+
 import com.github.javafaker.Faker;
+
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
 
 public class ApplicationServiceTest {
     private final Faker faker = new Faker();
@@ -155,14 +160,14 @@ public class ApplicationServiceTest {
         assertThat(application.id()).isNotNull();
         assertThat(application.projectId()).isEqualTo(projectId);
         assertThat(application.applicantId()).isEqualTo(githubUserId);
-        assertThat(application.appliedAt()).isEqualToIgnoringSeconds(ZonedDateTime.now());
+        assertThat(application.appliedAt()).isCloseTo(ZonedDateTime.now(), within(2, ChronoUnit.SECONDS));
         assertThat(application.origin()).isEqualTo(Application.Origin.MARKETPLACE);
         assertThat(application.issueId()).isEqualTo(issue.id());
         assertThat(application.commentId()).isNull();
         assertThat(application.commentBody()).isNull();
 
         verify(projectApplicationStoragePort).saveNew(application);
-        verify(applicationObserver, never()).onApplicationCreated(application);
+        verify(applicationObserver).onApplicationCreationStarted(application);
         verify(githubCommandService).createComment(application.id(), issue, githubUserId, githubComment);
     }
 

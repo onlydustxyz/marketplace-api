@@ -1,5 +1,12 @@
 package onlydust.com.marketplace.project.domain.job.githubcommands;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.project.domain.model.event.GithubCreateCommentCommand;
@@ -7,12 +14,6 @@ import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPo
 import onlydust.com.marketplace.project.domain.port.output.GithubApiPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectApplicationStoragePort;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
-import org.springframework.transaction.annotation.Transactional;
-
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @Slf4j
 @AllArgsConstructor
@@ -34,7 +35,7 @@ public class GithubCreateCommentCommandConsumer {
         application.commentId(commentId);
         application.commentBody(c.getBody());
         projectApplicationStoragePort.save(application);
-        applicationObserver.onApplicationCreated(application);
+        applicationObserver.onApplicationCreationCompleted(application);
     }
 
     @Recover

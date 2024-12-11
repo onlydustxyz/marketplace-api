@@ -1,8 +1,12 @@
 package onlydust.com.marketplace.api.configuration;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
 import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
-import onlydust.com.marketplace.accounting.domain.port.out.DepositStoragePort;
+
 import onlydust.com.marketplace.api.slack.AsyncSlackApiClient;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiClient;
@@ -12,9 +16,6 @@ import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.SponsorStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class SlackConfiguration {
@@ -42,10 +43,9 @@ public class SlackConfiguration {
                                            final UserStoragePort userStoragePort,
                                            final ProjectStoragePort projectStoragePort,
                                            final HackathonStoragePort hackathonStoragePort,
-                                           final DepositStoragePort depositStoragePort,
                                            final SponsorStoragePort sponsorStoragePort,
                                            final MetaBlockExplorer blockExplorer) {
-        return new SlackApiAdapter(slackProperties, slackApiClient, userStoragePort, projectStoragePort, hackathonStoragePort, depositStoragePort,
+        return new SlackApiAdapter(slackProperties, slackApiClient, userStoragePort, projectStoragePort, hackathonStoragePort,
                 sponsorStoragePort, blockExplorer);
     }
 }

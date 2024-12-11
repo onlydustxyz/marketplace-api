@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
+import java.util.Set;
+
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -17,8 +19,6 @@ import onlydust.com.marketplace.project.domain.port.input.ContributionObserverPo
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPort;
 import onlydust.com.marketplace.user.domain.port.input.UserObserverPort;
-
-import java.util.Set;
 
 @AllArgsConstructor
 public class PostgresBiProjectorAdapter implements AccountingObserverPort, ContributionObserverPort, ProjectObserverPort, UserObserverPort,
@@ -185,7 +185,7 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
 
     @Override
     @Transactional
-    public void onApplicationCreated(Application application) {
+    public void onApplicationCreationStarted(Application application) {
         entityManager.flush();
         final var contributionUUID = ContributionUUID.of(application.issueId().value());
         biContributionContributorsDataRepository.refreshByUUID(contributionUUID);
@@ -194,6 +194,10 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
         biApplicationDataRepository.refresh(application.id());
     }
 
+    @Override
+    public void onApplicationCreationCompleted(Application application) {
+    }
+    
     @Override
     @Transactional
     public void onApplicationAccepted(Application application, UserId projectLeadId) {

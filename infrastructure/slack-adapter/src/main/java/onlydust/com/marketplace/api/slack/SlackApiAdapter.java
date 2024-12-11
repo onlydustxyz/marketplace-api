@@ -1,5 +1,9 @@
 package onlydust.com.marketplace.api.slack;
 
+import static onlydust.com.marketplace.api.slack.mapper.DepositSubmittedOnSponsorMapper.mapToSlackBlock;
+
+import java.util.Set;
+
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +14,6 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfileChildrenKycVerification;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.DepositObserverPort;
-import onlydust.com.marketplace.accounting.domain.port.out.DepositStoragePort;
 import onlydust.com.marketplace.api.slack.mapper.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.ProjectId;
@@ -24,10 +27,6 @@ import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.view.GithubUserWithTelegramView;
 
-import java.util.Set;
-
-import static onlydust.com.marketplace.api.slack.mapper.DepositSubmittedOnSponsorMapper.mapToSlackBlock;
-
 @Slf4j
 @AllArgsConstructor
 public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObserverPort, HackathonObserverPort, ApplicationObserverPort, DepositObserverPort {
@@ -37,7 +36,6 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     private final UserStoragePort userStoragePort;
     private final ProjectStoragePort projectStoragePort;
     private final HackathonStoragePort hackathonStoragePort;
-    private final DepositStoragePort depositStoragePort;
     private final SponsorStoragePort sponsorStoragePort;
     private final MetaBlockExplorer blockExplorer;
 
@@ -72,7 +70,11 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     }
 
     @Override
-    public void onApplicationCreated(Application application) {
+    public void onApplicationCreationStarted(Application application) {
+    }
+
+    @Override
+    public void onApplicationCreationCompleted(Application application) {
         final var user = userStoragePort.getIndexedUserByGithubId(application.applicantId())
                 .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(application.applicantId())));
         final var project = projectStoragePort.getById(application.projectId())

@@ -1,6 +1,10 @@
 package onlydust.com.marketplace.api.helper;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.github.javafaker.Faker;
+
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
 import onlydust.com.marketplace.kernel.model.ProjectId;
@@ -8,8 +12,6 @@ import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.port.output.ProjectApplicationStoragePort;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class ApplicationHelper {
