@@ -16,7 +16,7 @@ public interface OutboxRepository<E extends EventEntity> extends JpaRepository<E
     @Query(value = """
             SELECT next_event
             FROM #{#entityName} next_event
-            WHERE next_event.status = 'PENDING' OR next_event.status = 'FAILED'
+            WHERE next_event.status IN ('PENDING', 'FAILED')
             ORDER BY next_event.id ASC
             LIMIT 1
             """)
