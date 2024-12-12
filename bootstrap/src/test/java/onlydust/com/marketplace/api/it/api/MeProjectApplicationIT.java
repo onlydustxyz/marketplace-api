@@ -35,6 +35,7 @@ import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
 import onlydust.com.marketplace.kernel.model.event.OnGithubIssueDeleted;
 import onlydust.com.marketplace.project.domain.model.Application;
@@ -378,12 +379,12 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 null
         ));
 
-        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+        final UserAuthHelper.AuthenticatedUser olivier = userAuthHelper.authenticateOlivier();
         applicationRepository.save(new ApplicationEntity(
                 UUID.randomUUID(),
                 ZonedDateTime.now(),
                 UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"),
-                pierre.user().getGithubUserId(),
+                olivier.user().getGithubUserId(),
                 Application.Origin.GITHUB,
                 1974125983L,
                 112L,
@@ -486,10 +487,10 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                         .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
                         .withRequestBody(matchingJsonPath("$.transactional_message_id",
                                 equalTo(customerIOProperties.getProjectApplicationRefusedEmailId().toString())))
-                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(pierre.user().getId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(olivier.user().getId().toString())))
                         .withRequestBody(matchingJsonPath("$.message_data", equalToJson("""
                                 {
-                                  "username" : "PierreOucif",
+                                  "username" : "ofux",
                                   "title": "Issue application refused",
                                   "description": "Thank you for your interest in project <b>Bretzel</b>.<br /><br />We wanted to inform you that the issue Test #7 you applied for <b>has been assigned to another candidate</b>. However, we encourage you to continue exploring other projects and applying to different opportunities that match your skills and interests.",
                                   "button" : {
@@ -498,7 +499,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                                               }
                                 }
                                 """, true, false)))
-                        .withRequestBody(matchingJsonPath("$.to", equalTo("pierre.oucif@gadz.org")))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo("abuisset@gmail.com")))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Issue application refused")))
         );
 
@@ -653,8 +654,14 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     void should_return_projects_led_and_applications() {
         // Given
         final var pierre = userAuthHelper.authenticatePierre();
+        final var antho = userAuthHelper.authenticateAntho();
+
         final var projectAppliedTo1 = UUID.fromString("dcb3548a-977a-480e-8fb4-423d3f890c04");
         final var projectAppliedTo2 = UUID.fromString("c66b929a-664d-40b9-96c4-90d3efd32a3c");
+        final var repo1 = githubHelper.createRepo("repo-1", ProjectId.of(projectAppliedTo1));
+        final var repo2 = githubHelper.createRepo("repo-2", ProjectId.of(projectAppliedTo2));
+        final var issue1 = githubHelper.createIssue(repo1, antho);
+        final var issue2 = githubHelper.createIssue(repo2, antho);
 
         applicationRepository.saveAll(List.of(
                 new ApplicationEntity(
@@ -663,7 +670,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                         projectAppliedTo1,
                         pierre.user().getGithubUserId(),
                         Application.Origin.MARKETPLACE,
-                        1736474921L,
+                        issue1,
                         112L,
                         "My motivations",
                         null
@@ -674,7 +681,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                         projectAppliedTo2,
                         pierre.user().getGithubUserId(),
                         Application.Origin.GITHUB,
-                        1736504583L,
+                        issue2,
                         113L,
                         "My motivations",
                         null
@@ -690,38 +697,28 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("pendingApplications[?(@.project.id == 'dcb3548a-977a-480e-8fb4-423d3f890c04')].issue.id").isEqualTo(issue1.intValue())
+                .jsonPath("pendingApplications[?(@.project.id == 'c66b929a-664d-40b9-96c4-90d3efd32a3c')].issue.id").isEqualTo(issue2.intValue())
                 .json("""
                         {
                           "pendingApplications": [
                             {
-                              "applicant": {
-                                "githubUserId": 16590657,
-                                "login": "PierreOucif",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                "isRegistered": true
-                              },
-                              "project": {
-                                "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                                "slug": "bretzel",
-                                "name": "Bretzel",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
-                              },
-                              "githubComment": "My motivations 2"
+                                "applicant": {
+                                    "login": "PierreOucif"
+                                },
+                                "project": {
+                                    "id": "c66b929a-664d-40b9-96c4-90d3efd32a3c"
+                                },
+                                "githubComment": "My motivations"
                             },
                             {
-                              "applicant": {
-                                "githubUserId": 16590657,
-                                "login": "PierreOucif",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                "isRegistered": true
-                              },
-                              "project": {
-                                "id": "c66b929a-664d-40b9-96c4-90d3efd32a3c",
-                                "slug": "yolo-croute",
-                                "name": "Yolo croute",
-                                "logoUrl": "https://i.natgeofe.com/n/8271db90-5c35-46bc-9429-588a9529e44a/raccoon_thumb_3x4.JPG"
-                              },
-                              "githubComment": "My motivations"
+                                "applicant": {
+                                    "login": "PierreOucif"
+                                },
+                                "project": {
+                                    "id": "dcb3548a-977a-480e-8fb4-423d3f890c04"
+                                },
+                                "githubComment": "My motivations"
                             }
                           ]
                         }
