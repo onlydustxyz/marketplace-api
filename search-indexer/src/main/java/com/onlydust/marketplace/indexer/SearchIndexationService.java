@@ -46,4 +46,6 @@ public class SearchIndexationService {
         LOGGER.info("Contributors from {} to {} where indexed", offset, offset + PAGE_SIZE);
         return contributors;
     }
+
+    
 }
