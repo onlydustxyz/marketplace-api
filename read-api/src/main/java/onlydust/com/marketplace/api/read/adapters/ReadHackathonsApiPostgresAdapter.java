@@ -4,10 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadHackathonsApi;
-import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
-import onlydust.com.marketplace.api.contract.model.HackathonProjectsIssuesResponse;
-import onlydust.com.marketplace.api.contract.model.HackathonsDetailsResponse;
-import onlydust.com.marketplace.api.contract.model.HackathonsListResponse;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.cache.Cache;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonItemReadEntity;
@@ -76,7 +73,11 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
                                                                               Boolean isGoodFirstIssue,
                                                                               String search) {
         final var hackathonProjectIssues = hackathonProjectIssuesReadRepository.findAll(hackathonId,
-                isNull(statuses) ? null : statuses.stream().distinct().map(GithubIssueStatus::name).toArray(String[]::new),
+                isNull(statuses) ? null : statuses.stream().distinct().map(s -> switch (s) {
+                    case OPEN -> ContributionStatus.IN_PROGRESS;
+                    case COMPLETED -> ContributionStatus.COMPLETED;
+                    case CANCELLED -> ContributionStatus.CANCELLED;
+                }).map(ContributionStatus::name).toArray(String[]::new),
                 isAssigned,
                 isApplied,
                 isAvailable,
