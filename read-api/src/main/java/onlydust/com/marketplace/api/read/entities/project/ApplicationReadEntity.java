@@ -65,7 +65,7 @@ public class ApplicationReadEntity {
                 .applicant(applicant.toContributorResponse())
                 .githubComment(commentBody)
                 .project(project.toLinkResponse())
-                .issue(issue.toLinkDto())
+                .issue(issue == null ? null : issue.toLinkDto())
                 ;
     }
 

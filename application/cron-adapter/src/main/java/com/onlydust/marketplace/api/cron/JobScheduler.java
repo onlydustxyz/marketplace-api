@@ -1,7 +1,13 @@
 package com.onlydust.marketplace.api.cron;
 
+import java.time.ZonedDateTime;
+
+import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.Scheduled;
+
 import com.onlydust.marketplace.api.cron.properties.NodeGuardiansBoostProperties;
 import com.onlydust.marketplace.indexer.SearchIndexationService;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
@@ -14,14 +20,9 @@ import onlydust.com.marketplace.project.domain.job.ApplicationsCleaner;
 import onlydust.com.marketplace.project.domain.job.GoodFirstIssueCreatedNotifierJob;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
 import onlydust.com.marketplace.project.domain.port.input.BoostNodeGuardiansRewardsPort;
-import onlydust.com.marketplace.project.domain.port.input.LanguageFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.user.domain.job.NotificationSummaryEmailJob;
-import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.annotation.Scheduled;
-
-import java.time.ZonedDateTime;
 
 @Slf4j
 @AllArgsConstructor
@@ -40,7 +41,6 @@ public class JobScheduler {
     private final BoostNodeGuardiansRewardsPort boostNodeGuardiansRewardsPort;
     private final NodeGuardiansBoostProperties nodeGuardiansBoostProperties;
     private final OutboxConsumerJob nodeGuardiansOutboxJob;
-    private final LanguageFacadePort languageFacadePort;
     private final ApplicationsCleaner applicationsCleaner;
     private final BillingProfileFacadePort billingProfileFacadePort;
     private final NotificationSummaryEmailJob notificationSummaryEmailJob;
