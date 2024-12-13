@@ -99,7 +99,7 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
                                   "name": "TypeScript",
                                   "percentage": 100.00,
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-typescript.png"
                                 }
                               ]
                             },
@@ -138,7 +138,7 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
                                   "name": "TypeScript",
                                   "percentage": 99.25,
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-typescript.png"
                                 }
                               ]
                             }
@@ -222,7 +222,7 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
                                    "name": "TypeScript",
                                    "percentage": 100.00,
                                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-typescript.png"
                                  }
                                ]
                              }

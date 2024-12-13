@@ -213,7 +213,7 @@ public class MeProjectsAsContributorApiIT extends AbstractMarketplaceApiIT {
                                   "languages": [
                                     {
                                       "slug": "typescript",
-                                      "name": "Typescript"
+                                      "name": "TypeScript"
                                     }
                                   ],
                                   "leads": [

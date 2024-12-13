@@ -165,7 +165,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                                 "starCount": 0,
                                 "forkCount": 1,
                                 "languages": [
-                                  "Typescript"
+                                  "TypeScript"
                                 ],
                                 "categories": null,
                                 "ecosystems": [
@@ -195,7 +195,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                             "categories": [],
                             "languages": [
                               {
-                                "name": "Typescript",
+                                "name": "TypeScript",
                                 "count": 1
                               }
                             ]
@@ -221,7 +221,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                           "pageSize": 10,
                           "pageIndex": 0,
                           "type": "PROJECT",
-                          "languages": ["Javascript"],
+                          "languages": ["JavaScript"],
                           "ecosystems": ["Starknet"]
                         }
                         """.formatted(keyword))
@@ -249,7 +249,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                                 "forkCount": 11724,
                                 "languages": [
                                   "Solidity",
-                                  "Javascript"
+                                  "JavaScript"
                                 ],
                                 "categories": null,
                                 "ecosystems": [
@@ -269,9 +269,9 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                                 "starCount": 2909,
                                 "forkCount": 188,
                                 "languages": [
-                                  "Typescript",
+                                  "TypeScript",
                                   "Rust",
-                                  "Javascript"
+                                  "JavaScript"
                                 ],
                                 "categories": null,
                                 "ecosystems": [
@@ -296,7 +296,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                             "categories": [],
                             "languages": [
                               {
-                                "name": "Javascript",
+                                "name": "JavaScript",
                                 "count": 2
                               },
                               {
@@ -308,7 +308,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                                 "count": 1
                               },
                               {
-                                "name": "Typescript",
+                                "name": "TypeScript",
                                 "count": 1
                               }
                             ]

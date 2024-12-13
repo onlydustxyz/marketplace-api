@@ -76,7 +76,6 @@ public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
                 "Rust",
                 "Cairo",
                 "Noir",
-                "Javascript",
                 "Python",
                 "Go",
                 "Zig",
@@ -85,9 +84,10 @@ public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
                 "Kotlin",
                 "Solidity",
                 "Swift",
-                "Typescript",
                 "C++",
-                "C#");
+                "C#",
+                "TypeScript",
+                "JavaScript");
 
         // Check blockchain ecosystems question (index 4)
         final var blockchainQuestion = response.getQuestions().get(4);
