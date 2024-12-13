@@ -81,3 +81,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000042_refactor_matching_v1_storage.sql
   - include:
       file: db/changelog/changelogs/00000043_remove_private_repos.sql
+  - include:
+      file: db/changelog/changelogs/00000044_add_missing_data_for_new_projects_page.sql

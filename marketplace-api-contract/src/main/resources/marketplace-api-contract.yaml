@@ -2145,31 +2145,26 @@ paths:
             items:
               $ref: '#/components/schemas/ProjectTag'
         - in: query
-          name: ecosystemSlugs
+          name: ecosystemIds
           description: Ecosystem filter
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/EcosystemSlug'
+              $ref: '#/components/schemas/EcosystemId'
         - in: query
-          name: languageSlugs
+          name: languageIds
           required: false
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/LanguageSlug'
+              $ref: '#/components/schemas/LanguageId'
         - in: query
-          name: categorySlugs
+          name: categoryIds
           required: false
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/ProjectCategorySlug'
-        - in: query
-          name: sort
-          description: Sort order
-          schema:
-            $ref: "#/components/schemas/ProjectListSort"
+              $ref: '#/components/schemas/ProjectCategoryId'
         - $ref: '#/components/parameters/pageIndexParam'
         - $ref: '#/components/parameters/pageSizeParam'
       responses:
@@ -8006,6 +8001,7 @@ components:
         - id
         - slug
         - name
+        - logoUrl
         - percentage
       properties:
         id:
@@ -8018,6 +8014,12 @@ components:
           example: Rust
         percentage:
           type: number
+        logoUrl:
+          type: string
+          format: url
+        bannerUrl:
+          type: string
+          format: url
 
     CountriesResponse:
       type: object
@@ -13182,8 +13184,8 @@ components:
         - shortDescription
         - contributorCount
         - starCount
-        - pullRequestCount
-        - issueCount
+        - forkCount
+        - availableIssueCount
         - goodFirstIssueCount
       properties:
         id:
@@ -13200,9 +13202,9 @@ components:
           type: integer
         starCount:
           type: integer
-        pullRequestCount:
+        forkCount:
           type: integer
-        issueCount:
+        availableIssueCount:
           type: integer
         goodFirstIssueCount:
           type: integer
