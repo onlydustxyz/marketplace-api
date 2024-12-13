@@ -6,6 +6,26 @@ update languages
 set name = 'JavaScript'
 where name = 'Javascript';
 
+
+CREATE OR REPLACE FUNCTION sum_func(
+    bigint, pg_catalog.anyelement, bigint
+)
+    RETURNS bigint AS
+$body$
+SELECT case when $3 is not null then COALESCE($1, 0) + $3 else $1 end
+$body$
+    LANGUAGE 'sql';
+
+CREATE AGGREGATE dist_sum (
+    pg_catalog."any",
+    bigint)
+    (
+    SFUNC = sum_func,
+    STYPE = int8
+    );
+
+
+
 call drop_pseudo_projection('bi', 'project_contributions_data');
 
 call create_pseudo_projection('bi', 'project_contributions_data', $$
@@ -25,15 +45,7 @@ SELECT p.id                                                             as proje
                                                            coalesce(array_length(ccd.assignee_ids, 1), 0) = 0 and
                                                            cd.contribution_status != 'COMPLETED' and
                                                            cd.contribution_status !=
-                                                           'CANCELLED') as live_hackathon_issue_count,
-       (select sum(gr.forks_count)
-        from project_github_repos pgr
-                 join indexer_exp.github_repos gr on pgr.github_repo_id = gr.id
-        where p.id = pgr.project_id)                                       fork_count,
-       (select sum(gr.stars_count)
-        from project_github_repos pgr
-                 join indexer_exp.github_repos gr on pgr.github_repo_id = gr.id
-        where p.id = pgr.project_id)                                       star_count
+                                                           'CANCELLED') as live_hackathon_issue_count
 FROM projects p
          LEFT JOIN bi.p_contribution_data cd ON cd.project_id = p.id
          LEFT JOIN bi.p_contribution_contributors_data ccd ON ccd.contribution_uuid = cd.contribution_uuid
@@ -98,7 +110,7 @@ SELECT p.id                                                                 as p
                                              'name', l.name,
                                              'logoUrl', l.logo_url,
                                              'bannerUrl', l.banner_url,
-                                             'lineCount', l.line_count))
+                                             'lineCount', grp.line_count))
        filter ( where l.id is not null )                                    as languages,
 
        jsonb_agg(distinct jsonb_build_object('id', e.id,
@@ -116,6 +128,9 @@ SELECT p.id                                                                 as p
 
        count(distinct pgr.github_repo_id) > count(distinct agr.repo_id)     as has_repos_without_github_app_installed,
 
+       dist_sum(distinct gr.id, gr.stars_count)                             as star_count,
+       dist_sum(distinct gr.id, gr.forks_count)                             as fork_count,
+
        concat(coalesce(string_agg(distinct uleads.github_login, ' '), ''), ' ',
               coalesce(string_agg(distinct p.name, ' '), ''), ' ',
               coalesce(string_agg(distinct p.slug, ' '), ''), ' ',
@@ -129,6 +144,7 @@ FROM projects p
          LEFT JOIN projects_ecosystems pe ON pe.project_id = p.id
          LEFT JOIN ecosystems e ON e.id = pe.ecosystem_id
          LEFT JOIN project_languages pl ON pl.project_id = p.id
+         LEFT JOIN languages l ON l.id = pl.language_id
          LEFT JOIN projects_project_categories ppc ON ppc.project_id = p.id
          LEFT JOIN project_categories pc ON pc.id = ppc.project_category_id
          LEFT JOIN v_programs_projects pp ON pp.project_id = p.id
@@ -139,22 +155,15 @@ FROM projects p
          LEFT JOIN iam.users uinvleads ON uinvleads.github_user_id = ppli.github_user_id
          LEFT JOIN projects_tags pt ON pt.project_id = p.id
          LEFT JOIN project_github_repos pgr ON pgr.project_id = p.id
+         LEFT JOIN indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
          LEFT JOIN indexer_exp.authorized_github_repos agr on agr.repo_id = pgr.github_repo_id
+         LEFT JOIN indexer_exp.github_repo_languages grp on grp.repo_id = pgr.github_repo_id and grp.language = l.name
          LEFT JOIN LATERAL (select distinct c.name, c.code
                             from bi.p_reward_data rd
                                      full outer join bi.p_project_grants_data gd on gd.project_id = rd.project_id
                                      join currencies c on c.id = coalesce(rd.currency_id, gd.currency_id)
                             where rd.project_id = p.id
                                or gd.project_id = p.id) currencies on true
-         LEFT JOIN LATERAL (
-    select l.name, l.id, l.slug, l.logo_url, l.banner_url, sum(grp.line_count) line_count
-    from project_github_repos pgr
-             join indexer_exp.github_repo_languages grp on grp.repo_id = pgr.github_repo_id
-             join project_languages pl on pl.project_id = pgr.project_id
-             join languages l on l.name = grp.language
-    where pgr.project_id = p.id
-    group by l.name, l.id, l.slug, l.logo_url, l.banner_url
-    ) l on true
 GROUP BY p.id
 $$, 'project_id');
 
