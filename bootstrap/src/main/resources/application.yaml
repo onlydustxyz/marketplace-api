@@ -65,7 +65,7 @@ application:
     default-stale-while-revalidate-seconds: ${API_CACHE_DEFAULT_STALE_WHILE_REVALIDATE_SECONDS}
   retryable:
     github-command-consumers:
-      max-attempts: 5
+      max-attempts: 4
 
 spring:
   autoconfigure:

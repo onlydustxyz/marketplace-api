@@ -26,6 +26,7 @@ import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.*;
 import onlydust.com.marketplace.project.domain.job.githubcommands.GithubCommandOutboxConsumer;
 import onlydust.com.marketplace.project.domain.job.githubcommands.GithubCreateCommentCommandConsumer;
+import onlydust.com.marketplace.project.domain.job.githubcommands.GithubCreateCommentCommandConsumerCleaner;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
 import onlydust.com.marketplace.project.domain.observer.ApplicationObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.ContributionObserverComposite;
@@ -227,11 +228,19 @@ public class ProjectConfiguration {
     }
 
     @Bean
+    public GithubCreateCommentCommandConsumerCleaner githubCreateCommentCommandConsumerCleaner(final ProjectApplicationStoragePort projectApplicationStoragePort,
+                                                                                               final ApplicationObserverPort applicationObservers) {
+        return new GithubCreateCommentCommandConsumerCleaner(projectApplicationStoragePort, applicationObservers);
+    }
+
+    @Bean
     public GithubCreateCommentCommandConsumer githubCreateCommentCommandConsumer(final GithubApiPort githubApiPort,
                                                                                  final GithubAuthenticationPort githubAuthenticationPort,
                                                                                  final ProjectApplicationStoragePort projectApplicationStoragePort,
-                                                                                 final ApplicationObserverPort applicationObservers) {
-        return new GithubCreateCommentCommandConsumer(githubApiPort, githubAuthenticationPort, projectApplicationStoragePort, applicationObservers);
+                                                                                 final ApplicationObserverPort applicationObservers,
+                                                                                 final GithubCreateCommentCommandConsumerCleaner githubCreateCommentCommandConsumerCleaner) {
+        return new GithubCreateCommentCommandConsumer(githubApiPort, githubAuthenticationPort, projectApplicationStoragePort, applicationObservers,
+                githubCreateCommentCommandConsumerCleaner);
     }
 
     @Bean

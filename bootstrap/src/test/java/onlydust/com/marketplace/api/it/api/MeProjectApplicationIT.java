@@ -1,26 +1,6 @@
 package onlydust.com.marketplace.api.it.api;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static onlydust.com.marketplace.api.helper.ConcurrentTesting.runConcurrently;
-import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
-
 import onlydust.com.marketplace.api.contract.model.ContributionsQueryParams;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateRequest;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateResponse;
@@ -39,6 +19,24 @@ import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
 import onlydust.com.marketplace.kernel.model.event.OnGithubIssueDeleted;
 import onlydust.com.marketplace.project.domain.model.Application;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static onlydust.com.marketplace.api.helper.ConcurrentTesting.runConcurrently;
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 
 @TagMe
 public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
@@ -118,6 +116,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                                 """)));
 
         githubCommandOutboxJob.run();
+        githubWireMockServer.verify(1, postRequestedFor(urlEqualTo("/repositories/380954304/issues/7/comments")));
 
         application = applicationRepository.findById(applicationId).orElseThrow();
         assertThat(application.commentId()).isEqualTo(123456789L);
@@ -178,9 +177,14 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
 
         // When
         githubCommandOutboxJob.run();
+        githubWireMockServer.verify(1, postRequestedFor(urlEqualTo("/repositories/380954304/issues/7/comments")));
 
         // Then
         assertThat(applicationRepository.findById(applicationId)).isEmpty();
+
+        // When the job is run again, it should not skip the errored event
+        githubCommandOutboxJob.run();
+        githubWireMockServer.verify(1, postRequestedFor(urlEqualTo("/repositories/380954304/issues/7/comments")));
     }
 
     @Test
