@@ -46,9 +46,9 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
 
     @BeforeEach
     void setUp() {
-        final var categoryAI = new ProjectCategoryEntity(UUID.fromString("283fed71-7da8-4016-ada2-1932adee99a0"), "ai2", "AI2", "AI is cool", "brain", Set.of());
+        final var categoryAI = new ProjectCategoryEntity(UUID.fromString("b151c7e4-1493-4927-bb0f-8647ec98a9c5"), "ai", "AI", "AI is cool", "brain", Set.of());
         projectCategoryRepository.saveAll(List.of(
-                new ProjectCategoryEntity(UUID.fromString("ed20dcd3-d392-491d-a47d-bd14a1b710a4"), "security2", "Security2", "Security is important", "lock",
+                new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "security", "Security", "Security is important", "lock",
                         Set.of()),
                 categoryAI
         ));
@@ -129,7 +129,7 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
                                   "slug": "javascript",
                                   "name": "JavaScript",
                                   "percentage": 0.75,
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                 },
                                 {
@@ -149,7 +149,7 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(PROJECTS_V2_GET, Map.of("categoryIds", "283fed71-7da8-4016-ada2-1932adee99a0", "pageSize", "2", "pageIndex", "0")))
+                .uri(getApiURI(PROJECTS_V2_GET, Map.of("categoryIds", "b151c7e4-1493-4927-bb0f-8647ec98a9c5", "pageSize", "2", "pageIndex", "0")))
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -175,7 +175,7 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
                                "goodFirstIssueCount": 0,
                                "categories": [
                                  {
-                                   "id": "283fed71-7da8-4016-ada2-1932adee99a0",
+                                   "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
                                    "slug": "ai",
                                    "name": "AI",
                                    "description": "AI is cool",
