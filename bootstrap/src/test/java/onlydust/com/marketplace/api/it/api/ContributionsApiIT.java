@@ -220,7 +220,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                               "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                               "slug": "javascript",
                               "name": "JavaScript",
-                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
+                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                             }
                           ],
