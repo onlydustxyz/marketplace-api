@@ -110,7 +110,7 @@ SELECT p.id                                                                 as p
                                              'name', l.name,
                                              'logoUrl', l.logo_url,
                                              'bannerUrl', l.banner_url,
-                                             'lineCount', grp.line_count))
+                                             'lineCount', coalesce(grp.line_count,0)))
        filter ( where l.id is not null )                                    as languages,
 
        jsonb_agg(distinct jsonb_build_object('id', e.id,

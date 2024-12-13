@@ -1,15 +1,16 @@
 package onlydust.com.marketplace.api.read.entities.project;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.contract.model.LanguageWithPercentageResponse;
+import onlydust.com.marketplace.api.contract.model.ProjectCategoryResponse;
+import onlydust.com.marketplace.api.contract.model.ProjectShortResponseV2;
+import onlydust.com.marketplace.api.contract.model.ProjectTag;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -40,8 +41,6 @@ public class ProjectPageV2ItemQueryEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     List<ProjectCategoryResponse> categories;
     @JdbcTypeCode(SqlTypes.JSON)
-    List<EcosystemLinkResponse> ecosystems;
-    @JdbcTypeCode(SqlTypes.JSON)
     List<LanguageWithLineCount> languages;
     @JdbcTypeCode(SqlTypes.ARRAY)
     List<ProjectTag> tags;
@@ -58,7 +57,7 @@ public class ProjectPageV2ItemQueryEntity {
         final long totalLines = languages.stream()
                 .mapToLong(language -> language.lineCount)
                 .sum();
-        return languages.stream()
+        return totalLines == 0L ? List.of() : languages.stream()
                 .map(language -> new LanguageWithPercentageResponse()
                         .name(language.name)
                         .slug(language.slug)
@@ -85,35 +84,6 @@ public class ProjectPageV2ItemQueryEntity {
                 .goodFirstIssueCount(goodFirstIssueCount)
                 .forkCount(forkCount)
                 .contributorCount(contributorCount);
-    }
-
-    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-    @Getter
-    @Accessors(fluent = true)
-    public static class Ecosystem {
-        @EqualsAndHashCode.Include
-        @JsonProperty("id")
-        UUID id;
-        @JsonProperty("url")
-        String url;
-        @JsonProperty("logoUrl")
-        String logoUrl;
-        @JsonProperty("name")
-        String name;
-        @JsonProperty("slug")
-        String slug;
-        @JsonProperty("hidden")
-        Boolean hidden;
-
-        public EcosystemLinkResponse toDto() {
-            return new EcosystemLinkResponse()
-                    .id(id)
-                    .name(name)
-                    .slug(slug)
-                    .logoUrl(logoUrl)
-                    .url(url)
-                    .hidden(hidden);
-        }
     }
 
     @EqualsAndHashCode(onlyExplicitlyIncluded = true)
