@@ -113,7 +113,7 @@ public class LanguagesApiIT extends AbstractMarketplaceApiIT {
                               "slug": "typescript",
                               "name": "TypeScript",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-typescript.png"
                             },
                             {
                               "id": "c607659b-7cca-45df-b478-33e427a96827",
