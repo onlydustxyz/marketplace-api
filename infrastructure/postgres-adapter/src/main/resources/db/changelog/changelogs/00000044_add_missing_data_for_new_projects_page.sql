@@ -110,7 +110,7 @@ SELECT p.id                                                                 as p
                                              'name', l.name,
                                              'logoUrl', l.logo_url,
                                              'bannerUrl', l.banner_url,
-                                             'lineCount', coalesce(grp.line_count,0)))
+                                             'lineCount', coalesce(l_count.line_count, 0)))
        filter ( where l.id is not null )                                    as languages,
 
        jsonb_agg(distinct jsonb_build_object('id', e.id,
@@ -157,13 +157,17 @@ FROM projects p
          LEFT JOIN project_github_repos pgr ON pgr.project_id = p.id
          LEFT JOIN indexer_exp.github_repos gr on gr.id = pgr.github_repo_id
          LEFT JOIN indexer_exp.authorized_github_repos agr on agr.repo_id = pgr.github_repo_id
-         LEFT JOIN indexer_exp.github_repo_languages grp on grp.repo_id = pgr.github_repo_id and grp.language = l.name
          LEFT JOIN LATERAL (select distinct c.name, c.code
                             from bi.p_reward_data rd
                                      full outer join bi.p_project_grants_data gd on gd.project_id = rd.project_id
                                      join currencies c on c.id = coalesce(rd.currency_id, gd.currency_id)
                             where rd.project_id = p.id
                                or gd.project_id = p.id) currencies on true
+          LEFT JOIN LATERAL (select pgr.project_id, grl.language, sum(grl.line_count) line_count
+                            from project_github_repos pgr
+                                     left join indexer_exp.github_repo_languages grl on grl.repo_id = pgr.github_repo_id
+                            where pgr.project_id = p.id
+                            group by pgr.project_id, grl.language) AS l_count on l_count.language = l.name
 GROUP BY p.id
 $$, 'project_id');
 

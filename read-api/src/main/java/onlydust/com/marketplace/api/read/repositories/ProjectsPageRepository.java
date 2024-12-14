@@ -83,38 +83,4 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                              Boolean hasGfiOrLiveHackathonIssues,
                                              Pageable pageable);
 
-    @Query(value = """
-            SELECT p.project_id                                                                  as id,
-                   p.project_slug                                                                as slug,
-                   p.rank                                                                        as rank,
-                   p.project_name                                                                as name,
-                   p.project ->> 'shortDescription'                                              as short_description,
-                   p.project ->> 'logoUrl'                                                       as logo_url,
-                   p.project ->> 'hiring'                                                        as hiring,
-                   p.project ->> 'visibility'                                                    as visibility,
-                   coalesce(array_length(p.repo_ids, 1), 0)                                      as repo_count,
-                   coalesce(pcd.contributor_count, 0)                                            as contributor_count,
-                   p.leads                                                                       as project_leads,
-                   p.categories                                                                  as categories,
-                   p.ecosystems                                                                  as ecosystems,
-                   p.languages                                                                   as languages,
-                   p.tags                                                                        as tags,
-                   coalesce(cast(pb.budget ->> 'availableBudgetUsd' as numeric), 0)
-                                                                                                 as remaining_usd_budget,
-                   coalesce(pcd.good_first_issue_count, 0) > 0                                   as has_good_first_issues,
-                   p.has_repos_without_github_app_installed                                      as has_repos_without_github_app_installed,
-                   is_invited_as_project_lead.value                                              as is_invited_as_project_lead
-            FROM bi.p_project_global_data p
-                     JOIN bi.p_project_budget_data pb on p.project_id = pb.project_id
-                     JOIN bi.p_project_contributions_data pcd on p.project_id = pcd.project_id
-                     LEFT JOIN p_user_project_recommendations pr on pr.project_id = p.project_id and pr.user_id = :userId
-                     LEFT JOIN LATERAL (
-                         select (:userId is not null and
-                                p.invited_project_lead_ids is not null and :userId = any (p.invited_project_lead_ids) and
-                                not (p.project_lead_ids is not null and :userId = any (p.project_lead_ids))) as value
-                     ) as is_invited_as_project_lead on true
-            
-            WHERE p.project_id = any (cast(:projectIds as uuid[]))
-            """, nativeQuery = true)
-    List<ProjectPageItemQueryEntity> findAllByIdIn(@NonNull UUID userId, @NonNull UUID[] projectIds);
 }
