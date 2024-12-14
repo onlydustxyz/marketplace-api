@@ -46,7 +46,7 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "globalRankPercentile": 0.000041734485205125,
                                 "bio": "FullStack engineerr",
                                 "signedUpOnGithubAt": "2018-09-21T06:45:50Z",
-                                "signedUpAt": "2022-12-12T08:51:58.48559Z",
+                                "signedUpAt": "2022-12-12T09:51:58.48559Z",
                                 "contacts": [
                                   {
                                     "channel": "TELEGRAM",

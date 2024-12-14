@@ -176,3 +176,4 @@ create unique index on bi.p_project_global_data (project_slug);
 create unique index on languages (name);
 
 call refresh_pseudo_projection('bi', 'contributor_global_data', 'contributor_id');
+call refresh_pseudo_projection('bi', 'contribution_data', 'contribution_uuid');
