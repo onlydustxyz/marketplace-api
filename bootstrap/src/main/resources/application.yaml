@@ -47,6 +47,7 @@ application:
     notify-good-first-issues-created-job-delay: 300000 # 5 minutes
     refresh-project-stats: 300000 # 5 minutes
     github-commands-job-delay: 5000 # 5 seconds
+    github-commands-concurrency-level: 10 # up to 10 commands are processed concurrently
     index-searchable-documents-job-delay: 86400000 # Every 24H : launch an indexation by restarting jobs app
   sumsub:
     webhook:
@@ -65,7 +66,7 @@ application:
     default-stale-while-revalidate-seconds: ${API_CACHE_DEFAULT_STALE_WHILE_REVALIDATE_SECONDS}
   retryable:
     github-command-consumers:
-      max-attempts: 5
+      max-attempts: 4
 
 spring:
   autoconfigure:

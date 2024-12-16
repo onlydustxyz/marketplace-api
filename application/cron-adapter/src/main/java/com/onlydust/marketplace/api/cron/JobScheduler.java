@@ -1,18 +1,13 @@
 package com.onlydust.marketplace.api.cron;
 
-import java.time.ZonedDateTime;
-
-import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.annotation.Scheduled;
-
 import com.onlydust.marketplace.api.cron.properties.NodeGuardiansBoostProperties;
 import com.onlydust.marketplace.indexer.SearchIndexationService;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
+import onlydust.com.marketplace.kernel.jobs.OutboxAsyncConsumerJob;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
@@ -23,6 +18,10 @@ import onlydust.com.marketplace.project.domain.port.input.BoostNodeGuardiansRewa
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.user.domain.job.NotificationSummaryEmailJob;
+import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.Scheduled;
+
+import java.time.ZonedDateTime;
 
 @Slf4j
 @AllArgsConstructor
@@ -31,7 +30,7 @@ public class JobScheduler {
     private final OutboxConsumerJob indexerOutboxJob;
     private final OutboxConsumerJob trackingOutboxJob;
     private final OutboxConsumerJob indexingEventsOutboxJob;
-    private final OutboxConsumerJob githubCommandOutboxJob;
+    private final OutboxAsyncConsumerJob githubCommandOutboxJob;
     private final ProjectFacadePort projectFacadePort;
     private final CurrencyFacadePort currencyFacadePort;
     private final UserFacadePort userFacadePort;

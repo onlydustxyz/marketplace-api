@@ -19,6 +19,8 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfile
 import onlydust.com.marketplace.api.posthog.adapters.PosthogApiClientAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.stellar.adapters.StellarTransactionStorageAdapter;
+import onlydust.com.marketplace.kernel.infrastructure.postgres.PostgresOutboxAdapter;
+import onlydust.com.marketplace.kernel.jobs.OutboxAsyncConsumerJob;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import onlydust.com.marketplace.kernel.port.output.*;
@@ -26,6 +28,7 @@ import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.*;
 import onlydust.com.marketplace.project.domain.job.githubcommands.GithubCommandOutboxConsumer;
 import onlydust.com.marketplace.project.domain.job.githubcommands.GithubCreateCommentCommandConsumer;
+import onlydust.com.marketplace.project.domain.job.githubcommands.GithubCreateCommentCommandConsumerCleaner;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
 import onlydust.com.marketplace.project.domain.observer.ApplicationObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.ContributionObserverComposite;
@@ -34,6 +37,7 @@ import onlydust.com.marketplace.project.domain.observer.ProjectObserverComposite
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -213,10 +217,13 @@ public class ProjectConfiguration {
         return new OutboxConsumerJob(indexingEventsOutbox, indexingEventsOutboxConsumer);
     }
 
+    @Value("${application.cron.github-commands-concurrency-level}")
+    private int githubCommandsConcurrencyLevel;
+
     @Bean
-    public OutboxConsumerJob githubCommandOutboxJob(final OutboxPort githubCommandOutbox,
-                                                    final OutboxConsumer githubCommandOutboxConsumer) {
-        return new OutboxConsumerJob(githubCommandOutbox, githubCommandOutboxConsumer);
+    public OutboxAsyncConsumerJob githubCommandOutboxJob(final OutboxPort githubCommandOutbox,
+                                                         final OutboxConsumer githubCommandOutboxConsumer) {
+        return new OutboxAsyncConsumerJob(githubCommandOutbox, githubCommandOutboxConsumer, githubCommandsConcurrencyLevel);
     }
 
     @Bean
@@ -227,11 +234,19 @@ public class ProjectConfiguration {
     }
 
     @Bean
+    public GithubCreateCommentCommandConsumerCleaner githubCreateCommentCommandConsumerCleaner(final ProjectApplicationStoragePort projectApplicationStoragePort,
+                                                                                               final ApplicationObserverPort applicationObservers) {
+        return new GithubCreateCommentCommandConsumerCleaner(projectApplicationStoragePort, applicationObservers);
+    }
+
+    @Bean
     public GithubCreateCommentCommandConsumer githubCreateCommentCommandConsumer(final GithubApiPort githubApiPort,
                                                                                  final GithubAuthenticationPort githubAuthenticationPort,
                                                                                  final ProjectApplicationStoragePort projectApplicationStoragePort,
-                                                                                 final ApplicationObserverPort applicationObservers) {
-        return new GithubCreateCommentCommandConsumer(githubApiPort, githubAuthenticationPort, projectApplicationStoragePort, applicationObservers);
+                                                                                 final ApplicationObserverPort applicationObservers,
+                                                                                 final GithubCreateCommentCommandConsumerCleaner githubCreateCommentCommandConsumerCleaner) {
+        return new GithubCreateCommentCommandConsumer(githubApiPort, githubAuthenticationPort, projectApplicationStoragePort, applicationObservers,
+                githubCreateCommentCommandConsumerCleaner);
     }
 
     @Bean

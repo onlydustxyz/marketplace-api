@@ -83,3 +83,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000043_remove_private_repos.sql
   - include:
       file: db/changelog/changelogs/00000044_add_missing_data_for_new_projects_page.sql
+  - include:
+      file: db/changelog/changelogs/00000044_add_processing_event_status.sql
