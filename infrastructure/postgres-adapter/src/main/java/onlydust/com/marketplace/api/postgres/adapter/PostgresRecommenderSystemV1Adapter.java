@@ -98,15 +98,15 @@ public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort
     @Transactional(readOnly = true)
     public List<ProjectId> getRecommendedProjects(final @NonNull UserId userId) {
         // Get all potential projects
-        final var matchingProjects = projectRecommendationV1Repository.findTopMatchingProjects(userId.value(), 9)
+        final var matchingProjects = projectRecommendationV1Repository.findTopMatchingProjects(userId.value(), 15)
                 .stream()
                 .map(ProjectRecommendationEntity::getProjectId)
                 .toList();
-        final var topProjects = projectRecommendationV1Repository.findTopProjects(3)
+        final var topProjects = projectRecommendationV1Repository.findTopProjects(userId.value(), 3)
                 .stream()
                 .map(ProjectRecommendationEntity::getProjectId)
                 .toList();
-        final var lastActiveProjects = projectRecommendationV1Repository.findLastActiveProjects(3)
+        final var lastActiveProjects = projectRecommendationV1Repository.findLastActiveProjects(userId.value(), 3)
                 .stream()
                 .map(ProjectRecommendationEntity::getProjectId)
                 .toList();

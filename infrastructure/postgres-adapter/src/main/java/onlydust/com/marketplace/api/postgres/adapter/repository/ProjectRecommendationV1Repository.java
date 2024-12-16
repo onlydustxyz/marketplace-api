@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface ProjectRecommendationV1Repository extends JpaRepository<ProjectRecommendationEntity, UUID> {
 
     @Query(value = """
-            SELECT project_id   as project_id,
+            SELECT p.project_id as project_id,
                    0            as score
             FROM (SELECT DISTINCT ON (project_id) cd.project_id, cd.timestamp
                   FROM bi.p_contribution_data cd
@@ -20,19 +20,35 @@ public interface ProjectRecommendationV1Repository extends JpaRepository<Project
                     and cd.contribution_status = 'COMPLETED'
                     and cd.project_id is not null
                   ORDER BY cd.project_id, cd.timestamp DESC) t
+                     JOIN bi.p_project_global_data p ON p.project_id = t.project_id
+                     JOIN reco.user_answers_v1 ua ON ua.user_id = :userId and
+                                                     (array_length(ua.languages, 1) = 0 or
+                                                      ua.languages && cast(ARRAY ['00000000-0000-0000-0000-000000000000'] as uuid[]) or
+                                                      ua.languages && p.language_ids) and
+                                                     (array_length(ua.ecosystems, 1) = 0 or
+                                                      ua.ecosystems && cast(ARRAY ['00000000-0000-0000-0000-000000000000'] as uuid[]) or
+                                                      ua.ecosystems && p.ecosystem_ids)
             ORDER BY timestamp DESC
             LIMIT :limit
             """, nativeQuery = true)
-    List<ProjectRecommendationEntity> findLastActiveProjects(int limit);
+    List<ProjectRecommendationEntity> findLastActiveProjects(UUID userId, int limit);
 
     @Query(value = """
-            SELECT p.id     as project_id,
-                   p.rank   as score
+            SELECT p.id   as project_id,
+                   p.rank as score
             FROM projects p
+                     JOIN bi.p_project_global_data pgd ON pgd.project_id = p.id
+                     JOIN reco.user_answers_v1 ua ON ua.user_id = :userId and
+                                                     (array_length(ua.languages, 1) = 0 or
+                                                      ua.languages && cast(ARRAY ['00000000-0000-0000-0000-000000000000'] as uuid[]) or
+                                                      ua.languages && pgd.language_ids) and
+                                                     (array_length(ua.ecosystems, 1) = 0 or
+                                                      ua.ecosystems && cast(ARRAY ['00000000-0000-0000-0000-000000000000'] as uuid[]) or
+                                                      ua.ecosystems && pgd.ecosystem_ids)
             ORDER BY p.rank DESC
             LIMIT :limit
             """, nativeQuery = true)
-    List<ProjectRecommendationEntity> findTopProjects(int limit);
+    List<ProjectRecommendationEntity> findTopProjects(UUID userId, int limit);
 
     @Query(value = """
             select d.project_id,
@@ -40,12 +56,12 @@ public interface ProjectRecommendationV1Repository extends JpaRepository<Project
             from (select p.project_id,
                          p.project_name,
                          (case
-                              when ua.languages is null or array_length(ua.languages, 1) = 0 or ua.languages && ARRAY ['00000000-0000-0000-0000-000000000000']::uuid[] then 0
+                              when ua.languages is null or array_length(ua.languages, 1) = 0 or ua.languages && cast(ARRAY ['00000000-0000-0000-0000-000000000000'] as uuid[]) then 0
                               when ua.learning_preference = 1 then 100.0
                               when ua.learning_preference = 2 then 10.0
                               else 0 end) * (clamp(uap.common_languages_count, 0, 1)) as language_score,
                          100.0 * (case
-                                      when ua.ecosystems is null or array_length(ua.ecosystems, 1) = 0 or ua.ecosystems && ARRAY ['00000000-0000-0000-0000-000000000000']::uuid[] then 0
+                                      when ua.ecosystems is null or array_length(ua.ecosystems, 1) = 0 or ua.ecosystems && cast(ARRAY ['00000000-0000-0000-0000-000000000000'] as uuid[]) then 0
                                       else uap.common_ecosystems_count_normalized end)         as ecosystem_score,
                          5.0 * (case
                                     when ua.learning_preference = 1 then 1 - abs(uap.experience_level_diff) / 3.0
