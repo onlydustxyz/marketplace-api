@@ -19,6 +19,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfile
 import onlydust.com.marketplace.api.posthog.adapters.PosthogApiClientAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.stellar.adapters.StellarTransactionStorageAdapter;
+import onlydust.com.marketplace.kernel.infrastructure.postgres.PostgresOutboxAdapter;
 import onlydust.com.marketplace.kernel.jobs.OutboxAsyncConsumerJob;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;

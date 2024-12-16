@@ -1,13 +1,16 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.OutboxRepository;
+import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BoostNodeGuardiansRewardsEventEntity;
+import onlydust.com.marketplace.kernel.infrastructure.postgres.OutboxRepository;
 import onlydust.com.marketplace.kernel.model.Event;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface BoostNodeGuardiansRewardsRepository extends OutboxRepository<BoostNodeGuardiansRewardsEventEntity> {
+public interface BoostNodeGuardiansRewardsRepository extends OutboxRepository<BoostNodeGuardiansRewardsEventEntity>,
+        JpaRepository<BoostNodeGuardiansRewardsEventEntity, Long> {
 
     @Override
-    default void saveEvent(Event event) {
+    default void saveEvent(@NonNull Event event) {
         save(new BoostNodeGuardiansRewardsEventEntity(event));
     }
 }

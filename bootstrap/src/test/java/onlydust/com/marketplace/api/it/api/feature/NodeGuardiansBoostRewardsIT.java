@@ -14,7 +14,6 @@ import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.node.guardians.NodeGuardiansApiProperties;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BoostNodeGuardiansRewardsEventEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.EventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NodeGuardianBoostRewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
@@ -24,6 +23,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadR
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import onlydust.com.marketplace.api.read.entities.reward.RewardDetailsReadEntity;
 import onlydust.com.marketplace.api.read.repositories.RewardDetailsReadRepository;
+import onlydust.com.marketplace.kernel.infrastructure.postgres.EventEntity;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.port.input.BoostNodeGuardiansRewardsPort;
