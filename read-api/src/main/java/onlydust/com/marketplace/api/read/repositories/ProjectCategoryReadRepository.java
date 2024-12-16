@@ -25,7 +25,9 @@ public interface ProjectCategoryReadRepository extends Repository<ProjectCategor
     Page<ProjectCategoryReadEntity> findAllByEcosystemSlug(String ecosystemSlug, Pageable pageable);
 
     @Query(value = """
-            SELECT DISTINCT pc.*
+            SELECT DISTINCT pc.*, (select count(ppc.project_id)
+            from projects_project_categories ppc
+            where ppc.project_category_id = pc.id) projectCount
             FROM project_categories pc
             JOIN user_profile_info upi ON pc.id = ANY (upi.preferred_category_ids) and upi.id = :userId
             """, nativeQuery = true)

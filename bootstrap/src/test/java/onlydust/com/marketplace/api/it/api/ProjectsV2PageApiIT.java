@@ -157,35 +157,36 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .json("""
                         {
-                           "totalPageNumber": 1,
-                           "totalItemNumber": 1,
-                           "hasMore": false,
-                           "nextPageIndex": 0,
-                           "projects": [
-                             {
-                               "id": "6239cb20-eece-466a-80a0-742c1071dd3c",
-                               "slug": null,
-                               "name": "Starklings",
-                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg",
-                               "shortDescription": "Stop tuto",
-                               "contributorCount": 0,
-                               "starCount": 0,
-                               "forkCount": 0,
-                               "availableIssueCount": 0,
-                               "goodFirstIssueCount": 0,
-                               "categories": [
-                                 {
-                                   "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
-                                   "slug": "ai",
-                                   "name": "AI",
-                                   "description": "AI is cool",
-                                   "iconSlug": "brain"
-                                 }
-                               ],
-                               "languages": []
-                             }
-                           ]
-                         }
+                            "totalPageNumber": 1,
+                            "totalItemNumber": 1,
+                            "hasMore": false,
+                            "nextPageIndex": 0,
+                            "projects": [
+                              {
+                                "id": "6239cb20-eece-466a-80a0-742c1071dd3c",
+                                "slug": null,
+                                "name": "Starklings",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg",
+                                "shortDescription": "Stop tuto",
+                                "contributorCount": 0,
+                                "starCount": 0,
+                                "forkCount": 0,
+                                "availableIssueCount": 0,
+                                "goodFirstIssueCount": 0,
+                                "categories": [
+                                  {
+                                    "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
+                                    "slug": "ai",
+                                    "name": "AI",
+                                    "description": "AI is cool",
+                                    "iconSlug": "brain",
+                                    "projectCount": null
+                                  }
+                                ],
+                                "languages": []
+                              }
+                            ]
+                          }
                         """, true);
 
         // When

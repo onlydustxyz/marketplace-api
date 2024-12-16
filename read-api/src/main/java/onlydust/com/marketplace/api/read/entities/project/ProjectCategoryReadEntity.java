@@ -7,10 +7,13 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.ProjectCategoryResponse;
 import onlydust.com.marketplace.api.read.entities.ecosystem.EcosystemReadEntity;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Immutable;
 
 import java.util.Set;
 import java.util.UUID;
+
+import static java.util.Objects.isNull;
 
 @Entity
 @NoArgsConstructor(force = true)
@@ -29,6 +32,12 @@ public class ProjectCategoryReadEntity {
     private @NonNull String name;
     private @NonNull String description;
     private @NonNull String iconSlug;
+    @Formula("""
+            (select count(ppc.project_id)
+            from projects_project_categories ppc
+            where ppc.project_category_id = id)
+            """)
+    private Integer projectCount;
 
     @ManyToMany
     @JoinTable(name = "ecosystem_project_categories",
@@ -53,6 +62,7 @@ public class ProjectCategoryReadEntity {
                 .name(name)
                 .description(description)
                 .iconSlug(iconSlug)
+                .projectCount(isNull(projectCount) ? 0 : projectCount)
                 ;
     }
 }

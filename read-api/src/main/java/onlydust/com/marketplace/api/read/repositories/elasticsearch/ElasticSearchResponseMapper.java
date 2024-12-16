@@ -21,6 +21,8 @@ import static java.util.Objects.isNull;
 
 
 public interface ElasticSearchResponseMapper {
+    String PROJECTS_TYPE = "Projects";
+    String CONTRIBUTORS_TYPE = "Contributors";
     ObjectMapper objectMapper = new ObjectMapper();
     Supplier<SearchResponse> EMPTY_RESPONSE =
             () -> new SearchResponse()
@@ -28,7 +30,13 @@ public interface ElasticSearchResponseMapper {
                     .results(List.of())
                     .totalItemNumber(0)
                     .nextPageIndex(0)
-                    .totalPageNumber(0);
+                    .totalPageNumber(0)
+                    .typeFacets(new TypesFacetResponse()
+                            .types(List.of(
+                                    new SearchFacetResponse(PROJECTS_TYPE, 0),
+                                    new SearchFacetResponse(CONTRIBUTORS_TYPE, 0)
+                            )));
+
 
     static SuggestResponse jsonNodeToSuggestResponse(final JsonNode jsonNode) {
         if (jsonNode.get("hits").get("total").get("value").asInt() == 0) {
@@ -110,11 +118,11 @@ public interface ElasticSearchResponseMapper {
                 final String indexName = bucket.get("key").textValue();
                 if (indexName.equals(ElasticSearchAdapter.PROJECTS_INDEX)) {
                     facets.add(new SearchFacetResponse()
-                            .name("Projects")
+                            .name(PROJECTS_TYPE)
                             .count(bucket.get("doc_count").asInt()));
                 } else if (indexName.equals(ElasticSearchAdapter.CONTRIBUTORS_INDEX)) {
                     facets.add(new SearchFacetResponse()
-                            .name("Contributors")
+                            .name(CONTRIBUTORS_TYPE)
                             .count(bucket.get("doc_count").asInt()));
                 } else {
                     throw OnlyDustException.internalServerError("Unknown index %s".formatted(indexName));
