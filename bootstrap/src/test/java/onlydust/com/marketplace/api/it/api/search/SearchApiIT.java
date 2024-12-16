@@ -205,7 +205,11 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                               {
                                 "name": "Projects",
                                 "count": 2
-                              }
+                              },
+                             {
+                               "name": "Contributors",
+                               "count": 0
+                             }
                             ]
                           }
                         }
@@ -318,7 +322,11 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                               {
                                 "name": "Projects",
                                 "count": 2
-                              }
+                              },
+                                {
+                                  "name": "Contributors",
+                                  "count": 0
+                                }
                             ]
                           }
                         }
@@ -414,7 +422,11 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                                {
                                  "name": "Projects",
                                  "count": 3
-                               }
+                               },
+                              {
+                                "name": "Contributors",
+                                "count": 0
+                              }
                              ]
                            }
                          }""");
@@ -474,7 +486,11 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "name": "Contributors",
                                   "count": 1
-                                }
+                                },
+                               {
+                                 "name": "Projects",
+                                 "count": 0
+                               }
                               ]
                             }
                           }
@@ -569,7 +585,11 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                                {
                                  "name": "Projects",
                                  "count": 3
-                               }
+                               },
+                              {
+                                "name": "Contributors",
+                                "count": 0
+                              }
                              ]
                            }
                          }""");
@@ -633,7 +653,11 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
                               {
                                 "name": "Contributors",
                                 "count": 1
-                              }
+                              },
+                             {
+                               "name": "Projects",
+                               "count": 0
+                             }
                             ]
                           }
                         }
