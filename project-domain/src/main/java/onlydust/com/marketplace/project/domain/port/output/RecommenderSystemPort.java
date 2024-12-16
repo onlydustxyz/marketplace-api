@@ -16,4 +16,6 @@ public interface RecommenderSystemPort {
     void saveMatchingAnswers(@NonNull UserId userId, @NonNull MatchingQuestion.Id questionId, @NonNull Set<Integer> chosenAnswerIndexes);
 
     List<ProjectId> getRecommendedProjects(@NonNull UserId userId);
+
+    void refreshData();
 }

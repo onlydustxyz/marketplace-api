@@ -1,8 +1,6 @@
 package onlydust.com.marketplace.api.it.api;
 
-import onlydust.com.marketplace.api.contract.model.MatchingAnswerResponse;
-import onlydust.com.marketplace.api.contract.model.MatchingQuestionsResponse;
-import onlydust.com.marketplace.api.contract.model.SaveMatchingAnswersRequest;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.UserAnswersV1Entity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
@@ -134,40 +132,27 @@ public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
                 .build());
 
         // When
-        client.get()
+        final var response = client.get()
                 .uri(getApiURI("/api/v1/me/reco/projects", Map.of("v", RECOMMENDER_SYSTEM_VERSION)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + pierre.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody()
-                .json("""
-                        {
-                          "projects": [
-                            {
-                              "name": "Zama"
-                            },
-                            {
-                              "name": "Cal.com"
-                            },
-                            {
-                              "name": "Taco Tuesday"
-                            },
-                            {
-                              "name": "Pizzeria Yoshi !"
-                            },
-                            {
-                              "name": "Mooooooonlight"
-                            },
-                            {
-                              "name": "No sponsors"
-                            },
-                            {
-                              "name": "QA new contributions"
-                            }
-                          ]
-                        }
-                        """);
+                .expectBody(RecommendedProjectsResponse.class)
+                .returnResult()
+                .getResponseBody();
+
+        // Then
+        assertThat(response).isNotNull();
+        assertThat(response.getProjects()).hasSize(7);
+        assertThat(response.getProjects().stream().map(ProjectShortResponseV2::getName).toList()).containsExactly(
+                "Zama",
+                "Cal.com",
+                "Taco Tuesday",
+                "Pizzeria Yoshi !",
+                "Mooooooonlight",
+                "Pineapple",
+                "QA new contributions");
     }
 
     @Test

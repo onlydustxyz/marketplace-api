@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.ProjectRecommendationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -76,12 +77,19 @@ public interface ProjectRecommendationV1Repository extends JpaRepository<Project
                               when ua.community_importance = 2 then 6.0
                               else 0 end) * pe.active_community_score_normalized               as community_score
                   from bi.p_project_global_data p
-                           join reco.projects_computed_data pc on p.project_id = pc.project_id
-                           join reco.projects_extrapolated_data pe on p.project_id = pe.project_id
+                           join reco.m_projects_computed_data pc on p.project_id = pc.project_id
+                           join reco.m_projects_extrapolated_data pe on p.project_id = pe.project_id
                            join reco.user_answers_v1 ua on ua.user_id = :userId
                            join reco.user_answers_to_projects_data uap on uap.project_id = p.project_id and uap.user_id = ua.user_id) d
             order by score desc
             LIMIT :limit
             """, nativeQuery = true)
     List<ProjectRecommendationEntity> findTopMatchingProjects(UUID userId, int limit);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            REFRESH MATERIALIZED VIEW CONCURRENTLY reco.m_projects_computed_data;
+            REFRESH MATERIALIZED VIEW CONCURRENTLY reco.m_projects_extrapolated_data;
+            """)
+    void refreshMaterializedViews();
 } 

@@ -140,7 +140,7 @@ $$;
 
 
 
-CREATE OR REPLACE VIEW reco.projects_computed_data AS
+CREATE MATERIALIZED VIEW reco.m_projects_computed_data AS
 SELECT p.project_id,
        p.created_at,
        p.language_ids,
@@ -213,6 +213,8 @@ FROM bi.p_project_global_data p
          LEFT JOIN reco.get_project_contributions_metrics(p.project_id, now() - '3 month'::interval) cm_last_3months ON true
 ;
 
+create unique index m_projects_computed_data_project_id_idx on reco.m_projects_computed_data (project_id);
+
 
 
 CREATE DOMAIN reco.skill_level AS integer
@@ -226,7 +228,7 @@ CREATE TABLE reco.project_skill_levels
 
 
 
-CREATE OR REPLACE VIEW reco.projects_extrapolated_data AS
+CREATE MATERIALIZED VIEW reco.m_projects_extrapolated_data AS
 WITH raw_scores AS (SELECT p.project_id,
                            -- Raw scores
                            clamp(now()::date - p.created_at::date, 0, 500) +
@@ -239,7 +241,7 @@ WITH raw_scores AS (SELECT p.project_id,
 
                            p.contributor_count_last_3months / clamp(now()::date - p.created_at::date, 1, 100) AS active_community_score,
                            psl.level                                                                          AS skill_level
-                    FROM reco.projects_computed_data p
+                    FROM reco.m_projects_computed_data p
                              LEFT JOIN reco.project_skill_levels psl on p.project_id = psl.project_id)
 SELECT project_id,
        -- Raw scores
@@ -265,6 +267,8 @@ SELECT project_id,
        ) AS active_community_score_normalized
 FROM raw_scores;
 
+create unique index m_projects_extrapolated_data_project_id_idx on reco.m_projects_extrapolated_data (project_id);
+
 
 
 CREATE OR REPLACE VIEW reco.user_answers_to_projects_data AS
@@ -274,7 +278,7 @@ WITH raw_scores AS (select p.project_id,
                            common_entries_count(p.ecosystem_ids, ua.ecosystems) as common_ecosystems_count,
                            coalesce(ua.experience_level - pe.skill_level, 2)    as experience_level_diff
                     from bi.p_project_global_data p
-                             join reco.projects_extrapolated_data pe on p.project_id = pe.project_id
+                             join reco.m_projects_extrapolated_data pe on p.project_id = pe.project_id
                              cross join reco.user_answers_v1 ua)
 SELECT project_id,
        user_id,

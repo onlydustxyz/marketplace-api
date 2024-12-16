@@ -128,6 +128,12 @@ public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort
                 .toList();
     }
 
+    @Override
+    @Transactional
+    public void refreshData() {
+        projectRecommendationV1Repository.refreshMaterializedViews();
+    }
+
     private Set<UUID> completeWith(Set<UUID> current, List<UUID> complement, int upTo) {
         return current.size() >= upTo ? current : Stream.concat(current.stream(), complement.stream())
                 .collect(HashSet<UUID>::new, HashSet::add, HashSet::addAll)
