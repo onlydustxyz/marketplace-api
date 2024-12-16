@@ -37,6 +37,7 @@ import onlydust.com.marketplace.project.domain.observer.ProjectObserverComposite
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -216,10 +217,13 @@ public class ProjectConfiguration {
         return new OutboxConsumerJob(indexingEventsOutbox, indexingEventsOutboxConsumer);
     }
 
+    @Value("${application.cron.github-commands-concurrency-level}")
+    private int githubCommandsConcurrencyLevel;
+
     @Bean
     public OutboxAsyncConsumerJob githubCommandOutboxJob(final OutboxPort githubCommandOutbox,
                                                          final OutboxConsumer githubCommandOutboxConsumer) {
-        return new OutboxAsyncConsumerJob(githubCommandOutbox, githubCommandOutboxConsumer, 10); // TODO : make it configurable
+        return new OutboxAsyncConsumerJob(githubCommandOutbox, githubCommandOutboxConsumer, githubCommandsConcurrencyLevel);
     }
 
     @Bean
