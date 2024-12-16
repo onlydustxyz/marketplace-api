@@ -9667,6 +9667,7 @@ components:
         - name
         - description
         - iconSlug
+        - projectCount
       properties:
         id:
           $ref: '#/components/schemas/ProjectCategoryId'
@@ -9678,6 +9679,8 @@ components:
           type: string
         iconSlug:
           type: string
+        projectCount:
+          type: integer
 
     ProjectRewardSettings:
       type: object
@@ -13280,6 +13283,7 @@ components:
         - type: object
           required:
             - results
+            - typeFacets
           properties:
             results:
               type: array

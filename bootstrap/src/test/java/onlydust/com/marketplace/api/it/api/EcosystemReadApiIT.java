@@ -51,141 +51,143 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 4,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "ecosystems": [
-                            {
-                              "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
-                              "slug": "starknet",
-                              "name": "Starknet",
-                              "description": "Starknet ecosystem",
-                              "banners": {
-                                "xl": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/starknet-xl.png",
-                                  "fontColor": "DARK"
-                                },
-                                "md": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/starknet-md.png",
-                                  "fontColor": "DARK"
-                                }
-                              },
-                              "topProjects": [
-                                {
-                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                                  "slug": "mooooooonlight",
-                                  "name": "Mooooooonlight",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                },
-                                {
-                                  "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
-                                  "slug": "calcom",
-                                  "name": "Cal.com",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
-                                },
-                                {
-                                  "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
-                                  "slug": "zero-title-11",
-                                  "name": "Zero title 11",
-                                  "logoUrl": null
-                                }
-                              ],
-                              "projectCount": 3,
-                              "topProjectCategories": [],
-                              "projectCategoryCount": 0
-                            },
-                            {
-                              "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
-                              "slug": "aztec",
-                              "name": "Aztec",
-                              "description": "Aztec ecosystem",
-                              "banners": {
-                                "xl": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/aztec-xl.png",
-                                  "fontColor": "DARK"
-                                },
-                                "md": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/aztec-md.png",
-                                  "fontColor": "DARK"
-                                }
-                              },
-                              "topProjects": [
-                                {
-                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                                  "slug": "mooooooonlight",
-                                  "name": "Mooooooonlight",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                }
-                              ],
-                              "projectCount": 1,
-                              "topProjectCategories": [],
-                              "projectCategoryCount": 0
-                            },
-                            {
-                              "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
-                              "slug": "ethereum",
-                              "name": "Ethereum",
-                              "description": "Ethereum ecosystem",
-                              "banners": {
-                                "xl": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/ethereum-xl.png",
-                                  "fontColor": "LIGHT"
-                                },
-                                "md": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/ethereum-md.png",
-                                  "fontColor": "LIGHT"
-                                }
-                              },
-                              "topProjects": [
-                                {
-                                  "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                                  "slug": "bretzel",
-                                  "name": "Bretzel",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
-                                }
-                              ],
-                              "projectCount": 1,
-                              "topProjectCategories": [
-                                {
-                                  "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
-                                  "slug": "security",
-                                  "name": "Security",
-                                  "description": "Security is important",
-                                  "iconSlug": "lock"
-                                },
-                                {
-                                  "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
-                                  "slug": "ai",
-                                  "name": "AI",
-                                  "description": "AI is cool",
-                                  "iconSlug": "brain"
-                                }
-                              ],
-                              "projectCategoryCount": 2
-                            },
-                            {
-                              "id": "dd6f737e-2a9d-40b9-be62-8f64ec157989",
-                              "slug": "optimism",
-                              "name": "Optimism",
-                              "description": "Optimism ecosystem",
-                              "banners": {
-                                "xl": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/optimism-xl.png",
-                                  "fontColor": "DARK"
-                                },
-                                "md": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/optimism-md.png",
-                                  "fontColor": "DARK"
-                                }
-                              },
-                              "topProjects": [],
-                              "projectCount": 0,
-                              "topProjectCategories": [],
-                              "projectCategoryCount": 0
-                            }
-                          ]
-                        }
+                           "totalPageNumber": 1,
+                           "totalItemNumber": 4,
+                           "hasMore": false,
+                           "nextPageIndex": 0,
+                           "ecosystems": [
+                             {
+                               "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                               "slug": "starknet",
+                               "name": "Starknet",
+                               "description": "Starknet ecosystem",
+                               "banners": {
+                                 "xl": {
+                                   "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/starknet-xl.png",
+                                   "fontColor": "DARK"
+                                 },
+                                 "md": {
+                                   "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/starknet-md.png",
+                                   "fontColor": "DARK"
+                                 }
+                               },
+                               "topProjects": [
+                                 {
+                                   "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                   "slug": "mooooooonlight",
+                                   "name": "Mooooooonlight",
+                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                 },
+                                 {
+                                   "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
+                                   "slug": "calcom",
+                                   "name": "Cal.com",
+                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
+                                 },
+                                 {
+                                   "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
+                                   "slug": "zero-title-11",
+                                   "name": "Zero title 11",
+                                   "logoUrl": null
+                                 }
+                               ],
+                               "projectCount": 3,
+                               "topProjectCategories": [],
+                               "projectCategoryCount": 0
+                             },
+                             {
+                               "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
+                               "slug": "aztec",
+                               "name": "Aztec",
+                               "description": "Aztec ecosystem",
+                               "banners": {
+                                 "xl": {
+                                   "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/aztec-xl.png",
+                                   "fontColor": "DARK"
+                                 },
+                                 "md": {
+                                   "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/aztec-md.png",
+                                   "fontColor": "DARK"
+                                 }
+                               },
+                               "topProjects": [
+                                 {
+                                   "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                   "slug": "mooooooonlight",
+                                   "name": "Mooooooonlight",
+                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                 }
+                               ],
+                               "projectCount": 1,
+                               "topProjectCategories": [],
+                               "projectCategoryCount": 0
+                             },
+                             {
+                               "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                               "slug": "ethereum",
+                               "name": "Ethereum",
+                               "description": "Ethereum ecosystem",
+                               "banners": {
+                                 "xl": {
+                                   "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/ethereum-xl.png",
+                                   "fontColor": "LIGHT"
+                                 },
+                                 "md": {
+                                   "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/ethereum-md.png",
+                                   "fontColor": "LIGHT"
+                                 }
+                               },
+                               "topProjects": [
+                                 {
+                                   "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                   "slug": "bretzel",
+                                   "name": "Bretzel",
+                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                                 }
+                               ],
+                               "projectCount": 1,
+                               "topProjectCategories": [
+                                 {
+                                   "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
+                                   "slug": "security",
+                                   "name": "Security",
+                                   "description": "Security is important",
+                                   "iconSlug": "lock",
+                                   "projectCount": 1
+                                 },
+                                 {
+                                   "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
+                                   "slug": "ai",
+                                   "name": "AI",
+                                   "description": "AI is cool",
+                                   "iconSlug": "brain",
+                                   "projectCount": 1
+                                 }
+                               ],
+                               "projectCategoryCount": 2
+                             },
+                             {
+                               "id": "dd6f737e-2a9d-40b9-be62-8f64ec157989",
+                               "slug": "optimism",
+                               "name": "Optimism",
+                               "description": "Optimism ecosystem",
+                               "banners": {
+                                 "xl": {
+                                   "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/optimism-xl.png",
+                                   "fontColor": "DARK"
+                                 },
+                                 "md": {
+                                   "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/optimism-md.png",
+                                   "fontColor": "DARK"
+                                 }
+                               },
+                               "topProjects": [],
+                               "projectCount": 0,
+                               "topProjectCategories": [],
+                               "projectCategoryCount": 0
+                             }
+                           ]
+                         }
                         """, true);
     }
 
@@ -201,94 +203,96 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 2,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "ecosystems": [
-                            {
-                              "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
-                              "slug": "starknet",
-                              "name": "Starknet",
-                              "description": "Starknet ecosystem",
-                              "banners": {
-                                "xl": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/starknet-xl.png",
-                                  "fontColor": "DARK"
-                                },
-                                "md": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/starknet-md.png",
-                                  "fontColor": "DARK"
-                                }
-                              },
-                              "topProjects": [
-                                {
-                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                                  "slug": "mooooooonlight",
-                                  "name": "Mooooooonlight",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                },
-                                {
-                                  "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
-                                  "slug": "calcom",
-                                  "name": "Cal.com",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
-                                },
-                                {
-                                  "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
-                                  "slug": "zero-title-11",
-                                  "name": "Zero title 11",
-                                  "logoUrl": null
-                                }
-                              ],
-                              "projectCount": 3,
-                              "topProjectCategories": [],
-                              "projectCategoryCount": 0
-                            },
-                            {
-                              "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
-                              "slug": "ethereum",
-                              "name": "Ethereum",
-                              "description": "Ethereum ecosystem",
-                              "banners": {
-                                "xl": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/ethereum-xl.png",
-                                  "fontColor": "LIGHT"
-                                },
-                                "md": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/ethereum-md.png",
-                                  "fontColor": "LIGHT"
-                                }
-                              },
-                              "topProjects": [
-                                {
-                                  "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                                  "slug": "bretzel",
-                                  "name": "Bretzel",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
-                                }
-                              ],
-                              "projectCount": 1,
-                              "topProjectCategories": [
-                                {
-                                  "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
-                                  "slug": "security",
-                                  "name": "Security",
-                                  "description": "Security is important",
-                                  "iconSlug": "lock"
-                                },
-                                {
-                                  "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
-                                  "slug": "ai",
-                                  "name": "AI",
-                                  "description": "AI is cool",
-                                  "iconSlug": "brain"
-                                }
-                              ],
-                              "projectCategoryCount": 2
-                            }
-                          ]
-                        }
+                           "totalPageNumber": 1,
+                           "totalItemNumber": 2,
+                           "hasMore": false,
+                           "nextPageIndex": 0,
+                           "ecosystems": [
+                             {
+                               "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                               "slug": "starknet",
+                               "name": "Starknet",
+                               "description": "Starknet ecosystem",
+                               "banners": {
+                                 "xl": {
+                                   "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/starknet-xl.png",
+                                   "fontColor": "DARK"
+                                 },
+                                 "md": {
+                                   "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/starknet-md.png",
+                                   "fontColor": "DARK"
+                                 }
+                               },
+                               "topProjects": [
+                                 {
+                                   "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                   "slug": "mooooooonlight",
+                                   "name": "Mooooooonlight",
+                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                 },
+                                 {
+                                   "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
+                                   "slug": "calcom",
+                                   "name": "Cal.com",
+                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
+                                 },
+                                 {
+                                   "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
+                                   "slug": "zero-title-11",
+                                   "name": "Zero title 11",
+                                   "logoUrl": null
+                                 }
+                               ],
+                               "projectCount": 3,
+                               "topProjectCategories": [],
+                               "projectCategoryCount": 0
+                             },
+                             {
+                               "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                               "slug": "ethereum",
+                               "name": "Ethereum",
+                               "description": "Ethereum ecosystem",
+                               "banners": {
+                                 "xl": {
+                                   "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/ethereum-xl.png",
+                                   "fontColor": "LIGHT"
+                                 },
+                                 "md": {
+                                   "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/ethereum-md.png",
+                                   "fontColor": "LIGHT"
+                                 }
+                               },
+                               "topProjects": [
+                                 {
+                                   "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                   "slug": "bretzel",
+                                   "name": "Bretzel",
+                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                                 }
+                               ],
+                               "projectCount": 1,
+                               "topProjectCategories": [
+                                 {
+                                   "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
+                                   "slug": "security",
+                                   "name": "Security",
+                                   "description": "Security is important",
+                                   "iconSlug": "lock",
+                                   "projectCount": 1
+                                 },
+                                 {
+                                   "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
+                                   "slug": "ai",
+                                   "name": "AI",
+                                   "description": "AI is cool",
+                                   "iconSlug": "brain",
+                                   "projectCount": 1
+                                 }
+                               ],
+                               "projectCategoryCount": 2
+                             }
+                           ]
+                         }
                         """, true);
     }
 

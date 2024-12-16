@@ -40,13 +40,15 @@ public class ProjectCategoriesApiIT extends AbstractMarketplaceApiIT {
                               "name": "Game",
                               "description": "Games are fun",
                               "slug": "game",
-                              "iconSlug": "game"
+                              "iconSlug": "game",
+                              "projectCount": 0
                             },
                             {
                               "name": "Tutorial",
                               "description": "I love learning",
                               "slug": "tutorial",
-                              "iconSlug": "tuto"
+                              "iconSlug": "tuto",
+                              "projectCount": 0
                             }
                           ]
                         }
