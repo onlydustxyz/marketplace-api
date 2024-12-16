@@ -1,25 +1,6 @@
 --------------------------------------------------------------------------------
 -- Helpers ---------------------------------------------------------------------
 --------------------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION sum_func(
-    bigint, pg_catalog.anyelement, bigint
-)
-    RETURNS bigint AS
-$body$
-SELECT case when $3 is not null then COALESCE($1, 0) + $3 else $1 end
-$body$
-    LANGUAGE 'sql';
-
-CREATE AGGREGATE dist_sum (
-    pg_catalog."any",
-    bigint)
-    (
-    SFUNC = sum_func,
-    STYPE = int8
-    );
-
-
-
 create or replace function common_entries_count(arr1 uuid[], arr2 uuid[])
     returns int
     stable parallel restricted
