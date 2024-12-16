@@ -588,241 +588,213 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 2,
-                          "totalItemNumber": 13,
-                          "hasMore": true,
-                          "nextPageIndex": 1,
-                          "deposits": [
-                            {
-                              "sponsor": {
-                                "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                                "name": "Coca Cola",
-                                "url": null,
-                                "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
-                                "leads": []
-                              },
-                              "transaction": {
-                                "network": "STARKNET",
-                                "amount": 10
-                              },
-                              "currency": {
-                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                "code": "USDC",
-                                "name": "USD Coin",
-                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                "decimals": 6
-                              },
-                              "status": "PENDING"
-                            },
-                            {
-                              "sponsor": {
-                                "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                                "name": "Coca Cola",
-                                "url": null,
-                                "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
-                                "leads": []
-                              },
-                              "transaction": {
-                                "network": "OPTIMISM",
-                                "amount": 10
-                              },
-                              "currency": {
-                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                "code": "USDC",
-                                "name": "USD Coin",
-                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                "decimals": 6
-                              },
-                              "status": "PENDING"
-                            },
-                            {
-                              "sponsor": {
-                                "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                                "name": "Coca Cola",
-                                "url": null,
-                                "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
-                                "leads": []
-                              },
-                              "transaction": {
-                                "network": "STELLAR",
-                                "amount": 10
-                              },
-                              "currency": {
-                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                "code": "USDC",
-                                "name": "USD Coin",
-                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                "decimals": 6
-                              },
-                              "status": "COMPLETED"
-                            },
-                            {
-                              "sponsor": {
-                                "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                                "name": "Coca Cola",
-                                "url": null,
-                                "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
-                                "leads": []
-                              },
-                              "transaction": {
-                                "network": "STELLAR",
-                                "amount": 10
-                              },
-                              "currency": {
-                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                "code": "USDC",
-                                "name": "USD Coin",
-                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                "decimals": 6
-                              },
-                              "status": "REJECTED"
-                            },
-                            {
-                              "sponsor": {
-                                "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                                "name": "Coca Cola",
-                                "url": null,
-                                "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
-                                "leads": []
-                              },
-                              "transaction": {
-                                "network": "ETHEREUM",
-                                "reference": "0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db",
-                                "timestamp": "2024-03-13T14:13:29.553065Z",
-                                "amount": 1000,
-                                "blockExplorerUrl": "https://etherscan.io/tx/0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db"
-                              },
-                              "currency": {
-                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                "code": "USDC",
-                                "name": "USD Coin",
-                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                "decimals": 6
-                              },
-                              "status": "COMPLETED"
-                            },
-                            {
-                              "sponsor": {
-                                "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                                "name": "Coca Cola",
-                                "url": null,
-                                "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
-                                "leads": []
-                              },
-                              "transaction": {
-                                "network": "ETHEREUM",
-                                "reference": "0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db",
-                                "timestamp": "2024-03-13T14:13:22.971559Z",
-                                "amount": 1000.00,
-                                "blockExplorerUrl": "https://etherscan.io/tx/0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db"
-                              },
-                              "currency": {
-                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                "code": "USDC",
-                                "name": "USD Coin",
-                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                "decimals": 6
-                              },
-                              "status": "COMPLETED"
-                            },
-                            {
-                              "sponsor": {
-                                "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                                "name": "Coca Cola",
-                                "url": null,
-                                "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
-                                "leads": []
-                              },
-                              "transaction": {
-                                "network": "ETHEREUM",
-                                "reference": "UNKNOWN",
-                                "timestamp": "2024-03-13T14:13:21.247974Z",
-                                "amount": 3000,
-                                "blockExplorerUrl": null
-                              },
-                              "currency": {
-                                "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                                "code": "ETH",
-                                "name": "Ether",
-                                "logoUrl": null,
-                                "decimals": 18
-                              },
-                              "status": "COMPLETED"
-                            },
-                            {
-                              "sponsor": {
-                                "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                                "name": "Coca Cola",
-                                "url": null,
-                                "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
-                                "leads": []
-                              },
-                              "transaction": {
-                                "network": "ETHEREUM",
-                                "reference": "UNKNOWN",
-                                "timestamp": "2024-03-13T14:13:21.247974Z",
-                                "amount": 3000,
-                                "blockExplorerUrl": null
-                              },
-                              "currency": {
-                                "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                                "code": "USD",
-                                "name": "US Dollar",
-                                "logoUrl": null,
-                                "decimals": 2
-                              },
-                              "status": "COMPLETED"
-                            },
-                            {
-                              "sponsor": {
-                                "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                                "name": "Coca Cola",
-                                "url": null,
-                                "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
-                                "leads": []
-                              },
-                              "transaction": {
-                                "network": "ETHEREUM",
-                                "reference": "UNKNOWN",
-                                "timestamp": "2024-03-13T14:13:21.195069Z",
-                                "amount": 19933440,
-                                "blockExplorerUrl": null
-                              },
-                              "currency": {
-                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                "code": "USDC",
-                                "name": "USD Coin",
-                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                "decimals": 6
-                              },
-                              "status": "COMPLETED"
-                            },
-                            {
-                              "sponsor": {
-                                "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                                "name": "Coca Cola",
-                                "url": null,
-                                "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
-                                "leads": []
-                              },
-                              "transaction": {
-                                "network": "APTOS",
-                                "reference": "UNKNOWN",
-                                "timestamp": "2024-03-13T14:13:21.178611Z",
-                                "amount": 400000,
-                                "blockExplorerUrl": null
-                              },
-                              "currency": {
-                                "id": "48388edb-fda2-4a32-b228-28152a147500",
-                                "code": "APT",
-                                "name": "Aptos Coin",
-                                "logoUrl": null,
-                                "decimals": 8
-                              },
-                              "status": "COMPLETED"
-                            }
-                          ]
-                        }
+                           "totalPageNumber": 1,
+                           "totalItemNumber": 9,
+                           "hasMore": false,
+                           "nextPageIndex": 0,
+                           "deposits": [
+                             {
+                               "sponsor": {
+                                 "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                                 "name": "Coca Cola",
+                                 "url": null,
+                                 "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
+                                 "leads": []
+                               },
+                               "transaction": {
+                                 "network": "STARKNET",
+                                 "amount": 10
+                               },
+                               "currency": {
+                                 "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                 "code": "USDC",
+                                 "name": "USD Coin",
+                                 "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                 "decimals": 6
+                               },
+                               "status": "PENDING"
+                             },
+                             {
+                               "sponsor": {
+                                 "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                                 "name": "Coca Cola",
+                                 "url": null,
+                                 "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
+                                 "leads": []
+                               },
+                               "transaction": {
+                                 "network": "OPTIMISM",
+                                 "amount": 10
+                               },
+                               "currency": {
+                                 "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                 "code": "USDC",
+                                 "name": "USD Coin",
+                                 "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                 "decimals": 6
+                               },
+                               "status": "PENDING"
+                             },
+                             {
+                               "sponsor": {
+                                 "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                                 "name": "Coca Cola",
+                                 "url": null,
+                                 "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
+                                 "leads": []
+                               },
+                               "transaction": {
+                                 "network": "STELLAR",
+                                 "amount": 10
+                               },
+                               "currency": {
+                                 "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                 "code": "USDC",
+                                 "name": "USD Coin",
+                                 "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                 "decimals": 6
+                               },
+                               "status": "COMPLETED"
+                             },
+                             {
+                               "sponsor": {
+                                 "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                                 "name": "Coca Cola",
+                                 "url": null,
+                                 "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
+                                 "leads": []
+                               },
+                               "transaction": {
+                                 "network": "STELLAR",
+                                 "amount": 10
+                               },
+                               "currency": {
+                                 "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                 "code": "USDC",
+                                 "name": "USD Coin",
+                                 "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                 "decimals": 6
+                               },
+                               "status": "REJECTED"
+                             },
+                             {
+                               "sponsor": {
+                                 "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                                 "name": "Coca Cola",
+                                 "url": null,
+                                 "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
+                                 "leads": []
+                               },
+                               "transaction": {
+                                 "network": "ETHEREUM",
+                                 "amount": 3000,
+                                 "blockExplorerUrl": null
+                               },
+                               "currency": {
+                                 "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                 "code": "ETH",
+                                 "name": "Ether",
+                                 "logoUrl": null,
+                                 "decimals": 18
+                               },
+                               "status": "COMPLETED"
+                             },
+                             {
+                               "sponsor": {
+                                 "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                                 "name": "Coca Cola",
+                                 "url": null,
+                                 "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
+                                 "leads": []
+                               },
+                               "transaction": {
+                                 "network": "ETHEREUM",
+                                 "amount": 19933440,
+                                 "blockExplorerUrl": null
+                               },
+                               "currency": {
+                                 "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                 "code": "USDC",
+                                 "name": "USD Coin",
+                                 "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                 "decimals": 6
+                               },
+                               "status": "COMPLETED"
+                             },
+                             {
+                               "sponsor": {
+                                 "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                                 "name": "Coca Cola",
+                                 "url": null,
+                                 "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
+                                 "leads": []
+                               },
+                               "transaction": {
+                                 "network": "APTOS",
+                                 "reference": "UNKNOWN",
+                                 "timestamp": "2024-03-13T14:13:21.178611Z",
+                                 "amount": 400000,
+                                 "blockExplorerUrl": null
+                               },
+                               "currency": {
+                                 "id": "48388edb-fda2-4a32-b228-28152a147500",
+                                 "code": "APT",
+                                 "name": "Aptos Coin",
+                                 "logoUrl": null,
+                                 "decimals": 8
+                               },
+                               "status": "COMPLETED"
+                             },
+                             {
+                               "sponsor": {
+                                 "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                                 "name": "Coca Cola",
+                                 "url": null,
+                                 "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
+                                 "leads": []
+                               },
+                               "transaction": {
+                                 "network": "SEPA",
+                                 "reference": "UNKNOWN",
+                                 "timestamp": "2024-03-13T14:13:21.150006Z",
+                                 "amount": 3000,
+                                 "blockExplorerUrl": null
+                               },
+                               "currency": {
+                                 "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                 "code": "USD",
+                                 "name": "US Dollar",
+                                 "logoUrl": null,
+                                 "decimals": 2
+                               },
+                               "status": "COMPLETED"
+                             },
+                             {
+                               "sponsor": {
+                                 "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                                 "name": "Coca Cola",
+                                 "url": null,
+                                 "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
+                                 "leads": []
+                               },
+                               "transaction": {
+                                 "network": "OPTIMISM",
+                                 "reference": "UNKNOWN",
+                                 "timestamp": "2024-03-13T14:13:21.124359Z",
+                                 "amount": 17000,
+                                 "blockExplorerUrl": null
+                               },
+                               "currency": {
+                                 "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
+                                 "code": "OP",
+                                 "name": "Optimism",
+                                 "logoUrl": null,
+                                 "decimals": 18
+                               },
+                               "status": "COMPLETED"
+                             }
+                           ]
+                         }
                         """);
 
     }
