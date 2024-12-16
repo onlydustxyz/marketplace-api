@@ -354,7 +354,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                   "slug": "typescript",
-                                  "name": "Typescript",
+                                  "name": "TypeScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                 }
@@ -407,7 +407,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                   "slug": "typescript",
-                                  "name": "Typescript",
+                                  "name": "TypeScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                 }
@@ -441,7 +441,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                   "slug": "javascript",
-                                  "name": "Javascript",
+                                  "name": "JavaScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                 },
@@ -482,7 +482,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                   "slug": "javascript",
-                                  "name": "Javascript",
+                                  "name": "JavaScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                 },
@@ -496,7 +496,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                   "slug": "typescript",
-                                  "name": "Typescript",
+                                  "name": "TypeScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                 }
@@ -546,7 +546,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                   "slug": "typescript",
-                                  "name": "Typescript",
+                                  "name": "TypeScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                 }
@@ -596,7 +596,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                   "slug": "javascript",
-                                  "name": "Javascript",
+                                  "name": "JavaScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                 },
@@ -610,7 +610,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                   "slug": "typescript",
-                                  "name": "Typescript",
+                                  "name": "TypeScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                 }
@@ -664,7 +664,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                   "slug": "typescript",
-                                  "name": "Typescript",
+                                  "name": "TypeScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                 }
@@ -721,7 +721,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                   "slug": "javascript",
-                                  "name": "Javascript",
+                                  "name": "JavaScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                 },
@@ -735,7 +735,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                   "slug": "typescript",
-                                  "name": "Typescript",
+                                  "name": "TypeScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                 }
@@ -769,7 +769,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                   "slug": "javascript",
-                                  "name": "Javascript",
+                                  "name": "JavaScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                 },

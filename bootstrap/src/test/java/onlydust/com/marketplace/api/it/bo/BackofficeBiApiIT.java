@@ -46,7 +46,7 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "globalRankPercentile": 0.000041734485205125,
                                 "bio": "FullStack engineerr",
                                 "signedUpOnGithubAt": "2018-09-21T06:45:50Z",
-                                "signedUpAt": "2022-12-12T08:51:58.48559Z",
+                                "signedUpAt": "2022-12-12T09:51:58.48559Z",
                                 "contacts": [
                                   {
                                     "channel": "TELEGRAM",
@@ -75,10 +75,10 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "languages": [
                                   "Rust",
                                   "Cairo",
-                                  "Javascript",
+                                  "JavaScript",
                                   "Python",
                                   "Java",
-                                  "Typescript"
+                                  "TypeScript"
                                 ],
                                 "ecosystems": [
                                   "Aptos",
@@ -180,7 +180,7 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "projectName": "Pizzeria Yoshi !",
                                   "projectSlug": "pizzeria-yoshi-",
                                   "languages": [
-                                    "Typescript",
+                                    "TypeScript",
                                     "Solidity",
                                     "Python",
                                     "Cairo"
@@ -312,8 +312,8 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "projectName": "kaaper",
                                   "projectSlug": "kaaper",
                                   "languages": [
-                                    "Javascript",
-                                    "Typescript",
+                                    "JavaScript",
+                                    "TypeScript",
                                     "Rust",
                                     "Cairo"
                                   ],
@@ -377,7 +377,7 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "projectName": "Bretzel",
                                   "projectSlug": "bretzel",
                                   "languages": [
-                                    "Typescript"
+                                    "TypeScript"
                                   ],
                                   "ecosystems": [
                                     "Ethereum",
@@ -443,8 +443,8 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "projectName": "Mooooooonlight",
                                   "projectSlug": "mooooooonlight",
                                   "languages": [
-                                    "Javascript",
-                                    "Typescript",
+                                    "JavaScript",
+                                    "TypeScript",
                                     "Rust"
                                   ],
                                   "ecosystems": [
@@ -501,7 +501,7 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "Cairo",
                                   "Python",
                                   "Solidity",
-                                  "Typescript"
+                                  "TypeScript"
                                 ],
                                 "ecosystems": null,
                                 "categories": null,
@@ -534,7 +534,7 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "projectName": "Taco Tuesday",
                                   "projectSlug": "taco-tuesday",
                                   "languages": [
-                                    "Typescript",
+                                    "TypeScript",
                                     "Rust",
                                     "Cairo"
                                   ],
@@ -568,8 +568,8 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "projectName": "kaaper",
                                   "projectSlug": "kaaper",
                                   "languages": [
-                                    "Javascript",
-                                    "Typescript",
+                                    "JavaScript",
+                                    "TypeScript",
                                     "Rust",
                                     "Cairo"
                                   ],

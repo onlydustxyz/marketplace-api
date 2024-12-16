@@ -219,7 +219,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
                             {
                               "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                               "slug": "javascript",
-                              "name": "Javascript",
+                              "name": "JavaScript",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                             }
@@ -681,7 +681,7 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
 
         assertContributions(Map.of("languageIds", "1109d0a2-1143-4915-a9c1-69e8be6c1bea"))
                 .extracting(ContributionActivityPageItemResponse::getLanguages)
-                .allMatch(languages -> languages.stream().anyMatch(l -> l.getName().equals("Javascript")));
+                .allMatch(languages -> languages.stream().anyMatch(l -> l.getName().equals("JavaScript")));
 
         assertContributions(Map.of("fromDate", "2022-07-11", "toDate", "2022-07-12"))
                 .extracting(ContributionActivityPageItemResponse::getCreatedAt)

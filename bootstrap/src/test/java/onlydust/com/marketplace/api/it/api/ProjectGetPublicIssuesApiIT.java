@@ -687,7 +687,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                             {
                               "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                               "slug": "typescript",
-                              "name": "Typescript",
+                              "name": "TypeScript",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                             },
@@ -1665,7 +1665,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                             {
                               "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                               "slug": "typescript",
-                              "name": "Typescript",
+                              "name": "TypeScript",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                             },

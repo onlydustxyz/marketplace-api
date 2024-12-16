@@ -6,7 +6,9 @@ import onlydust.com.marketplace.api.contract.model.IssueApplicantsPageItemRespon
 import onlydust.com.marketplace.api.contract.model.IssueApplicantsPageResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationPatchRequest;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.LanguageEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.LanguageRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
@@ -941,7 +943,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                   "slug": "javascript",
-                                  "name": "Javascript",
+                                  "name": "JavaScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                 },
@@ -962,7 +964,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                   "slug": "typescript",
-                                  "name": "Typescript",
+                                  "name": "TypeScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                 }
@@ -1138,7 +1140,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                   "slug": "javascript",
-                                  "name": "Javascript",
+                                  "name": "JavaScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                 },
@@ -1152,7 +1154,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                   "slug": "typescript",
-                                  "name": "Typescript",
+                                  "name": "TypeScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                 }
@@ -1409,7 +1411,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                   "slug": "javascript",
-                                  "name": "Javascript",
+                                  "name": "JavaScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                 },
@@ -1430,7 +1432,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                   "slug": "typescript",
-                                  "name": "Typescript",
+                                  "name": "TypeScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                 }

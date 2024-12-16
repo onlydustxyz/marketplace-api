@@ -89,6 +89,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     private final ProjectCustomStatsReadRepository projectCustomStatsReadRepository;
     private final AllTransactionReadRepository allTransactionReadRepository;
     private final ProgramReadRepository programReadRepository;
+    private final ProjectsPageV2Repository projectsPageV2Repository;
 
 
     private static @NonNull List<FinancialTransactionType> sanitizeTypes(List<FinancialTransactionType> types) {
@@ -552,36 +553,22 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         );
     }
 
+
     @Override
-    @Transactional(readOnly = true)
-    public ResponseEntity<ProjectPageResponseV2> getProjectsV2(Integer pageIndex, Integer pageSize, List<ProjectTag> tags, List<String> ecosystemSlugs,
-                                                               List<String> languageSlugs, List<String> categorySlugs, ProjectListSort sort) {
-        final var projects = projectsPageRepository.findAll(null,
+    public ResponseEntity<ProjectPageResponseV2> getProjectsV2(Integer pageIndex, Integer pageSize, List<ProjectTag> tags, List<UUID> ecosystemIds,
+                                                               List<UUID> languageIds, List<UUID> categoryIds) {
+        final int sanitizePageIndex = sanitizePageIndex(pageIndex);
+        final int sanitizePageSize = sanitizePageSize(pageSize);
+        final var projects = projectsPageV2Repository.findAll(
                 null,
-                null,
-                null,
-                null,
-                null,
-                isNull(categorySlugs) ? null : categorySlugs.toArray(String[]::new),
-                null,
-                isNull(languageSlugs) ? null : languageSlugs.toArray(String[]::new),
-                null,
-                isNull(ecosystemSlugs) ? null : ecosystemSlugs.toArray(String[]::new),
+                isNull(categoryIds) ? null : categoryIds.toArray(UUID[]::new),
+                isNull(languageIds) ? null : languageIds.toArray(UUID[]::new),
+                isNull(ecosystemIds) ? null : ecosystemIds.toArray(UUID[]::new),
                 isNull(tags) ? null : tags.stream().map(ProjectTag::name).toArray(String[]::new),
-                null,
-                null,
-                PageRequest.of(pageIndex, pageSize, isNull(sort) ? JpaSort.unsafe(ASC, "project_name") :
-                        switch (sort) {
-                            case RANK -> JpaSort.unsafe(DESC, "coalesce(is_invited_as_project_lead.value, false)")
-                                    .and(JpaSort.unsafe(DESC, "coalesce(pr.rank, p.rank)"))
-                                    .and(JpaSort.unsafe(ASC, "project_name"));
-                            case NAME -> JpaSort.unsafe(ASC, "project_name");
-                            case REPO_COUNT -> JpaSort.unsafe(DESC, "coalesce(array_length(p.repo_ids, 1), 0)").and(JpaSort.unsafe(ASC, "project_name"));
-                            case CONTRIBUTOR_COUNT -> JpaSort.unsafe(DESC, "coalesce(pcd.contributor_count, 0)").and(JpaSort.unsafe(ASC, "project_name"));
-                        })
-        );
+                PageRequest.of(sanitizePageIndex, sanitizePageSize, JpaSort.unsafe(DESC, "coalesce(p.rank, -10000)")));
+
         final List<ProjectShortResponseV2> projectShortResponseV2s = projects.stream()
-                .map(ProjectPageItemQueryEntity::toShortResponseV2).toList();
+                .map(ProjectPageV2ItemQueryEntity::toShortResponse).toList();
 
         return ok().body(new ProjectPageResponseV2()
                 .projects(projectShortResponseV2s)
