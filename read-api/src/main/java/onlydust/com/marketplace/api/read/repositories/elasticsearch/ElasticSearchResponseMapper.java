@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.StreamSupport;
 
 import static com.onlydust.marketplace.indexer.elasticsearch.ElasticSearchAdapter.CONTRIBUTORS_INDEX;
 import static com.onlydust.marketplace.indexer.elasticsearch.ElasticSearchAdapter.PROJECTS_INDEX;
@@ -114,20 +115,23 @@ public interface ElasticSearchResponseMapper {
         final TypesFacetResponse typesFacetResponse = new TypesFacetResponse();
         if (aggregations.has(TypeFacet.INDEXES.getAggregationName())) {
             final List<SearchFacetResponse> facets = new ArrayList<>();
-            aggregations.get(TypeFacet.INDEXES.getAggregationName()).get("buckets").iterator().forEachRemaining(bucket -> {
-                final String indexName = bucket.get("key").textValue();
-                if (indexName.equals(ElasticSearchAdapter.PROJECTS_INDEX)) {
-                    facets.add(new SearchFacetResponse()
+
+            facets.add(StreamSupport.stream(aggregations.get(TypeFacet.INDEXES.getAggregationName()).get("buckets").spliterator(), false)
+                    .filter(bucket -> bucket.get("key").textValue().equals(PROJECTS_INDEX))
+                    .findFirst()
+                    .map(bucket -> new SearchFacetResponse()
                             .name(PROJECTS_TYPE)
-                            .count(bucket.get("doc_count").asInt()));
-                } else if (indexName.equals(ElasticSearchAdapter.CONTRIBUTORS_INDEX)) {
-                    facets.add(new SearchFacetResponse()
+                            .count(bucket.get("doc_count").asInt()))
+                    .orElse(new SearchFacetResponse().name(PROJECTS_TYPE).count(0)));
+
+            facets.add(StreamSupport.stream(aggregations.get(TypeFacet.INDEXES.getAggregationName()).get("buckets").spliterator(), false)
+                    .filter(bucket -> bucket.get("key").textValue().equals(CONTRIBUTORS_INDEX))
+                    .findFirst()
+                    .map(bucket -> new SearchFacetResponse()
                             .name(CONTRIBUTORS_TYPE)
-                            .count(bucket.get("doc_count").asInt()));
-                } else {
-                    throw OnlyDustException.internalServerError("Unknown index %s".formatted(indexName));
-                }
-            });
+                            .count(bucket.get("doc_count").asInt()))
+                    .orElse(new SearchFacetResponse().name(CONTRIBUTORS_TYPE).count(0)));
+
             typesFacetResponse.types(facets.stream().sorted(Comparator.comparing(SearchFacetResponse::getCount).reversed()).toList());
         }
         return typesFacetResponse;

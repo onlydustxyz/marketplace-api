@@ -54,7 +54,8 @@ public class ElasticSearchResponseMapperTest {
             assertEquals(0, searchResponse.getNextPageIndex());
             assertTrue(searchResponse.getResults().isEmpty());
             assertNull(searchResponse.getProjectFacets());
-            assertNull(searchResponse.getTypeFacets());
+            assertEquals(0,searchResponse.getTypeFacets().getTypes().get(0).getCount());
+            assertEquals(0,searchResponse.getTypeFacets().getTypes().get(1).getCount());
         }
 
         @Test
@@ -338,6 +339,71 @@ public class ElasticSearchResponseMapperTest {
             assertEquals(0, contributor.getIssueCount());
             assertEquals("https://github.com/XAMPPRocky", contributor.getHtmlUrl());
         }
+
+        @Test
+        void given_only_one_type() throws JsonProcessingException {
+            // Given
+            final JsonNode jsonNode = objectMapper.readTree("""
+                    {
+                       "took": 3,
+                       "timed_out": false,
+                       "_shards": {
+                         "total": 2,
+                         "successful": 2,
+                         "skipped": 0,
+                         "failed": 0
+                       },
+                       "hits": {
+                         "total": {
+                           "value": 1,
+                           "relation": "eq"
+                         },
+                         "max_score": 1,
+                         "hits": [
+                           {
+                             "_index": "od-contributors",
+                             "_id": "4464295",
+                             "_score": 1,
+                             "_source": {
+                               "githubId": 4464295,
+                               "githubLogin": "XAMPPRocky",
+                               "bio": "➣ Livia Prima",
+                               "contributionCount": 0,
+                               "projectCount": 0,
+                               "pullRequestCount": 0,
+                               "issueCount": 0,
+                               "htmlUrl": "https://github.com/XAMPPRocky"
+                             }
+                           }
+                         ]
+                       },
+                       "aggregations": {
+                         "indexes_facet": {
+                           "doc_count_error_upper_bound": 0,
+                           "sum_other_doc_count": 0,
+                           "buckets": [
+                             {
+                               "key": "od-contributors",
+                               "doc_count": 37
+                             }
+                           ]
+                         }
+                       }
+                     }
+                    """);
+
+            // When
+            final SearchResponse searchResponse = ElasticSearchResponseMapper.jsonNodeToSearchResponse(jsonNode, 0, 2);
+
+            // Then
+            assertEquals(2, searchResponse.getTypeFacets().getTypes().size());
+            assertEquals("Contributors", searchResponse.getTypeFacets().getTypes().get(0).getName());
+            assertEquals(37, searchResponse.getTypeFacets().getTypes().get(0).getCount());
+            assertEquals("Projects", searchResponse.getTypeFacets().getTypes().get(1).getName());
+            assertEquals(0, searchResponse.getTypeFacets().getTypes().get(1).getCount());
+        }
+
+
 
         @Test
         void given_pagination() {
