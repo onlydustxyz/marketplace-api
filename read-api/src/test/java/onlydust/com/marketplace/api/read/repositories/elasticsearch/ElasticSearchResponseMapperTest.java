@@ -54,7 +54,7 @@ public class ElasticSearchResponseMapperTest {
             assertEquals(0, searchResponse.getNextPageIndex());
             assertTrue(searchResponse.getResults().isEmpty());
             assertNull(searchResponse.getProjectFacets());
-            assertNull(searchResponse.getTypeFacets());
+            searchResponse.getTypeFacets().getTypes().forEach(t -> assertEquals(0, t.getCount()));
         }
 
         @Test
@@ -408,7 +408,7 @@ public class ElasticSearchResponseMapperTest {
             assertEquals("tdelabro", suggestResponse.getValue());
         }
 
-         @Test
+        @Test
         void given_a_project() throws JsonProcessingException {
             // Given
             // When
