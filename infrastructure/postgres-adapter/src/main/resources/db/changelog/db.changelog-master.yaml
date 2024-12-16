@@ -86,4 +86,4 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000044_add_processing_event_status.sql
   - include:
-      file: db/changelog/changelogs/00000044_matching_system_v1.sql
+      file: db/changelog/changelogs/00000045_matching_system_v1.sql
