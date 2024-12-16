@@ -16,6 +16,7 @@ import onlydust.com.marketplace.api.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.configuration.SwaggerConfiguration;
 import onlydust.com.marketplace.api.helper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.kernel.jobs.OutboxAsyncConsumerJob;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
@@ -314,7 +315,7 @@ public class AbstractMarketplaceApiIT {
     @Autowired
     OutboxConsumerJob billingProfileVerificationOutboxJob;
     @Autowired
-    OutboxConsumerJob githubCommandOutboxJob;
+    OutboxAsyncConsumerJob githubCommandOutboxJob;
 
 
     @Autowired

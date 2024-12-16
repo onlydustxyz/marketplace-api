@@ -75,7 +75,7 @@
         <datasource-proxy-spring-boot-starter.version>1.9.1</datasource-proxy-spring-boot-starter.version>
         <mockito-junit-jupiter.version>5.14.2</mockito-junit-jupiter.version>
         <assertj-core.version>3.26.3</assertj-core.version>
-        <marketplace-kernel.version>0.50.0</marketplace-kernel.version>
+        <marketplace-kernel.version>0.51.0</marketplace-kernel.version>
     </properties>
 
     <dependencyManagement>

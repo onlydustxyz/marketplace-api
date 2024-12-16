@@ -19,6 +19,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfile
 import onlydust.com.marketplace.api.posthog.adapters.PosthogApiClientAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.stellar.adapters.StellarTransactionStorageAdapter;
+import onlydust.com.marketplace.kernel.jobs.OutboxAsyncConsumerJob;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import onlydust.com.marketplace.kernel.port.output.*;
@@ -215,9 +216,9 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public OutboxConsumerJob githubCommandOutboxJob(final OutboxPort githubCommandOutbox,
-                                                    final OutboxConsumer githubCommandOutboxConsumer) {
-        return new OutboxConsumerJob(githubCommandOutbox, githubCommandOutboxConsumer);
+    public OutboxAsyncConsumerJob githubCommandOutboxJob(final OutboxPort githubCommandOutbox,
+                                                         final OutboxConsumer githubCommandOutboxConsumer) {
+        return new OutboxAsyncConsumerJob(githubCommandOutbox, githubCommandOutboxConsumer, 10); // TODO : make it configurable
     }
 
     @Bean

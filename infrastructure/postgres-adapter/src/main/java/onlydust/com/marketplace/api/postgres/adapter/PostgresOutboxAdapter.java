@@ -21,6 +21,7 @@ public class PostgresOutboxAdapter<E extends EventEntity> implements OutboxPort 
 
     @Override
     public Optional<IdentifiableEvent> peek() {
+        // TODO; introduce PROCESSING status to avoid peeking the same event twice
         return outboxRepository.findNextToProcess().map(EventEntity::toIdentifiableEvent);
     }
 
