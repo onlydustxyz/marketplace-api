@@ -17,6 +17,7 @@ import onlydust.com.marketplace.project.domain.model.GlobalConfig;
 import onlydust.com.marketplace.project.domain.port.input.BoostNodeGuardiansRewardsPort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.project.domain.port.output.RecommenderSystemPort;
 import onlydust.com.marketplace.user.domain.job.NotificationSummaryEmailJob;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -45,6 +46,7 @@ public class JobScheduler {
     private final NotificationSummaryEmailJob notificationSummaryEmailJob;
     private final GoodFirstIssueCreatedNotifierJob goodFirstIssueCreatedNotifierJob;
     private final SearchIndexationService searchIndexationService;
+    private final RecommenderSystemPort postgresRecommenderSystemV1Adapter;
 
     @Scheduled(fixedDelayString = "${application.cron.indexer-sync-job-delay}")
     public void processPendingIndexerApiCalls() {
@@ -173,6 +175,12 @@ public class JobScheduler {
         LOGGER.info("Index searchable documents");
         searchIndexationService.indexAllProjects();
         searchIndexationService.indexAllContributors();
+    }
+
+    @Scheduled(fixedDelayString = "${application.cron.refresh-reco-v1-data-job-delay}")
+    public void refreshRecommenderSystemV1Data() {
+        LOGGER.info("Refresh recommender system V1 data");
+        postgresRecommenderSystemV1Adapter.refreshData();
     }
 
 }

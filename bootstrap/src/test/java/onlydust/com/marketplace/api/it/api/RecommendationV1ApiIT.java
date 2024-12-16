@@ -5,13 +5,21 @@ import onlydust.com.marketplace.api.contract.model.MatchingQuestionsResponse;
 import onlydust.com.marketplace.api.contract.model.RecommendedProjectsResponse;
 import onlydust.com.marketplace.api.contract.model.SaveMatchingAnswersRequest;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.UserAnswersV1Entity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.LanguageEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.EcosystemRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.LanguageRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.UserAnswersV1Repository;
 import onlydust.com.marketplace.api.suites.tags.TagRecommendation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,6 +27,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
     private static final String RECOMMENDER_SYSTEM_VERSION = "v1";
     UserAuthHelper.AuthenticatedUser pierre;
+    @Autowired
+    UserAnswersV1Repository userAnswersV1Repository;
+    @Autowired
+    LanguageRepository languageRepository;
+    @Autowired
+    EcosystemRepository ecosystemRepository;
 
     @BeforeEach
     void setUp() {
@@ -103,6 +117,22 @@ public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_get_recommended_projects_based_on_answers() {
+        // Given
+        final var languages = languageRepository.findAll();
+        final var ecosystems = ecosystemRepository.findAll();
+        userAnswersV1Repository.save(UserAnswersV1Entity.builder()
+                .userId(pierre.userId().value())
+                .primaryGoals(new Integer[]{0, 1, 2})
+                .learningPreference(1)
+                .experienceLevel(4)
+                .languages(languages.stream().filter(l -> l.name().equals("Rust") || l.name().equals("Cairo"))
+                        .map(LanguageEntity::id).toArray(UUID[]::new))
+                .ecosystems(ecosystems.stream().filter(e -> e.getName().equals("Starknet"))
+                        .map(EcosystemEntity::getId).toArray(UUID[]::new))
+                .projectMaturity(0)
+                .communityImportance(2)
+                .longTermInvolvement(1)
+                .build());
 
         // When
         final var response = client.get()
@@ -117,7 +147,10 @@ public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
 
         // Then
         assertThat(response).isNotNull();
-        assertThat(response.getProjects()).isNotEmpty();
+        assertThat(response.getProjects()).hasSize(7);
+        assertThat(response.getProjects().getFirst().getName()).isEqualTo("Zama");
+        assertThat(response.getProjects().get(1).getName()).isEqualTo("Cal.com");
+        assertThat(response.getProjects().get(2).getName()).isEqualTo("Taco Tuesday");
     }
 
     @Test

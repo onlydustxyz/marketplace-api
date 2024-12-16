@@ -49,6 +49,7 @@ application:
     github-commands-job-delay: 5000 # 5 seconds
     github-commands-concurrency-level: 10 # up to 10 commands are processed concurrently
     index-searchable-documents-job-delay: 86400000 # Every 24H : launch an indexation by restarting jobs app
+    refresh-reco-v1-data-job-delay: 600000 # 10 minutes
   sumsub:
     webhook:
       secret: ${SUMSUB_WEBHOOK_SECRET}

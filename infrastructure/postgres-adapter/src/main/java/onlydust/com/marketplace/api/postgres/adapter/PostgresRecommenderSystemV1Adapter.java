@@ -16,9 +16,11 @@ import onlydust.com.marketplace.project.domain.port.output.RecommenderSystemPort
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -95,11 +97,49 @@ public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort
     @Override
     @Transactional(readOnly = true)
     public List<ProjectId> getRecommendedProjects(final @NonNull UserId userId) {
-        return Stream.concat(projectRecommendationV1Repository.findTopProjects(3).stream(),
-                        projectRecommendationV1Repository.findLastActiveProjects(3).stream())
+        // Get all potential projects
+        final var matchingProjects = projectRecommendationV1Repository.findTopMatchingProjects(userId.value(), 15)
+                .stream()
                 .map(ProjectRecommendationEntity::getProjectId)
+                .toList();
+        final var topProjects = projectRecommendationV1Repository.findTopProjects(userId.value(), 3)
+                .stream()
+                .map(ProjectRecommendationEntity::getProjectId)
+                .toList();
+        final var lastActiveProjects = projectRecommendationV1Repository.findLastActiveProjects(userId.value(), 3)
+                .stream()
+                .map(ProjectRecommendationEntity::getProjectId)
+                .toList();
+
+        // Start with top matching projects (3)
+        var recommendedProjects = completeWith(new HashSet<>(), matchingProjects, 3);
+
+        // Add top projects (up to 3)
+        recommendedProjects = completeWith(recommendedProjects, topProjects, 6);
+
+        // Add last active projects (up to 3)
+        recommendedProjects = completeWith(recommendedProjects, lastActiveProjects, 9);
+
+        // If we don't have 9 projects yet, complete with remaining matching projects
+        recommendedProjects = completeWith(recommendedProjects, matchingProjects, 9);
+
+        return recommendedProjects.stream()
                 .map(ProjectId::of)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public void refreshData() {
+        projectRecommendationV1Repository.refreshMaterializedViews();
+    }
+
+    private Set<UUID> completeWith(Set<UUID> current, List<UUID> complement, int upTo) {
+        return current.size() >= upTo ? current : Stream.concat(current.stream(), complement.stream())
+                .collect(HashSet<UUID>::new, HashSet::add, HashSet::addAll)
+                .stream()
+                .limit(upTo)
+                .collect(Collectors.toSet());
     }
 
     private List<MatchingQuestion<?>> getMatchingQuestions() {
