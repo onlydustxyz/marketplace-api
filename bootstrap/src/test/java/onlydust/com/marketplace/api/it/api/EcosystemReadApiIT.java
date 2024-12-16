@@ -1,18 +1,19 @@
 package onlydust.com.marketplace.api.it.api;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategoryRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 @TagProject
 public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
@@ -361,7 +362,9 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                "name": "TypeScript",
                                "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png",
+                               "color": "#3178C6",
+                               "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/typescript.png"
                              }
                            ]
                          }

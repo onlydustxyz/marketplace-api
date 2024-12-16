@@ -1,12 +1,13 @@
 package onlydust.com.marketplace.api.it.api;
 
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserProfileInfoRepository;
-import onlydust.com.marketplace.api.suites.tags.TagUser;
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Map;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserProfileInfoRepository;
+import onlydust.com.marketplace.api.suites.tags.TagUser;
 
 @TagUser
 public class UsersReadApiIT extends AbstractMarketplaceApiIT {
@@ -89,7 +90,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                                 "slug": "typescript",
                                 "name": "TypeScript",
                                 "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png",
+                                "color": "#3178C6",
+                                "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/typescript.png"
                               }
                             },
                             {
@@ -136,7 +139,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                                 "slug": "rust",
                                 "name": "Rust",
                                 "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
-                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
+                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png",
+                                "color": "#F74B00",
+                                "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/rust.png"
                               }
                             },
                             {
@@ -177,7 +182,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                                 "slug": "javascript",
                                 "name": "JavaScript",
                                 "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png",
+                                "color": "#F7DF1E",
+                                "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/javascript.png"
                               }
                             },
                             {
@@ -200,7 +207,9 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                                 "slug": "python",
                                 "name": "Python",
                                 "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
-                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
+                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png",
+                                "color": "#FFD141",
+                                "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/python.png"
                               }
                             }
                           ]

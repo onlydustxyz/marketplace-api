@@ -82,7 +82,9 @@ select c.contribution_uuid                                                      
                                              'slug', l.slug,
                                              'name', l.name,
                                              'logoUrl', l.logo_url,
-                                             'bannerUrl', l.banner_url)) filter ( where l.id is not null )      as languages,
+                                             'bannerUrl', l.banner_url,
+                                             'transparentLogoUrl', l.transparent_logo_url,
+                                             'color', l.color)) filter ( where l.id is not null )      as languages,
 
        jsonb_agg(distinct jsonb_build_object('type', 'ISSUE',
                                              'contributionUuid', i.contribution_uuid,
@@ -206,7 +208,9 @@ FROM (SELECT c.*,
                                                         'slug', l.slug,
                                                         'name', l.name,
                                                         'logoUrl', l.logo_url,
-                                                        'bannerUrl', l.banner_url))
+                                                        'bannerUrl', l.banner_url,
+                                                        'transparentLogoUrl', l.transparent_logo_url,
+                                                        'color', l.color))
                     from languages l
                     where l.id = any (c.language_ids))               as languages,
 
@@ -375,6 +379,8 @@ FROM (SELECT p.id                                                               
                                              'name', l.name,
                                              'logoUrl', l.logo_url,
                                              'bannerUrl', l.banner_url,
+                                             'transparentLogoUrl', l.transparent_logo_url,
+                                             'color', l.color,
                                              'lineCount', coalesce(l_count.line_count, 0)))
        filter ( where l.id is not null )                                    as languages,
 
