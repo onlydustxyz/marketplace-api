@@ -1,3 +1,7 @@
+ALTER TABLE languages 
+ADD COLUMN transparent_logo_url TEXT,
+ADD COLUMN color TEXT; 
+
 -- call create_pseudo_projection('bi', 'contribution_data', $$...$$);
 create or replace view bi.v_contribution_data as
 SELECT v.*, md5(v::text) as hash

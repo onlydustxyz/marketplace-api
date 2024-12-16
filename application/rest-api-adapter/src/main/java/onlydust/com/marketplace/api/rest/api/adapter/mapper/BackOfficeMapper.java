@@ -1,10 +1,20 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
+import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.ETHEREUM;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
+
+import java.net.URI;
+import java.time.ZoneOffset;
+import java.util.*;
+
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.*;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
@@ -23,16 +33,6 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Language;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
-
-import java.net.URI;
-import java.time.ZoneOffset;
-import java.util.*;
-
-import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
-import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.ETHEREUM;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
 
 public interface BackOfficeMapper {
     static ShortCurrencyResponse toShortCurrency(final Currency currency) {
@@ -501,7 +501,9 @@ public interface BackOfficeMapper {
                 .name(language.name())
                 .fileExtensions(language.fileExtensions().stream().toList())
                 .logoUrl(language.logoUrl())
-                .bannerUrl(language.bannerUrl());
+                .transparentLogoUrl(language.transparentLogoUrl())
+                .bannerUrl(language.bannerUrl())
+                .color(language.color());
     }
 
     static Language mapLanguageUpdateRequest(UUID languageId, LanguageUpdateRequest languageUpdateRequest) {
@@ -510,7 +512,9 @@ public interface BackOfficeMapper {
                 languageUpdateRequest.getSlug(),
                 new HashSet<>(languageUpdateRequest.getFileExtensions()),
                 languageUpdateRequest.getLogoUrl(),
-                languageUpdateRequest.getBannerUrl());
+                languageUpdateRequest.getTransparentLogoUrl(),
+                languageUpdateRequest.getBannerUrl(),
+                languageUpdateRequest.getColor());
     }
 
     static LanguageExtensionListResponse mapLanguageExtensionResponse(Map<String, Optional<Language>> extensions) {

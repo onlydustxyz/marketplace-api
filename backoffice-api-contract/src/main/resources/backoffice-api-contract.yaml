@@ -4352,6 +4352,18 @@ components:
           type: array
           items:
             type: string
+        logoUrl:
+          type: string
+          format: uri
+        transparentLogoUrl:
+          type: string
+          format: uri
+        bannerUrl:
+          type: string
+          format: uri
+        color:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}$'
 
     DepositUpdateRequest:
       type: object
@@ -4379,9 +4391,15 @@ components:
         logoUrl:
           type: string
           format: uri
+        transparentLogoUrl:
+          type: string
+          format: uri
         bannerUrl:
           type: string
           format: uri
+        color:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}$'
 
     LanguageListResponse:
       type: object
@@ -4415,6 +4433,12 @@ components:
         bannerUrl:
           type: string
           format: uri
+        transparentLogoUrl:
+          type: string
+          format: uri
+        color:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}$'
 
     LanguageExtensionListResponse:
       type: object
