@@ -7989,37 +7989,32 @@ components:
           format: url
           description: Direct URL to language's logo image
           example: 'https://rust.org/logo.png'
+        transparentLogoUrl:
+          type: string
+          format: url
+          description: Direct URL to language's transparent logo image
+          example: 'https://rust.org/logo-transparent.png'
         bannerUrl:
           type: string
           format: url
           description: Direct URL to language's banner image
           example: 'https://rust.org/banner.png'
+        color:
+          type: string
+          description: Hex color code associated with the language
+          example: '#FF0000'
 
     LanguageWithPercentageResponse:
-      type: object
-      required:
-        - id
-        - slug
-        - name
-        - logoUrl
-        - percentage
-      properties:
-        id:
-          $ref: '#/components/schemas/LanguageId'
-        slug:
-          $ref: '#/components/schemas/LanguageSlug'
-        name:
-          type: string
-          description: Language name
-          example: Rust
-        percentage:
-          type: number
-        logoUrl:
-          type: string
-          format: url
-        bannerUrl:
-          type: string
-          format: url
+      allOf:
+        - $ref: '#/components/schemas/LanguageResponse'
+        - type: object
+          required:
+            - percentage
+          properties:
+            percentage:
+              type: number
+              description: Percentage of the language in the project
+              example: 50
 
     CountriesResponse:
       type: object

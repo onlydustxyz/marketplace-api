@@ -1,14 +1,15 @@
 package onlydust.com.marketplace.api.it.api;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import onlydust.com.marketplace.api.suites.tags.TagProject;
+import java.io.IOException;
+import java.util.Map;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.IOException;
-import java.util.Map;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import onlydust.com.marketplace.api.suites.tags.TagProject;
 
 @TagProject
 public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
@@ -723,21 +724,27 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                   "slug": "javascript",
                                   "name": "JavaScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png",
+                                  "color": "#F7DF1E",
+                                  "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/javascript.png"
                                 },
                                 {
                                   "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                                   "slug": "rust",
                                   "name": "Rust",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png",
+                                  "color": "#F74B00",
+                                  "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/rust.png"
                                 },
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                   "slug": "typescript",
                                   "name": "TypeScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png",
+                                  "color": "#3178C6",
+                                  "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/typescript.png"
                                 }
                               ]
                             },
@@ -771,14 +778,18 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                   "slug": "javascript",
                                   "name": "JavaScript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png",
+                                  "color": "#F7DF1E",
+                                  "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/javascript.png"
                                 },
                                 {
                                   "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                                   "slug": "solidity",
                                   "name": "Solidity",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png",
+                                  "color": "#2B247C",
+                                  "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/solidity.png"
                                 }
                               ]
                             }

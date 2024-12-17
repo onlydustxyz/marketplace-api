@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.Accessors;
-import onlydust.com.marketplace.project.domain.model.Language;
+import static java.util.Objects.isNull;
 
 import java.net.URI;
 import java.util.List;
@@ -11,7 +8,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static java.util.Objects.isNull;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.Accessors;
+import onlydust.com.marketplace.project.domain.model.Language;
 
 @Entity
 @Table(name = "languages", schema = "public")
@@ -30,7 +30,9 @@ public class LanguageEntity {
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "languageId")
     private List<LanguageFileExtensionEntity> fileExtensions;
     private String logoUrl;
+    private String transparentLogoUrl;
     private String bannerUrl;
+    private String color;
 
     public static LanguageEntity of(Language language) {
         return new LanguageEntity(language.id().value(),
@@ -38,7 +40,9 @@ public class LanguageEntity {
                 language.slug(),
                 language.fileExtensions().stream().map(e -> new LanguageFileExtensionEntity(e, language.id().value())).toList(),
                 isNull(language.logoUrl()) ? null : language.logoUrl().toString(),
-                isNull(language.bannerUrl()) ? null : language.bannerUrl().toString());
+                isNull(language.transparentLogoUrl()) ? null : language.transparentLogoUrl().toString(),
+                isNull(language.bannerUrl()) ? null : language.bannerUrl().toString(),
+                language.color());
     }
 
     public Language toDomain() {
@@ -47,6 +51,8 @@ public class LanguageEntity {
                 slug,
                 isNull(fileExtensions) ? Set.of() : fileExtensions.stream().map(LanguageFileExtensionEntity::extension).collect(Collectors.toSet()),
                 isNull(logoUrl) ? null : URI.create(logoUrl),
-                isNull(bannerUrl) ? null : URI.create(bannerUrl));
+                isNull(transparentLogoUrl) ? null : URI.create(transparentLogoUrl),
+                isNull(bannerUrl) ? null : URI.create(bannerUrl),
+                color);
     }
 }

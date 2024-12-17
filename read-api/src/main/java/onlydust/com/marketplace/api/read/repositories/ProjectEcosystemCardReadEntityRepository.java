@@ -1,11 +1,12 @@
 package onlydust.com.marketplace.api.read.repositories;
 
-import onlydust.com.marketplace.api.read.entities.project.ProjectEcosystemCardReadEntity;
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
-import java.util.UUID;
+import onlydust.com.marketplace.api.read.entities.project.ProjectEcosystemCardReadEntity;
 
 public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<ProjectEcosystemCardReadEntity, UUID> {
 
@@ -23,7 +24,7 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                        (select count(distinct github_user_id) from projects_contributors where project_id = p.id) contributors_count,
                        coalesce((select jsonb_agg(
                                        jsonb_build_object(
-                                               'id', l.id, 'name', l.name, 'slug', l.slug, 'logoUrl', l.logo_url, 'bannerUrl', l.banner_url
+                                               'id', l.id, 'name', l.name, 'slug', l.slug, 'logoUrl', l.logo_url, 'bannerUrl', l.banner_url, 'color', l.color, 'transparentLogoUrl', l.transparent_logo_url
                                        ) order by l.name
                                )
                         from project_languages pl

@@ -1,5 +1,16 @@
 package onlydust.com.marketplace.api.read.entities.project;
 
+import static java.util.Comparator.comparing;
+import static java.util.Objects.isNull;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
+
+import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
@@ -11,16 +22,6 @@ import onlydust.com.marketplace.api.contract.model.LanguageWithPercentageRespons
 import onlydust.com.marketplace.api.contract.model.ProjectCategoryResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectShortResponseV2;
 import onlydust.com.marketplace.api.contract.model.ProjectTag;
-import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.UUID;
-
-import static java.util.Comparator.comparing;
-import static java.util.Objects.isNull;
 
 @NoArgsConstructor(force = true)
 @FieldDefaults(level = AccessLevel.PUBLIC, makeFinal = true)
@@ -63,7 +64,9 @@ public class ProjectPageV2ItemQueryEntity {
                         .slug(language.slug)
                         .id(language.id)
                         .logoUrl(language.logoUrl)
+                        .transparentLogoUrl(language.transparentLogoUrl)
                         .bannerUrl(language.bannerUrl)
+                        .color(language.color)
                         .percentage(BigDecimal.valueOf(language.lineCount)
                                 .multiply(BigDecimal.valueOf(100))
                                 .divide(BigDecimal.valueOf(totalLines), 2, java.math.RoundingMode.HALF_UP)))
@@ -95,6 +98,8 @@ public class ProjectPageV2ItemQueryEntity {
         String slug;
         String logoUrl;
         String bannerUrl;
+        String transparentLogoUrl;
+        String color;
         Integer lineCount;
     }
 }

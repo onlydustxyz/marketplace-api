@@ -1,11 +1,12 @@
 package onlydust.com.marketplace.api.it.bo;
 
-import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagBO;
+import java.util.Map;
+
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
-import java.util.Map;
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.suites.tags.TagBO;
 
 @TagBO
 public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
@@ -45,7 +46,7 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "globalRank": 1,
                                 "globalRankPercentile": 0.000041734485205125,
                                 "bio": "FullStack engineerr",
-                                "signedUpOnGithubAt": "2018-09-21T06:45:50Z",
+                                "signedUpOnGithubAt": "2018-09-21T08:45:50Z",
                                 "signedUpAt": "2022-12-12T09:51:58.48559Z",
                                 "contacts": [
                                   {
@@ -91,10 +92,10 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "Zama"
                                 ],
                                 "categories": null,
-                                "completedContributionCount": 435,
-                                "completedIssueCount": 44,
-                                "completedPrCount": 265,
-                                "completedCodeReviewCount": 126,
+                                "completedContributionCount": 373,
+                                "completedIssueCount": 36,
+                                "completedPrCount": 227,
+                                "completedCodeReviewCount": 110,
                                 "odCompletedContributionCount": 137,
                                 "odCompletedIssueCount": 13,
                                 "odCompletedPrCount": 102,
@@ -415,10 +416,10 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "languages": null,
                                   "ecosystems": null,
                                   "categories": null,
-                                  "completedContributionCount": 298,
-                                  "completedIssueCount": 31,
-                                  "completedPrCount": 163,
-                                  "completedCodeReviewCount": 104,
+                                  "completedContributionCount": 236,
+                                  "completedIssueCount": 23,
+                                  "completedPrCount": 125,
+                                  "completedCodeReviewCount": 88,
                                   "odCompletedContributionCount": 0,
                                   "odCompletedIssueCount": 0,
                                   "odCompletedPrCount": 0,
@@ -486,7 +487,7 @@ public class BackofficeBiApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "globalRank": 17,
                                 "globalRankPercentile": 0.0007094862484871249,
                                 "bio": null,
-                                "signedUpOnGithubAt": "2020-02-04T13:19:48Z",
+                                "signedUpOnGithubAt": "2020-02-04T14:19:48Z",
                                 "signedUpAt": null,
                                 "contacts": null,
                                 "githubUserId": 60658558,

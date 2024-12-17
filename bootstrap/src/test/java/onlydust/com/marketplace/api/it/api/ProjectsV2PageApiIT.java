@@ -1,5 +1,16 @@
 package onlydust.com.marketplace.api.it.api;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import onlydust.com.marketplace.api.helper.DatabaseHelper;
 import onlydust.com.marketplace.api.helper.EcosystemHelper;
 import onlydust.com.marketplace.api.helper.ProjectHelper;
@@ -7,23 +18,11 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategor
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategoryRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiProjectGlobalDataRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.model.EcosystemId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 
 @TagProject
@@ -99,7 +98,9 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
                                   "name": "TypeScript",
                                   "percentage": 100.00,
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png",
+                                  "color": "#3178C6",
+                                  "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/typescript.png"
                                 }
                               ]
                             },
@@ -122,7 +123,9 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
                                   "name": "Rust",
                                   "percentage": 0.00,
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png",
+                                  "color": "#F74B00",
+                                  "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/rust.png"
                                 },
                                 {
                                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
@@ -130,7 +133,9 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
                                   "name": "JavaScript",
                                   "percentage": 0.75,
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png",
+                                  "color": "#F7DF1E",
+                                  "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/javascript.png"
                                 },
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
@@ -138,7 +143,9 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
                                   "name": "TypeScript",
                                   "percentage": 99.25,
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png",
+                                  "color": "#3178C6",
+                                  "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/typescript.png"
                                 }
                               ]
                             }
@@ -223,7 +230,9 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
                                    "name": "TypeScript",
                                    "percentage": 100.00,
                                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png",
+                                   "color": "#3178C6",
+                                   "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/typescript.png"
                                  }
                                ]
                              }

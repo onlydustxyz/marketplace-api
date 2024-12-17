@@ -1,20 +1,21 @@
 package onlydust.com.marketplace.project.domain.service;
 
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
-import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
-import onlydust.com.marketplace.project.domain.model.Language;
-import onlydust.com.marketplace.project.domain.port.input.LanguageFacadePort;
-import onlydust.com.marketplace.project.domain.port.output.LanguageStorage;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
+import onlydust.com.marketplace.project.domain.model.Language;
+import onlydust.com.marketplace.project.domain.port.input.LanguageFacadePort;
+import onlydust.com.marketplace.project.domain.port.output.LanguageStorage;
 
 
 @AllArgsConstructor
@@ -23,8 +24,14 @@ public class LanguageService implements LanguageFacadePort {
     private final ImageStoragePort imageStoragePort;
 
     @Override
-    public Language createLanguage(final @NonNull String name, final @NonNull String slug, final @NonNull Set<String> fileExtensions) {
-        final var language = Language.of(name, slug, fileExtensions);
+    public Language createLanguage(final @NonNull String name, 
+                                   final @NonNull String slug, 
+                                   final @NonNull Set<String> fileExtensions, 
+                                   final URI logoUrl, 
+                                   final URI transparentLogoUrl, 
+                                   final URI bannerUrl, 
+                                   final String color) {
+        final var language = new Language(Language.Id.random(), name, slug, fileExtensions, logoUrl, transparentLogoUrl, bannerUrl, color);
         languageStorage.save(language);
         return language;
     }
@@ -44,7 +51,7 @@ public class LanguageService implements LanguageFacadePort {
     }
 
     @Override
-    public URL uploadPicture(InputStream imageInputStream) {
+    public URL uploadPicture(final @NonNull InputStream imageInputStream) {
         return imageStoragePort.storeImage(imageInputStream);
     }
 

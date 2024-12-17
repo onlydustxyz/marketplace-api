@@ -1,18 +1,19 @@
 package onlydust.com.marketplace.api.it.bo;
 
-import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagBO;
-import onlydust.com.marketplace.api.postgres.adapter.repository.LanguageRepository;
-import onlydust.com.marketplace.user.domain.model.BackofficeUser;
-import org.apache.commons.lang3.mutable.MutableObject;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import java.util.List;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
+import org.apache.commons.lang3.mutable.MutableObject;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.repository.LanguageRepository;
+import onlydust.com.marketplace.api.suites.tags.TagBO;
+import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 
 @TagBO
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -44,7 +45,9 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                         {
                             "name": "Alphabetic",
                             "slug": "alphabetic",
-                            "fileExtensions": ["a", "B", "c"]
+                            "fileExtensions": ["a", "B", "c"],
+                            "transparentLogoUrl": "https://example.com/logo-transparent.png",
+                            "color": "#FF0000"
                         }
                         """)
                 .exchange()
@@ -58,7 +61,9 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                             "slug": "alphabetic",
                             "fileExtensions": ["a", "b", "c"],
                             "logoUrl": null,
-                            "bannerUrl": null
+                            "transparentLogoUrl": "https://example.com/logo-transparent.png",
+                            "bannerUrl": null,
+                            "color": "#FF0000"
                         }
                         """);
 
@@ -88,7 +93,9 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                                 "c"
                               ],
                               "logoUrl": null,
-                              "bannerUrl": null
+                              "transparentLogoUrl": "https://example.com/logo-transparent.png",
+                              "bannerUrl": null,
+                              "color": "#FF0000"
                             }
                           ]
                         }
@@ -109,7 +116,9 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                             "slug": "alphabeticcc",
                             "fileExtensions": ["b", "C", "d"],
                             "logoUrl": "https://example.com/logo.png",
-                            "bannerUrl": "https://example.com/banner.png"
+                            "transparentLogoUrl": "https://example.com/logo-transparent-updated.png",
+                            "bannerUrl": "https://example.com/banner.png",
+                            "color": "#00FF00"
                         }
                         """)
                 .exchange()
@@ -123,10 +132,11 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                             "slug": "alphabeticcc",
                             "fileExtensions": ["b", "c", "d"],
                             "logoUrl": "https://example.com/logo.png",
-                            "bannerUrl": "https://example.com/banner.png"
+                            "transparentLogoUrl": "https://example.com/logo-transparent-updated.png",
+                            "bannerUrl": "https://example.com/banner.png",
+                            "color": "#00FF00"
                         }
                         """);
-
 
         client
                 .get()
@@ -148,13 +158,14 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                                 "d"
                               ],
                               "logoUrl": "https://example.com/logo.png",
-                              "bannerUrl": "https://example.com/banner.png"
+                              "transparentLogoUrl": "https://example.com/logo-transparent-updated.png",
+                              "bannerUrl": "https://example.com/banner.png",
+                              "color": "#00FF00"
                             }
                           ]
                         }
                         """);
     }
-
 
     @Test
     @Order(10)
@@ -168,7 +179,11 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                         {
                             "name": "Foo",
                             "slug": "foo",
-                            "fileExtensions": []
+                            "fileExtensions": [],
+                            "logoUrl": "https://example.com/foo-logo.png",
+                            "transparentLogoUrl": "https://example.com/foo-logo-transparent.png",
+                            "bannerUrl": "https://example.com/foo-banner.png",
+                            "color": "#123456"
                         }
                         """)
                 .exchange()
@@ -181,11 +196,12 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                             "name": "Foo",
                             "slug": "foo",
                             "fileExtensions": [],
-                            "logoUrl": null,
-                            "bannerUrl": null
+                            "logoUrl": "https://example.com/foo-logo.png",
+                            "transparentLogoUrl": "https://example.com/foo-logo-transparent.png",
+                            "bannerUrl": "https://example.com/foo-banner.png",
+                            "color": "#123456"
                         }
                         """);
-
 
         client
                 .get()
@@ -207,13 +223,17 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                                 "d"
                               ],
                               "logoUrl": "https://example.com/logo.png",
-                              "bannerUrl": "https://example.com/banner.png"
+                              "transparentLogoUrl": "https://example.com/logo-transparent-updated.png",
+                              "bannerUrl": "https://example.com/banner.png",
+                              "color": "#00FF00"
                             },{
                               "name": "Foo",
                               "slug": "foo",
                               "fileExtensions": [],
-                              "logoUrl": null,
-                              "bannerUrl": null
+                              "logoUrl": "https://example.com/foo-logo.png",
+                              "transparentLogoUrl": "https://example.com/foo-logo-transparent.png",
+                              "bannerUrl": "https://example.com/foo-banner.png",
+                              "color": "#123456"
                             }
                           ]
                         }
