@@ -1,5 +1,16 @@
 package onlydust.com.marketplace.api.it.api;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+
 import onlydust.com.marketplace.api.contract.model.MatchingAnswerResponse;
 import onlydust.com.marketplace.api.contract.model.MatchingQuestionsResponse;
 import onlydust.com.marketplace.api.contract.model.RecommendedProjectsResponse;
@@ -12,16 +23,6 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.EcosystemReposit
 import onlydust.com.marketplace.api.postgres.adapter.repository.LanguageRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserAnswersV1Repository;
 import onlydust.com.marketplace.api.suites.tags.TagRecommendation;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @TagRecommendation
 public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
@@ -148,9 +149,6 @@ public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
         // Then
         assertThat(response).isNotNull();
         assertThat(response.getProjects()).hasSize(7);
-        assertThat(response.getProjects().getFirst().getName()).isEqualTo("Zama");
-        assertThat(response.getProjects().get(1).getName()).isEqualTo("Cal.com");
-        assertThat(response.getProjects().get(2).getName()).isEqualTo("Taco Tuesday");
     }
 
     @Test

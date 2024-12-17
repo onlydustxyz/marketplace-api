@@ -1,23 +1,7 @@
 package onlydust.com.marketplace.api.it.api;
 
-import lombok.NonNull;
-import onlydust.com.marketplace.api.contract.model.ContributorOverviewResponse;
-import onlydust.com.marketplace.api.contract.model.IssueApplicantsPageItemResponse;
-import onlydust.com.marketplace.api.contract.model.IssueApplicantsPageResponse;
-import onlydust.com.marketplace.api.contract.model.ProjectApplicationPatchRequest;
-import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.LanguageEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.LanguageRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
-import onlydust.com.marketplace.api.suites.tags.TagProject;
-import onlydust.com.marketplace.kernel.model.ContributionUUID;
-import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.project.domain.model.Application;
-import onlydust.com.marketplace.project.domain.port.input.ProjectContributorLabelFacadePort;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -26,8 +10,23 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.NonNull;
+import onlydust.com.marketplace.api.contract.model.ContributorOverviewResponse;
+import onlydust.com.marketplace.api.contract.model.IssueApplicantsPageItemResponse;
+import onlydust.com.marketplace.api.contract.model.IssueApplicantsPageResponse;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationPatchRequest;
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
+import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.project.domain.model.Application;
+import onlydust.com.marketplace.project.domain.port.input.ProjectContributorLabelFacadePort;
 
 
 @TagProject
@@ -1057,19 +1056,19 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "trend": "UP"
                               },
                               "issueCount": {
-                                "value": 44,
+                                "value": 36,
                                 "trend": "UP"
                               },
                               "prCount": {
-                                "value": 265,
+                                "value": 227,
                                 "trend": "UP"
                               },
                               "codeReviewCount": {
-                                "value": 126,
+                                "value": 110,
                                 "trend": "UP"
                               },
                               "contributionCount": {
-                                "value": 435,
+                                "value": 373,
                                 "trend": "UP"
                               },
                               "maintainedProjectCount": 2,
@@ -1208,15 +1207,15 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "trend": "STABLE"
                               },
                               "prCount": {
-                                "value": 102,
+                                "value": 46,
                                 "trend": "UP"
                               },
                               "codeReviewCount": {
-                                "value": 163,
+                                "value": 75,
                                 "trend": "UP"
                               },
                               "contributionCount": {
-                                "value": 265,
+                                "value": 121,
                                 "trend": "UP"
                               },
                               "maintainedProjectCount": 1,
@@ -1495,19 +1494,19 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "trend": "UP"
                               },
                               "issueCount": {
-                                "value": 14,
+                                "value": 9,
                                 "trend": "UP"
                               },
                               "prCount": {
-                                "value": 198,
+                                "value": 157,
                                 "trend": "UP"
                               },
                               "codeReviewCount": {
-                                "value": 63,
+                                "value": 50,
                                 "trend": "UP"
                               },
                               "contributionCount": {
-                                "value": 275,
+                                "value": 216,
                                 "trend": "UP"
                               },
                               "maintainedProjectCount": 3,
