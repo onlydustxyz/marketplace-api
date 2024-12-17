@@ -44,8 +44,8 @@ class NotificationServiceTest {
         // Then
         Thread.sleep(1000); // Wait for async processing
         verify(notificationStoragePort).save(eq(notification));
-        verify(notificationEmailSender).send(any(SendableNotification.class));
-        verify(notificationStoragePort).markAsSent(NotificationChannel.EMAIL, List.of(notification.id()));
+        verify(notificationEmailSender, timeout(5000)).send(any(SendableNotification.class));
+        verify(notificationStoragePort, timeout(5000)).markAsSent(NotificationChannel.EMAIL, List.of(notification.id()));
     }
 
     @Test
@@ -63,7 +63,7 @@ class NotificationServiceTest {
 
         // Then
         verify(notificationStoragePort).save(eq(notification));
-        verify(notificationEmailSender).send(any(SendableNotification.class));
+        verify(notificationEmailSender, timeout(5000)).send(any(SendableNotification.class));
         verify(notificationStoragePort, never()).markAsSent(NotificationChannel.EMAIL, List.of(notification.id()));
     }
 
