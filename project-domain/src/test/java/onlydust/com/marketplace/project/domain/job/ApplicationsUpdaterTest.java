@@ -142,7 +142,7 @@ class ApplicationsUpdaterTest {
             assertThat(applications).allMatch(application -> application.appliedAt().equals(event.createdAt()));
             assertThat(applications).allMatch(application -> application.commentBody().equals(event.body()));
 
-            verify(indexerPort).indexUser(event.authorId());
+            verify(indexerPort).indexUser(event.authorId(), false);
             Arrays.stream(applications).forEach(application -> verify(applicationObserverPort).onApplicationCreated(application));
         }
 
@@ -243,7 +243,7 @@ class ApplicationsUpdaterTest {
             assertThat(applications).allMatch(application -> application.appliedAt().equals(event.updatedAt()));
             assertThat(applications).allMatch(application -> application.commentBody().equals(event.body()));
 
-            verify(indexerPort).indexUser(event.authorId());
+            verify(indexerPort).indexUser(event.authorId(), false);
 
             Arrays.stream(applications).forEach(application -> verify(applicationObserverPort).onApplicationCreated(application));
         }

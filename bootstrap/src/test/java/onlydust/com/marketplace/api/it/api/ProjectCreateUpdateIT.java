@@ -63,31 +63,31 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     @BeforeEach
     public void setup() {
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/595505"))
+                        WireMock.urlEqualTo("/api/v1/users/595505?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/43467246"))
+                        WireMock.urlEqualTo("/api/v1/users/43467246?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/16590657"))
+                        WireMock.urlEqualTo("/api/v1/users/16590657?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/5160414"))
+                        WireMock.urlEqualTo("/api/v1/users/5160414?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/777"))
+                        WireMock.urlEqualTo("/api/v1/users/777?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.responseDefinition().withStatus(500)));
@@ -317,11 +317,11 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                         }
                         """, true, false))
                 .willReturn(WireMock.noContent()));
-        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/16590657"))
+        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/16590657?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
-        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/43467246"))
+        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/43467246?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
@@ -390,11 +390,11 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                         }
                         """, true, false))
                 .willReturn(WireMock.noContent()));
-        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/16590657"))
+        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/16590657?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
-        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/43467246"))
+        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/43467246?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
@@ -462,11 +462,11 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                         }
                         """, true, false))
                 .willReturn(WireMock.noContent()));
-        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/16590657"))
+        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/16590657?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
-        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/43467246"))
+        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/43467246?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
@@ -527,10 +527,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         assertProjectWasUpdated();
 
         runJobs();
-        indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/43467246"))
+        indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/43467246?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
         );
-        indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/16590657"))
+        indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/16590657?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
         );
         indexerApiWireMockServer.verify(1, postRequestedFor(urlEqualTo("/api/v1/events/on-repo-link-changed"))
@@ -837,11 +837,11 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                         }
                         """.formatted(otherRepo.getId()), true, false))
                 .willReturn(WireMock.noContent()));
-        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/595505"))
+        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/595505?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
-        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/43467246"))
+        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/43467246?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
@@ -886,10 +886,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
         runJobs();
 
-        indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/43467246"))
+        indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/43467246?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
         );
-        indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/595505"))
+        indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/595505?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
         );
         indexerApiWireMockServer.verify(1, postRequestedFor(urlEqualTo("/api/v1/events/on-repo-link-changed"))

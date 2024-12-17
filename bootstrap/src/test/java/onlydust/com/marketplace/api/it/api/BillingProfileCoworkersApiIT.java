@@ -8,12 +8,12 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBi
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.junit.jupiter.api.MethodOrderer;
@@ -207,13 +207,13 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
         final var companyBillingProfile = billingProfileService.createCompanyBillingProfile(userId, faker.rickAndMorty().character(), null);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/123456789999"))
+                        WireMock.urlEqualTo("/api/v1/users/123456789999?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/595505"))
+                        WireMock.urlEqualTo("/api/v1/users/595505?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
@@ -692,13 +692,13 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
         final var companyBillingProfile = billingProfileService.createCompanyBillingProfile(userId, faker.rickAndMorty().character(), null);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/123456789999"))
+                        WireMock.urlEqualTo("/api/v1/users/123456789999?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/595505"))
+                        WireMock.urlEqualTo("/api/v1/users/595505?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
@@ -896,7 +896,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                         """);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/595505"))
+                        WireMock.urlEqualTo("/api/v1/users/595505?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
@@ -1079,7 +1079,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
         final var companyBillingProfile = billingProfileService.createCompanyBillingProfile(adminId, faker.rickAndMorty().character(), null);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/%d".formatted(coworker.user().getGithubUserId())))
+                        WireMock.urlEqualTo("/api/v1/users/%d?forceRefresh=false".formatted(coworker.user().getGithubUserId())))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
@@ -1330,13 +1330,13 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
         final var companyBillingProfile = billingProfileService.createCompanyBillingProfile(userId, faker.rickAndMorty().character(), null);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/123456789999"))
+                        WireMock.urlEqualTo("/api/v1/users/123456789999?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/595505"))
+                        WireMock.urlEqualTo("/api/v1/users/595505?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));

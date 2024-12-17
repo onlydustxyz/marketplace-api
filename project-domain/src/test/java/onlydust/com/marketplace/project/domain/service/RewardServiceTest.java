@@ -79,7 +79,7 @@ public class RewardServiceTest {
 
             // Then
             assertThat(rewardId).isNotNull();
-            verify(indexerPort).indexUser(recipientId);
+            verify(indexerPort).indexUser(recipientId, false);
 
             final var reward = ArgumentCaptor.forClass(Reward.class);
             verify(rewardStoragePort).save(reward.capture());

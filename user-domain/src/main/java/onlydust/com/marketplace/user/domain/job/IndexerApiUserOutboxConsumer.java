@@ -23,7 +23,7 @@ public class IndexerApiUserOutboxConsumer implements OutboxConsumer {
     @Retryable(maxAttempts = 6, backoff = @Backoff(delay = 500, multiplier = 2))
     private void callIndexerApi(Event event) {
         if (event instanceof UserSignedUp userSignedUp) {
-            indexerPort.indexUser(userSignedUp.getGithubUserId());
+            indexerPort.indexUser(userSignedUp.getGithubUserId(), true);
         }
     }
 }

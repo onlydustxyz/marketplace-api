@@ -68,7 +68,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .willReturn(okForEmptyJson().withHeader("x-oauth-scopes", "read:org, read:packages, public_repo")));
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/%d".formatted(githubUserId)))
+                        WireMock.urlEqualTo("/api/v1/users/%d?forceRefresh=true".formatted(githubUserId)))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(okForEmptyJson()));
@@ -112,7 +112,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         assertMe(me);
         assertUserEntity(me.getId());
         runJobs();
-        indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/%d".formatted(githubUserId)))
+        indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/%d?forceRefresh=true".formatted(githubUserId)))
                 .withHeader("Content-Type", equalTo("application/json"))
         );
         posthogWireMockServer.verify(1, postRequestedFor(urlEqualTo("/capture/"))

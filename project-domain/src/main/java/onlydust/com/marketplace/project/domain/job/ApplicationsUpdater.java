@@ -108,7 +108,7 @@ public class ApplicationsUpdater implements OutboxConsumer {
                 .collect(joining("\n"));
 
         if (llmPort.isCommentShowingInterestToContribute(cleanComment)) {
-            indexerPort.indexUser(comment.authorId());
+            indexerPort.indexUser(comment.authorId(), false);
             saveGithubApplications(comment, projectIds);
         }
     }

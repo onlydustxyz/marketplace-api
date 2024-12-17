@@ -13,13 +13,13 @@ public class IndexerApiClientAdapter implements IndexerPort {
     private final IndexerApiHttpClient httpClient;
 
     @Override
-    public void indexUser(Long githubUserId) {
-        httpClient.send("/api/v1/users/" + githubUserId, HttpMethod.PUT, null, Void.class);
+    public void indexUser(Long githubUserId, boolean forceRefresh) {
+        httpClient.send("/api/v1/users/%d?forceRefresh=%s".formatted(githubUserId, forceRefresh), HttpMethod.PUT, null, Void.class);
     }
 
     @Override
     public void indexUsers(List<Long> githubUserIds) {
-        githubUserIds.stream().parallel().forEach(this::indexUser);
+        githubUserIds.stream().parallel().forEach(githubUserId -> indexUser(githubUserId, false));
     }
 
     @Override

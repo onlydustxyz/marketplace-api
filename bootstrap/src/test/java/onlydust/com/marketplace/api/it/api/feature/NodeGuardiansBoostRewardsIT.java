@@ -85,7 +85,7 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
                         }
                         """))
                 .willReturn(okJson(String.format(CLOSE_ISSUE_RESPONSE_JSON, faker.rickAndMorty().character()))));
-        dustyBotApiWireMockServer.stubFor(put(urlEqualTo("/api/v1/users/595505"))
+        dustyBotApiWireMockServer.stubFor(put(urlEqualTo("/api/v1/users/595505?forceRefresh=false"))
                 .withHeader("Authorization", equalTo("Bearer " + githubDustyBotConfig.getPersonalAccessToken()))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
     }
@@ -212,7 +212,7 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
 
         // When
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/%s".formatted(recipientId)))
+                        WireMock.urlEqualTo("/api/v1/users/%s?forceRefresh=false".formatted(recipientId)))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));

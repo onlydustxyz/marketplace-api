@@ -115,7 +115,7 @@ public class BackOfficeProjectsApiIT extends AbstractMarketplaceBackOfficeApiIT 
                         }
                         """)));
 
-        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/212"))
+        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/212?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));

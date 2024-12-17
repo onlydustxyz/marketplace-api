@@ -138,7 +138,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
 
         // When
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/16590657"))
+                        WireMock.urlEqualTo("/api/v1/users/16590657?forceRefresh=false"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.like(ResponseDefinitionBuilder.jsonResponse("""
