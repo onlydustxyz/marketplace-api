@@ -13,7 +13,7 @@ public interface RecommenderSystemPort {
 
     List<MatchingQuestion<?>> getMatchingQuestions(@NonNull UserId userId);
 
-    void saveMatchingAnswers(@NonNull UserId userId, @NonNull MatchingQuestion.Id questionId, @NonNull Set<Integer> chosenAnswerIndexes);
+    void saveMatchingAnswers(@NonNull UserId userId, @NonNull MatchingQuestion.Id questionId, @NonNull Set<String> chosenAnswerValues);
 
     List<ProjectId> getRecommendedProjects(@NonNull UserId userId);
 

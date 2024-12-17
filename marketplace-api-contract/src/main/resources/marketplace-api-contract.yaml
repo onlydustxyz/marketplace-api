@@ -13447,12 +13447,12 @@ components:
     MatchingAnswerResponse:
       type: object
       required:
-        - id
+        - value
         - body
         - chosen
       properties:
-        index:
-          type: integer
+        value:
+          type: string
         body:
           type: string
         chosen:
@@ -13461,12 +13461,12 @@ components:
     SaveMatchingAnswersRequest:
       type: object
       required:
-        - answerIndexes
+        - answerValues
       properties:
-        answerIndexes:
+        answerValues:
           type: array
           items:
-            type: integer
+            type: string
 
     RecommendedProjectsResponse:
       type: object

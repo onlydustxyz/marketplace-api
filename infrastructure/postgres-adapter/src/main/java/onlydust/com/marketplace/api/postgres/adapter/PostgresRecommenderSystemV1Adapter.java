@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.ProjectRecommendationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.recommendation.UserAnswersV1Entity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.LanguageEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.EcosystemRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.LanguageRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRecommendationV1Repository;
@@ -16,12 +18,8 @@ import onlydust.com.marketplace.project.domain.port.output.RecommenderSystemPort
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -53,7 +51,7 @@ public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort
 
     @Override
     @Transactional
-    public void saveMatchingAnswers(@NonNull UserId userId, @NonNull MatchingQuestion.Id questionId, @NonNull Set<Integer> chosenAnswerIndexes) {
+    public void saveMatchingAnswers(@NonNull UserId userId, @NonNull MatchingQuestion.Id questionId, @NonNull Set<String> chosenAnswerValues) {
         final var userAnswers = userAnswersV1Repository.findById(userId.value())
                 .orElse(UserAnswersV1Entity.builder().userId(userId.value()).build());
         final var matchingQuestion = getMatchingQuestions(userAnswers).stream()
@@ -61,9 +59,8 @@ public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort
                 .findFirst()
                 .orElseThrow(() -> notFound("Question %s not found".formatted(questionId)));
 
-        final var chosenAnswers = IntStream.range(0, matchingQuestion.answers().size())
-                .filter(chosenAnswerIndexes::contains)
-                .mapToObj(i -> matchingQuestion.answers().get(i));
+        final var chosenAnswers = matchingQuestion.answers().stream()
+                .filter(a -> chosenAnswerValues.contains(a.valueString()));
 
         switch (questionId.toString()) {
             case "b98a375e-3a9d-4b63-a553-4d8d0c31d7c4":
@@ -147,8 +144,8 @@ public class PostgresRecommenderSystemV1Adapter implements RecommenderSystemPort
     }
 
     private List<MatchingQuestion<?>> getMatchingQuestions(final @NonNull UserAnswersV1Entity userAnswers) {
-        final var languages = languageRepository.findAll();
-        final var ecosystems = ecosystemRepository.findAll();
+        final var languages = languageRepository.findAll().stream().sorted(Comparator.comparing(LanguageEntity::name)).toList();
+        final var ecosystems = ecosystemRepository.findAll().stream().sorted(Comparator.comparing(EcosystemEntity::getName)).toList();
         return List.of(
                 // Question 0: Primary goals
                 MatchingQuestion.<Integer>builder()

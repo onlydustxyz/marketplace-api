@@ -9,4 +9,8 @@ public class MatchingAnswer<T> {
     String body;
     boolean chosen;
     T value;
+
+    public String valueString() {
+        return value.toString();
+    }
 }

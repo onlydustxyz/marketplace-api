@@ -26,11 +26,11 @@ public class RecommendationService implements RecommendationFacadePort {
     @Override
     public void saveMatchingAnswers(final @NonNull UserId userId,
                                     final @NonNull MatchingQuestion.Id questionId,
-                                    final @NonNull Set<Integer> chosenAnswerIndexes) {
-        if (!recommenderSystemPort.isMultipleChoice(questionId) && chosenAnswerIndexes.size() > 1) {
+                                    final @NonNull Set<String> chosenAnswerValues) {
+        if (!recommenderSystemPort.isMultipleChoice(questionId) && chosenAnswerValues.size() > 1) {
             throw badRequest("Question %s is not multiple choice".formatted(questionId));
         }
-        recommenderSystemPort.saveMatchingAnswers(userId, questionId, chosenAnswerIndexes);
+        recommenderSystemPort.saveMatchingAnswers(userId, questionId, chosenAnswerValues);
     }
 
     @Override
