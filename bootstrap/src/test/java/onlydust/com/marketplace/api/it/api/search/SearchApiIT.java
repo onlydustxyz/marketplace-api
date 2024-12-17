@@ -602,7 +602,7 @@ public class SearchApiIT extends AbstractMarketplaceApiIT {
     @Order(20)
     void should_search_contributors() {
         // Given
-        final String keyword = "pierreoucif";
+        final String keyword = "PierreOucif";
 
         // When
         client.post()

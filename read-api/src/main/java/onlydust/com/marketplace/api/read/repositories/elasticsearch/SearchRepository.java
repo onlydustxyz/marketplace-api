@@ -47,7 +47,8 @@ public class SearchRepository {
                 .orElseGet(SuggestResponse::new);
     }
 
-    public static JsonNode buildSuggestQuery(final String keyword, final SearchItemType type, final Map<ProjectFacet, List<String>> facets) {
+    public static JsonNode buildSuggestQuery(String keyword, final SearchItemType type, final Map<ProjectFacet, List<String>> facets) {
+        keyword = keyword.toLowerCase();
         if (isNull(type)) {
             return ElasticSearchQuery.builder()
                     .withPrefixes(
