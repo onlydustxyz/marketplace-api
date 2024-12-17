@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashSet;
 import java.util.UUID;
-import java.util.stream.IntStream;
 
 @RestController
 @Tags(@Tag(name = "Recommendations"))
@@ -40,21 +39,17 @@ public class RecommendationsRestApi implements RecommendationsApi {
                                 .body(q.body())
                                 .description(q.description())
                                 .multipleChoice(q.multipleChoice())
-                                .answers(IntStream.range(0, q.answers().size())
-                                        .mapToObj(i -> {
-                                            final var a = q.answers().get(i);
-                                            return new MatchingAnswerResponse()
-                                                    .index(i)
-                                                    .body(a.body())
-                                                    .chosen(a.chosen());
-                                        }).toList()))
+                                .answers(q.answers().stream().map(a -> new MatchingAnswerResponse()
+                                        .value(a.valueString())
+                                        .body(a.body())
+                                        .chosen(a.chosen())).toList()))
                         .toList()));
     }
 
     @Override
     public ResponseEntity<Void> saveMatchingQuestionAnswers(UUID questionId, SaveMatchingAnswersRequest request) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        recommendationFacadePort.saveMatchingAnswers(authenticatedUser.id(), MatchingQuestion.Id.of(questionId), new HashSet<>(request.getAnswerIndexes()));
+        recommendationFacadePort.saveMatchingAnswers(authenticatedUser.id(), MatchingQuestion.Id.of(questionId), new HashSet<>(request.getAnswerValues()));
         return ResponseEntity.noContent().build();
     }
 }

@@ -87,21 +87,21 @@ public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
                 .contains("Select the languages you'd like to work with in open source projects.");
         assertThat(languagesQuestion.getMultipleChoice()).isTrue();
         assertThat(languagesQuestion.getAnswers()).extracting(MatchingAnswerResponse::getBody).containsExactly(
-                "Rust",
+                "C#",
+                "C++",
                 "Cairo",
+                "Go",
+                "Java",
+                "JavaScript",
+                "Kotlin",
                 "Noir",
                 "Python",
-                "Go",
-                "Zig",
-                "Java",
                 "Ruby",
-                "Kotlin",
+                "Rust",
                 "Solidity",
                 "Swift",
-                "C++",
-                "C#",
                 "TypeScript",
-                "JavaScript");
+                "Zig");
 
         // Check blockchain ecosystems question (index 4)
         final var blockchainQuestion = response.getQuestions().get(4);
@@ -159,7 +159,7 @@ public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
         client.put()
                 .uri(getApiURI("/api/v1/me/reco/projects/matching-questions/4f52195c-1c13-4c54-9132-a89e73e4c69d/answers"))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + pierre.jwt())
-                .bodyValue(new SaveMatchingAnswersRequest().answerIndexes(List.of(2))) // Advanced
+                .bodyValue(new SaveMatchingAnswersRequest().answerValues(List.of("3"))) // Advanced
                 .exchange()
                 .expectStatus()
                 .isNoContent();
@@ -191,7 +191,8 @@ public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
         client.put()
                 .uri(getApiURI("/api/v1/me/reco/projects/matching-questions/7d052a24-7824-43d8-8e7b-3727c2c1c9b4/answers"))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + pierre.jwt())
-                .bodyValue(new SaveMatchingAnswersRequest().answerIndexes(List.of(0, 2))) // JavaScript
+                .bodyValue(new SaveMatchingAnswersRequest().answerValues(List.of("ca600cac-0f45-44e9-a6e8-25e21b0c6887",
+                        "e1842c39-fcfa-4289-9b5e-61bf50386a72")))
                 // and Rust
                 .exchange()
                 .expectStatus()
@@ -215,7 +216,7 @@ public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
                 .filteredOn(MatchingAnswerResponse::getChosen)
                 .hasSize(2)
                 .extracting(MatchingAnswerResponse::getBody)
-                .containsExactlyInAnyOrder("Rust", "Noir");
+                .containsExactlyInAnyOrder("Rust", "Python");
     }
 
     @Test
@@ -224,7 +225,7 @@ public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
         client.put()
                 .uri(getApiURI("/api/v1/me/reco/projects/matching-questions/4f52195c-1c13-4c54-9132-a89e73e4c69d/answers"))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + pierre.jwt())
-                .bodyValue(new SaveMatchingAnswersRequest().answerIndexes(List.of(1, 2))) // Intermediate
+                .bodyValue(new SaveMatchingAnswersRequest().answerValues(List.of("1", "2")))
                 // and
                 // Advanced
                 .exchange()
@@ -237,7 +238,7 @@ public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
         client.put()
                 .uri(getApiURI("/api/v1/me/reco/projects/matching-questions/00000000-0000-0000-0000-000000000000/answers"))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + pierre.jwt())
-                .bodyValue(new SaveMatchingAnswersRequest().answerIndexes(List.of(0)))
+                .bodyValue(new SaveMatchingAnswersRequest().answerValues(List.of("1")))
                 .exchange()
                 .expectStatus()
                 .isNotFound();
@@ -247,7 +248,7 @@ public class RecommendationV1ApiIT extends AbstractMarketplaceApiIT {
     void should_fail_when_not_authenticated() {
         client.put()
                 .uri(getApiURI("/api/v1/me/reco/projects/matching-questions/4f52195c-1c13-4c54-9132-a89e73e4c69d/answers"))
-                .bodyValue(new SaveMatchingAnswersRequest().answerIndexes(List.of(0)))
+                .bodyValue(new SaveMatchingAnswersRequest().answerValues(List.of("1")))
                 .exchange()
                 .expectStatus()
                 .isUnauthorized();
