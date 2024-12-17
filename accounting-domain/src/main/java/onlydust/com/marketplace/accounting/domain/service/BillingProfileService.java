@@ -258,7 +258,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (List.of(BillingProfile.Type.INDIVIDUAL, BillingProfile.Type.SELF_EMPLOYED).contains(billingProfile.type()))
             throw forbidden("Cannot invite coworker on individual or self employed billing profile %s".formatted(billingProfile.id()));
 
-        indexerPort.indexUser(invitedGithubUserId.value());
+        indexerPort.indexUser(invitedGithubUserId.value(), false);
         billingProfileStoragePort.saveCoworkerInvitation(billingProfileId, invitedBy, invitedGithubUserId, role, ZonedDateTime.now());
     }
 

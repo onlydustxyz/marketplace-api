@@ -38,7 +38,7 @@ public class RewardService implements RewardFacadePort {
         if (command.getAmount().compareTo(BigDecimal.ZERO) <= 0)
             throw forbidden("Amount must be greater than 0");
 
-        indexerPort.indexUser(command.getRecipientId());
+        indexerPort.indexUser(command.getRecipientId(), false);
 
         final var rewardId = RewardId.random();
         final var reward = new Reward(

@@ -70,7 +70,7 @@ public class AppUserService implements AppUserFacadePort {
             throw OnlyDustException.internalServerError("Github user %s not found".formatted(newGithubLogin));
         }
         final GithubUserIdentity newGithubUserIdentity = githubUserIdentities.get(0);
-        indexerPort.indexUser(newGithubUserIdentity.githubUserId());
+        indexerPort.indexUser(newGithubUserIdentity.githubUserId(), false);
         String githubPersonalToken = identityProviderPort.getGithubPersonalToken(currentGithubUserId);
         githubOAuthAppPort.deleteGithubOAuthApp(githubOAuthAppId, githubOAuthAppSecret, githubPersonalToken);
         identityProviderPort.deleteUser(currentGithubUserId);

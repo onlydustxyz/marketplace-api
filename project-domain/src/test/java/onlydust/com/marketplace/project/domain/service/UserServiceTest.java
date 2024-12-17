@@ -482,7 +482,7 @@ public class UserServiceTest {
         // Then
         final ArgumentCaptor<GithubUserIdentity> userArgumentCaptor = ArgumentCaptor.forClass(GithubUserIdentity.class);
         verify(userStoragePort, times(1)).saveUser(userArgumentCaptor.capture());
-        verify(indexerPort, times(1)).indexUser(githubUserId);
+        verify(indexerPort, times(1)).indexUser(githubUserId, true);
         assertEquals(githubUserIdentity.login(), userArgumentCaptor.getValue().login());
         assertEquals(githubUserIdentity.avatarUrl(), userArgumentCaptor.getValue().avatarUrl());
         assertEquals(githubUserIdentity.email(), userArgumentCaptor.getValue().email());

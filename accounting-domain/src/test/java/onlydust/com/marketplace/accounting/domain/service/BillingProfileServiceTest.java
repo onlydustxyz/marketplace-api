@@ -1247,7 +1247,7 @@ class BillingProfileServiceTest {
         billingProfileService.inviteCoworker(billingProfileId, userId, githubUserId, BillingProfile.User.Role.MEMBER);
 
         // Then
-        verify(indexerPort).indexUser(githubUserId.value());
+        verify(indexerPort).indexUser(githubUserId.value(), false);
         verify(billingProfileStoragePort).saveCoworkerInvitation(eq(billingProfileId), eq(userId), eq(githubUserId), eq(BillingProfile.User.Role.MEMBER),
                 any());
     }
@@ -1265,7 +1265,7 @@ class BillingProfileServiceTest {
                 .hasMessage("User %s must be admin to invite coworker to billing profile %s".formatted(userIdNotAdmin, billingProfileId));
 
         // Then
-        verify(indexerPort, never()).indexUser(any());
+        verify(indexerPort, never()).indexUser(any(), any());
         verify(billingProfileStoragePort, never()).saveCoworkerInvitation(any(), any(), any(), any(), any());
     }
 
@@ -1283,7 +1283,7 @@ class BillingProfileServiceTest {
                 .hasMessage("Cannot invite coworker on individual or self employed billing profile %s".formatted(billingProfile.id()));
 
         // Then
-        verify(indexerPort, never()).indexUser(any());
+        verify(indexerPort, never()).indexUser(any(), any());
         verify(billingProfileStoragePort, never()).saveCoworkerInvitation(any(), any(), any(), any(), any());
 
     }
@@ -1303,7 +1303,7 @@ class BillingProfileServiceTest {
                 .hasMessage("Cannot invite coworker on individual or self employed billing profile %s".formatted(billingProfile.id()));
 
         // Then
-        verify(indexerPort, never()).indexUser(any());
+        verify(indexerPort, never()).indexUser(any(), any());
         verify(billingProfileStoragePort, never()).saveCoworkerInvitation(any(), any(), any(), any(), any());
 
     }
