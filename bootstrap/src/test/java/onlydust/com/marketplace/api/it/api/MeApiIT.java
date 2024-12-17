@@ -545,7 +545,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/%s".formatted(recipientId)))
+                        WireMock.urlEqualTo("/api/v1/users/%s?forceRefresh=false".formatted(recipientId)))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));

@@ -570,7 +570,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
         accountingService.grant(programId, projectId, PositiveAmount.of(100000L), Currency.Id.of(usdcId));
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/%s".formatted(authenticatedUser.user().getGithubUserId())))
+                        WireMock.urlEqualTo("/api/v1/users/%s?forceRefresh=false".formatted(authenticatedUser.user().getGithubUserId())))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
@@ -594,7 +594,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful();
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/%s".formatted(authenticatedUser.user().getGithubUserId())))
+                        WireMock.urlEqualTo("/api/v1/users/%s?forceRefresh=false".formatted(authenticatedUser.user().getGithubUserId())))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));

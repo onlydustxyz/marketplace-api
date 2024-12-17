@@ -218,7 +218,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         accountingHelper.grant(program.id(), KAAPER, 100, USDC);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        urlEqualTo("/api/v1/users/%d".formatted(ofux.user().getGithubUserId())))
+                        urlEqualTo("/api/v1/users/%d?forceRefresh=false".formatted(ofux.user().getGithubUserId())))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
@@ -400,7 +400,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         accountingHelper.grant(program.id(), KAAPER, 100, USDC);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        urlEqualTo("/api/v1/users/%d".formatted(ofux.user().getGithubUserId())))
+                        urlEqualTo("/api/v1/users/%d?forceRefresh=false".formatted(ofux.user().getGithubUserId())))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
@@ -560,7 +560,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         accountingHelper.grant(program.id(), KAAPER, 100, APT);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        urlEqualTo("/api/v1/users/%d".formatted(ofux.user().getGithubUserId())))
+                        urlEqualTo("/api/v1/users/%d?forceRefresh=false".formatted(ofux.user().getGithubUserId())))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));

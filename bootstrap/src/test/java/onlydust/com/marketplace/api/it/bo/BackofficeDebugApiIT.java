@@ -229,7 +229,7 @@ public class BackofficeDebugApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectStatus()
                 .isNoContent();
 
-        indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/%d".formatted(1234L)))
+        indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/%d?forceRefresh=false".formatted(1234L)))
                 .withHeader("Content-Type", equalTo("application/json"))
         );
     }

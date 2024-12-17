@@ -574,7 +574,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         assertThat(application.origin()).isEqualTo(Application.Origin.GITHUB);
         assertThat(application.commentBody()).isEqualTo(commentBody);
 
-        indexerApiWireMockServer.verify(putRequestedFor(urlEqualTo("/api/v1/users/" + antho.user().getGithubUserId())));
+        indexerApiWireMockServer.verify(putRequestedFor(urlEqualTo("/api/v1/users/" + antho.user().getGithubUserId() + "?forceRefresh=false")));
         verify(slackApiAdapter).onApplicationCreated(any(Application.class));
 
         trackingOutboxJob.run();
