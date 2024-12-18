@@ -30,13 +30,13 @@ public class ReadSearchApiElasticSearchAdapter implements ReadSearchApi {
     @Override
     public ResponseEntity<SearchResponse> search(SearchPostRequest searchPostRequest) {
         final Map<ProjectFacet, List<String>> facets = new HashMap<>();
-        if (nonNull(searchPostRequest.getCategories())){
+        if (nonNull(searchPostRequest.getCategories()) && !searchPostRequest.getCategories().isEmpty()) {
             facets.put(ProjectFacet.CATEGORIES, searchPostRequest.getCategories());
         }
-        if (nonNull(searchPostRequest.getLanguages())){
+        if (nonNull(searchPostRequest.getLanguages()) && !searchPostRequest.getLanguages().isEmpty()) {
             facets.put(ProjectFacet.LANGUAGES, searchPostRequest.getLanguages());
         }
-        if (nonNull(searchPostRequest.getEcosystems())){
+        if (nonNull(searchPostRequest.getEcosystems()) && !searchPostRequest.getEcosystems().isEmpty()) {
             facets.put(ProjectFacet.ECOSYSTEMS, searchPostRequest.getEcosystems());
         }
         final SearchResponse searchResponse = searchRepository.searchAll(
@@ -51,13 +51,13 @@ public class ReadSearchApiElasticSearchAdapter implements ReadSearchApi {
     @Override
     public ResponseEntity<SuggestResponse> suggest(SuggestPostRequest suggestPostRequest) {
         final Map<ProjectFacet, List<String>> facets = new HashMap<>();
-        if (nonNull(suggestPostRequest.getCategories())){
+        if (nonNull(suggestPostRequest.getCategories()) && !suggestPostRequest.getCategories().isEmpty()){
             facets.put(ProjectFacet.CATEGORIES, suggestPostRequest.getCategories());
         }
-        if (nonNull(suggestPostRequest.getLanguages())){
+        if (nonNull(suggestPostRequest.getLanguages()) && !suggestPostRequest.getLanguages().isEmpty()){
             facets.put(ProjectFacet.LANGUAGES, suggestPostRequest.getLanguages());
         }
-        if (nonNull(suggestPostRequest.getEcosystems())){
+        if (nonNull(suggestPostRequest.getEcosystems()) && !suggestPostRequest.getEcosystems().isEmpty()){
             facets.put(ProjectFacet.ECOSYSTEMS, suggestPostRequest.getEcosystems());
         }
         final SuggestResponse SuggestResponse = searchRepository.suggest(suggestPostRequest.getKeyword(), suggestPostRequest.getType(), facets);
