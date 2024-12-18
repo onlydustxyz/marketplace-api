@@ -13,15 +13,9 @@ import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.api.contract.model.LanguageWithPercentageResponse;
-import onlydust.com.marketplace.api.contract.model.ProjectCategoryResponse;
-import onlydust.com.marketplace.api.contract.model.ProjectShortResponseV2;
-import onlydust.com.marketplace.api.contract.model.ProjectTag;
+import onlydust.com.marketplace.api.contract.model.*;
 
 @NoArgsConstructor(force = true)
 @FieldDefaults(level = AccessLevel.PUBLIC, makeFinal = true)
@@ -45,6 +39,8 @@ public class ProjectPageV2ItemQueryEntity {
     List<LanguageWithLineCount> languages;
     @JdbcTypeCode(SqlTypes.ARRAY)
     List<ProjectTag> tags;
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @NonNull List<EcosystemLinkResponse> ecosystems;
 
 
     private List<ProjectCategoryResponse> categories() {
@@ -86,7 +82,8 @@ public class ProjectPageV2ItemQueryEntity {
                 .starCount(starCount)
                 .goodFirstIssueCount(goodFirstIssueCount)
                 .forkCount(forkCount)
-                .contributorCount(contributorCount);
+                .contributorCount(contributorCount)
+                .ecosystems(ecosystems);
     }
 
     @EqualsAndHashCode(onlyExplicitlyIncluded = true)
