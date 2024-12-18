@@ -13185,6 +13185,7 @@ components:
         - forkCount
         - availableIssueCount
         - goodFirstIssueCount
+        - ecosystems
       properties:
         id:
           $ref: '#/components/schemas/ProjectId'
@@ -13214,6 +13215,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/LanguageWithPercentageResponse'
+        ecosystems:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemLinkResponse'
 
     SearchPostRequest:
       type: object

@@ -102,6 +102,21 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
                                   "color": "#3178C6",
                                   "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/typescript.png"
                                 }
+                              ],
+                              "ecosystems": [
+                                {
+                                  "name": "Chipotle",
+                                  "slug": "chipotle"
+                                },
+                                {
+                                  "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                                  "name": "Starknet",
+                                  "url": "https://www.starknet.io/en",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
+                                  "bannerUrl": null,
+                                  "slug": "starknet",
+                                  "hidden": null
+                                }
                               ]
                             },
                             {
@@ -147,12 +162,12 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
                                   "color": "#3178C6",
                                   "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/typescript.png"
                                 }
-                              ]
+                              ],
+                              "ecosystems": []
                             }
                           ]
                         }
-                        
-                        """, true);
+                        """);
 
         // When
         client.get()
@@ -190,7 +205,8 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
                                     "projectCount": null
                                   }
                                 ],
-                                "languages": []
+                                "languages": [],
+                                "ecosystems": []
                               }
                             ]
                           }
@@ -234,11 +250,26 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
                                    "color": "#3178C6",
                                    "transparentLogoUrl": "https://od-languages-develop.s3.eu-west-1.amazonaws.com/transparent/typescript.png"
                                  }
+                               ],
+                               "ecosystems": [
+                                {
+                                  "name": "Chipotle",
+                                  "slug": "chipotle"
+                                },
+                                {
+                                  "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                                  "name": "Starknet",
+                                  "url": "https://www.starknet.io/en",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
+                                  "bannerUrl": null,
+                                  "slug": "starknet",
+                                  "hidden": null
+                                }
                                ]
                              }
                            ]
                          }
-                        """, true);
+                        """);
 
 
     }
