@@ -108,14 +108,6 @@ public class JobScheduler {
         rewardStatusService.refreshRewardsUsdEquivalents();
     }
 
-    @Scheduled(cron = "${application.cron.boost-rewards-cron-expression}")
-    public void boostNodeGuardianRewards() {
-        LOGGER.info("Boost rewards for NodeGuardians");
-        boostNodeGuardiansRewardsPort.boostProject(ProjectId.of(nodeGuardiansBoostProperties.getProjectId()),
-                UserId.of(nodeGuardiansBoostProperties.getProjectLeadId()),
-                nodeGuardiansBoostProperties.getGithubRepoId(), nodeGuardiansBoostProperties.getEcosystemId());
-    }
-
     @Scheduled(cron = "${application.cron.process-boosted-rewards-cron-expression}")
     public void processNodeGuardianRewards() {
         LOGGER.info("Processing NodeGuardians rewards boosts");
