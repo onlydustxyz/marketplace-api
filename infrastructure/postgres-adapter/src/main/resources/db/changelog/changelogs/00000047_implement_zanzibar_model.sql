@@ -66,9 +66,11 @@ begin
             userType
             );
     execute format(
-            'create or replace function fga.add_%s(_%s fga.%s, _%s fga.%s) returns void as $func$
-                insert into fga.%s values (_%s, _%s);
-            $func$ language sql stable;',
+            'create or replace function fga.add_%ss(_%s fga.%s, _%ss fga.%s[]) returns void as $func$
+                insert into fga.%s
+                select _%s, unnest(_%ss)
+                on conflict do nothing;
+            $func$ language sql;',
             name,
             type,
             type,
@@ -79,9 +81,9 @@ begin
             userType
             );
     execute format(
-            'create or replace function fga.remove_%s(_%s fga.%s, _%s fga.%s) returns void as $func$
-                delete from fga.%s where "%s" = _%s and "%s" = _%s;
-            $func$ language sql stable;',
+            'create or replace function fga.remove_%ss(_%s fga.%s, _%ss fga.%s[]) returns void as $func$
+                delete from fga.%s where "%s" = _%s and "%s" = any(_%ss);
+            $func$ language sql;',
             name,
             type,
             type,
@@ -93,10 +95,30 @@ begin
             userType,
             userType
             );
+    execute format(
+            'create or replace function fga.override_%ss(_%s fga.%s, _%ss fga.%s[]) returns void as $func$
+                delete from fga.%s where "%s" = _%s and "%s" != any(_%ss);
+                select fga.add_%ss(_%s, _%ss);
+            $func$ language sql;',
+            name,
+            type,
+            type,
+            userType,
+            userType,
+            tableName,
+            type,
+            type,
+            userType,
+            userType,
+            name,
+            type,
+            userType
+            );
     raise notice 'Created table fga.%', tableName;
     raise notice 'Created function: fga.%', getterName;
-    raise notice 'Created function: fga.add_%', name;
-    raise notice 'Created function: fga.remove_%', name;
+    raise notice 'Created function: fga.add_%s', name;
+    raise notice 'Created function: fga.remove_%s', name;
+    raise notice 'Created function: fga.override_%s', name;
 end;
 $$ language plpgsql;
 
@@ -227,5 +249,4 @@ select fga.new_implied_relation('billing_profile', 'can_write', 'admin');
 -- Reward implied relations
 select fga.new_implied_relation('reward', 'can_cancel', 'maintainer from project');
 select fga.new_implied_relation('reward', 'can_claim', 'recipient');
-
 
