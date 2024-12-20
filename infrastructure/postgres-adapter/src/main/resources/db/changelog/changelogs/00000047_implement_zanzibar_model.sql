@@ -225,19 +225,22 @@ select fga.new_relation('reward', 'recipient', 'user');
 
 
 -- Sponsor implied relations
+select fga.new_implied_relation('sponsor', 'can_edit', 'head_of_finance');
 select fga.new_implied_relation('sponsor', 'can_read_financial', 'finance_viewer or head_of_finance or head_of from ecosystem');
 select fga.new_implied_relation('sponsor', 'can_send_allocation', 'head_of_finance');
 select fga.new_implied_relation('sponsor', 'can_deposit_funds', 'head_of_finance');
 select fga.new_implied_relation('sponsor', 'can_edit_a_program', 'head_of_finance');
 
 -- Program implied relations
-select fga.new_implied_relation('program', 'can_edit_leads', 'lead or can_edit_a_program from allocating_sponsor');
+select fga.new_implied_relation('project', 'can_edit', 'lead or can_edit_a_program from allocating_sponsor');
+select fga.new_implied_relation('program', 'can_edit_permissions', 'lead or can_edit_a_program from allocating_sponsor');
 select fga.new_implied_relation('program', 'can_read_financial', 'lead or can_read_financial from allocating_sponsor');
 select fga.new_implied_relation('program', 'can_refund_allocation', 'lead');
 select fga.new_implied_relation('program', 'can_send_grant', 'lead');
 
 -- Project implied relations
-select fga.new_implied_relation('project', 'can_edit_maintainers', 'maintainer');
+select fga.new_implied_relation('project', 'can_edit', 'maintainer');
+select fga.new_implied_relation('project', 'can_edit_permissions', 'maintainer');
 select fga.new_implied_relation('project', 'can_read_financial', 'maintainer or can_read_financial from granting_program');
 select fga.new_implied_relation('project', 'can_refund_grant', 'maintainer');
 select fga.new_implied_relation('project', 'can_send_reward', 'maintainer');
