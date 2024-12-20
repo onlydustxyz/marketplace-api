@@ -11,13 +11,13 @@ public interface FgaPort {
 
         void setMaintainers(ProjectId projectId, List<UserId> userIds);
 
-        void addGrantingProgram(ProjectId projectId, ProgramId programIds);
+        void addGrantingProgram(ProjectId projectId, ProgramId programId);
 
         boolean canEdit(ProjectId projectId, UserId userId);
 
         boolean canEditPermissions(ProjectId projectId, UserId userId);
 
-        boolean canReadFinancials(ProjectId projectId, UserId userId);
+        boolean canReadFinancial(ProjectId projectId, UserId userId);
 
     }
 }
