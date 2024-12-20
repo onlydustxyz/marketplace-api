@@ -2177,6 +2177,66 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v2/projects/{projectIdOrSlug}:
+    get:
+      security:
+        - { }
+        - bearerAuth: [ ]
+      tags:
+        - ReadProjects
+      summary: Get project details
+      operationId: getProjectV2
+      description: |
+        Get the project if it is visible to the caller.
+      parameters:
+        - in: path
+          name: projectIdOrSlug
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 'Project details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectResponseV2'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/projects/{projectIdOrSlug}/similar-projects:
+    get:
+      security:
+        - { }
+        - bearerAuth: [ ]
+      tags:
+        - ReadProjects
+      summary: Get similar projects
+      operationId: getSimilarProjects
+      description: |
+        Get the similar projects to the given project.
+      parameters:
+        - in: path
+          name: projectIdOrSlug
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+      responses:
+        "200":
+          description: 'List of similar projects'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectLinkPageResponse'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 
 
   /api/v1/projects/{projectId}/contributions/{contributionId}:
@@ -2753,6 +2813,47 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/projects/{projectIdOrSlug}/available-issues:
+    get:
+      security:
+        - { }
+      tags:
+        - ReadProjects
+      summary: Get project available issues
+      operationId: getProjectAvailableIssues
+      description: |
+        Get paginated list of project available issues.
+        An issue is available if it is open and not assigned to any contributor.
+        If the issue belongs to a OD Hack, it is available if the OD Hack is open.
+      parameters:
+        - in: path
+          name: projectIdOrSlug
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: githubLabels
+          description: |
+            Filter by labels.
+            The issue must have all the labels selected
+          schema:
+            type: array
+            items:
+              type: string
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+      responses:
+        "200":
+          description: 'List of project available issues'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GithubIssuePageResponse'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/projects/{projectId}/contributors:
     get:
       security:
@@ -2824,6 +2925,44 @@ paths:
           description: 'Contributors labels were updated successfully.'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v2/projects/{projectIdOrSlug}/contributors:
+    get:
+      security:
+        - { }
+        - bearerAuth: [ ]
+      tags:
+        - ReadProjects
+      summary: Get all project contributors
+      operationId: getProjectContributorsV2
+      description: |
+        Get the paginated list of all contributors of the project.
+      parameters:
+        - in: path
+          name: projectIdOrSlug
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: login
+          description: Filter by login (case-insensitive search by login)
+          schema:
+            type: string
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+      responses:
+        "200":
+          description: 'List of project contributors'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributorsPageResponseV2'
         "403":
           $ref: '#/components/responses/ProjectForbiddenError'
         "404":
@@ -3214,6 +3353,35 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v2/projects/{projectIdOrSlug}/rewards:
+    get:
+      security:
+        - { }
+        - bearerAuth: [ ]
+      tags:
+        - ReadProjects
+      summary: Get project rewards
+      operationId: getProjectRewardsV2
+      description: |
+        Get the list of all rewards granted from this project. 
+      parameters:
+        - in: path
+          name: projectIdOrSlug
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 'List of rewards'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RewardsPageResponseV2'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 
 
   /api/v1/projects/{projectId}/rewards/{rewardId}:
@@ -3289,6 +3457,7 @@ paths:
   /api/v1/projects/{projectId}/rewards/{rewardId}/reward-items:
     get:
       security:
+        - { }
         - bearerAuth: [ ]
       tags:
         - Projects
@@ -7152,6 +7321,18 @@ components:
               items:
                 $ref: '#/components/schemas/ContributorPageItemResponse'
 
+    ContributorsPageResponseV2:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - contributors
+          properties:
+            contributors:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContributorPageItemResponseV2'
+
     ContributorPageItemResponse:
       allOf:
         - $ref: '#/components/schemas/ContributorResponse'
@@ -7187,6 +7368,28 @@ components:
             hidden:
               type: boolean
               description: Whether the contributor is hidden to the user
+
+    ContributorPageItemResponseV2:
+      allOf:
+        - $ref: '#/components/schemas/RankedContributorResponse'
+        - type: object
+          required:
+            - mergedPullRequestCount
+            - rewardCount
+            - totalEarnedUsdAmount
+          properties:
+            mergedPullRequestCount:
+              type: integer
+              description: Total number of merged pull requests the contributor made on this project.
+              example: 22
+            rewardCount:
+              type: integer
+              description: Total number of rewards the contributor got on this project.
+              example: 10
+            totalEarnedUsdAmount:
+              type: number
+              description: Total USD-equivalent amount of all rewards granted on this project for the contributor.
+              example: 25400
 
     GithubIssueState:
       type: string
@@ -8073,6 +8276,18 @@ components:
               items:
                 $ref: '#/components/schemas/ProjectShortResponseV2'
 
+    ProjectLinkPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - projects
+          properties:
+            projects:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectLinkWithDescriptionResponse'
+
     ProjectPageItemResponse:
       type: object
       required:
@@ -8488,6 +8703,18 @@ components:
               type: integer
               description: Number of contributors that have been rewarded
 
+    RewardsPageResponseV2:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - rewards
+          properties:
+            rewards:
+              type: array
+              items:
+                $ref: '#/components/schemas/RewardsPageItemResponseV2'
+
     MyRewardsPageResponse:
       allOf:
         - $ref: '#/components/schemas/PageResponse'
@@ -8549,6 +8776,33 @@ components:
           $ref: '#/components/schemas/ContributorResponse'
         id:
           $ref: '#/components/schemas/RewardId'
+
+    RewardsPageItemResponseV2:
+      type: object
+      required:
+        - id
+        - requestedAt
+        - from
+        - to
+        - amount
+        - contributionCount
+      properties:
+        id:
+          $ref: '#/components/schemas/RewardId'
+        requestedAt:
+          type: string
+          format: date-time
+          example: 2023-07-21T12:45:04.750174
+        from:
+          $ref: '#/components/schemas/GithubUserResponse'
+        to:
+          $ref: '#/components/schemas/GithubUserResponse'
+        amount:
+          $ref: '#/components/schemas/Money'
+        contributionCount:
+          type: integer
+          example: 11
+
     MyRewardPageItemResponse:
       type: object
       required:
@@ -8763,9 +9017,8 @@ components:
             - labels
             - applicants
             - assignees
+            - commentCount
           properties:
-            repo:
-              $ref: '#/components/schemas/ShortGithubRepoResponse'
             createdAt:
               type: string
               format: date-time
@@ -8792,6 +9045,8 @@ components:
               description: The list of assignees for this issue
               items:
                 $ref: '#/components/schemas/GithubUserResponse'
+            commentCount:
+              type: integer
 
     ApplicationLinkResponse:
       allOf:
@@ -9727,6 +9982,7 @@ components:
           type: string
         value:
           type: string
+
     GithubUserListResponse:
       type: array
       items:
@@ -13219,6 +13475,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EcosystemLinkResponse'
+
+    ProjectResponseV2:
+      allOf:
+        - $ref: '#/components/schemas/ProjectShortResponseV2'
+        - type: object
+          required:
+            - leads
+            - moreInfos
+          properties:
+            leads:
+              type: array
+              items:
+                $ref: '#/components/schemas/GithubUserResponse'
+            moreInfos:
+              type: array
+              items:
+                $ref: '#/components/schemas/SimpleLink'
+            mergedPrCount:
+              type: integer
+
 
     SearchPostRequest:
       type: object
