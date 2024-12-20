@@ -13484,6 +13484,8 @@ components:
             - leads
             - moreInfos
             - mergedPrCount
+            - currentWeekAvailableIssueCount
+            - currentWeekMergedPrCount
           properties:
             leads:
               type: array
@@ -13495,7 +13497,10 @@ components:
                 $ref: '#/components/schemas/SimpleLink'
             mergedPrCount:
               type: integer
-
+            currentWeekAvailableIssueCount:
+              type: integer
+            currentWeekMergedPrCount:
+              type: integer
 
     SearchPostRequest:
       type: object

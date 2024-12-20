@@ -36,6 +36,9 @@ public class ProjectV2ReadEntity {
     Integer goodFirstIssueCount;
     Integer availableIssueCount;
     Integer mergedPrCount;
+    Integer currentWeekAvailableIssueCount;
+    Integer currentWeekMergedPrCount;
+
     @JdbcTypeCode(SqlTypes.JSON)
     List<ProjectCategoryResponse> categories;
     @JdbcTypeCode(SqlTypes.JSON)
@@ -78,6 +81,8 @@ public class ProjectV2ReadEntity {
                 .contributorCount(contributorCount)
                 .ecosystems(ecosystems())
                 .leads(leads())
-                .moreInfos(moreInfos);
+                .moreInfos(moreInfos)
+                .currentWeekAvailableIssueCount(currentWeekAvailableIssueCount)
+                .currentWeekMergedPrCount(currentWeekMergedPrCount);
     }
 }

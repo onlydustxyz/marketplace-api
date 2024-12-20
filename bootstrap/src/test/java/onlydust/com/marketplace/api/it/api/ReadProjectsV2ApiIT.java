@@ -81,6 +81,28 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
 
         final var contributor1 = userAuthHelper.create();
         final var contributor2 = userAuthHelper.create();
+        final var contributor3 = userAuthHelper.create();
+
+
+        at(ZonedDateTime.now().minusWeeks(2), () -> {
+            // merged pull requests
+            githubHelper.createPullRequest(repo1, contributor3, List.of("rs"));
+            
+            // available issue
+            githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1);
+            githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1);
+
+            // available good first issue
+            final var goodFirstIssueId = githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1);
+            githubHelper.addLabelToIssue(goodFirstIssueId, "good first issue", CurrentDateProvider.now());
+
+            // hackathon open issues
+            final var pastHackathonIssueId = githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1);
+            githubHelper.addLabelToIssue(pastHackathonIssueId, pastHackathonLabel, CurrentDateProvider.now());
+            
+            final var upcomingHackathonIssueId = githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1);
+            githubHelper.addLabelToIssue(upcomingHackathonIssueId, upcomingHackathonLabel, CurrentDateProvider.now());
+        });
 
         at(ZonedDateTime.now().minusDays(1), () -> {
             // merged pull requests
@@ -127,6 +149,7 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
         githubHelper.addRepoLanguage(repo1.getId(), "Java", 100L);
         githubHelper.addRepoLanguage(repo2.getId(), "JavaScript", 10L);
         githubHelper.addRepoLanguage(repo2.getId(), "TypeScript", 50L);
+        githubHelper.addRepoLanguage(repo2.getId(), "Rust", 30L);
 
         databaseHelper.executeInTransaction(() -> {
             biProjectGlobalDataRepository.refreshByProject(projectId);
@@ -159,12 +182,17 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
         assertThat(response.getName()).isEqualTo(project.getName());
         assertThat(response.getLogoUrl()).isEqualTo(project.getLogoUrl());
         assertThat(response.getShortDescription()).isEqualTo(project.getShortDescription());
-        assertThat(response.getContributorCount()).isEqualTo(2);
+        assertThat(response.getContributorCount()).isEqualTo(3);
         assertThat(response.getStarCount()).isEqualTo(repo1.getStarsCount() + repo2.getStarsCount());
         assertThat(response.getForkCount()).isEqualTo(repo1.getForksCount() + repo2.getForksCount());
-        assertThat(response.getAvailableIssueCount()).isEqualTo(5);
-        assertThat(response.getGoodFirstIssueCount()).isEqualTo(1);
-        assertThat(response.getMergedPrCount()).isEqualTo(2);
+
+        assertThat(response.getAvailableIssueCount()).isEqualTo(9);
+        assertThat(response.getCurrentWeekAvailableIssueCount()).isEqualTo(5);
+
+        assertThat(response.getGoodFirstIssueCount()).isEqualTo(2);
+        
+        assertThat(response.getMergedPrCount()).isEqualTo(3);
+        assertThat(response.getCurrentWeekMergedPrCount()).isEqualTo(2);
 
         assertThat(response.getCategories())
             .extracting(ProjectCategoryResponse::getName)
@@ -172,7 +200,7 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
         
         assertThat(response.getLanguages())
             .extracting(LanguageWithPercentageResponse::getName)
-            .containsExactly("Java", "TypeScript", "JavaScript");
+            .containsExactly("Java", "TypeScript", "Rust", "JavaScript");
             
         assertThat(response.getEcosystems())
             .extracting(EcosystemLinkResponse::getName)

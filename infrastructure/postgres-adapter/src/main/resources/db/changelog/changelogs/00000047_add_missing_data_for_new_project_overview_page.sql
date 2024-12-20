@@ -26,7 +26,9 @@ call drop_pseudo_projection('bi', 'project_contributions_data');
 
 call create_pseudo_projection('bi', 'project_contributions_data', $$
 SELECT p.id                                                             as project_id,
+       
        count(distinct unnested.contributor_ids)                         as contributor_count,
+
        count(distinct cd.contribution_uuid) filter ( where cd.is_good_first_issue and
                                                            coalesce(array_length(ccd.assignee_ids, 1), 0) = 0 and
                                                            cd.contribution_status = 'IN_PROGRESS') as good_first_issue_count,
@@ -45,6 +47,21 @@ SELECT p.id                                                             as proje
                                                                  AND gl.id = any (cd.github_label_ids)
                                                            )) as available_issue_count,
 
+        count(distinct cd.contribution_uuid) filter ( where cd.contribution_type = 'ISSUE' and
+                                                           coalesce(array_length(ccd.assignee_ids, 1), 0) = 0 and
+                                                           cd.contribution_status = 'IN_PROGRESS' and
+                                                           cd.created_at >= now() - interval '1 week' and
+                                                           NOT EXISTS (
+                                                               SELECT 1 
+                                                               FROM hackathons h
+                                                               JOIN hackathon_projects hp ON h.id = hp.hackathon_id
+                                                               JOIN indexer_exp.github_labels gl ON gl.name = any (h.github_labels)
+                                                               WHERE hp.project_id = p.id
+                                                                 AND h.status = 'PUBLISHED'
+                                                                 AND h.start_date > now()
+                                                                 AND gl.id = any (cd.github_label_ids)
+                                                           )) as current_week_available_issue_count,
+
        count(distinct cd.contribution_uuid) filter ( where cd.contribution_type = 'ISSUE' and
                                                            coalesce(array_length(ccd.assignee_ids, 1), 0) = 0 and
                                                            cd.contribution_status = 'IN_PROGRESS' and
@@ -61,7 +78,11 @@ SELECT p.id                                                             as proje
                                                            )) as live_hackathon_issue_count,
 
        count(distinct cd.contribution_uuid) filter ( where cd.contribution_type = 'PULL_REQUEST' and
-                                                           cd.contribution_status = 'COMPLETED') as merged_pr_count
+                                                           cd.contribution_status = 'COMPLETED') as merged_pr_count,
+
+       count(distinct cd.contribution_uuid) filter ( where cd.contribution_type = 'PULL_REQUEST' and
+                                                           cd.contribution_status = 'COMPLETED' and
+                                                           cd.created_at >= now() - interval '1 week') as current_week_merged_pr_count
 
 FROM projects p
          LEFT JOIN bi.p_contribution_data cd ON cd.project_id = p.id
