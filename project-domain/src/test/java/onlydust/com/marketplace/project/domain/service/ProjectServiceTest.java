@@ -46,10 +46,11 @@ public class ProjectServiceTest {
     private final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
     private final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
     private final ProjectObserverPort projectObserverPort = mock(ProjectObserverPort.class);
+    private final FgaPort.Project projectFgaPort = mock(FgaPort.Project.class);
     private final ProjectService projectService = new ProjectService(projectObserverPort, projectStoragePort,
             imageStoragePort,
             uuidGeneratorPort, permissionService, indexerPort, dateProvider,
-            contributionStoragePort, dustyBotStoragePort, githubStoragePort);
+            contributionStoragePort, dustyBotStoragePort, githubStoragePort, projectFgaPort);
 
     @BeforeEach
     void setUp() {
@@ -134,7 +135,8 @@ public class ProjectServiceTest {
                 .build();
 
         // When
-        when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
+        when(projectFgaPort.canEdit(projectId, projectLeadId)).thenReturn(true);
+        when(projectFgaPort.canEditPermissions(projectId, projectLeadId)).thenReturn(true);
         when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(projectLeadId));
         when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(new HashSet<>(Arrays.asList(1L, 2L, 3L)));
         when(projectStoragePort.getProjectCategorySuggestions(projectId)).thenReturn(List.of(
@@ -419,7 +421,7 @@ public class ProjectServiceTest {
         final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort,
                 mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
-                mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class));
+                mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class), mock(FgaPort.Project.class));
         final ProjectId projectId = ProjectId.random();
         final UserId projectLeadId = UserId.random();
         final String githubRepoOwner = faker.name().username();
@@ -491,7 +493,7 @@ public class ProjectServiceTest {
         final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort,
                 mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
-                mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class));
+                mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class), mock(FgaPort.Project.class));
         final ProjectId projectId = ProjectId.random();
         final UserId projectLeadId = UserId.random();
         final String githubRepoOwner = faker.name().username();
