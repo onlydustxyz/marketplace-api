@@ -1,5 +1,25 @@
 package onlydust.com.marketplace.api.it.api.me;
 
+import static onlydust.com.marketplace.api.helper.CurrencyHelper.ETH;
+import static onlydust.com.marketplace.api.helper.CurrencyHelper.STRK;
+import static onlydust.com.marketplace.api.helper.CurrencyHelper.USD;
+import static onlydust.com.marketplace.api.helper.DateHelper.at;
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
@@ -11,23 +31,6 @@ import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
-import static onlydust.com.marketplace.api.helper.DateHelper.at;
-import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @TagMe
 public class MeProjectsAsContributorApiIT extends AbstractMarketplaceApiIT {
@@ -136,7 +139,6 @@ public class MeProjectsAsContributorApiIT extends AbstractMarketplaceApiIT {
                               "nextPageIndex": 0,
                               "projects": [
                                 {
-                                  "logoUrl": null,
                                   "visibility": "PUBLIC",
                                   "languages": [
                                     {
@@ -208,7 +210,6 @@ public class MeProjectsAsContributorApiIT extends AbstractMarketplaceApiIT {
                               "nextPageIndex": 0,
                               "projects": [
                                 {
-                                  "logoUrl": null,
                                   "visibility": "PUBLIC",
                                   "languages": [
                                     {
@@ -249,7 +250,6 @@ public class MeProjectsAsContributorApiIT extends AbstractMarketplaceApiIT {
                                   }
                                 },
                                 {
-                                  "logoUrl": null,
                                   "visibility": "PUBLIC",
                                   "languages": [
                                     {

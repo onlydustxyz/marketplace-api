@@ -133,6 +133,8 @@ public class GithubHelper {
                 insert into indexer_exp.github_repo_languages(repo_id, language, line_count)
                 values(:repoId, :language, :lineCount)
                 on conflict do nothing;
+
+                REFRESH MATERIALIZED VIEW project_languages;
                 """, Map.of(
                 "repoId", repoId,
                 "language", language,

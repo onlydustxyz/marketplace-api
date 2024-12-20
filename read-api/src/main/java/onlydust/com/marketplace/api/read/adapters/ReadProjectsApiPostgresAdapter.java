@@ -1,5 +1,49 @@
 package onlydust.com.marketplace.api.read.adapters;
 
+import static java.lang.String.format;
+import static java.util.Comparator.comparing;
+import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.contract.model.FinancialTransactionType.GRANTED;
+import static onlydust.com.marketplace.api.contract.model.FinancialTransactionType.REWARDED;
+import static onlydust.com.marketplace.api.contract.model.FinancialTransactionType.UNGRANTED;
+import static onlydust.com.marketplace.api.read.cache.Cache.S;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapRewardSettings;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
+import static onlydust.com.marketplace.project.domain.model.ContributionStatus.IN_PROGRESS;
+import static org.springframework.data.domain.Sort.Direction.ASC;
+import static org.springframework.data.domain.Sort.Direction.DESC;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
+import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.status;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.contract.ReadProjectsApi;
@@ -28,42 +72,6 @@ import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.context.annotation.Profile;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.JpaSort;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static java.lang.String.format;
-import static java.util.Comparator.comparing;
-import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.contract.model.FinancialTransactionType.*;
-import static onlydust.com.marketplace.api.read.cache.Cache.S;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapRewardSettings;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
-import static onlydust.com.marketplace.project.domain.model.ContributionStatus.IN_PROGRESS;
-import static org.springframework.data.domain.Sort.Direction.ASC;
-import static org.springframework.data.domain.Sort.Direction.DESC;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
-import static org.springframework.http.ResponseEntity.ok;
-import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @AllArgsConstructor
@@ -90,6 +98,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     private final AllTransactionReadRepository allTransactionReadRepository;
     private final ProgramReadRepository programReadRepository;
     private final ProjectsPageV2Repository projectsPageV2Repository;
+    private final ProjectsV2ReadRepository projectsV2ReadRepository;
 
 
     private static @NonNull List<FinancialTransactionType> sanitizeTypes(List<FinancialTransactionType> types) {
@@ -576,5 +585,16 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 .totalItemNumber((int) projects.getTotalElements())
                 .hasMore(hasMore(pageIndex, projects.getTotalPages()))
                 .nextPageIndex(nextPageIndex(pageIndex, projects.getTotalPages())));
+    }
+
+    @Override
+    public ResponseEntity<ProjectResponseV2> getProjectV2(String projectIdOrSlug) {
+        final var projectIdOrSlugObj = OrSlug.of(projectIdOrSlug, ProjectId::of);
+
+        final var project = projectsV2ReadRepository.findByIdOrSlug(projectIdOrSlugObj.uuid().orElse(null),
+                projectIdOrSlugObj.slug().orElse(null))
+                .orElseThrow(() -> notFound("Project %s not found".formatted(projectIdOrSlug)));
+
+        return ok(project.toResponse());
     }
 }
