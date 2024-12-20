@@ -93,6 +93,7 @@ public class ProjectService implements ProjectFacadePort {
             command.getCategorySuggestions().forEach(categorySuggestion ->
                     projectObserverPort.onProjectCategorySuggested(categorySuggestion, projectLeadId));
 
+        projectFgaPort.setMaintainers(projectId, List.of(command.getFirstProjectLeaderId()));
         return Pair.of(projectId, slug);
     }
 
@@ -147,7 +148,9 @@ public class ProjectService implements ProjectFacadePort {
         addedCategorySuggestions.forEach(categorySuggestion ->
                 projectObserverPort.onProjectCategorySuggested(categorySuggestion, projectLeadId));
 
-        projectFgaPort.setMaintainers(command.getId(), command.getProjectLeadersToKeep());
+        if (command.getProjectLeadersToKeep() != null) {
+            projectFgaPort.setMaintainers(command.getId(), command.getProjectLeadersToKeep());
+        }
         return Pair.of(command.getId(), slug);
     }
 

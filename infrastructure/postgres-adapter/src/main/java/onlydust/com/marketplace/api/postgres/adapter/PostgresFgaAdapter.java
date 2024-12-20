@@ -12,6 +12,7 @@ import org.intellij.lang.annotations.Language;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class PostgresFgaAdapter implements FgaPort.Project {
@@ -20,14 +21,14 @@ public class PostgresFgaAdapter implements FgaPort.Project {
 
     @Override
     public void setMaintainers(ProjectId projectId, List<UserId> userIds) {
-        executeQuery("select fga.ocerride_maintainers(cast(:projectId as fga.project), cast(:userIds as fga.user[]))",
-                Map.of("projectId", projectId.value(), "userIds", userIds.stream().map(UserId::value).toArray()));
+        executeQuery("select fga.override_maintainers(cast(:projectId as fga.project), cast(:userIds as fga.user[]))",
+                Map.of("projectId", projectId.value(), "userIds", userIds.stream().map(UserId::value).toArray(UUID[]::new)));
     }
 
     @Override
     public void addGrantingProgram(ProjectId projectId, ProgramId programId) {
         executeQuery("select fga.add_granting_programs(cast(:projectId as fga.project), cast(:programIds as fga.program[]))",
-                Map.of("projectId", projectId.value(), "programIds", List.of(programId.value()).toArray()));
+                Map.of("projectId", projectId.value(), "programIds", List.of(programId.value())));
     }
 
     @Override
@@ -54,7 +55,7 @@ public class PostgresFgaAdapter implements FgaPort.Project {
         em.getTransaction().begin();
         final var q = em.createNativeQuery(query);
         parameters.forEach(q::setParameter);
-        q.executeUpdate();
+        q.getResultList();
 
         em.flush();
         em.getTransaction().commit();
