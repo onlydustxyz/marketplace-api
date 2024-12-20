@@ -16,17 +16,14 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.api.contract.model.EcosystemLinkResponse;
-import onlydust.com.marketplace.api.contract.model.ProjectCategoryResponse;
-import onlydust.com.marketplace.api.contract.model.ProjectShortResponseV2;
-import onlydust.com.marketplace.api.contract.model.ProjectTag;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.model.LanguageWithLineCount;
 
 @NoArgsConstructor(force = true)
 @FieldDefaults(level = AccessLevel.PUBLIC, makeFinal = true)
 @Immutable
 @Entity
-public class ProjectPageV2ItemQueryEntity {
+public class ProjectV2ReadEntity {
     @Id
     UUID id;
     String slug;
@@ -38,6 +35,7 @@ public class ProjectPageV2ItemQueryEntity {
     Integer starCount;
     Integer goodFirstIssueCount;
     Integer availableIssueCount;
+    Integer mergedPrCount;
     @JdbcTypeCode(SqlTypes.JSON)
     List<ProjectCategoryResponse> categories;
     @JdbcTypeCode(SqlTypes.JSON)
@@ -46,24 +44,40 @@ public class ProjectPageV2ItemQueryEntity {
     List<ProjectTag> tags;
     @JdbcTypeCode(SqlTypes.ARRAY)
     @NonNull List<EcosystemLinkResponse> ecosystems;
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    List<GithubUserResponse> leads;
+    @JdbcTypeCode(SqlTypes.JSON)
+    List<SimpleLink> moreInfos;
 
     private List<ProjectCategoryResponse> categories() {
         return categories == null ? List.of() : categories.stream().sorted(comparing(ProjectCategoryResponse::getName)).toList();
     }
 
-    public ProjectShortResponseV2 toShortResponse() {
-        return new ProjectShortResponseV2()
+    private List<EcosystemLinkResponse> ecosystems() {
+        return ecosystems == null ? List.of() : ecosystems.stream().sorted(comparing(EcosystemLinkResponse::getName)).toList();
+    }
+
+    private List<GithubUserResponse> leads() {
+        return leads == null ? List.of() : leads.stream().sorted(comparing(GithubUserResponse::getLogin)).toList();
+    }
+
+    public ProjectResponseV2 toResponse() {
+        return new ProjectResponseV2()
                 .name(name)
+                .slug(slug)
                 .shortDescription(shortDescription)
                 .id(id)
                 .logoUrl(logoUrl)
                 .categories(categories())
                 .languages(toLanguageWithPercentageResponse(languages))
                 .availableIssueCount(availableIssueCount)
-                .starCount(starCount)
                 .goodFirstIssueCount(goodFirstIssueCount)
+                .mergedPrCount(mergedPrCount)
+                .starCount(starCount)
                 .forkCount(forkCount)
                 .contributorCount(contributorCount)
-                .ecosystems(ecosystems);
+                .ecosystems(ecosystems())
+                .leads(leads())
+                .moreInfos(moreInfos);
     }
 }

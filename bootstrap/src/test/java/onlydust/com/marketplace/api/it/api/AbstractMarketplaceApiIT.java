@@ -1,25 +1,13 @@
 package onlydust.com.marketplace.api.it.api;
 
-import com.auth0.jwt.interfaces.JWTVerifier;
-import com.github.javafaker.Faker;
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
-import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
-import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
-import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
-import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
-import onlydust.com.marketplace.api.MarketplaceApiApplicationIT;
-import onlydust.com.marketplace.api.configuration.SwaggerConfiguration;
-import onlydust.com.marketplace.api.helper.*;
-import onlydust.com.marketplace.api.postgres.adapter.repository.*;
-import onlydust.com.marketplace.kernel.jobs.OutboxAsyncConsumerJob;
-import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
-import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
-import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.Map;
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,13 +27,27 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.Map;
-import java.util.UUID;
+import com.auth0.jwt.interfaces.JWTVerifier;
+import com.github.javafaker.Faker;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
+import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
+import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
+import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
+import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
+import onlydust.com.marketplace.api.MarketplaceApiApplicationIT;
+import onlydust.com.marketplace.api.configuration.SwaggerConfiguration;
+import onlydust.com.marketplace.api.helper.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.kernel.jobs.OutboxAsyncConsumerJob;
+import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
+import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
 
 
 @ActiveProfiles({"it", "api"})
@@ -88,6 +90,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_GET_BY_SLUG = "/api/v1/projects/slug";
     protected static final String PROJECTS_GET = "/api/v1/projects";
     protected static final String PROJECTS_V2_GET = "/api/v2/projects";
+    protected static final String PROJECTS_V2_GET_BY_ID_OR_SLUG = "/api/v2/projects/%s";
     protected static final String USERS_SEARCH_CONTRIBUTORS = "/api/v1/users/search";
     protected static final String PROJECTS_CONTRIBUTORS = "/api/v1/projects/%s/contributors";
     protected static final String PROJECTS_HIDE_CONTRIBUTOR = "/api/v1/projects/%s/contributors/%d/hidden";

@@ -1,6 +1,15 @@
 package onlydust.com.marketplace.api.helper;
 
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.github.javafaker.Faker;
+
 import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
 import onlydust.com.marketplace.kernel.model.EcosystemId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
@@ -8,13 +17,6 @@ import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectCategoryStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @Service
 public class ProjectHelper {
@@ -48,6 +50,7 @@ public class ProjectHelper {
                         .longDescription(faker.lorem().paragraph())
                         .isLookingForContributors(faker.bool().bool())
                         .ecosystemIds(ecosystemIds)
+                        .imageUrl(faker.internet().url())
                         .build());
     }
 
@@ -157,5 +160,24 @@ public class ProjectHelper {
                 "githubUserId", lead.githubUserId().value()
         ));
         postgresBiProjectorAdapter.onProjectCreated(projectId, lead.userId());
+    }
+
+    public NamedLink createMoreInfoLink() {
+        return NamedLink.builder()
+                .value(faker.lorem().word())
+                .url(faker.internet().url())
+                .build();
+    }
+
+    public void addMoreInfo(ProjectId projectId, NamedLink moreInfoLink) {
+        databaseHelper.executeQuery("""
+                insert into project_more_infos(project_id, name, url, rank)
+                select :projectId, :name, :url, coalesce(max(rank), 0) + 1
+                from project_more_infos where project_id = :projectId
+                """, Map.of(
+                "projectId", projectId.value(),
+                "name", moreInfoLink.getValue(),
+                "url", moreInfoLink.getUrl().toString()
+        ));
     }
 }

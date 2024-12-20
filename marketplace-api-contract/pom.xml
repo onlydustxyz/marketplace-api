@@ -19,7 +19,6 @@
         <generated.code.dir>${project.basedir}/src/gen/java</generated.code.dir>
         <contract.name>marketplace-api-contract.yaml</contract.name>
         <contract.path>src/main/resources/${contract.name}</contract.path>
-        <old-contract.path>${project.build.directory}/${contract.name}</old-contract.path>
 
         <maven-antrun-plugin.version>1.7</maven-antrun-plugin.version>
         <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
