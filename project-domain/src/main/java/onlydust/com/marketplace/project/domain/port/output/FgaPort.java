@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
@@ -9,15 +10,15 @@ import java.util.List;
 public interface FgaPort {
     interface Project {
 
-        void setMaintainers(ProjectId projectId, List<UserId> userIds);
+        void setMaintainers(@NonNull ProjectId projectId, @NonNull List<UserId> userIds);
 
-        void addGrantingProgram(ProjectId projectId, ProgramId programId);
+        void addGrantingProgram(@NonNull ProjectId projectId, @NonNull ProgramId programId);
 
-        boolean canEdit(ProjectId projectId, UserId userId);
+        boolean canEdit(@NonNull ProjectId projectId, @NonNull UserId userId);
 
-        boolean canEditPermissions(ProjectId projectId, UserId userId);
+        boolean canEditPermissions(@NonNull ProjectId projectId, @NonNull UserId userId);
 
-        boolean canReadFinancial(ProjectId projectId, UserId userId);
+        boolean canReadFinancial(@NonNull ProjectId projectId, @NonNull UserId userId);
 
     }
 }
