@@ -193,7 +193,7 @@ $$ language plpgsql;
 ------------------------------------------------------------------------------------------------------------------------
 -- Zanzibar model
 ------------------------------------------------------------------------------------------------------------------------
-
+BEGIN;
 -- Types
 create domain fga.user as uuid not null;
 create domain fga.ecosystem as uuid not null;
@@ -236,7 +236,7 @@ select fga.new_implied_relation('sponsor', 'can_deposit_funds', 'head_of_finance
 select fga.new_implied_relation('sponsor', 'can_edit_a_program', 'head_of_finance');
 
 -- Program implied relations
-select fga.new_implied_relation('project', 'can_edit', 'lead or can_edit_a_program from allocating_sponsor');
+select fga.new_implied_relation('program', 'can_edit', 'lead or can_edit_a_program from allocating_sponsor');
 select fga.new_implied_relation('program', 'can_edit_permissions', 'lead or can_edit_a_program from allocating_sponsor');
 select fga.new_implied_relation('program', 'can_read_financial', 'lead or can_read_financial from allocating_sponsor');
 select fga.new_implied_relation('program', 'can_refund_allocation', 'lead');
