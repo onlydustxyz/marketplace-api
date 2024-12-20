@@ -32,7 +32,7 @@ public class HackathonHelper {
         final UUID id = UUID.randomUUID();
         final Map<String, Object> parameters = new HashMap<>();
         parameters.put("id", id);
-        parameters.put("slug", faker.rickAndMorty().character());
+        parameters.put("slug", faker.rickAndMorty().character() + "-" + id.getLeastSignificantBits());
         parameters.put("title", faker.rickAndMorty().location());
         parameters.put("status", status.name());
         parameters.put("description", faker.lorem().sentence());
