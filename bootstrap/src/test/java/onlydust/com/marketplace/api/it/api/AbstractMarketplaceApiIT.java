@@ -92,6 +92,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_V2_GET = "/api/v2/projects";
     protected static final String PROJECTS_V2_GET_BY_ID_OR_SLUG = "/api/v2/projects/%s";
     protected static final String PROJECTS_GET_AVAILABLE_ISSUES_BY_ID_OR_SLUG = "/api/v1/projects/%s/available-issues";
+    protected static final String PROJECTS_V2_GET_CONTRIBUTORS_BY_ID_OR_SLUG = "/api/v2/projects/%s/contributors";
     protected static final String USERS_SEARCH_CONTRIBUTORS = "/api/v1/users/search";
     protected static final String PROJECTS_CONTRIBUTORS = "/api/v1/projects/%s/contributors";
     protected static final String PROJECTS_HIDE_CONTRIBUTOR = "/api/v1/projects/%s/contributors/%d/hidden";

@@ -3,7 +3,10 @@ package onlydust.com.marketplace.api.it.api;
 import static java.util.Comparator.comparing;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.util.BigDecimalComparator.BIG_DECIMAL_COMPARATOR;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,14 +15,17 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.github.javafaker.Faker;
 
+import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiContributorGlobalDataRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiProjectContributionsDataRepository;
@@ -56,6 +62,10 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
     static Long upcomingHackathonLabelId;
     static Long goodFirstIssueLabelId;
 
+    static UserAuthHelper.AuthenticatedUser contributor1;
+    static UserAuthHelper.AuthenticatedUser contributor2;
+    static UserAuthHelper.AuthenticatedUser contributor3;
+
     @BeforeEach 
     void setUp() {
         if(setupDone.compareAndExchange(false, true)) return;
@@ -73,7 +83,7 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
         repo2 = githubHelper.createRepo(projectId);
 
         categories = IntStream.range(0,2)
-            .mapToObj(i -> projectHelper.createCategory(faker.lorem().word()))
+            .mapToObj(i -> projectHelper.createCategory(faker.lorem().word() + "-" + i))
             .peek(c -> projectHelper.addCategory(projectId, c.id()))
             .toList();
 
@@ -96,9 +106,9 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
 
         goodFirstIssueLabelId = githubHelper.createLabel("good first issue");
 
-        final var contributor1 = userAuthHelper.create();
-        final var contributor2 = userAuthHelper.create();
-        final var contributor3 = userAuthHelper.create();
+        contributor1 = userAuthHelper.create();
+        contributor2 = userAuthHelper.create();
+        contributor3 = userAuthHelper.create();
 
         databaseHelper.executeInTransaction(() -> {
             biContributorGlobalDataRepository.refresh(contributor1.user().getGithubUserId());
@@ -176,6 +186,22 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
             githubHelper.addLabelToIssue(upcomingHackathonIssue.id(), upcomingHackathonLabelId, CurrentDateProvider.now());
         });
 
+        accountingHelper.saveQuote(new Quote(CurrencyHelper.STRK, CurrencyHelper.USD, BigDecimal.valueOf(0.55), Instant.now()));
+
+        final var sponsor = sponsorHelper.create();
+        accountingHelper.createSponsorAccount(sponsor.id(), 1000, CurrencyHelper.USD);
+        accountingHelper.createSponsorAccount(sponsor.id(), 1000, CurrencyHelper.STRK);
+
+        final var program = programHelper.create(sponsor.id());
+        accountingHelper.allocate(sponsor.id(), program.id(), 1000, CurrencyHelper.USD);
+        accountingHelper.allocate(sponsor.id(), program.id(), 1000, CurrencyHelper.STRK);
+
+        accountingHelper.grant(program.id(), projectId, 1000, CurrencyHelper.USD);
+        accountingHelper.grant(program.id(), projectId, 1000, CurrencyHelper.STRK);
+
+        rewardHelper.create(projectId, projectLead, contributor2.githubUserId(), 120, CurrencyHelper.STRK);
+        rewardHelper.create(projectId, projectLead, contributor2.githubUserId(), 100, CurrencyHelper.USD);
+
         githubHelper.addRepoLanguage(repo1.getId(), "Java", 100L);
         githubHelper.addRepoLanguage(repo2.getId(), "JavaScript", 10L);
         githubHelper.addRepoLanguage(repo2.getId(), "TypeScript", 50L);
@@ -184,6 +210,10 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
         databaseHelper.executeInTransaction(() -> {
             biProjectGlobalDataRepository.refreshByProject(projectId);
             biProjectContributionsDataRepository.refreshByProject(projectId);
+            userRepository.refreshUsersRanksAndStats();
+            biContributorGlobalDataRepository.refresh(contributor1.user().getGithubUserId());
+            biContributorGlobalDataRepository.refresh(contributor2.user().getGithubUserId());
+            biContributorGlobalDataRepository.refresh(contributor3.user().getGithubUserId());
         });
     }
 
@@ -382,6 +412,100 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isOk()
                 .expectBody(GithubIssuePageWithLabelsResponse.class)
+                .returnResult().getResponseBody();
+    }
+
+    @Test
+    public void should_get_project_contributors_by_id() {
+        should_get_project_contributors(project.getId().toString());
+    }
+
+    @Test
+    public void should_get_project_contributors_by_slug() {
+        should_get_project_contributors(project.getSlug());
+    }
+
+    @Test
+    public void should_filter_contributors_by_login() {
+        // Given
+        final var search = contributor1.user().getGithubLogin().substring(0, 3);
+
+        // When
+        final var contributors = get_project_contributors(project.getId().toString(), search.toUpperCase())
+            .getContributors();
+
+        assertThat(contributors)
+            .isNotEmpty()
+            .extracting(ContributorPageItemResponseV2::getLogin)
+            .allMatch(login -> login.toLowerCase().contains(search.toLowerCase()));
+    }
+
+    private void should_get_project_contributors(String idOrSlug) {
+        // When
+        final var contributors = get_project_contributors(idOrSlug, null)
+            .getContributors();
+
+        assertThat(contributors)
+            .hasSize(3)
+            .isSortedAccordingTo(comparing(ContributorPageItemResponseV2::getGlobalRank))
+            .usingRecursiveFieldByFieldElementComparator(RecursiveComparisonConfiguration.builder()
+                .withComparatorForType(BIG_DECIMAL_COMPARATOR, BigDecimal.class)
+                .build())
+            .containsExactlyInAnyOrder(
+                new ContributorPageItemResponseV2()
+                    .githubUserId(contributor1.user().getGithubUserId())
+                    .login(contributor1.user().getGithubLogin())
+                    .avatarUrl(contributor1.user().getGithubAvatarUrl())
+                    .isRegistered(true)
+                    .id(contributor1.userId().value())
+                    .globalRank(80)
+                    .globalRankPercentile(BigDecimal.valueOf(0.0035872194877784266))
+                    .globalRankCategory(UserRankCategory.A)
+                    .mergedPullRequestCount(2)
+                    .rewardCount(0)
+                    .totalEarnedUsdAmount(BigDecimal.valueOf(0)),
+
+                new ContributorPageItemResponseV2()
+                    .githubUserId(contributor2.user().getGithubUserId())
+                    .login(contributor2.user().getGithubLogin())
+                    .avatarUrl(contributor2.user().getGithubAvatarUrl())
+                    .isRegistered(true)
+                    .id(contributor2.userId().value())
+                    .globalRank(149)
+                    .globalRankPercentile(BigDecimal.valueOf(0.006215066321848669))
+                    .globalRankCategory(UserRankCategory.A)
+                    .mergedPullRequestCount(0)
+                    .rewardCount(2)
+                    .totalEarnedUsdAmount(BigDecimal.valueOf(166)),
+
+                new ContributorPageItemResponseV2()
+                    .githubUserId(contributor3.user().getGithubUserId())
+                    .login(contributor3.user().getGithubLogin())
+                    .avatarUrl(contributor3.user().getGithubAvatarUrl())
+                    .isRegistered(true)
+                    .id(contributor3.userId().value())
+                    .globalRank(89)
+                    .globalRankPercentile(BigDecimal.valueOf(0.006048218903812463))
+                    .globalRankCategory(UserRankCategory.A)
+                    .mergedPullRequestCount(1)
+                    .rewardCount(0)
+                    .totalEarnedUsdAmount(BigDecimal.valueOf(0))
+            );
+    }
+
+    private ContributorsPageResponseV2 get_project_contributors(String idOrSlug, String login) {
+        final var params = new HashMap<String, String>();
+        params.put("pageSize", "10");
+        if (login != null) 
+            params.put("login", login);
+
+        // When
+        return client.get()
+                .uri(getApiURI(PROJECTS_V2_GET_CONTRIBUTORS_BY_ID_OR_SLUG.formatted(idOrSlug), params))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(ContributorsPageResponseV2.class)
                 .returnResult().getResponseBody();
     }
 }
