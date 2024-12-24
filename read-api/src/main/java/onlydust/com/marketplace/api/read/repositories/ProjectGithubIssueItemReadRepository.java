@@ -132,11 +132,10 @@ public interface ProjectGithubIssueItemReadRepository extends Repository<Project
                         join indexer_exp.github_labels gl on gl.name = any (h.github_labels) and gl.id = any (c.github_label_ids)
                         where h.status = 'PUBLISHED' and h.start_date > now()
                     )
-                    and (coalesce(:githubLabels) is null or exists (
-                        select 1
+                    and (coalesce(:githubLabels) is null or (
+                        select array_agg(name)
                         from indexer_exp.github_labels 
-                        where id = any (c.github_label_ids) and 
-                        name = any(:githubLabels)))
+                        where id = any (c.github_label_ids)) @> cast(:githubLabels as text[]))
             """, nativeQuery = true)
     Page<ProjectGithubIssueItemReadEntity> findAvailableIssues(UUID projectId,
                                                                String projectSlug,  

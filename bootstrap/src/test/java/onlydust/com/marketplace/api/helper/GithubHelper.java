@@ -313,40 +313,52 @@ public class GithubHelper {
     }
 
     public void addLabelToIssue(GithubIssue.Id issueId, String label, ZonedDateTime addedToIssueAt) {
-        addLabelToIssue(issueId.value(), label, addedToIssueAt);
+        final var labelId = createLabel(label);
+        addLabelToIssue(issueId, labelId, addedToIssueAt);
     }
 
     public void addLabelToIssue(Long issueId, String label, ZonedDateTime addedToIssueAt) {
-        final var labelParameters = new HashMap<String, Object>();
-        labelParameters.put("id", faker.random().nextInt(200));
-        labelParameters.put("label", label);
-        labelParameters.put("description", faker.lorem().sentence());
+        addLabelToIssue(GithubIssue.Id.of(issueId), label, addedToIssueAt);
+    }
+
+    public Long createLabel(String label) {
+        final var nextLabelId = databaseHelper.<Long>executeReadQuery(
+                """
+                select coalesce(max(id), 0) + 1  from indexer_exp.github_labels
+                """
+        );
 
         databaseHelper.executeQuery(
                 """
-                        INSERT INTO indexer_exp.github_labels (id, name, description)
-                        VALUES (:id, :label, :description)
-                        ON CONFLICT DO NOTHING;
-                        """,
-                labelParameters
+                    INSERT INTO indexer_exp.github_labels (id, name, description)
+                    VALUES (:id, :label, :description)
+                """,
+                Map.of(
+                    "id", nextLabelId,
+                    "label", label,
+                    "description", faker.lorem().sentence()
+                )
         );
 
-        final var issueLabelParameters = new HashMap<String, Object>();
-        issueLabelParameters.put("issueId", issueId);
-        issueLabelParameters.put("label", label);
-        issueLabelParameters.put("createdAt", addedToIssueAt);
-        issueLabelParameters.put("updatedAt", addedToIssueAt);
+        return nextLabelId;
+    }
+
+    public void addLabelToIssue(GithubIssue.Id issueId, Long labelId, ZonedDateTime addedToIssueAt) {
         databaseHelper.executeQuery(
                 """
-                                    INSERT INTO indexer_exp.github_issues_labels (issue_id, label_id, tech_created_at, tech_updated_at)
-                                    SELECT :issueId, gl.id, :createdAt, :updatedAt
-                                    FROM indexer_exp.github_labels gl
-                                    WHERE gl.name = :label
-                        """,
-                issueLabelParameters
+                    INSERT INTO indexer_exp.github_issues_labels (issue_id, label_id, tech_created_at, tech_updated_at)
+                    VALUES (:issueId, :labelId, :createdAt, :updatedAt)
+                    ON CONFLICT DO NOTHING;
+                """,
+                Map.of(
+                    "issueId", issueId.value(),
+                    "labelId", labelId,
+                    "createdAt", addedToIssueAt,
+                    "updatedAt", addedToIssueAt
+                )
         );
 
-        postgresBiProjectorAdapter.onContributionsChanged(ContributionUUID.of(issueId));
+        postgresBiProjectorAdapter.onContributionsChanged(ContributionUUID.of(issueId.value()));
     }
 
     public void assignIssueToContributor(GithubIssue.Id issueId, Long contributorId) {

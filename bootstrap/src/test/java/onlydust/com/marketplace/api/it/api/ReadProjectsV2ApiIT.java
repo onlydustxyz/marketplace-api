@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -49,6 +50,12 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
 
     static List<GithubIssue> availableIssues = new ArrayList<>();
 
+    static Long pastHackathonLabelId;
+    static Long liveHackathonLabelId;
+    static Long draftHackathonLabelId;
+    static Long upcomingHackathonLabelId;
+    static Long goodFirstIssueLabelId;
+
     @BeforeEach 
     void setUp() {
         if(setupDone.compareAndExchange(false, true)) return;
@@ -75,17 +82,19 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
             .peek(m -> projectHelper.addMoreInfo(projectId, m))
             .toList();
 
-        final var pastHackathonLabel = "od-past";
-        hackathonHelper.createHackathon(Hackathon.Status.PUBLISHED, List.of(pastHackathonLabel), List.of(projectId), ZonedDateTime.now().minusDays(2), ZonedDateTime.now().minusDays(1));
+        pastHackathonLabelId = githubHelper.createLabel("od-past");
+        hackathonHelper.createHackathon(Hackathon.Status.PUBLISHED, List.of("od-past"), List.of(projectId), ZonedDateTime.now().minusDays(2), ZonedDateTime.now().minusDays(1));
 
-        final var liveHackathonLabel = "od-live";
-        hackathonHelper.createHackathon(Hackathon.Status.PUBLISHED, List.of(liveHackathonLabel), List.of(projectId), ZonedDateTime.now().minusDays(1), ZonedDateTime.now().plusDays(1));
+        liveHackathonLabelId = githubHelper.createLabel("od-live");
+        hackathonHelper.createHackathon(Hackathon.Status.PUBLISHED, List.of("od-live"), List.of(projectId), ZonedDateTime.now().minusDays(1), ZonedDateTime.now().plusDays(1));
 
-        final var draftHackathonLabel = "od-draft";
-        hackathonHelper.createHackathon(Hackathon.Status.DRAFT, List.of(draftHackathonLabel), List.of(projectId), ZonedDateTime.now().plusDays(1), ZonedDateTime.now().plusDays(2));
+        draftHackathonLabelId = githubHelper.createLabel("od-draft");
+        hackathonHelper.createHackathon(Hackathon.Status.DRAFT, List.of("od-draft"), List.of(projectId), ZonedDateTime.now().plusDays(1), ZonedDateTime.now().plusDays(2));
 
-        final var upcomingHackathonLabel = "od-upcoming";
-        hackathonHelper.createHackathon(Hackathon.Status.PUBLISHED, List.of(upcomingHackathonLabel), List.of(projectId), ZonedDateTime.now().plusDays(1), ZonedDateTime.now().plusDays(2));
+        upcomingHackathonLabelId = githubHelper.createLabel("od-upcoming");
+        hackathonHelper.createHackathon(Hackathon.Status.PUBLISHED, List.of("od-upcoming"), List.of(projectId), ZonedDateTime.now().plusDays(1), ZonedDateTime.now().plusDays(2));
+
+        goodFirstIssueLabelId = githubHelper.createLabel("good first issue");
 
         final var contributor1 = userAuthHelper.create();
         final var contributor2 = userAuthHelper.create();
@@ -107,17 +116,17 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
 
             // available good first issue
             final var goodFirstIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(3), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(goodFirstIssue.id(), "good first issue", CurrentDateProvider.now());
+            githubHelper.addLabelToIssue(goodFirstIssue.id(), goodFirstIssueLabelId, CurrentDateProvider.now());
             availableIssues.add(goodFirstIssue);
 
             // hackathon open issues
             final var pastHackathonIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(4), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(pastHackathonIssue.id(), pastHackathonLabel, CurrentDateProvider.now());
-            githubHelper.addLabelToIssue(pastHackathonIssue.id(), "good first issue", CurrentDateProvider.now());
+            githubHelper.addLabelToIssue(pastHackathonIssue.id(), pastHackathonLabelId, CurrentDateProvider.now());
+            githubHelper.addLabelToIssue(pastHackathonIssue.id(), goodFirstIssueLabelId, CurrentDateProvider.now());
             availableIssues.add(pastHackathonIssue);
 
             final var upcomingHackathonIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(5), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(upcomingHackathonIssue.id(), upcomingHackathonLabel, CurrentDateProvider.now());
+            githubHelper.addLabelToIssue(upcomingHackathonIssue.id(), upcomingHackathonLabelId, CurrentDateProvider.now());
         });
 
         at(ZonedDateTime.now().minusDays(1), () -> {
@@ -137,34 +146,34 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
 
             // available good first issue
             final var goodFirstIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(4), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(goodFirstIssue.id(), "good first issue", CurrentDateProvider.now());
+            githubHelper.addLabelToIssue(goodFirstIssue.id(), goodFirstIssueLabelId, CurrentDateProvider.now());
             availableIssues.add(goodFirstIssue);
 
             // assigned good first issue
             final var assignedGoodFirstIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(5), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(assignedGoodFirstIssue.id(), "good first issue", CurrentDateProvider.now());
+            githubHelper.addLabelToIssue(assignedGoodFirstIssue.id(), goodFirstIssueLabelId, CurrentDateProvider.now());
             githubHelper.assignIssueToContributor(assignedGoodFirstIssue.id(), contributor1.user().getGithubUserId());
 
             // closed good first issue
             final var closedGoodFirstIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(6), CurrentDateProvider.now().plusHours(2), "COMPLETED", contributor1);
-            githubHelper.addLabelToIssue(closedGoodFirstIssue.id(), "good first issue", CurrentDateProvider.now());
+            githubHelper.addLabelToIssue(closedGoodFirstIssue.id(), goodFirstIssueLabelId, CurrentDateProvider.now());
 
             // hackathon open issues
             final var pastHackathonIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(7), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(pastHackathonIssue.id(), pastHackathonLabel, CurrentDateProvider.now());
+            githubHelper.addLabelToIssue(pastHackathonIssue.id(), pastHackathonLabelId, CurrentDateProvider.now());
             availableIssues.add(pastHackathonIssue);
 
             final var liveHackathonIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(8), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(liveHackathonIssue.id(), liveHackathonLabel, CurrentDateProvider.now());
+            githubHelper.addLabelToIssue(liveHackathonIssue.id(), liveHackathonLabelId, CurrentDateProvider.now());
             availableIssues.add(liveHackathonIssue);
 
             final var draftHackathonIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(9), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(draftHackathonIssue.id(), draftHackathonLabel, CurrentDateProvider.now());
-            githubHelper.addLabelToIssue(draftHackathonIssue.id(), "good first issue", CurrentDateProvider.now());
+            githubHelper.addLabelToIssue(draftHackathonIssue.id(), draftHackathonLabelId, CurrentDateProvider.now());
+            githubHelper.addLabelToIssue(draftHackathonIssue.id(), goodFirstIssueLabelId, CurrentDateProvider.now());
             availableIssues.add(draftHackathonIssue);
 
             final var upcomingHackathonIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(10), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(upcomingHackathonIssue.id(), upcomingHackathonLabel, CurrentDateProvider.now());
+            githubHelper.addLabelToIssue(upcomingHackathonIssue.id(), upcomingHackathonLabelId, CurrentDateProvider.now());
         });
 
         githubHelper.addRepoLanguage(repo1.getId(), "Java", 100L);
@@ -243,7 +252,13 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     public void should_filter_issues_by_labels_by_id() {
-        should_filter_issues_by_labels(project.getId().toString(), "good first issue", "od-past");
+        assertThat(should_filter_issues_by_labels(project.getId().toString(), "good first issue", "od-past")
+            .getLabels())
+            .usingRecursiveFieldByFieldElementComparatorOnFields("name", "count")
+            .containsExactly(
+                new GithubLabelWithCountResponse().name("good first issue").count(1),
+                new GithubLabelWithCountResponse().name("od-past").count(1)
+            );
     }
 
     @Test
@@ -251,15 +266,11 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
         should_get_project_available_issues(project.getSlug());
     }
 
-    @Test
-    public void should_filter_issues_by_labels_by_slug() {
-        should_filter_issues_by_labels(project.getSlug(), "good first issue", "od-past");
-    }
-
     private void should_get_project_available_issues(String idOrSlug) {
         // When
         final var response = get_project_available_issues_by_id_or_slug(idOrSlug);
         final var issues = response.getIssues();
+        final var labels = response.getLabels();
 
         assertThat(issues)
             .hasSize(availableIssues.size())
@@ -323,19 +334,41 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
         assertThat(issues)
             .extracting(GithubIssuePageItemResponse::getCommentCount)
             .allMatch(c -> c > 0);
+
+        assertThat(labels)
+            .hasSize(4)
+            .isSortedAccordingTo(comparing(GithubLabelWithCountResponse::getCount).reversed());
+
+        assertThat(labels)
+            .extracting(GithubLabelWithCountResponse::getName)
+            .containsExactlyInAnyOrder("good first issue", "od-past", "od-live", "od-draft");
+
+        assertThat(labels)
+            .extracting(GithubLabelWithCountResponse::getCount)
+            .containsExactly(4, 2, 1, 1);
     }
 
-    private void should_filter_issues_by_labels(String idOrSlug, String... labels) {
+    private GithubIssuePageWithLabelsResponse should_filter_issues_by_labels(String idOrSlug, String... labels) {
         final var response = get_project_available_issues_by_id_or_slug(idOrSlug, labels);
         final var issues = response.getIssues();
+        final var allLabels = response.getLabels();
 
         assertThat(issues)
             .isNotEmpty()
             .extracting(GithubIssuePageItemResponse::getLabels)
-            .allMatch(issueLabels -> issueLabels.stream().map(GithubLabel::getName).anyMatch(l -> List.of(labels).contains(l)));
+            .map(l -> l.stream().map(GithubLabel::getName).toList())
+            .allMatch(issueLabels -> Arrays.stream(labels).allMatch(issueLabels::contains));
+
+        assertThat(allLabels)
+            .isNotEmpty()
+            .isSortedAccordingTo(comparing(GithubLabelWithCountResponse::getCount).reversed())
+            .extracting(GithubLabelWithCountResponse::getName)
+            .contains(labels);
+
+        return response;
     }
 
-    private GithubIssuePageResponse get_project_available_issues_by_id_or_slug(String idOrSlug, String... labels) {
+    private GithubIssuePageWithLabelsResponse get_project_available_issues_by_id_or_slug(String idOrSlug, String... labels) {
         // Given
         final var params = new HashMap<String, String>();
         params.put("pageSize", "10");
@@ -348,7 +381,7 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody(GithubIssuePageResponse.class)
+                .expectBody(GithubIssuePageWithLabelsResponse.class)
                 .returnResult().getResponseBody();
     }
 }
