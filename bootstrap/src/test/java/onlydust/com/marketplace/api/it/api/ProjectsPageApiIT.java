@@ -1,5 +1,19 @@
 package onlydust.com.marketplace.api.it.api;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+
 import onlydust.com.marketplace.api.contract.model.ProjectPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectPageResponse;
 import onlydust.com.marketplace.api.helper.DatabaseHelper;
@@ -22,19 +36,6 @@ import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
 
 
 @TagProject
@@ -4188,7 +4189,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
         hackathon.githubLabels().add(label);
         hackathon.projectIds().add(UUID.fromString("a0c91aee-9770-4000-a893-953ddcbd62a7"));
         hackathonStoragePort.save(hackathon);
-        final var hackathonIssueId = githubHelper.createIssue(99600159L, ZonedDateTime.now().minusDays(3), null, "OPEN", antho);
+        final var hackathonIssueId = githubHelper.createIssue(99600159L, "react-click-outside", ZonedDateTime.now().minusDays(3), null, "OPEN", antho).id().value();
         githubHelper.addLabelToIssue(hackathonIssueId, label, ZonedDateTime.now().minusSeconds(10));
         postgresBiProjectorAdapter.onContributionsChanged(99600159L, ContributionUUID.of(hackathonIssueId));
 

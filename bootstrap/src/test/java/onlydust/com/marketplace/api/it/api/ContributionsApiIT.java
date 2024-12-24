@@ -70,8 +70,8 @@ public class ContributionsApiIT extends AbstractMarketplaceApiIT {
         postgresBiProjectorAdapter.onContributionsChanged(ContributionUUID.of(UUID.fromString("f4db1d9b-4e1d-300c-9277-8d05824c804e")));
 
         final var fooRepo = githubHelper.createRepo("foo");
-        newIssueId = at("2024-01-01T00:00:00Z", () -> githubHelper.createIssue(fooRepo.getId(), ZonedDateTime.parse("2024-01-01T00:00:00Z"), null, "OPEN",
-                projectLead));
+        newIssueId = at("2024-01-01T00:00:00Z", () -> githubHelper.createIssue(fooRepo, ZonedDateTime.parse("2024-01-01T00:00:00Z"), null, "OPEN",
+                projectLead).id().value());
 
         final var privateRepo = githubHelper.createPrivateRepo("private-repo");
         at("2024-01-01T00:00:00Z", () -> githubHelper.createPullRequest(privateRepo, projectLead, List.of("java")));

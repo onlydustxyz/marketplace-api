@@ -1,5 +1,18 @@
 package onlydust.com.marketplace.api.it.api;
 
+import static onlydust.com.marketplace.api.it.api.ApplicationsApiIT.fakeApplication;
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import onlydust.com.marketplace.api.contract.model.GithubIssuePageResponse;
 import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
 import onlydust.com.marketplace.api.helper.DatabaseHelper;
@@ -14,18 +27,6 @@ import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import static onlydust.com.marketplace.api.it.api.ApplicationsApiIT.fakeApplication;
-import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 @TagProject
@@ -1703,7 +1704,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
         hackathon.githubLabels().add(label);
         hackathon.projectIds().add(UUID.fromString("00490be6-2c03-4720-993b-aea3e07edd81"));
         hackathonStoragePort.save(hackathon);
-        final var hackathonIssueId = githubHelper.createIssue(480776993L, ZonedDateTime.now().minusDays(3), null, "OPEN", antho);
+        final var hackathonIssueId = githubHelper.createIssue(480776993L, "starklings", ZonedDateTime.now().minusDays(3), null, "OPEN", antho).id().value();
         githubHelper.addLabelToIssue(hackathonIssueId, label, ZonedDateTime.now().minusSeconds(10));
 
         // When

@@ -17,6 +17,7 @@ import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
 import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.GithubAccount;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
 
 @Service
@@ -232,22 +233,14 @@ public class GithubHelper {
     }
 
     public Long createIssue(GithubRepo repo, UserAuthHelper.AuthenticatedUser author) {
-        return createIssue(repo.getId(), CurrentDateProvider.now(), CurrentDateProvider.now().plusDays(1), "COMPLETED", author);
+        return createIssue(repo, CurrentDateProvider.now(), CurrentDateProvider.now().plusDays(1), "COMPLETED", author).id().value();
     }
 
-    public Long createIssue(Long repoId, ZonedDateTime createdAt, ZonedDateTime closedAt, String status, UserAuthHelper.AuthenticatedUser author) {
-        final var parameters = new HashMap<String, Object>();
-        parameters.put("repoId", repoId);
-        parameters.put("number", faker.random().nextInt(10));
-        parameters.put("title", faker.lorem().sentence());
-        parameters.put("body", faker.lorem().sentence());
-        parameters.put("status", status);
-        parameters.put("commentsCount", faker.random().nextInt(10));
-        parameters.put("createdAt", createdAt);
-        parameters.put("closedAt", closedAt);
-        parameters.put("authorId", author.user().getGithubUserId());
-        parameters.put("htmlUrl", faker.internet().url());
+    public GithubIssue createIssue(GithubRepo repo, ZonedDateTime createdAt, ZonedDateTime closedAt, String status, UserAuthHelper.AuthenticatedUser author) {
+        return createIssue(repo.getId(), repo.getName(), createdAt, closedAt, status, author);
+    }
 
+    public GithubIssue createIssue(Long repoId, String repoName, ZonedDateTime createdAt, ZonedDateTime closedAt, String status, UserAuthHelper.AuthenticatedUser author) {
         final Long nextIssueId = databaseHelper.<Long>executeReadQuery(
                 """
                         select id + 1  from indexer_exp.github_issues
@@ -255,7 +248,33 @@ public class GithubHelper {
                         limit 1
                         """, Map.of()
         );
-        parameters.put("issueId", nextIssueId);
+        
+        final var issue = new GithubIssue(
+                GithubIssue.Id.of(nextIssueId),
+                repoId,
+                faker.random().nextLong(10),
+                faker.lorem().sentence(),
+                faker.lorem().sentence(),
+                faker.internet().url(),
+                repoName,
+                0,
+                author.user().getGithubLogin(),
+                author.user().getGithubAvatarUrl(),
+                List.of()
+        );
+
+        final var parameters = new HashMap<String, Object>();
+        parameters.put("issueId", issue.id().value());
+        parameters.put("repoId", issue.repoId());
+        parameters.put("number", issue.number());
+        parameters.put("title", issue.title());
+        parameters.put("body", issue.description());
+        parameters.put("status", status);
+        parameters.put("commentsCount", faker.random().nextInt(10));
+        parameters.put("createdAt", createdAt);
+        parameters.put("closedAt", closedAt);
+        parameters.put("authorId", author.user().getGithubUserId());
+        parameters.put("htmlUrl", issue.htmlUrl());
 
         createAccount(author);
 
@@ -290,7 +309,11 @@ public class GithubHelper {
 
         createContributionFromIssue(nextIssueId, null);
 
-        return nextIssueId;
+        return issue;
+    }
+
+    public void addLabelToIssue(GithubIssue.Id issueId, String label, ZonedDateTime addedToIssueAt) {
+        addLabelToIssue(issueId.value(), label, addedToIssueAt);
     }
 
     public void addLabelToIssue(Long issueId, String label, ZonedDateTime addedToIssueAt) {
@@ -324,6 +347,10 @@ public class GithubHelper {
         );
 
         postgresBiProjectorAdapter.onContributionsChanged(ContributionUUID.of(issueId));
+    }
+
+    public void assignIssueToContributor(GithubIssue.Id issueId, Long contributorId) {
+        assignIssueToContributor(issueId.value(), contributorId);
     }
 
     public void assignIssueToContributor(Long issueId, Long contributorId) {
