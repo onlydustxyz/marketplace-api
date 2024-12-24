@@ -6,8 +6,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
@@ -113,6 +113,7 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
             // hackathon open issues
             final var pastHackathonIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(4), null, "OPEN", contributor1);
             githubHelper.addLabelToIssue(pastHackathonIssue.id(), pastHackathonLabel, CurrentDateProvider.now());
+            githubHelper.addLabelToIssue(pastHackathonIssue.id(), "good first issue", CurrentDateProvider.now());
             availableIssues.add(pastHackathonIssue);
 
             final var upcomingHackathonIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(5), null, "OPEN", contributor1);
@@ -159,6 +160,7 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
 
             final var draftHackathonIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(9), null, "OPEN", contributor1);
             githubHelper.addLabelToIssue(draftHackathonIssue.id(), draftHackathonLabel, CurrentDateProvider.now());
+            githubHelper.addLabelToIssue(draftHackathonIssue.id(), "good first issue", CurrentDateProvider.now());
             availableIssues.add(draftHackathonIssue);
 
             final var upcomingHackathonIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(10), null, "OPEN", contributor1);
@@ -208,7 +210,7 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
         assertThat(response.getAvailableIssueCount()).isEqualTo(9);
         assertThat(response.getCurrentWeekAvailableIssueCount()).isEqualTo(5);
 
-        assertThat(response.getGoodFirstIssueCount()).isEqualTo(2);
+        assertThat(response.getGoodFirstIssueCount()).isEqualTo(4);
         
         assertThat(response.getMergedPrCount()).isEqualTo(3);
         assertThat(response.getCurrentWeekMergedPrCount()).isEqualTo(2);
@@ -236,24 +238,28 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     public void should_get_project_available_issues_by_id() {
-        should_get_project_available_issues_by_id_or_slug(project.getId().toString());
+        should_get_project_available_issues(project.getId().toString());
+    }
+
+    @Test
+    public void should_filter_issues_by_labels_by_id() {
+        should_filter_issues_by_labels(project.getId().toString(), "good first issue", "od-past");
     }
 
     @Test
     public void should_get_project_available_issues_by_slug() {
-        should_get_project_available_issues_by_id_or_slug(project.getSlug());
+        should_get_project_available_issues(project.getSlug());
     }
 
-    private void should_get_project_available_issues_by_id_or_slug(String idOrSlug) {
+    @Test
+    public void should_filter_issues_by_labels_by_slug() {
+        should_filter_issues_by_labels(project.getSlug(), "good first issue", "od-past");
+    }
+
+    private void should_get_project_available_issues(String idOrSlug) {
         // When
-        final var issues = client.get()
-                .uri(getApiURI(PROJECTS_GET_AVAILABLE_ISSUES_BY_ID_OR_SLUG.formatted(idOrSlug), Map.of("pageSize", "10")))
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(GithubIssuePageResponse.class)
-                .consumeWith(System.out::println)
-                .returnResult().getResponseBody().getIssues();
+        final var response = get_project_available_issues_by_id_or_slug(idOrSlug);
+        final var issues = response.getIssues();
 
         assertThat(issues)
             .hasSize(availableIssues.size())
@@ -317,5 +323,32 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
         assertThat(issues)
             .extracting(GithubIssuePageItemResponse::getCommentCount)
             .allMatch(c -> c > 0);
+    }
+
+    private void should_filter_issues_by_labels(String idOrSlug, String... labels) {
+        final var response = get_project_available_issues_by_id_or_slug(idOrSlug, labels);
+        final var issues = response.getIssues();
+
+        assertThat(issues)
+            .isNotEmpty()
+            .extracting(GithubIssuePageItemResponse::getLabels)
+            .allMatch(issueLabels -> issueLabels.stream().map(GithubLabel::getName).anyMatch(l -> List.of(labels).contains(l)));
+    }
+
+    private GithubIssuePageResponse get_project_available_issues_by_id_or_slug(String idOrSlug, String... labels) {
+        // Given
+        final var params = new HashMap<String, String>();
+        params.put("pageSize", "10");
+        if (labels.length > 0) 
+            params.put("githubLabels", String.join(",", labels));
+
+        // When
+        return client.get()
+                .uri(getApiURI(PROJECTS_GET_AVAILABLE_ISSUES_BY_ID_OR_SLUG.formatted(idOrSlug), params))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(GithubIssuePageResponse.class)
+                .returnResult().getResponseBody();
     }
 }
