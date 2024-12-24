@@ -597,4 +597,25 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
         return ok(project.toResponse());
     }
+
+    @Override
+    public ResponseEntity<GithubIssuePageResponse> getProjectAvailableIssues(String projectIdOrSlug, Integer pageIndex, Integer pageSize, List<String> githubLabels) {
+        final var projectIdOrSlugObj = OrSlug.of(projectIdOrSlug, ProjectId::of);
+        final int sanitizePageIndex = sanitizePageIndex(pageIndex);
+        final int sanitizePageSize = sanitizePageSize(pageSize);
+
+        final var page = projectGithubIssueItemReadRepository.findAvailableIssues(
+            projectIdOrSlugObj.uuid().orElse(null), 
+            projectIdOrSlugObj.slug().orElse(null),
+            githubLabels == null ? null : githubLabels.toArray(String[]::new), 
+            PageRequest.of(sanitizePageIndex, sanitizePageSize, Sort.by("created_at").descending()));
+
+            return ok()
+                .body(new GithubIssuePageResponse()
+                        .issues(page.stream().map(ProjectGithubIssueItemReadEntity::toPageItemResponse).toList())
+                        .totalPageNumber(page.getTotalPages())
+                        .totalItemNumber((int) page.getTotalElements())
+                        .hasMore(hasMore(pageIndex, page.getTotalPages()))
+                        .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
+    }
 }

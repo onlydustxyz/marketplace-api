@@ -1,10 +1,13 @@
 package onlydust.com.marketplace.api.it.api;
 
+import static java.util.Comparator.comparing;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
@@ -17,6 +20,7 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiContributorGlobalDataRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiProjectContributionsDataRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiProjectGlobalDataRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
@@ -30,6 +34,8 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
     BiProjectGlobalDataRepository biProjectGlobalDataRepository;
     @Autowired
     BiProjectContributionsDataRepository biProjectContributionsDataRepository;
+    @Autowired
+    BiContributorGlobalDataRepository biContributorGlobalDataRepository;
 
     static final Faker faker = new Faker();
     static final AtomicBoolean setupDone = new AtomicBoolean();
@@ -40,6 +46,8 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
     static UserAuthHelper.AuthenticatedUser projectLead;
     static GithubRepo repo1;
     static GithubRepo repo2;
+
+    static List<GithubIssue> availableIssues = new ArrayList<>();
 
     @BeforeEach 
     void setUp() {
@@ -83,25 +91,32 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
         final var contributor2 = userAuthHelper.create();
         final var contributor3 = userAuthHelper.create();
 
+        databaseHelper.executeInTransaction(() -> {
+            biContributorGlobalDataRepository.refresh(contributor1.user().getGithubUserId());
+            biContributorGlobalDataRepository.refresh(contributor2.user().getGithubUserId());
+            biContributorGlobalDataRepository.refresh(contributor3.user().getGithubUserId());
+        });
 
         at(ZonedDateTime.now().minusWeeks(2), () -> {
             // merged pull requests
             githubHelper.createPullRequest(repo1, contributor3, List.of("rs"));
             
             // available issue
-            githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1);
-            githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1);
+            availableIssues.add(githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(1), null, "OPEN", contributor1));
+            availableIssues.add(githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(2), null, "OPEN", contributor1));
 
             // available good first issue
-            final var goodFirstIssueId = githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(goodFirstIssueId, "good first issue", CurrentDateProvider.now());
+            final var goodFirstIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(3), null, "OPEN", contributor1);
+            githubHelper.addLabelToIssue(goodFirstIssue.id(), "good first issue", CurrentDateProvider.now());
+            availableIssues.add(goodFirstIssue);
 
             // hackathon open issues
-            final var pastHackathonIssueId = githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(pastHackathonIssueId, pastHackathonLabel, CurrentDateProvider.now());
-            
-            final var upcomingHackathonIssueId = githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(upcomingHackathonIssueId, upcomingHackathonLabel, CurrentDateProvider.now());
+            final var pastHackathonIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(4), null, "OPEN", contributor1);
+            githubHelper.addLabelToIssue(pastHackathonIssue.id(), pastHackathonLabel, CurrentDateProvider.now());
+            availableIssues.add(pastHackathonIssue);
+
+            final var upcomingHackathonIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(5), null, "OPEN", contributor1);
+            githubHelper.addLabelToIssue(upcomingHackathonIssue.id(), upcomingHackathonLabel, CurrentDateProvider.now());
         });
 
         at(ZonedDateTime.now().minusDays(1), () -> {
@@ -110,40 +125,44 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
             githubHelper.createPullRequest(repo2, contributor1, List.of("js", "ts"));
             
             // available issue
-            githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1);
+            availableIssues.add(githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(1), null, "OPEN", contributor1));
 
             // assigned issue
-            final var assignedIssueId = githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1); 
-            githubHelper.assignIssueToContributor(assignedIssueId, contributor2.user().getGithubUserId());
+            final var assignedIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(2), null, "OPEN", contributor1); 
+            githubHelper.assignIssueToContributor(assignedIssue.id(), contributor2.user().getGithubUserId());
             
             // closed issue
-            githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), CurrentDateProvider.now().plusHours(2), "COMPLETED", contributor1);
+            githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(3), CurrentDateProvider.now().plusHours(2), "COMPLETED", contributor1);
 
             // available good first issue
-            final var goodFirstIssueId = githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(goodFirstIssueId, "good first issue", CurrentDateProvider.now());
+            final var goodFirstIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(4), null, "OPEN", contributor1);
+            githubHelper.addLabelToIssue(goodFirstIssue.id(), "good first issue", CurrentDateProvider.now());
+            availableIssues.add(goodFirstIssue);
 
             // assigned good first issue
-            final var assignedGoodFirstIssueId = githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(assignedGoodFirstIssueId, "good first issue", CurrentDateProvider.now());
-            githubHelper.assignIssueToContributor(assignedGoodFirstIssueId, contributor1.user().getGithubUserId());
+            final var assignedGoodFirstIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(5), null, "OPEN", contributor1);
+            githubHelper.addLabelToIssue(assignedGoodFirstIssue.id(), "good first issue", CurrentDateProvider.now());
+            githubHelper.assignIssueToContributor(assignedGoodFirstIssue.id(), contributor1.user().getGithubUserId());
 
             // closed good first issue
-            final var closedGoodFirstIssueId = githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), CurrentDateProvider.now().plusHours(2), "COMPLETED", contributor1);
-            githubHelper.addLabelToIssue(closedGoodFirstIssueId, "good first issue", CurrentDateProvider.now());
+            final var closedGoodFirstIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(6), CurrentDateProvider.now().plusHours(2), "COMPLETED", contributor1);
+            githubHelper.addLabelToIssue(closedGoodFirstIssue.id(), "good first issue", CurrentDateProvider.now());
 
             // hackathon open issues
-            final var pastHackathonIssueId = githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(pastHackathonIssueId, pastHackathonLabel, CurrentDateProvider.now());
-            
-            final var liveHackathonIssueId = githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(liveHackathonIssueId, liveHackathonLabel, CurrentDateProvider.now());
+            final var pastHackathonIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(7), null, "OPEN", contributor1);
+            githubHelper.addLabelToIssue(pastHackathonIssue.id(), pastHackathonLabel, CurrentDateProvider.now());
+            availableIssues.add(pastHackathonIssue);
 
-            final var draftHackathonIssueId = githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(draftHackathonIssueId, draftHackathonLabel, CurrentDateProvider.now());
+            final var liveHackathonIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(8), null, "OPEN", contributor1);
+            githubHelper.addLabelToIssue(liveHackathonIssue.id(), liveHackathonLabel, CurrentDateProvider.now());
+            availableIssues.add(liveHackathonIssue);
 
-            final var upcomingHackathonIssueId = githubHelper.createIssue(repo1.getId(), CurrentDateProvider.now(), null, "OPEN", contributor1);
-            githubHelper.addLabelToIssue(upcomingHackathonIssueId, upcomingHackathonLabel, CurrentDateProvider.now());
+            final var draftHackathonIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(9), null, "OPEN", contributor1);
+            githubHelper.addLabelToIssue(draftHackathonIssue.id(), draftHackathonLabel, CurrentDateProvider.now());
+            availableIssues.add(draftHackathonIssue);
+
+            final var upcomingHackathonIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(10), null, "OPEN", contributor1);
+            githubHelper.addLabelToIssue(upcomingHackathonIssue.id(), upcomingHackathonLabel, CurrentDateProvider.now());
         });
 
         githubHelper.addRepoLanguage(repo1.getId(), "Java", 100L);
@@ -213,5 +232,86 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
         assertThat(response.getMoreInfos())
             .extracting(SimpleLink::getUrl)
             .containsExactlyElementsOf(moreInfos.stream().map(NamedLink::getUrl).toList());
+    }
+
+    @Test
+    public void should_get_project_available_issues_by_id() {
+        should_get_project_available_issues_by_id_or_slug(project.getId().toString());
+    }
+
+    @Test
+    public void should_get_project_available_issues_by_slug() {
+        should_get_project_available_issues_by_id_or_slug(project.getSlug());
+    }
+
+    private void should_get_project_available_issues_by_id_or_slug(String idOrSlug) {
+        // When
+        final var issues = client.get()
+                .uri(getApiURI(PROJECTS_GET_AVAILABLE_ISSUES_BY_ID_OR_SLUG.formatted(idOrSlug), Map.of("pageSize", "10")))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(GithubIssuePageResponse.class)
+                .consumeWith(System.out::println)
+                .returnResult().getResponseBody().getIssues();
+
+        assertThat(issues)
+            .hasSize(availableIssues.size())
+            .isSortedAccordingTo(comparing(GithubIssuePageItemResponse::getCreatedAt).reversed());
+
+        assertThat(issues)
+            .extracting(GithubIssuePageItemResponse::getId)
+            .containsExactlyInAnyOrderElementsOf(availableIssues.stream().map(GithubIssue::id).map(GithubIssue.Id::value).toList());
+
+        assertThat(issues)
+            .extracting(GithubIssuePageItemResponse::getTitle)
+            .containsExactlyInAnyOrderElementsOf(availableIssues.stream().map(GithubIssue::title).toList());
+
+        assertThat(issues)
+            .extracting(GithubIssuePageItemResponse::getNumber)
+            .containsExactlyInAnyOrderElementsOf(availableIssues.stream().map(GithubIssue::number).toList());
+
+        assertThat(issues)
+            .extracting(GithubIssuePageItemResponse::getStatus)
+            .containsOnly(GithubIssueStatus.OPEN);
+
+        assertThat(issues)
+            .extracting(GithubIssuePageItemResponse::getHtmlUrl)
+            .containsExactlyInAnyOrderElementsOf(availableIssues.stream().map(GithubIssue::htmlUrl).toList());
+
+        assertThat(issues)
+            .extracting(GithubIssuePageItemResponse::getRepo)
+            .extracting(ShortGithubRepoResponse::getId)
+            .containsExactlyInAnyOrderElementsOf(availableIssues.stream().map(GithubIssue::repoId).toList());
+
+        assertThat(issues)
+            .extracting(GithubIssuePageItemResponse::getAuthor)
+            .extracting(ContributorResponse::getLogin)
+            .containsExactlyInAnyOrderElementsOf(availableIssues.stream().map(GithubIssue::authorLogin).toList());
+
+        assertThat(issues)
+            .extracting(GithubIssuePageItemResponse::getCreatedAt)
+            .allMatch(d -> d.isAfter(ZonedDateTime.now().minusWeeks(2).minusDays(1)));
+
+        assertThat(issues)
+            .extracting(GithubIssuePageItemResponse::getClosedAt)
+            .containsOnlyNulls();
+
+        assertThat(issues)
+            .extracting(GithubIssuePageItemResponse::getBody)
+            .containsExactlyInAnyOrderElementsOf(availableIssues.stream().map(GithubIssue::description).toList());
+
+        assertThat(issues)
+            .flatExtracting(GithubIssuePageItemResponse::getLabels)
+            .extracting(GithubLabel::getName)
+            .containsOnly("good first issue", "od-past", "od-live", "od-draft");
+
+        assertThat(issues)
+            .extracting(GithubIssuePageItemResponse::getApplicants)
+            .allMatch(applicants -> applicants.isEmpty());
+
+        assertThat(issues)
+            .extracting(GithubIssuePageItemResponse::getAssignees)
+            .allMatch(assignees -> assignees.isEmpty());
     }
 }

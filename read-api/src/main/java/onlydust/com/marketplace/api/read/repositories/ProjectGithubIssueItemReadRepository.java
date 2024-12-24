@@ -1,13 +1,14 @@
 package onlydust.com.marketplace.api.read.repositories;
 
-import lombok.NonNull;
-import onlydust.com.marketplace.api.read.entities.github.ProjectGithubIssueItemReadEntity;
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
-import java.util.UUID;
+import lombok.NonNull;
+import onlydust.com.marketplace.api.read.entities.github.ProjectGithubIssueItemReadEntity;
 
 public interface ProjectGithubIssueItemReadRepository extends Repository<ProjectGithubIssueItemReadEntity, Long> {
 
@@ -100,4 +101,43 @@ public interface ProjectGithubIssueItemReadRepository extends Repository<Project
                                                         UUID[] languageIds,
                                                         String search,
                                                         Pageable pageable);
+
+
+    @Query(value = """
+            select  c.issue_id        as id,
+                    c.github_number   as number,
+                    c.github_title    as title,
+                    c.github_status   as status,
+                    c.github_html_url as html_url,
+                    c.github_repo     as repo,
+                    ccd.github_author as author,
+                    c.created_at      as created_at,
+                    c.completed_at    as closed_at,
+                    c.github_body     as body,
+                    c.github_labels   as labels,
+                    ccd.applicants    as applications,
+                    '[]'              as assignees
+                from bi.p_contribution_data c
+                    join bi.p_contribution_contributors_data ccd on ccd.contribution_uuid = c.contribution_uuid
+                where (c.project_id = :projectId or c.project_slug = :projectSlug)
+                    and c.contribution_type = 'ISSUE'
+                    and c.contribution_status = 'IN_PROGRESS'
+                    and coalesce(array_length(ccd.assignee_ids, 1), 0) = 0
+                    and not exists (
+                        select 1
+                        from hackathons h
+                        join hackathon_projects hp on hp.hackathon_id = h.id and hp.project_id = c.project_id
+                        join indexer_exp.github_labels gl on gl.name = any (h.github_labels) and gl.id = any (c.github_label_ids)
+                        where h.status = 'PUBLISHED' and h.start_date > now()
+                    )
+                    and (coalesce(:githubLabels) is null or exists (
+                        select 1
+                        from indexer_exp.github_labels 
+                        where id = any (c.github_label_ids) and 
+                        name = any(:githubLabels)))
+            """, nativeQuery = true)
+    Page<ProjectGithubIssueItemReadEntity> findAvailableIssues(UUID projectId,
+                                                               String projectSlug,  
+                                                               String[] githubLabels,
+                                                               Pageable pageable);
 }
