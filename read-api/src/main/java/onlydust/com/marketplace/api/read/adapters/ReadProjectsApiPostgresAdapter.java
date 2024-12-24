@@ -101,7 +101,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     private final ProjectsPageV2Repository projectsPageV2Repository;
     private final ProjectsV2ReadRepository projectsV2ReadRepository;
     private final GithubLabelWithCountReadRepository githubLabelWithCountReadRepository;
-
+    private final ProjectContributorV2ReadRepository projectContributorV2ReadRepository;
 
     private static @NonNull List<FinancialTransactionType> sanitizeTypes(List<FinancialTransactionType> types) {
         final var acceptedTypes = List.of(GRANTED, UNGRANTED, REWARDED);
@@ -625,5 +625,26 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                     .totalItemNumber((int) page.getTotalElements())
                     .hasMore(hasMore(pageIndex, page.getTotalPages()))
                     .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
+    }
+
+    @Override
+    public ResponseEntity<ContributorsPageResponseV2> getProjectContributorsV2(String projectIdOrSlug, Integer pageIndex, Integer pageSize, String search) {
+        final var projectIdOrSlugObj = OrSlug.of(projectIdOrSlug, ProjectId::of);
+        final int sanitizePageIndex = sanitizePageIndex(pageIndex);
+        final int sanitizePageSize = sanitizePageSize(pageSize);
+
+        final var page = projectContributorV2ReadRepository.findAll(
+            projectIdOrSlugObj.uuid().orElse(null),
+            projectIdOrSlugObj.slug().orElse(null),
+            search,
+            PageRequest.of(sanitizePageIndex, sanitizePageSize, JpaSort.unsafe("cast(c.contributor ->> 'globalRank' as int)")));
+
+        return ok()
+            .body(new ContributorsPageResponseV2()
+                .contributors(page.stream().map(ProjectContributorV2ReadEntity::toResponse).toList())
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements())
+                .hasMore(hasMore(pageIndex, page.getTotalPages()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
     }
 }
