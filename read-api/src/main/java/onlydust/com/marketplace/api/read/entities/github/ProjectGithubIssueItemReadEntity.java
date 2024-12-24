@@ -68,6 +68,8 @@ public class ProjectGithubIssueItemReadEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     List<ApplicationLinkResponse> applications;
 
+    int commentCount;
+
     public GithubIssuePageItemResponse toPageItemResponse() {
         return new GithubIssuePageItemResponse()
                 .id(id)
@@ -83,6 +85,6 @@ public class ProjectGithubIssueItemReadEntity {
                 .labels(isNull(labels) ? List.of() : labels.stream().sorted(Comparator.comparing(GithubLabel::getName)).toList())
                 .applicants(isNull(applications) ? List.of() : applications.stream().sorted(Comparator.comparing(ApplicationLinkResponse::getLogin)).toList())
                 .assignees(isNull(assignees) ? List.of() : assignees.stream().sorted(Comparator.comparing(GithubUserResponse::getLogin)).toList())
-                ;
+                .commentCount(commentCount);
     }
 }

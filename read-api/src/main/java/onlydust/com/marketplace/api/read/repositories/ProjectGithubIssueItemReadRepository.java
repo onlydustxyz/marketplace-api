@@ -28,6 +28,7 @@ public interface ProjectGithubIssueItemReadRepository extends Repository<Project
                     where ga.id = any (ccd.assignee_ids))           assignees,
                    ccd.applicants                                   applications,
                    c.github_labels                                  labels,
+                   c.github_comment_count                           comment_count,
                    ccd.github_author                                author,
                    c.github_repo                                    repo
             FROM projects p
@@ -104,19 +105,20 @@ public interface ProjectGithubIssueItemReadRepository extends Repository<Project
 
 
     @Query(value = """
-            select  c.issue_id        as id,
-                    c.github_number   as number,
-                    c.github_title    as title,
-                    c.github_status   as status,
-                    c.github_html_url as html_url,
-                    c.github_repo     as repo,
-                    ccd.github_author as author,
-                    c.created_at      as created_at,
-                    c.completed_at    as closed_at,
-                    c.github_body     as body,
-                    c.github_labels   as labels,
-                    ccd.applicants    as applications,
-                    '[]'              as assignees
+            select  c.issue_id             as id,
+                    c.github_number        as number,
+                    c.github_title         as title,
+                    c.github_status        as status,
+                    c.github_html_url      as html_url,
+                    c.github_repo          as repo,
+                    ccd.github_author      as author,
+                    c.created_at           as created_at,
+                    c.completed_at         as closed_at,
+                    c.github_body          as body,
+                    c.github_comment_count as comment_count,
+                    c.github_labels        as labels,
+                    ccd.applicants         as applications,
+                    '[]'                   as assignees
                 from bi.p_contribution_data c
                     join bi.p_contribution_contributors_data ccd on ccd.contribution_uuid = c.contribution_uuid
                 where (c.project_id = :projectId or c.project_slug = :projectSlug)

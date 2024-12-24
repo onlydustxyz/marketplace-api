@@ -313,5 +313,9 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
         assertThat(issues)
             .extracting(GithubIssuePageItemResponse::getAssignees)
             .allMatch(assignees -> assignees.isEmpty());
+
+        assertThat(issues)
+            .extracting(GithubIssuePageItemResponse::getCommentCount)
+            .allMatch(c -> c > 0);
     }
 }

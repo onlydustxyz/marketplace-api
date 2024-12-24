@@ -270,7 +270,7 @@ public class GithubHelper {
         parameters.put("title", issue.title());
         parameters.put("body", issue.description());
         parameters.put("status", status);
-        parameters.put("commentsCount", faker.random().nextInt(10));
+        parameters.put("commentsCount", faker.random().nextInt(10)+1);
         parameters.put("createdAt", createdAt);
         parameters.put("closedAt", closedAt);
         parameters.put("authorId", author.user().getGithubUserId());
