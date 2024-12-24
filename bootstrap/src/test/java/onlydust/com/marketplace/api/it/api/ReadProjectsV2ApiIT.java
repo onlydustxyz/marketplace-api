@@ -425,17 +425,25 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
         should_get_project_contributors(project.getSlug());
     }
 
+    @Test
+    public void should_filter_contributors_by_login() {
+        // Given
+        final var search = contributor1.user().getGithubLogin().substring(0, 3);
+
+        // When
+        final var contributors = get_project_contributors(project.getId().toString(), search.toUpperCase())
+            .getContributors();
+
+        assertThat(contributors)
+            .isNotEmpty()
+            .extracting(ContributorPageItemResponseV2::getLogin)
+            .allMatch(login -> login.toLowerCase().contains(search.toLowerCase()));
+    }
+
     private void should_get_project_contributors(String idOrSlug) {
         // When
-        final var response = client.get()
-                .uri(getApiURI(PROJECTS_V2_GET_CONTRIBUTORS_BY_ID_OR_SLUG.formatted(idOrSlug)))
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(ContributorsPageResponseV2.class)
-                .returnResult().getResponseBody();
-
-        final var contributors = response.getContributors();
+        final var contributors = get_project_contributors(idOrSlug, null)
+            .getContributors();
 
         assertThat(contributors)
             .hasSize(3)
@@ -483,5 +491,21 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
                     .rewardCount(0)
                     .totalEarnedUsdAmount(BigDecimal.valueOf(0))
             );
+    }
+
+    private ContributorsPageResponseV2 get_project_contributors(String idOrSlug, String login) {
+        final var params = new HashMap<String, String>();
+        params.put("pageSize", "10");
+        if (login != null) 
+            params.put("login", login);
+
+        // When
+        return client.get()
+                .uri(getApiURI(PROJECTS_V2_GET_CONTRIBUTORS_BY_ID_OR_SLUG.formatted(idOrSlug), params))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(ContributorsPageResponseV2.class)
+                .returnResult().getResponseBody();
     }
 }
