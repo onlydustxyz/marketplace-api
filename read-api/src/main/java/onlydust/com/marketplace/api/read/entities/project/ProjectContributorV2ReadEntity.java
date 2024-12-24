@@ -2,10 +2,9 @@ package onlydust.com.marketplace.api.read.entities.project;
 
 import java.math.BigDecimal;
 
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-
-import com.google.errorprone.annotations.Immutable;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
