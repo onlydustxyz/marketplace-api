@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.util.BigDecimalComparator.BIG_DECIMAL_COMPARATOR;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,8 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.github.javafaker.Faker;
 
+import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiContributorGlobalDataRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiProjectContributionsDataRepository;
@@ -182,6 +185,22 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
             final var upcomingHackathonIssue = githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(10), null, "OPEN", contributor1);
             githubHelper.addLabelToIssue(upcomingHackathonIssue.id(), upcomingHackathonLabelId, CurrentDateProvider.now());
         });
+
+        accountingHelper.saveQuote(new Quote(CurrencyHelper.STRK, CurrencyHelper.USD, BigDecimal.valueOf(0.55), Instant.now()));
+
+        final var sponsor = sponsorHelper.create();
+        accountingHelper.createSponsorAccount(sponsor.id(), 1000, CurrencyHelper.USD);
+        accountingHelper.createSponsorAccount(sponsor.id(), 1000, CurrencyHelper.STRK);
+
+        final var program = programHelper.create(sponsor.id());
+        accountingHelper.allocate(sponsor.id(), program.id(), 1000, CurrencyHelper.USD);
+        accountingHelper.allocate(sponsor.id(), program.id(), 1000, CurrencyHelper.STRK);
+
+        accountingHelper.grant(program.id(), projectId, 1000, CurrencyHelper.USD);
+        accountingHelper.grant(program.id(), projectId, 1000, CurrencyHelper.STRK);
+
+        rewardHelper.create(projectId, projectLead, contributor2.githubUserId(), 120, CurrencyHelper.STRK);
+        rewardHelper.create(projectId, projectLead, contributor2.githubUserId(), 100, CurrencyHelper.USD);
 
         githubHelper.addRepoLanguage(repo1.getId(), "Java", 100L);
         githubHelper.addRepoLanguage(repo2.getId(), "JavaScript", 10L);
@@ -431,8 +450,8 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
                     .avatarUrl(contributor1.user().getGithubAvatarUrl())
                     .isRegistered(true)
                     .id(contributor1.userId().value())
-                    .globalRank(79)
-                    .globalRankPercentile(BigDecimal.valueOf(0.0035465431635165016))
+                    .globalRank(80)
+                    .globalRankPercentile(BigDecimal.valueOf(0.0035882672007343432))
                     .globalRankCategory(UserRankCategory.A)
                     .mergedPullRequestCount(2)
                     .rewardCount(0)
@@ -444,12 +463,12 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
                     .avatarUrl(contributor2.user().getGithubAvatarUrl())
                     .isRegistered(true)
                     .id(contributor2.userId().value())
-                    .globalRank(148)
-                    .globalRankPercentile(BigDecimal.valueOf(0.9998331038511287))
-                    .globalRankCategory(UserRankCategory.F)
+                    .globalRank(149)
+                    .globalRankPercentile(BigDecimal.valueOf(0.006216881545458339))
+                    .globalRankCategory(UserRankCategory.A)
                     .mergedPullRequestCount(0)
-                    .rewardCount(0)
-                    .totalEarnedUsdAmount(BigDecimal.valueOf(0)),
+                    .rewardCount(2)
+                    .totalEarnedUsdAmount(BigDecimal.valueOf(166)),
 
                 new ContributorPageItemResponseV2()
                     .githubUserId(contributor3.user().getGithubUserId())
@@ -457,8 +476,8 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
                     .avatarUrl(contributor3.user().getGithubAvatarUrl())
                     .isRegistered(true)
                     .id(contributor3.userId().value())
-                    .globalRank(88)
-                    .globalRankPercentile(BigDecimal.valueOf(0.0060082613593691325))
+                    .globalRank(89)
+                    .globalRankPercentile(BigDecimal.valueOf(0.006049985396586974))
                     .globalRankCategory(UserRankCategory.A)
                     .mergedPullRequestCount(1)
                     .rewardCount(0)
