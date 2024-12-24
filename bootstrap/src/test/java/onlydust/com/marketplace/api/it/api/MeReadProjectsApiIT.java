@@ -1,5 +1,20 @@
 package onlydust.com.marketplace.api.it.api;
 
+import static java.math.BigDecimal.ZERO;
+import static java.util.stream.Collectors.toSet;
+import static onlydust.com.marketplace.api.helper.CurrencyHelper.ETH;
+import static onlydust.com.marketplace.api.helper.CurrencyHelper.USDC;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.LongStream;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
+
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
 import onlydust.com.marketplace.api.contract.model.DetailedTotalMoney;
@@ -9,20 +24,6 @@ import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpHeaders;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.LongStream;
-
-import static java.math.BigDecimal.ZERO;
-import static java.util.stream.Collectors.toSet;
-import static onlydust.com.marketplace.api.helper.CurrencyHelper.ETH;
-import static onlydust.com.marketplace.api.helper.CurrencyHelper.USDC;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @TagMe
 public class MeReadProjectsApiIT extends AbstractMarketplaceApiIT {
@@ -136,7 +137,7 @@ public class MeReadProjectsApiIT extends AbstractMarketplaceApiIT {
             githubHelper.createPullRequest(repo1, userAuthHelper.create());
 
             final var repo2 = githubHelper.createRepo(projectId);
-            final var issue2 = githubHelper.createIssue(repo2.getId(), CurrentDateProvider.now(), null, "OPEN", userAuthHelper.create());
+            final var issue2 = githubHelper.createIssue(repo2, CurrentDateProvider.now(), null, "OPEN", userAuthHelper.create()).id().value();
             githubHelper.assignIssueToContributor(issue2, userAuthHelper.create().user().getGithubUserId());
             githubHelper.assignIssueToContributor(issue2, userAuthHelper.create().user().getGithubUserId());
             final var issue3 = githubHelper.createIssue(repo2, userAuthHelper.create());

@@ -2848,7 +2848,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GithubIssuePageResponse'
+                $ref: '#/components/schemas/GithubIssuePageWithLabelsResponse'
         "404":
           $ref: '#/components/responses/NotFoundError'
         "500":
@@ -7410,6 +7410,18 @@ components:
               items:
                 $ref: '#/components/schemas/GithubIssuePageItemResponse'
 
+    GithubIssuePageWithLabelsResponse:
+      allOf:
+        - $ref: '#/components/schemas/GithubIssuePageResponse'
+        - type: object
+          required:
+            - labels
+          properties:
+            labels:
+              type: array
+              items:
+                $ref: '#/components/schemas/GithubLabelWithCountResponse'
+
     HackathonProjectsIssuesResponse:
       type: object
       required:
@@ -9067,6 +9079,16 @@ components:
           type: string
         description:
           type: string
+
+    GithubLabelWithCountResponse:
+      allOf:
+        - $ref: '#/components/schemas/GithubLabel'
+        - type: object
+          required:
+            - count
+          properties:
+            count:
+              type: integer
 
     ContributionType:
       type: string

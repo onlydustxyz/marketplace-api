@@ -89,7 +89,7 @@ public class MeProjectsAsContributorApiIT extends AbstractMarketplaceApiIT {
             final var bridge_frontend = githubHelper.createRepo("bridge", bridge);
 
 
-            final Long goodFirstIssue = githubHelper.createIssue(marketplace_api.getId(), ZonedDateTime.now(), null, "OPEN", lead);
+            final Long goodFirstIssue = githubHelper.createIssue(marketplace_api, ZonedDateTime.now(), null, "OPEN", lead).id().value();
             githubHelper.addLabelToIssue(goodFirstIssue, "good-first-issue", ZonedDateTime.now());
 
             at("2021-01-01T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho, List.of("java")));

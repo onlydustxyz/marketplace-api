@@ -58,6 +58,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectLeadViewR
 import onlydust.com.marketplace.api.read.cache.Cache;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.accounting.AllTransactionReadEntity;
+import onlydust.com.marketplace.api.read.entities.github.GithubLabelWithCountReadEntity;
 import onlydust.com.marketplace.api.read.entities.github.ProjectGithubIssueItemReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.*;
@@ -99,6 +100,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     private final ProgramReadRepository programReadRepository;
     private final ProjectsPageV2Repository projectsPageV2Repository;
     private final ProjectsV2ReadRepository projectsV2ReadRepository;
+    private final GithubLabelWithCountReadRepository githubLabelWithCountReadRepository;
 
 
     private static @NonNull List<FinancialTransactionType> sanitizeTypes(List<FinancialTransactionType> types) {
@@ -596,5 +598,32 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 .orElseThrow(() -> notFound("Project %s not found".formatted(projectIdOrSlug)));
 
         return ok(project.toResponse());
+    }
+
+    @Override
+    public ResponseEntity<GithubIssuePageWithLabelsResponse> getProjectAvailableIssues(String projectIdOrSlug, Integer pageIndex, Integer pageSize, List<String> githubLabels) {
+        final var projectIdOrSlugObj = OrSlug.of(projectIdOrSlug, ProjectId::of);
+        final int sanitizePageIndex = sanitizePageIndex(pageIndex);
+        final int sanitizePageSize = sanitizePageSize(pageSize);
+
+        final var page = projectGithubIssueItemReadRepository.findAvailableIssues(
+            projectIdOrSlugObj.uuid().orElse(null), 
+            projectIdOrSlugObj.slug().orElse(null),
+            githubLabels == null ? null : githubLabels.toArray(String[]::new), 
+            PageRequest.of(sanitizePageIndex, sanitizePageSize, Sort.by("created_at").descending()));
+
+        final var labels = githubLabelWithCountReadRepository.findForAvailableIssues(
+            projectIdOrSlugObj.uuid().orElse(null),
+            projectIdOrSlugObj.slug().orElse(null),
+            githubLabels == null ? null : githubLabels.toArray(String[]::new));
+
+        return ok()
+            .body(new GithubIssuePageWithLabelsResponse()
+                    .issues(page.stream().map(ProjectGithubIssueItemReadEntity::toPageItemResponse).toList())
+                    .labels(labels.stream().map(GithubLabelWithCountReadEntity::toResponse).toList())
+                    .totalPageNumber(page.getTotalPages())
+                    .totalItemNumber((int) page.getTotalElements())
+                    .hasMore(hasMore(pageIndex, page.getTotalPages()))
+                    .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
     }
 }

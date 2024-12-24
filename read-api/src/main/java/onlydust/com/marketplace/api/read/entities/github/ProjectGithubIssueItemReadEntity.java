@@ -1,22 +1,22 @@
 package onlydust.com.marketplace.api.read.entities.github;
 
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.Accessors;
-import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.api.contract.model.*;
+import static java.util.Objects.isNull;
+
+import java.time.ZonedDateTime;
+import java.util.Comparator;
+import java.util.List;
+
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
-import java.time.ZonedDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
-
-import static java.util.Objects.isNull;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
+import onlydust.com.marketplace.api.contract.model.*;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
@@ -58,20 +58,6 @@ public class ProjectGithubIssueItemReadEntity {
     @NonNull
     String htmlUrl;
     String body;
-    @NonNull
-    Integer commentsCount;
-    @NonNull
-    String repoOwnerLogin;
-    @NonNull
-    String repoName;
-    @NonNull
-    String repoHtmlUrl;
-    @NonNull
-    String authorLogin;
-    @NonNull
-    String authorHtmlUrl;
-    @NonNull
-    String authorAvatarUrl;
 
     @JdbcTypeCode(SqlTypes.JSON)
     List<GithubLabel> labels;
@@ -82,10 +68,7 @@ public class ProjectGithubIssueItemReadEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     List<ApplicationLinkResponse> applications;
 
-    UUID projectId;
-    String projectSlug;
-    String projectName;
-    String projectLogoUrl;
+    int commentCount;
 
     public GithubIssuePageItemResponse toPageItemResponse() {
         return new GithubIssuePageItemResponse()
@@ -102,6 +85,6 @@ public class ProjectGithubIssueItemReadEntity {
                 .labels(isNull(labels) ? List.of() : labels.stream().sorted(Comparator.comparing(GithubLabel::getName)).toList())
                 .applicants(isNull(applications) ? List.of() : applications.stream().sorted(Comparator.comparing(ApplicationLinkResponse::getLogin)).toList())
                 .assignees(isNull(assignees) ? List.of() : assignees.stream().sorted(Comparator.comparing(GithubUserResponse::getLogin)).toList())
-                ;
+                .commentCount(commentCount);
     }
 }

@@ -164,10 +164,10 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             final var issueId1 = at("2021-01-01T00:00:03Z", () -> githubHelper.createIssue(marketplace_frontend, mehdi));
             at("2021-01-01T02:00:03Z", () -> applicationHelper.create(onlyDust, GithubIssue.Id.of(issueId1), james.githubUserId()));
 
-            final var issueId2 = at("2021-01-01T00:00:04Z", () -> githubHelper.createIssue(marketplace_frontend.getId(), CurrentDateProvider.now(),
-                    null, "OPEN", mehdi));
-            at("2021-01-01T02:00:04Z", () -> applicationHelper.create(onlyDust, GithubIssue.Id.of(issueId2), james.githubUserId())); // SHELVED
-            at("2021-01-01T00:00:04Z", () -> githubHelper.assignIssueToContributor(issueId2, mehdi.user().getGithubUserId()));
+            final var issueId2 = at("2021-01-01T00:00:04Z", () -> githubHelper.createIssue(marketplace_frontend, CurrentDateProvider.now(),
+                    null, "OPEN", mehdi).id());
+            at("2021-01-01T02:00:04Z", () -> applicationHelper.create(onlyDust, issueId2, james.githubUserId())); // SHELVED
+            at("2021-01-01T00:00:04Z", () -> githubHelper.assignIssueToContributor(issueId2.value(), mehdi.user().getGithubUserId()));
 
             at("2021-01-01T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi, List.of("ts")));
             at("2021-01-01T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden, List.of("ts")));

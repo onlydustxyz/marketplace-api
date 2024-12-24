@@ -1,6 +1,16 @@
 package onlydust.com.marketplace.api.it.api.feature;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
+
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.kernel.model.ProjectId;
@@ -14,14 +24,6 @@ import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
 import onlydust.com.marketplace.user.domain.service.NotificationSettingsService;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class GoodFirstIssueCreatedNotifierJobIT extends AbstractMarketplaceApiIT {
 
@@ -50,12 +52,12 @@ public class GoodFirstIssueCreatedNotifierJobIT extends AbstractMarketplaceApiIT
         final GithubRepo repo2 = githubHelper.createRepo();
         projectHelper.addRepo(projectId1, repo1.getId());
         projectHelper.addRepo(projectId2, repo2.getId());
-        final Long issueId11 = githubHelper.createIssue(repo1.getId(), ZonedDateTime.now(), null, "OPEN", dummyContributor);
-        githubHelper.createIssue(repo1.getId(), ZonedDateTime.now(), null, "OPEN", dummyContributor);
-        final Long issueId13 = githubHelper.createIssue(repo1.getId(), ZonedDateTime.now(), null, "COMPLETED", dummyContributor);
-        final Long issueId14 = githubHelper.createIssue(repo1.getId(), ZonedDateTime.now().minusMinutes(6), null, "OPEN", dummyContributor);
-        final Long issueId15 = githubHelper.createIssue(repo1.getId(), ZonedDateTime.now(), null, "OPEN", dummyContributor);
-        final Long issueId16 = githubHelper.createIssue(repo1.getId(), ZonedDateTime.now(), null, "OPEN", dummyContributor);
+        final Long issueId11 = githubHelper.createIssue(repo1, ZonedDateTime.now(), null, "OPEN", dummyContributor).id().value();
+        githubHelper.createIssue(repo1, ZonedDateTime.now(), null, "OPEN", dummyContributor).id().value();
+        final Long issueId13 = githubHelper.createIssue(repo1, ZonedDateTime.now(), null, "COMPLETED", dummyContributor).id().value();
+        final Long issueId14 = githubHelper.createIssue(repo1, ZonedDateTime.now().minusMinutes(6), null, "OPEN", dummyContributor).id().value();
+        final Long issueId15 = githubHelper.createIssue(repo1, ZonedDateTime.now(), null, "OPEN", dummyContributor).id().value();
+        final Long issueId16 = githubHelper.createIssue(repo1, ZonedDateTime.now(), null, "OPEN", dummyContributor).id().value();
         githubHelper.addLabelToIssue(issueId11, "good-First_ISSUE", ZonedDateTime.now());
         githubHelper.addLabelToIssue(issueId13, "good-First_ISSUE", ZonedDateTime.now());
         githubHelper.addLabelToIssue(issueId14, "good-First_ISSUE2", ZonedDateTime.now().minusMinutes(6));
@@ -65,7 +67,7 @@ public class GoodFirstIssueCreatedNotifierJobIT extends AbstractMarketplaceApiIT
         githubHelper.addLabelToIssue(issueId16, "good-first-issue-20", ZonedDateTime.now());
         githubHelper.addLabelToIssue(issueId16, "hackathon-gfi", ZonedDateTime.now());
         hackathonHelper.createHackathon(Hackathon.Status.PUBLISHED, List.of("hackathon-gfi"), List.of(projectId1));
-        final Long issueId21 = githubHelper.createIssue(repo2.getId(), ZonedDateTime.now().minusDays(1), null, "OPEN", dummyContributor);
+        final Long issueId21 = githubHelper.createIssue(repo2, ZonedDateTime.now().minusDays(1), null, "OPEN", dummyContributor).id().value();
         githubHelper.addLabelToIssue(issueId21, "GOOD-First_ISSUE", ZonedDateTime.now());
         notificationSettingsService.patchNotificationSettingsForProject(recipientId1, new NotificationSettings.Project(projectId1, Optional.of(false)));
         notificationSettingsService.patchNotificationSettingsForProject(recipientId1, new NotificationSettings.Project(projectId2, Optional.of(true)));
