@@ -2,16 +2,14 @@ package onlydust.com.marketplace.api.it.api;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CustomIgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomIgnoredContributionsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContributionsRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
-import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
-import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
-import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.project.domain.model.CreateProjectCommand;
+import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -62,7 +60,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     @Autowired
     CustomIgnoredContributionsRepository customIgnoredContributionsRepository;
     @Autowired
-    PostgresProjectAdapter projectStoragePort;
+    ProjectFacadePort projectFacadePort;
 
     @BeforeEach
     void beforeEach() {
@@ -522,15 +520,25 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
 
 
     private UUID createProject() {
-        final ProjectId projectId = ProjectId.random();
         final UserId leadId = userAuthHelper.authenticatePierre().userId();
-        projectStoragePort.createProject(projectId, "name-" + projectId,
-                "Name " + projectId, "a", "b", false, List.of(),
-                List.of(repo1, repo2),
-                leadId, List.of(), ProjectVisibility.PUBLIC, "",
-                new ProjectRewardSettings(false, false, false, null),
-                List.of(), List.of(), List.of(), true, List.of());
-        return projectId.value();
+        final var result = projectFacadePort.createProject(leadId, CreateProjectCommand.builder()
+                .name("Name " + faker.lordOfTheRings().location())
+                .shortDescription("a")
+                .longDescription("b")
+                .isLookingForContributors(false)
+                .moreInfos(List.of())
+                .githubRepoIds(List.of(repo1, repo2))
+                .firstProjectLeaderId(leadId)
+                .build());
+        updateRewardSettings(result.getLeft().value(), """
+                {
+                    "ignorePullRequests": false,
+                    "ignoreIssues": false,
+                    "ignoreCodeReviews": false,
+                    "ignoreContributionsBefore": null
+                }
+                """);
+        return result.getLeft().value();
     }
 
     private void updateRewardSettings(UUID projectId, String rewardSettings) {
