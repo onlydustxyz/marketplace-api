@@ -211,6 +211,7 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
             biProjectGlobalDataRepository.refreshByProject(projectId);
             biProjectContributionsDataRepository.refreshByProject(projectId);
             userRepository.refreshUsersRanksAndStats();
+            biContributorGlobalDataRepository.refresh(projectLead.user().getGithubUserId());
             biContributorGlobalDataRepository.refresh(contributor1.user().getGithubUserId());
             biContributorGlobalDataRepository.refresh(contributor2.user().getGithubUserId());
             biContributorGlobalDataRepository.refresh(contributor3.user().getGithubUserId());
@@ -507,5 +508,52 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
                 .isOk()
                 .expectBody(ContributorsPageResponseV2.class)
                 .returnResult().getResponseBody();
+    }
+
+    @Test
+    public void should_get_project_rewards_by_id() {
+        should_get_project_rewards(project.getId().toString());
+    }
+
+    @Test
+    public void should_get_project_rewards_by_slug() {
+        should_get_project_rewards(project.getSlug());
+    }
+
+    private void should_get_project_rewards(String idOrSlug) {
+        // When
+        final var response = client.get()
+                .uri(getApiURI(PROJECTS_V2_GET_REWARDS_BY_ID_OR_SLUG.formatted(idOrSlug)))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(RewardsPageResponseV2.class)
+                .returnResult().getResponseBody();
+
+        assertThat(response.getRewards())
+            .hasSize(2)
+            .isSortedAccordingTo(comparing(RewardsPageItemResponseV2::getRequestedAt).reversed());
+
+        assertThat(response.getRewards())
+            .extracting(RewardsPageItemResponseV2::getAmount)
+            .extracting(Money::getCurrency)
+            .extracting(ShortCurrencyResponse::getCode)
+            .containsExactlyInAnyOrder("STRK", "USD");
+
+        assertThat(response.getRewards())
+            .extracting(RewardsPageItemResponseV2::getAmount)
+            .extracting(Money::getUsdEquivalent)
+            .usingElementComparator(BIG_DECIMAL_COMPARATOR)
+            .containsExactlyInAnyOrder(BigDecimal.valueOf(100.00), BigDecimal.valueOf(66.00));
+
+        assertThat(response.getRewards())
+            .extracting(RewardsPageItemResponseV2::getFrom)
+            .extracting(GithubUserResponse::getLogin)
+            .containsOnly(projectLead.user().getGithubLogin());
+
+        assertThat(response.getRewards())
+            .extracting(RewardsPageItemResponseV2::getTo)
+            .extracting(GithubUserResponse::getLogin)
+            .containsOnly(contributor2.user().getGithubLogin());
     }
 }

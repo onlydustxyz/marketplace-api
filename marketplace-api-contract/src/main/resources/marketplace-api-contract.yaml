@@ -3370,6 +3370,8 @@ paths:
           required: true
           schema:
             type: string
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
       responses:
         "200":
           description: 'List of rewards'
