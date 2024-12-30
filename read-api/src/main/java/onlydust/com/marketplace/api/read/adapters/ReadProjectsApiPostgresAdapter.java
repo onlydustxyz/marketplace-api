@@ -102,6 +102,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     private final ProjectsV2ReadRepository projectsV2ReadRepository;
     private final GithubLabelWithCountReadRepository githubLabelWithCountReadRepository;
     private final ProjectContributorV2ReadRepository projectContributorV2ReadRepository;
+    private final ProjectRewardV2ReadRepository projectRewardV2ReadRepository;
 
     private static @NonNull List<FinancialTransactionType> sanitizeTypes(List<FinancialTransactionType> types) {
         final var acceptedTypes = List.of(GRANTED, UNGRANTED, REWARDED);
@@ -642,6 +643,26 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         return ok()
             .body(new ContributorsPageResponseV2()
                 .contributors(page.stream().map(ProjectContributorV2ReadEntity::toResponse).toList())
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements())
+                .hasMore(hasMore(pageIndex, page.getTotalPages()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
+    }
+
+    @Override
+    public ResponseEntity<RewardsPageResponseV2> getProjectRewardsV2(String projectIdOrSlug, Integer pageIndex, Integer pageSize) {
+        final var projectIdOrSlugObj = OrSlug.of(projectIdOrSlug, ProjectId::of);
+        final int sanitizePageIndex = sanitizePageIndex(pageIndex);
+        final int sanitizePageSize = sanitizePageSize(pageSize);
+
+        final var page = projectRewardV2ReadRepository.findAll(
+            projectIdOrSlugObj.uuid().orElse(null),
+            projectIdOrSlugObj.slug().orElse(null),
+            PageRequest.of(sanitizePageIndex, sanitizePageSize, Sort.by("requested_at").descending()));
+
+        return ok()
+            .body(new RewardsPageResponseV2()
+                .rewards(page.stream().map(ProjectRewardV2ReadEntity::toResponse).toList())
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())
                 .hasMore(hasMore(pageIndex, page.getTotalPages()))
