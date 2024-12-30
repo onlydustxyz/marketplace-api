@@ -50,6 +50,7 @@ public class ProjectService implements ProjectFacadePort {
     private final ContributionStoragePort contributionStoragePort;
     private final DustyBotStoragePort dustyBotStoragePort;
     private final GithubStoragePort githubStoragePort;
+    private final FgaPort.Project projectFgaPort;
 
     @Override
     @Transactional
@@ -92,13 +93,14 @@ public class ProjectService implements ProjectFacadePort {
             command.getCategorySuggestions().forEach(categorySuggestion ->
                     projectObserverPort.onProjectCategorySuggested(categorySuggestion, projectLeadId));
 
+        projectFgaPort.setMaintainers(projectId, List.of(command.getFirstProjectLeaderId()));
         return Pair.of(projectId, slug);
     }
 
     @Override
     @Transactional
     public Pair<ProjectId, String> updateProject(UserId projectLeadId, UpdateProjectCommand command) {
-        if (!permissionService.isUserProjectLead(command.getId(), projectLeadId)) {
+        if (!projectFgaPort.canEdit(command.getId(), projectLeadId) || !projectFgaPort.canEditPermissions(command.getId(), projectLeadId)) {
             throw OnlyDustException.forbidden("Only project leads can update their projects");
         }
         final var slug = Project.slugOf(command.getName());
@@ -146,6 +148,9 @@ public class ProjectService implements ProjectFacadePort {
         addedCategorySuggestions.forEach(categorySuggestion ->
                 projectObserverPort.onProjectCategorySuggested(categorySuggestion, projectLeadId));
 
+        if (command.getProjectLeadersToKeep() != null) {
+            projectFgaPort.setMaintainers(command.getId(), command.getProjectLeadersToKeep());
+        }
         return Pair.of(command.getId(), slug);
     }
 

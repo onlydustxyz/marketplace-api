@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.configuration;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
@@ -610,5 +611,10 @@ public class PostgresConfiguration {
                                                                                  final EcosystemRepository ecosystemRepository) {
         return new PostgresRecommenderSystemV1Adapter(userAnswersV1Repository, projectRecommendationV1Repository,
                 languageRepository, ecosystemRepository);
+    }
+
+    @Bean
+    public PostgresFgaAdapter postgresFgaAdapter(final EntityManagerFactory entityManagerFactory) {
+        return new PostgresFgaAdapter(entityManagerFactory);
     }
 }

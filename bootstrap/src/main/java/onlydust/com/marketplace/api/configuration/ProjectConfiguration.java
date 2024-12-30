@@ -72,7 +72,8 @@ public class ProjectConfiguration {
                                                final DateProvider dateProvider,
                                                final ContributionStoragePort contributionStoragePort,
                                                final DustyBotStoragePort dustyBotStoragePort,
-                                               final GithubStoragePort githubStoragePort) {
+                                               final GithubStoragePort githubStoragePort,
+                                               final FgaPort.Project projectFgaPort) {
         return new ProjectService(projectObservers,
                 projectStoragePort,
                 imageStoragePort,
@@ -82,7 +83,8 @@ public class ProjectConfiguration {
                 dateProvider,
                 contributionStoragePort,
                 dustyBotStoragePort,
-                githubStoragePort);
+                githubStoragePort,
+                projectFgaPort);
     }
 
     @Bean
