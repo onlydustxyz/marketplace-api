@@ -92,5 +92,5 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000047_add_missing_data_for_new_project_overview_page.sql
   - include:
-      file: db/changelog/changelogs/00000047_implement_zanzibar_model.sql
+      file: db/changelog/changelogs/00000048_implement_zanzibar_model.sql
 
