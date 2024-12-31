@@ -19,3 +19,4 @@ REFRESH MATERIALIZED VIEW bi.project_contribution_stats;
 REFRESH MATERIALIZED VIEW bi.project_reward_stats;
 REFRESH MATERIALIZED VIEW reco.m_projects_computed_data;
 REFRESH MATERIALIZED VIEW reco.m_projects_extrapolated_data;
+REFRESH MATERIALIZED VIEW bi.m_project_similarities;

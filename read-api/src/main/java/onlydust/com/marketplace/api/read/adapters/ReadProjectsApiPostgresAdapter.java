@@ -103,6 +103,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     private final GithubLabelWithCountReadRepository githubLabelWithCountReadRepository;
     private final ProjectContributorV2ReadRepository projectContributorV2ReadRepository;
     private final ProjectRewardV2ReadRepository projectRewardV2ReadRepository;
+    private final SimilarProjectReadRepository similarProjectReadRepository;
 
     private static @NonNull List<FinancialTransactionType> sanitizeTypes(List<FinancialTransactionType> types) {
         final var acceptedTypes = List.of(GRANTED, UNGRANTED, REWARDED);
@@ -663,6 +664,26 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         return ok()
             .body(new RewardsPageResponseV2()
                 .rewards(page.stream().map(ProjectRewardV2ReadEntity::toResponse).toList())
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements())
+                .hasMore(hasMore(pageIndex, page.getTotalPages()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
+    }
+
+    @Override
+    public ResponseEntity<ProjectLinkPageResponse> getSimilarProjects(String projectIdOrSlug, Integer pageIndex, Integer pageSize) {
+        final var projectIdOrSlugObj = OrSlug.of(projectIdOrSlug, ProjectId::of);
+        final int sanitizePageIndex = sanitizePageIndex(pageIndex);
+        final int sanitizePageSize = sanitizePageSize(pageSize);
+
+        final var page = similarProjectReadRepository.findAll(
+            projectIdOrSlugObj.uuid().orElse(null),
+            projectIdOrSlugObj.slug().orElse(null),
+            PageRequest.of(sanitizePageIndex, sanitizePageSize));
+
+        return ok()
+            .body(new ProjectLinkPageResponse()
+                .projects(page.stream().map(SimilarProjectReadEntity::toResponse).toList())
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())
                 .hasMore(hasMore(pageIndex, page.getTotalPages()))

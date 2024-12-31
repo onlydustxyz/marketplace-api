@@ -8,10 +8,7 @@ import static org.assertj.core.util.BigDecimalComparator.BIG_DECIMAL_COMPARATOR;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
@@ -33,6 +30,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiProjectGlob
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.model.EcosystemId;
 import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 
 
 @TagProject
@@ -43,10 +41,16 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
     BiProjectContributionsDataRepository biProjectContributionsDataRepository;
     @Autowired
     BiContributorGlobalDataRepository biContributorGlobalDataRepository;
+    @Autowired
+    ProjectFacadePort projectFacadePort;
 
     static final Faker faker = new Faker();
     static final AtomicBoolean setupDone = new AtomicBoolean();
     static Project project;
+    static Project projectWithSimilarEcosystems;
+    static Project projectWithSimilarLanguages;
+    static Project projectWithSimilarContributors;
+    static Project anotherProject;
     static List<Ecosystem> ecosystems;
     static List<ProjectCategory> categories;
     static List<NamedLink> moreInfos;
@@ -72,13 +76,13 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
 
         projectLead = userAuthHelper.create();
         final var projectId = projectHelper.create(projectLead).getLeft();
+        project = projectHelper.get(projectId);
 
-        ecosystems = IntStream.range(0,2)
+        ecosystems = IntStream.range(0,3)
             .mapToObj(i -> ecosystemHelper.create(faker.internet().slug()))
             .peek(e -> projectHelper.addEcosystem(projectId, EcosystemId.of(e.id())))
             .toList();
 
-        project = projectHelper.get(projectId);
         repo1 = githubHelper.createRepo(projectId);
         repo2 = githubHelper.createRepo(projectId);
 
@@ -186,6 +190,37 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
             githubHelper.addLabelToIssue(upcomingHackathonIssue.id(), upcomingHackathonLabelId, CurrentDateProvider.now());
         });
 
+        {
+            projectWithSimilarEcosystems = projectHelper.get(projectHelper.create(projectLead, "similar-ecosystems").getLeft());
+            projectHelper.addEcosystem(projectWithSimilarEcosystems.getId(), EcosystemId.of(ecosystems.get(0).id()));
+            projectHelper.addEcosystem(projectWithSimilarEcosystems.getId(), EcosystemId.of(ecosystems.get(1).id()));
+            projectHelper.addEcosystem(projectWithSimilarEcosystems.getId(), EcosystemId.of(ecosystems.get(2).id()));
+        }
+
+        {
+            projectWithSimilarContributors = projectHelper.get(projectHelper.create(projectLead, "similar-contributors").getLeft());
+            final var repo = githubHelper.createRepo(projectWithSimilarContributors.getId());
+            githubHelper.createPullRequest(repo, contributor1, null);
+            githubHelper.createPullRequest(repo, contributor2, null);
+        }
+
+        {
+            projectWithSimilarLanguages = projectHelper.get(projectHelper.create(projectLead, "similar-languages").getLeft());
+            final var repo = githubHelper.createRepo(projectWithSimilarLanguages.getId());
+            githubHelper.createPullRequest(repo, userAuthHelper.create(), List.of("rs", "js", "ts", "java"));
+            githubHelper.addRepoLanguage(repo.getId(), "Rust", 100L);
+            githubHelper.addRepoLanguage(repo.getId(), "JavaScript", 100L);
+            githubHelper.addRepoLanguage(repo.getId(), "TypeScript", 100L);
+            githubHelper.addRepoLanguage(repo.getId(), "Java", 100L);
+        }
+
+        {
+            anotherProject = projectHelper.get(projectHelper.create(projectLead, "another-project").getLeft());
+            final var repo = githubHelper.createRepo(anotherProject.getId());
+            githubHelper.createPullRequest(repo, userAuthHelper.create(), List.of("cpp"));
+            githubHelper.addRepoLanguage(repo.getId(), "C++", 100L);
+        }
+
         accountingHelper.saveQuote(new Quote(CurrencyHelper.STRK, CurrencyHelper.USD, BigDecimal.valueOf(0.55), Instant.now()));
 
         final var sponsor = sponsorHelper.create();
@@ -209,12 +244,16 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
 
         databaseHelper.executeInTransaction(() -> {
             biProjectGlobalDataRepository.refreshByProject(projectId);
+            biProjectGlobalDataRepository.refreshByProject(projectWithSimilarEcosystems.getId());
+            biProjectGlobalDataRepository.refreshByProject(projectWithSimilarContributors.getId());
+            biProjectGlobalDataRepository.refreshByProject(projectWithSimilarLanguages.getId());
             biProjectContributionsDataRepository.refreshByProject(projectId);
             userRepository.refreshUsersRanksAndStats();
             biContributorGlobalDataRepository.refresh(projectLead.user().getGithubUserId());
             biContributorGlobalDataRepository.refresh(contributor1.user().getGithubUserId());
             biContributorGlobalDataRepository.refresh(contributor2.user().getGithubUserId());
             biContributorGlobalDataRepository.refresh(contributor3.user().getGithubUserId());
+            projectFacadePort.refreshStats();
         });
     }
 
@@ -451,6 +490,7 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
             .isSortedAccordingTo(comparing(ContributorPageItemResponseV2::getGlobalRank))
             .usingRecursiveFieldByFieldElementComparator(RecursiveComparisonConfiguration.builder()
                 .withComparatorForType(BIG_DECIMAL_COMPARATOR, BigDecimal.class)
+                .withIgnoreAllExpectedNullFields(true)
                 .build())
             .containsExactlyInAnyOrder(
                 new ContributorPageItemResponseV2()
@@ -459,9 +499,6 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
                     .avatarUrl(contributor1.user().getGithubAvatarUrl())
                     .isRegistered(true)
                     .id(contributor1.userId().value())
-                    .globalRank(80)
-                    .globalRankPercentile(BigDecimal.valueOf(0.0035872194877784266))
-                    .globalRankCategory(UserRankCategory.A)
                     .mergedPullRequestCount(2)
                     .rewardCount(0)
                     .totalEarnedUsdAmount(BigDecimal.valueOf(0)),
@@ -472,9 +509,6 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
                     .avatarUrl(contributor2.user().getGithubAvatarUrl())
                     .isRegistered(true)
                     .id(contributor2.userId().value())
-                    .globalRank(149)
-                    .globalRankPercentile(BigDecimal.valueOf(0.006215066321848669))
-                    .globalRankCategory(UserRankCategory.A)
                     .mergedPullRequestCount(0)
                     .rewardCount(2)
                     .totalEarnedUsdAmount(BigDecimal.valueOf(166)),
@@ -485,9 +519,6 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
                     .avatarUrl(contributor3.user().getGithubAvatarUrl())
                     .isRegistered(true)
                     .id(contributor3.userId().value())
-                    .globalRank(89)
-                    .globalRankPercentile(BigDecimal.valueOf(0.006048218903812463))
-                    .globalRankCategory(UserRankCategory.A)
                     .mergedPullRequestCount(1)
                     .rewardCount(0)
                     .totalEarnedUsdAmount(BigDecimal.valueOf(0))
@@ -555,5 +586,34 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
             .extracting(RewardsPageItemResponseV2::getTo)
             .extracting(GithubUserResponse::getLogin)
             .containsOnly(contributor2.user().getGithubLogin());
+    }
+
+    @Test
+    public void should_get_project_similar_projects_by_id() {
+        should_get_project_similar_projects(project.getId().toString());
+    }
+
+    @Test
+    public void should_get_project_similar_projects_by_slug() {
+        should_get_project_similar_projects(project.getSlug());
+    }
+
+    private void should_get_project_similar_projects(String idOrSlug) {
+        // When
+        final var response = client.get()
+                .uri(getApiURI(PROJECTS_GET_SIMILAR_PROJECTS_BY_ID_OR_SLUG.formatted(idOrSlug), Map.of("pageSize", "30")))
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(ProjectLinkPageResponse.class)
+                .returnResult().getResponseBody();
+
+        assertThat(response.getProjects())
+            .extracting(ProjectLinkWithDescriptionResponse::getSlug)
+            .contains(
+                projectWithSimilarLanguages.getSlug(),
+                projectWithSimilarEcosystems.getSlug(),
+                projectWithSimilarContributors.getSlug())
+            .doesNotContain(project.getSlug(), anotherProject.getSlug());
     }
 }

@@ -95,4 +95,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000048_implement_zanzibar_model.sql
   - include:
       file: db/changelog/changelogs/00000049_fix_sum_func.sql
-
+  - include:
+      file: db/changelog/changelogs/00000050_create_similar_projects.sql
