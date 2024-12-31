@@ -21,3 +21,4 @@ SELECT truncate_tables('indexer_outbox');
 SELECT truncate_tables('bi');
 SELECT truncate_tables('migration');
 SELECT truncate_tables('reco');
+SELECT truncate_tables('fga');
