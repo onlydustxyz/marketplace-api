@@ -297,6 +297,127 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/contributors/{contributorId}/projects:
+    get:
+      tags:
+        - ReadContributors
+      summary: Get projects the user has contributed to
+      operationId: getContributorProjects
+      parameters:
+        - name: contributorId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/GithubUserId'
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/searchParam'
+        - $ref: '#/components/parameters/ecosystemIdsParam'
+        - $ref: '#/components/parameters/languageIdsParam'
+        - $ref: '#/components/parameters/projectCategoryIdsParam'
+      responses:
+        "200":
+          description: 'List of projects'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectPageResponseV2'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/contributors/{contributorId}/contributions-over-time:
+    get:
+      tags:
+        - ReadContributors
+      summary: Get contributions by time
+      operationId: getContributionsByTime
+      parameters:
+        - name: contributorId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/GithubUserId'
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
+        - $ref: '#/components/parameters/timeGroupingParam'
+        - $ref: '#/components/parameters/languageIdsParam'
+        - $ref: '#/components/parameters/projectIdsParam'
+        - $ref: '#/components/parameters/ecosystemIdsParam'
+      responses:
+        "200":
+          description: 'Contributions by time'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributionCountOverTimeResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/contributors/{contributorId}/loc-distribution:
+    get:
+      tags:
+        - ReadContributors
+      summary: Get lines of code distribution
+      operationId: getContributorLocDistribution
+      parameters:
+        - name: contributorId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/GithubUserId'
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
+        - $ref: '#/components/parameters/languageIdsParam'
+        - $ref: '#/components/parameters/ecosystemIdsParam'
+        - $ref: '#/components/parameters/projectIdsParam'
+        - name: changeType
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/ChangeTypeEnum'
+        - name: grouping
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/LocDistributionGroupingEnum'
+      responses:
+        "200":
+          description: 'Lines of code distribution'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributorLocDistributionResponse'
+
+  /api/v1/contributors/{contributorId}/rewards-distribution:
+    get:
+      tags:
+        - ReadContributors
+      summary: Get rewards distribution
+      operationId: getContributorRewardsDistribution
+      parameters:
+        - name: contributorId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/GithubUserId'
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
+        - $ref: '#/components/parameters/languageIdsParam'
+        - $ref: '#/components/parameters/ecosystemIdsParam'
+        - $ref: '#/components/parameters/projectIdsParam'
+        - name: grouping
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/RewardsDistributionGroupingEnum'
+      responses:
+        "200":
+          description: 'Lines of code distribution'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributorRewardsDistributionResponse'
+
   /api/v1/bi/contributors/{contributorId}/activity-graph:
     get:
       tags:
@@ -321,6 +442,10 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/ProjectId'
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
+        - $ref: '#/components/parameters/languageIdsParam'
+        - $ref: '#/components/parameters/ecosystemIdsParam'
       responses:
         "200":
           description: 'Contributor'
@@ -331,6 +456,32 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/contributors/{contributorId}/stats:
+    get:
+      tags:
+        - ReadContributors
+      summary: Get contributor stats
+      operationId: getContributorStats
+      parameters:
+        - name: contributorId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/GithubUserId'
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
+        - $ref: '#/components/parameters/languageIdsParam'
+        - $ref: '#/components/parameters/ecosystemIdsParam'
+        - $ref: '#/components/parameters/projectIdsParam'
+      responses:
+        "200":
+          description: 'Contributor stats'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributorStatsResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /api/v1/contributions:
     get:
@@ -2144,27 +2295,9 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/ProjectTag'
-        - in: query
-          name: ecosystemIds
-          description: Ecosystem filter
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/EcosystemId'
-        - in: query
-          name: languageIds
-          required: false
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/LanguageId'
-        - in: query
-          name: categoryIds
-          required: false
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/ProjectCategoryId'
+        - $ref: '#/components/parameters/ecosystemIdsParam'
+        - $ref: '#/components/parameters/languageIdsParam'
+        - $ref: '#/components/parameters/projectCategoryIdsParam'
         - $ref: '#/components/parameters/pageIndexParam'
         - $ref: '#/components/parameters/pageSizeParam'
       responses:
@@ -2738,13 +2871,7 @@ paths:
           description: Filter by hackathon
           schema:
             $ref: '#/components/schemas/HackathonId'
-        - in: query
-          name: languageIds
-          description: Filter by languages
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/LanguageId'
+        - $ref: '#/components/parameters/languageIdsParam'
         - in: query
           name: statuses
           description: Filter by statuses
@@ -5718,6 +5845,129 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v2/hackathons/slug/{hackathonSlug}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadHackathons
+      summary: Get hackathon by slug
+      operationId: getHackathonBySlugV2
+      description: |
+        Get hackathon by slug
+      parameters:
+        - in: path
+          name: hackathonSlug
+          required: true
+          schema:
+            $ref: '#/components/schemas/HackathonSlug'
+      responses:
+        "200":
+          description: 'Hackathon response'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HackathonResponseV2'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/hackathons/slug/{hackathonSlug}/events:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadHackathons
+      summary: Get hackathon events
+      operationId: getHackathonEvents
+      description: |
+        Get hackathon events
+      parameters:
+        - in: path
+          name: hackathonSlug
+          required: true
+          schema:
+            $ref: '#/components/schemas/HackathonSlug'
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
+      responses:
+        "200":
+          description: 'Hackathon events'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HackathonEventsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/hackathons/slug/{hackathonSlug}/projects:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadHackathons
+      summary: Get hackathon projects
+      operationId: getHackathonProjects
+      description: |
+        Get hackathon projects
+      parameters:
+        - in: path
+          name: hackathonSlug
+          required: true
+          schema:
+            $ref: '#/components/schemas/HackathonSlug'
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/searchParam'
+        - $ref: '#/components/parameters/languageIdsParam'
+        - $ref: '#/components/parameters/ecosystemIdsParam'
+        - in: query
+          name: hasAvailableIssues
+          description: Filter by projects with available issues
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: 'Hackathon projects'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectPageResponseV2'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/hackathons/slug/{hackathonSlug}/contributors:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadHackathons
+      summary: Get hackathon contributors
+      operationId: getHackathonContributors
+      description: |
+        Get hackathon contributors
+      parameters:
+        - in: path
+          name: hackathonSlug
+          required: true
+          schema:
+            $ref: '#/components/schemas/HackathonSlug'
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/searchParam'
+      responses:
+        "200":
+          description: 'Hackathon contributors'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributorsPageResponseV2'
+
   /api/v1/hackathons/{hackathonId}/project-issues:
     get:
       security:
@@ -5734,13 +5984,7 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/HackathonId'
-        - in: query
-          name: languageIds
-          description: Filter by languages
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/LanguageId'
+        - $ref: '#/components/parameters/languageIdsParam'
         - in: query
           name: statuses
           description: Filter by statuses
@@ -6147,6 +6391,68 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/repos/{repoId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadRepos
+      summary: Get repo
+      operationId: getRepo
+      description: |
+        Get github repo
+      parameters:
+        - in: path
+          name: repoId
+          required: true
+          schema:
+            $ref: '#/components/schemas/GithubRepoId'
+      responses:
+        "200":
+          description: 'Github repo'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GithubRepoResponse'
+
+  /api/v1/repos/{repoId}/available-issues:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadRepos
+      summary: Get repo issues
+      operationId: getRepoAvailableIssues
+      description: |
+        Get repo available issues
+      parameters:
+        - in: path
+          name: repoId
+          required: true
+          schema:
+            $ref: '#/components/schemas/GithubRepoId'
+        - in: query
+          name: githubLabels
+          description: |
+            Filter by labels.
+            The issue must have all the labels selected
+          schema:
+            type: array
+            items:
+              type: string
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+      responses:
+        "200":
+          description: 'List of repo available issues'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GithubIssuePageWithLabelsResponse'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
 components:
   securitySchemes:
@@ -6207,6 +6513,42 @@ components:
         $ref: '#/components/schemas/TimeGroupingEnum'
     dataSourceIdsParam:
       name: dataSourceIds
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          format: uuid
+    ecosystemIdsParam:
+      name: ecosystemIds
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          format: uuid
+    projectIdsParam:
+      name: projectIds
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          format: uuid
+    languageIdsParam:
+      name: languageIds
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          format: uuid
+    projectCategoryIdsParam:
+      name: categoryIds
       in: query
       required: false
       schema:
@@ -8658,6 +9000,36 @@ components:
             isAuthorizedInGithubApp:
               type: boolean
               description: Is the repo authorized in the Github app?
+
+    GithubRepoResponseV2:
+      allOf:
+        - $ref: '#/components/schemas/ShortGithubRepoResponse'
+        - type: object
+          required:
+            - id
+            - owner
+            - name
+            - htmlUrl
+            - starCount
+            - forkCount
+            - languages
+          properties:
+            starCount:
+              type: integer
+              description: Number of stars on Github
+              example: 625
+            forkCount:
+              type: integer
+              description: Fork count on Github
+              example: 3
+            languages:
+              type: array
+              items:
+                $ref: '#/components/schemas/LanguageWithPercentageResponse'
+            readmeUrl:
+              type: string
+              format: url
+              description: The URL of the repo's readme file
 
     ContributorGithubRepoResponse:
       allOf:
@@ -11543,6 +11915,71 @@ components:
               items:
                 $ref: '#/components/schemas/HackathonsEventItemResponse'
 
+    HackathonResponseV2:
+      type: object
+      required:
+        - id
+        - index
+        - slug
+        - title
+        - description
+        - location
+        - totalBudget
+        - communityLinks
+        - links
+        - projects
+        - me
+        - subscriberCount
+        - issueCount
+        - openIssueCount
+        - events
+      properties:
+        id:
+          $ref: '#/components/schemas/HackathonId'
+        index:
+          type: integer
+          description: unique auto-incremented index of the hackathon
+        slug:
+          $ref: '#/components/schemas/HackathonSlug'
+        title:
+          type: string
+        location:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        projectCount:
+          type: integer
+        subscriberCount:
+          type: integer
+        issueCount:
+          type: integer
+        availableIssueCount:
+          type: integer
+        description:
+          type: string
+        communityLinks:
+          type: array
+          items:
+            $ref: '#/components/schemas/SimpleLink'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/SimpleLink'
+
+    HackathonEventsResponse:
+      type: object
+      required:
+        - events
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/HackathonsEventItemResponse'
+
     HackathonRegistrationResponse:
       type: object
       required:
@@ -12929,7 +13366,7 @@ components:
         languages:
           type: array
           items:
-            $ref: '#/components/schemas/LanguageResponse'
+            $ref: '#/components/schemas/LanguageWithPercentageResponse'
         ecosystems:
           type: array
           items:
@@ -13335,6 +13772,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectId'
+        ecosystemIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemId'
         billingProfileIds:
           type: array
           items:
@@ -13499,6 +13940,20 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EcosystemLinkResponse'
+        odHackStats:
+          type: object
+          properties:
+            issueCount:
+              type: integer
+            availableIssueCount:
+              type: integer
+        contributorStats:
+          type: object
+          properties:
+            totalRewardedUsdAmount:
+              type: number
+            mergedPrCount:
+              type: integer
 
     ProjectResponseV2:
       allOf:
@@ -13783,3 +14238,121 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectShortResponseV2'
+
+    ContributionCountOverTimeResponse:
+      type: object
+      required:
+        - counts
+      properties:
+        counts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributionCountOverTimeItemResponse'
+
+    ContributionCountOverTimeItemResponse:
+      type: object
+      required:
+        - time
+        - count
+      properties:
+        time:
+          type: string
+        count:
+          type: integer
+
+    ContributorStatsResponse:
+      type: object
+      required:
+        - stats
+      properties:
+        longestStreak:
+          type: integer
+        longestGap:
+          type: integer
+        busiestWeek:
+          type: integer
+        weekendActivity:
+          type: integer
+          format: percentage
+        activeDayCount:
+          type: integer
+        totalDayCount:
+          type: integer
+
+    ChangeTypeEnum:
+      type: string
+      enum:
+        - ADDITION
+        - DELETION
+        - MODIFICATION
+
+    LocDistributionGroupingEnum:
+      type: string
+      enum:
+        - LANGUAGE
+        - REPO
+
+    ContributorLocDistributionResponse:
+      type: object
+      required:
+        - total
+      properties:
+        total:
+          type: integer
+        distribution:
+          type: array
+          items:
+            $ref: '#/components/schemas/LocDistributionItemResponse'
+
+    LocDistributionItemResponse:
+      type: object
+      required:
+        - logoUrl
+        - name
+        - count
+      properties:
+        logoUrl:
+          type: string
+        name:
+          type: string
+        count:
+          type: integer
+
+    RewardsDistributionGroupingEnum:
+      type: string
+      enum:
+        - PROJECT
+        - CURRENCY
+
+    ContributorRewardsDistributionResponse:
+      type: object
+      required:
+        - totalRewardedUsdAmount
+        - rewardedContributionCount
+        - averageRewardedUsdAmount
+        - distribution
+      properties:
+        totalRewardedUsdAmount:
+          type: integer
+        rewardedContributionCount:
+          type: integer
+        averageRewardedUsdAmount:
+          type: integer
+        distribution:
+          type: array
+          items:
+            $ref: '#/components/schemas/RewardsDistributionItemResponse'
+
+    RewardsDistributionItemResponse:
+      type: object
+      required:
+        - logoUrl
+        - name
+        - count
+      properties:
+        logoUrl:
+          type: string
+        name:
+          type: string
+        count:
+          type: integer
