@@ -699,7 +699,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                             .contains("Gaming")), true
             );
             test_contributors_stats("languageIds", "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
-                    response -> response.getContributors().forEach(contributor -> assertThat(contributor.getLanguages().stream().map(LanguageResponse::getName).toList())
+                    response -> response.getContributors().forEach(contributor -> assertThat(contributor.getLanguages().stream().map(LanguageWithPercentageResponse::getName).toList())
                             .contains("Cairo")), true
             );
             test_contributors_stats("ecosystemIds", starknet.toString(),

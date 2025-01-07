@@ -1,13 +1,14 @@
 package onlydust.com.marketplace.api.read.repositories;
 
-import onlydust.com.marketplace.api.read.entities.user.UserWorkDistributionEntity;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.Repository;
-
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserWorkDistributionEntityRepository extends Repository<UserWorkDistributionEntity, String> {
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.Repository;
+
+import onlydust.com.marketplace.api.read.entities.user.UserWorkDistributionEntity;
+
+public interface UserWorkDistributionEntityRepository extends Repository<UserWorkDistributionEntity, Long> {
     @Query(value = """
             SELECT stats.contributor_id,
                    stats.code_review_count,

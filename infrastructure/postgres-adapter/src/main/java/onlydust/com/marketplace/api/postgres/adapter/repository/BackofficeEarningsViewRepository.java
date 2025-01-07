@@ -1,15 +1,16 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoEarningsQueryEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public interface BackofficeEarningsViewRepository extends JpaRepository<BoEarningsQueryEntity, Integer> {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import lombok.NonNull;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoEarningsQueryEntity;
+
+public interface BackofficeEarningsViewRepository extends JpaRepository<BoEarningsQueryEntity, UUID> {
 
     @Query(value = """
             SELECT  r.currency_id as currency_id,

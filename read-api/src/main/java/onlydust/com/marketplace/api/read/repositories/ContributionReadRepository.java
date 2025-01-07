@@ -1,11 +1,11 @@
 package onlydust.com.marketplace.api.read.repositories;
 
-import lombok.NonNull;
-import onlydust.com.marketplace.api.contract.model.ContributionsQueryParams;
-import onlydust.com.marketplace.api.contract.model.ContributionsSortEnum;
-import onlydust.com.marketplace.api.contract.model.DataSourceEnum;
-import onlydust.com.marketplace.api.contract.model.SortDirection;
-import onlydust.com.marketplace.api.read.entities.bi.ContributionReadEntity;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseZonedNullable;
+
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,13 +13,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.UUID;
+import lombok.NonNull;
+import onlydust.com.marketplace.api.contract.model.ContributionsQueryParams;
+import onlydust.com.marketplace.api.contract.model.ContributionsSortEnum;
+import onlydust.com.marketplace.api.contract.model.DataSourceEnum;
+import onlydust.com.marketplace.api.contract.model.SortDirection;
+import onlydust.com.marketplace.api.read.entities.bi.ContributionReadEntity;
 
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseZonedNullable;
-
-public interface ContributionReadRepository extends Repository<ContributionReadEntity, Long> {
+public interface ContributionReadRepository extends Repository<ContributionReadEntity, UUID> {
 
     @Query(value = """
             select c.contribution_uuid                       as contribution_uuid,

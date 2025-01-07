@@ -1,5 +1,19 @@
 package onlydust.com.marketplace.api.read.entities.bi;
 
+import static java.util.Comparator.comparing;
+import static onlydust.com.marketplace.api.read.entities.bi.ContributorKpisReadEntity.pretty;
+import static onlydust.com.marketplace.api.read.entities.bi.ContributorKpisReadEntity.toDecimalNumberKpi;
+import static onlydust.com.marketplace.api.read.entities.bi.ContributorKpisReadEntity.toNumberKpi;
+import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;
@@ -7,17 +21,6 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.api.contract.model.*;
-import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
-import static java.util.Comparator.comparing;
-import static onlydust.com.marketplace.api.read.entities.bi.ContributorKpisReadEntity.*;
-import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
 @Entity
 @NoArgsConstructor(force = true)
@@ -39,7 +42,7 @@ public class ContributorReadEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     List<ProjectCategoryResponse> categories;
     @JdbcTypeCode(SqlTypes.JSON)
-    List<LanguageResponse> languages;
+    List<LanguageWithPercentageResponse> languages;
     @JdbcTypeCode(SqlTypes.JSON)
     List<EcosystemLinkResponse> ecosystems;
     @JdbcTypeCode(SqlTypes.JSON)
@@ -68,7 +71,7 @@ public class ContributorReadEntity {
                 .contributor(pretty(contributor))
                 .projects(projects == null ? null : projects.stream().sorted(comparing(ProjectLinkResponse::getName)).toList())
                 .categories(categories == null ? null : categories.stream().sorted(comparing(ProjectCategoryResponse::getName)).toList())
-                .languages(languages == null ? null : languages.stream().sorted(comparing(LanguageResponse::getName)).toList())
+                .languages(languages == null ? null : languages.stream().sorted(comparing(LanguageWithPercentageResponse::getName)).toList())
                 .ecosystems(ecosystems == null ? null : ecosystems.stream().sorted(comparing(EcosystemLinkResponse::getName)).toList())
                 .projectContributorLabels(projectContributorLabels == null ? null :
                         projectContributorLabels.stream().sorted(comparing(ProjectContributorLabelResponse::getName)).toList())

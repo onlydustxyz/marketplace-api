@@ -1,13 +1,14 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionDetailsQueryEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ContributionDetailsViewEntityRepository extends JpaRepository<ContributionDetailsQueryEntity, String> {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionDetailsQueryEntity;
+
+public interface ContributionDetailsViewEntityRepository extends JpaRepository<ContributionDetailsQueryEntity, ContributionDetailsQueryEntity.PrimaryKey> {
 
     @Query(value = """
                 SELECT 

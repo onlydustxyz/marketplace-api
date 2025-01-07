@@ -1,5 +1,23 @@
 package onlydust.com.marketplace.api.read.entities.bi;
 
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.joining;
+import static onlydust.com.marketplace.api.contract.model.ContactInformation.VisibilityEnum.PUBLIC;
+import static onlydust.com.marketplace.api.read.entities.user.PublicUserProfileResponseV2Entity.prettyRankPercentile;
+import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.csv.CSVPrinter;
+import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import org.hibernate.type.SqlTypes;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -10,23 +28,6 @@ import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
-import org.apache.commons.csv.CSVPrinter;
-import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
-import org.hibernate.type.SqlTypes;
-
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.joining;
-import static onlydust.com.marketplace.api.contract.model.ContactInformation.VisibilityEnum.PUBLIC;
-import static onlydust.com.marketplace.api.read.entities.user.PublicUserProfileResponseV2Entity.prettyRankPercentile;
-import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
 @Entity
 @NoArgsConstructor(force = true)
@@ -48,7 +49,7 @@ public class ContributorKpisReadEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     List<ProjectCategoryResponse> categories;
     @JdbcTypeCode(SqlTypes.JSON)
-    List<LanguageResponse> languages;
+    List<LanguageWithPercentageResponse> languages;
     @JdbcTypeCode(SqlTypes.JSON)
     List<EcosystemLinkResponse> ecosystems;
     @JdbcTypeCode(SqlTypes.JSON)
@@ -116,7 +117,7 @@ public class ContributorKpisReadEntity {
                 .engagementStatus(engagementStatus)
                 .projects(projects == null ? null : projects.stream().sorted(comparing(ProjectLinkResponse::getName)).toList())
                 .categories(categories == null ? null : categories.stream().sorted(comparing(ProjectCategoryResponse::getName)).toList())
-                .languages(languages == null ? null : languages.stream().sorted(comparing(LanguageResponse::getName)).toList())
+                .languages(languages == null ? null : languages.stream().sorted(comparing(LanguageWithPercentageResponse::getName)).toList())
                 .ecosystems(ecosystems == null ? null : ecosystems.stream().sorted(comparing(EcosystemLinkResponse::getName)).toList())
                 .projectContributorLabels(projectContributorLabels == null ? null :
                         projectContributorLabels.stream().sorted(comparing(ProjectContributorLabelResponse::getName)).toList())
@@ -141,7 +142,7 @@ public class ContributorKpisReadEntity {
                 contributor.getLogin(),
                 projects == null ? null : projects.stream().map(ProjectLinkResponse::getName).sorted().collect(joining(",")),
                 categories == null ? null : categories.stream().map(ProjectCategoryResponse::getName).sorted().collect(joining(",")),
-                languages == null ? null : languages.stream().map(LanguageResponse::getName).sorted().collect(joining(",")),
+                languages == null ? null : languages.stream().map(LanguageWithPercentageResponse::getName).sorted().collect(joining(",")),
                 ecosystems == null ? null : ecosystems.stream().map(EcosystemLinkResponse::getName).sorted().collect(joining(",")),
                 projectContributorLabels == null ? null :
                         projectContributorLabels.stream().map(ProjectContributorLabelResponse::getName).sorted().collect(joining(",")),
@@ -163,7 +164,7 @@ public class ContributorKpisReadEntity {
                 .contributor(pretty(contributor))
                 .projects(projects == null ? null : projects.stream().sorted(comparing(ProjectLinkResponse::getName)).toList())
                 .categories(categories == null ? null : categories.stream().sorted(comparing(ProjectCategoryResponse::getName)).toList())
-                .languages(languages == null ? null : languages.stream().sorted(comparing(LanguageResponse::getName)).toList())
+                .languages(languages == null ? null : languages.stream().sorted(comparing(LanguageWithPercentageResponse::getName)).toList())
                 .ecosystems(ecosystems == null ? null : ecosystems.stream().sorted(comparing(EcosystemLinkResponse::getName)).toList())
                 .projectContributorLabels(projectContributorLabels == null ? null :
                         projectContributorLabels.stream().sorted(comparing(ProjectContributorLabelResponse::getName)).toList())

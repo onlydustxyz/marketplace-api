@@ -1,5 +1,48 @@
 package onlydust.com.marketplace.api.read.adapters;
 
+import static java.lang.Boolean.FALSE;
+import static java.util.Comparator.comparing;
+import static onlydust.com.marketplace.api.contract.model.FinancialTransactionType.*;
+import static onlydust.com.marketplace.api.read.repositories.BiFinancialMonthlyStatsReadRepository.IdGrouping.PROGRAM_ID;
+import static onlydust.com.marketplace.api.read.repositories.BiFinancialMonthlyStatsReadRepository.IdGrouping.PROJECT_ID;
+import static onlydust.com.marketplace.api.read.repositories.BiFinancialMonthlyStatsReadRepository.IdGrouping.RECIPIENT_ID;
+import static onlydust.com.marketplace.api.read.repositories.BiFinancialMonthlyStatsReadRepository.IdGrouping.SPONSOR_ID;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseZonedNullable;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
+import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.status;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadBiApi;
 import onlydust.com.marketplace.api.contract.model.*;
@@ -14,42 +57,6 @@ import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.springframework.context.annotation.Profile;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.lang.Boolean.FALSE;
-import static java.util.Comparator.comparing;
-import static onlydust.com.marketplace.api.contract.model.FinancialTransactionType.*;
-import static onlydust.com.marketplace.api.read.repositories.BiFinancialMonthlyStatsReadRepository.IdGrouping.*;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseZonedNullable;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
-import static org.springframework.http.ResponseEntity.ok;
-import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @AllArgsConstructor
@@ -159,7 +166,11 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     @Override
     public ResponseEntity<ContributorActivityGraphResponse> getContributorActivityGraph(Long contributorId,
                                                                                         DataSourceEnum dataSource,
-                                                                                        List<UUID> dataSourceProjectIds) {
+                                                                                        List<UUID> dataSourceProjectIds,
+                                                                                        String fromDate,
+                                                                                        String toDate,
+                                                                                        List<UUID> languageIds,
+                                                                                        List<UUID> ecosystemIds) {
         final var days = contributorActivityGraphReadRepository.findLastYear(ZonedDateTime.now().minusDays(364),
                 contributorId,
                 dataSource == DataSourceEnum.ONLYDUST,

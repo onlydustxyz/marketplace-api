@@ -1,17 +1,18 @@
 package onlydust.com.marketplace.api.read.repositories;
 
-import lombok.NonNull;
-import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
-import java.util.Optional;
-import java.util.UUID;
+import lombok.NonNull;
+import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 
-public interface UserReadRepository extends Repository<AllUserReadEntity, UUID> {
+public interface UserReadRepository extends Repository<AllUserReadEntity, Long> {
     @Query(value = """
             SELECT u
             FROM AllUserReadEntity u

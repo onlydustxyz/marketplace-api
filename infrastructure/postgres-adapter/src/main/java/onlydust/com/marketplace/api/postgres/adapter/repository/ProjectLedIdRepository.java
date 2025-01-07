@@ -1,13 +1,14 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdQueryEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-
 import java.util.List;
 import java.util.UUID;
 
-public interface ProjectLedIdRepository extends JpaRepository<ProjectLedIdQueryEntity, UUID> {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdQueryEntity;
+
+public interface ProjectLedIdRepository extends JpaRepository<ProjectLedIdQueryEntity, ProjectLedIdQueryEntity.Id> {
 
     @Query(value = """
               (select pl.user_id,
