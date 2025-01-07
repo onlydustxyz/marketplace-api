@@ -1,14 +1,15 @@
 package onlydust.com.marketplace.api.read.repositories;
 
-import onlydust.com.marketplace.api.read.entities.user.UserProfileProjectEarningsEntity;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.Repository;
-
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public interface UserProfileProjectEarningsEntityRepository extends Repository<UserProfileProjectEarningsEntity, String> {
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.Repository;
+
+import onlydust.com.marketplace.api.read.entities.user.UserProfileProjectEarningsEntity;
+
+public interface UserProfileProjectEarningsEntityRepository extends Repository<UserProfileProjectEarningsEntity, UUID> {
     @Query(value = """
             select r.project_id       as project_id,
                    sum(r.usd_amount)  as total_earned_usd

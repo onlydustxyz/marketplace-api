@@ -206,7 +206,9 @@ public class ProjectsV2PageApiIT extends AbstractMarketplaceApiIT {
                                   }
                                 ],
                                 "languages": [],
-                                "ecosystems": []
+                                "ecosystems": [],
+                                "contributorStats": null,
+                                "odHackStats": null
                               }
                             ]
                           }

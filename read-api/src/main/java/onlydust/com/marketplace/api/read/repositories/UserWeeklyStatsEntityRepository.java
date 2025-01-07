@@ -1,13 +1,15 @@
 package onlydust.com.marketplace.api.read.repositories;
 
-import onlydust.com.marketplace.api.read.entities.user.UserWeeklyStatsEntity;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.Repository;
-
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public interface UserWeeklyStatsEntityRepository extends Repository<UserWeeklyStatsEntity, String> {
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.Repository;
+
+import onlydust.com.marketplace.api.read.entities.user.UserWeeklyStatsEntity;
+
+public interface UserWeeklyStatsEntityRepository extends Repository<UserWeeklyStatsEntity, ZonedDateTime> {
     @Query(value = """
             SELECT stats.contributor_id,
                    stats.created_at_week as created_at,

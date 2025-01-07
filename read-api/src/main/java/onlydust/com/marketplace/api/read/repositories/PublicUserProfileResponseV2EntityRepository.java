@@ -1,14 +1,14 @@
 package onlydust.com.marketplace.api.read.repositories;
 
-import onlydust.com.marketplace.api.read.entities.user.PublicUserProfileResponseV2Entity;
+import java.util.Optional;
+
 import org.intellij.lang.annotations.Language;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
-import java.util.Optional;
-import java.util.UUID;
+import onlydust.com.marketplace.api.read.entities.user.PublicUserProfileResponseV2Entity;
 
-public interface PublicUserProfileResponseV2EntityRepository extends Repository<PublicUserProfileResponseV2Entity, UUID> {
+public interface PublicUserProfileResponseV2EntityRepository extends Repository<PublicUserProfileResponseV2Entity, Long> {
 
     @Language("PostgreSQL")
     String SELECT = """

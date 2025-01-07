@@ -1,13 +1,14 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.WalletEntity;
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.UUID;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.WalletEntity;
 
-public interface WalletRepository extends JpaRepository<WalletEntity, UUID> {
+public interface WalletRepository extends JpaRepository<WalletEntity, WalletEntity.PrimaryKey> {
 
     @Modifying
     @Query(value = "delete from accounting.wallets where billing_profile_id = :billingProfileId", nativeQuery = true)

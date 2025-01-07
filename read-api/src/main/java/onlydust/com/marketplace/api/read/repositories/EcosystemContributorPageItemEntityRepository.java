@@ -1,15 +1,14 @@
 package onlydust.com.marketplace.api.read.repositories;
 
-import onlydust.com.marketplace.api.read.entities.user.EcosystemContributorPageItemEntity;
 import org.intellij.lang.annotations.Language;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
-import java.util.UUID;
+import onlydust.com.marketplace.api.read.entities.user.EcosystemContributorPageItemEntity;
 
-public interface EcosystemContributorPageItemEntityRepository extends Repository<EcosystemContributorPageItemEntity, UUID> {
+public interface EcosystemContributorPageItemEntityRepository extends Repository<EcosystemContributorPageItemEntity, EcosystemContributorPageItemEntity.PrimaryKey> {
     @Language("PostgreSQL")
     String SELECT = """
             select uer.ecosystem_id                       as ecosystem_id,

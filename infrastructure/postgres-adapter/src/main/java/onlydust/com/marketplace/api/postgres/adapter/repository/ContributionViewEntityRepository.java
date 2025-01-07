@@ -1,18 +1,17 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionViewEntity;
-import onlydust.com.marketplace.kernel.model.ContributionUUID;
-import onlydust.com.marketplace.kernel.model.ProjectId;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributionViewEntity;
 
-public interface ContributionViewEntityRepository extends JpaRepository<ContributionViewEntity, String> {
+public interface ContributionViewEntityRepository extends JpaRepository<ContributionViewEntity, ContributionViewEntity.PrimaryKey> {
 
     @Query(value = """
             SELECT
