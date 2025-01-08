@@ -45,31 +45,33 @@ public interface ProjectsV2ReadRepository extends JpaRepository<ProjectV2ReadEnt
 
 
     @Query(value = """
-            SELECT p.project_id                                         as id,
-                   p.project_slug                                       as slug,
-                   p.project_name                                       as name,
-                   p.project ->> 'shortDescription'                     as short_description,
-                   p.project ->> 'logoUrl'                              as logo_url,
-                   coalesce(pcd.contributor_count, 0)                   as contributor_count,
-                   p.categories                                         as categories,
-                   p.languages                                          as languages,
-                   p.tags                                               as tags,
-                   coalesce(p.ecosystems, '[]')                         as ecosystems,
-                   coalesce(p.leads, '[]')                              as leads,
-                   coalesce(pcd.good_first_issue_count, 0)              as good_first_issue_count,
-                   coalesce(pcd.available_issue_count, 0)               as available_issue_count,
-                   coalesce(p.star_count, 0)                            as star_count,
-                   coalesce(p.fork_count, 0)                            as fork_count,
-                   coalesce(pcd.merged_pr_count, 0)                     as merged_pr_count,
-                   coalesce(pcd.current_week_available_issue_count, 0)  as current_week_available_issue_count,
-                   coalesce(pcd.current_week_merged_pr_count, 0)        as current_week_merged_pr_count,
+            SELECT pd.project_id                                         as id,
+                   pd.project_slug                                       as slug,
+                   pd.project_name                                       as name,
+                   pd.project ->> 'shortDescription'                     as short_description,
+                   p.long_description                                    as long_description,
+                   pd.project ->> 'logoUrl'                              as logo_url,
+                   coalesce(pcd.contributor_count, 0)                    as contributor_count,
+                   pd.categories                                         as categories,
+                   pd.languages                                          as languages,
+                   pd.tags                                               as tags,
+                   coalesce(pd.ecosystems, '[]')                         as ecosystems,
+                   coalesce(pd.leads, '[]')                              as leads,
+                   coalesce(pcd.good_first_issue_count, 0)               as good_first_issue_count,
+                   coalesce(pcd.available_issue_count, 0)                as available_issue_count,
+                   coalesce(pd.star_count, 0)                            as star_count,
+                   coalesce(pd.fork_count, 0)                            as fork_count,
+                   coalesce(pcd.merged_pr_count, 0)                      as merged_pr_count,
+                   coalesce(pcd.current_week_available_issue_count, 0)   as current_week_available_issue_count,
+                   coalesce(pcd.current_week_merged_pr_count, 0)         as current_week_merged_pr_count,
 
                    (select jsonb_agg(jsonb_build_object('url', pmi.url, 'value', pmi.name) order by pmi.rank)
                    from project_more_infos pmi 
-                   where pmi.project_id = p.project_id)        as more_infos
-            FROM bi.p_project_global_data p
-                     JOIN bi.p_project_contributions_data pcd on p.project_id = pcd.project_id
-            WHERE p.project_id = :id or p.project_slug = :slug
+                   where pmi.project_id = pd.project_id)        as more_infos
+            FROM bi.p_project_global_data pd
+                     JOIN projects p on pd.project_id = p.id
+                     JOIN bi.p_project_contributions_data pcd on pd.project_id = pcd.project_id
+            WHERE pd.project_id = :id or pd.project_slug = :slug
             """, nativeQuery = true)
     Optional<ProjectV2ReadEntity> findByIdOrSlug(UUID id, String slug);
 }

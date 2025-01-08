@@ -13960,12 +13960,15 @@ components:
         - $ref: '#/components/schemas/ProjectShortResponseV2'
         - type: object
           required:
+            - longDescription
             - leads
             - moreInfos
             - mergedPrCount
             - currentWeekAvailableIssueCount
             - currentWeekMergedPrCount
           properties:
+            longDescription:
+              type: string
             leads:
               type: array
               items:

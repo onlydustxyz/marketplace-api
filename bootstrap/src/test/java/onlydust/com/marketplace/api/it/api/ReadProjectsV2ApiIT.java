@@ -290,6 +290,7 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
         assertThat(response.getName()).isEqualTo(project.getName());
         assertThat(response.getLogoUrl()).isEqualTo(project.getLogoUrl());
         assertThat(response.getShortDescription()).isEqualTo(project.getShortDescription());
+        assertThat(response.getLongDescription()).isEqualTo(project.getLongDescription());
         assertThat(response.getContributorCount()).isEqualTo(3);
         assertThat(response.getStarCount()).isEqualTo(repo1.getStarsCount() + repo2.getStarsCount());
         assertThat(response.getForkCount()).isEqualTo(repo1.getForksCount() + repo2.getForksCount());
