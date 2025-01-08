@@ -508,6 +508,7 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
                     .avatarUrl(contributor1.user().getGithubAvatarUrl())
                     .isRegistered(true)
                     .id(contributor1.userId().value())
+                    .globalRankPercentile(BigDecimal.valueOf(1.0))
                     .mergedPullRequests(List.of(contribution1.value(), contribution2.value()))
                     .rewards(List.of())
                     .totalEarnedUsdAmount(BigDecimal.valueOf(0)),
@@ -518,6 +519,7 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
                     .avatarUrl(contributor2.user().getGithubAvatarUrl())
                     .isRegistered(true)
                     .id(contributor2.userId().value())
+                    .globalRankPercentile(BigDecimal.valueOf(1.0))
                     .mergedPullRequests(List.of())
                     .rewards(List.of(reward1.value(), reward2.value()))
                     .totalEarnedUsdAmount(BigDecimal.valueOf(166)),
@@ -528,6 +530,7 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
                     .avatarUrl(contributor3.user().getGithubAvatarUrl())
                     .isRegistered(true)
                     .id(contributor3.userId().value())
+                    .globalRankPercentile(BigDecimal.valueOf(1.0))
                     .mergedPullRequests(List.of(contribution3.value()))
                     .rewards(List.of())
                     .totalEarnedUsdAmount(BigDecimal.valueOf(0))

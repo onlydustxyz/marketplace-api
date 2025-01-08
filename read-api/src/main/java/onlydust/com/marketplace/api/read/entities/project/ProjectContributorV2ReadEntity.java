@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.ContributorPageItemResponseV2;
 import onlydust.com.marketplace.api.contract.model.RankedContributorResponse;
+import onlydust.com.marketplace.api.read.utils.RankingUtils;
 
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -39,7 +40,7 @@ public class ProjectContributorV2ReadEntity {
                 .isRegistered(contributor.getIsRegistered())
                 .id(contributor.getId())
                 .globalRank(contributor.getGlobalRank())
-                .globalRankPercentile(contributor.getGlobalRankPercentile())
+                .globalRankPercentile(RankingUtils.prettyRankPercentile(contributor.getGlobalRankPercentile()))
                 .globalRankCategory(contributor.getGlobalRankCategory())
                 .mergedPullRequests(List.of(mergedPullRequests))
                 .rewards(List.of(rewards))
