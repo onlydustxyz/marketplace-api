@@ -16,7 +16,7 @@ public interface ProjectRewardV2ReadRepository extends JpaRepository<ProjectRewa
                 r.timestamp                           as requested_at,
                 requestor.contributor                 as requestor,
                 recipient.contributor                 as recipient,
-                array_length(r.contribution_uuids, 1) as contribution_count,
+                r.contribution_uuids                  as contributions,
                 r.amount                              as amount,
                 c.id                                  as currency_id,
                 c.code                                as currency_code,

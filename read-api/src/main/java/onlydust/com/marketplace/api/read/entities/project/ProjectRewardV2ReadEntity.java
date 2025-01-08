@@ -7,9 +7,12 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -42,7 +45,8 @@ public class ProjectRewardV2ReadEntity {
     String currencyLogoUrl;
     Integer currencyDecimals;
     BigDecimal usdAmount;
-    Integer contributionCount;
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    UUID[] contributions;
 
     public RewardsPageItemResponseV2 toResponse() {
         final var conversionRate = usdAmount.compareTo(ZERO) == 0 ? ONE : amount.divide(usdAmount, 2, RoundingMode.HALF_EVEN);
@@ -64,6 +68,6 @@ public class ProjectRewardV2ReadEntity {
                         .usdEquivalent(AmountMapper.prettyUsd(usdAmount))
                         .usdConversionRate(conversionRate)
                 )
-                .contributionCount(contributionCount);
+                .contributions(List.of(contributions));
     }
 } 
