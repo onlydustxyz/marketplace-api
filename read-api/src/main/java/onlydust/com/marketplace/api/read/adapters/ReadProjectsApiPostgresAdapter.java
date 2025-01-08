@@ -639,7 +639,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
             projectIdOrSlugObj.uuid().orElse(null),
             projectIdOrSlugObj.slug().orElse(null),
             search,
-            PageRequest.of(sanitizePageIndex, sanitizePageSize, JpaSort.unsafe("cast(c.contributor ->> 'globalRank' as int)")));
+            PageRequest.of(sanitizePageIndex, sanitizePageSize));
 
         return ok()
             .body(new ContributorsPageResponseV2()

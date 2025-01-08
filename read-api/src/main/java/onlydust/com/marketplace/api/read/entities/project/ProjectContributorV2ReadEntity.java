@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.read.entities.project;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
 
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -23,8 +25,10 @@ public class ProjectContributorV2ReadEntity {
     private Long id;
     @JdbcTypeCode(SqlTypes.JSON)
     private RankedContributorResponse contributor;
-    private Integer mergedPullRequestCount;
-    private Integer rewardCount;
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    private UUID[] mergedPullRequests;
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    private UUID[] rewards;
     private BigDecimal totalEarnedUsdAmount;
 
     public ContributorPageItemResponseV2 toResponse() {
@@ -37,8 +41,8 @@ public class ProjectContributorV2ReadEntity {
                 .globalRank(contributor.getGlobalRank())
                 .globalRankPercentile(contributor.getGlobalRankPercentile())
                 .globalRankCategory(contributor.getGlobalRankCategory())
-                .mergedPullRequestCount(mergedPullRequestCount)
-                .rewardCount(rewardCount)
+                .mergedPullRequests(List.of(mergedPullRequests))
+                .rewards(List.of(rewards))
                 .totalEarnedUsdAmount(totalEarnedUsdAmount);
     }
 }
