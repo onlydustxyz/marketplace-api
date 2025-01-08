@@ -28,7 +28,9 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiContributor
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiProjectContributionsDataRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiProjectGlobalDataRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.kernel.model.ContributionUUID;
 import onlydust.com.marketplace.kernel.model.EcosystemId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 
@@ -69,6 +71,12 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
     static UserAuthHelper.AuthenticatedUser contributor1;
     static UserAuthHelper.AuthenticatedUser contributor2;
     static UserAuthHelper.AuthenticatedUser contributor3;
+
+    static RewardId reward1;
+    static RewardId reward2;
+    static ContributionUUID contribution1;
+    static ContributionUUID contribution2;
+    static ContributionUUID contribution3;
 
     @BeforeEach 
     void setUp() {
@@ -122,7 +130,7 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
 
         at(ZonedDateTime.now().minusWeeks(2), () -> {
             // merged pull requests
-            githubHelper.createPullRequest(repo1, contributor3, List.of("rs"));
+            contribution3 = githubHelper.createPullRequest(repo1, contributor3, List.of("rs"));
             
             // available issue
             availableIssues.add(githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(1), null, "OPEN", contributor1));
@@ -145,8 +153,8 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
 
         at(ZonedDateTime.now().minusDays(1), () -> {
             // merged pull requests
-            githubHelper.createPullRequest(repo1, contributor1, List.of("java"));
-            githubHelper.createPullRequest(repo2, contributor1, List.of("js", "ts"));
+            contribution1 = githubHelper.createPullRequest(repo1, contributor1, List.of("java"));
+            contribution2 = githubHelper.createPullRequest(repo2, contributor1, List.of("js", "ts"));
             
             // available issue
             availableIssues.add(githubHelper.createIssue(repo1, CurrentDateProvider.now().plusSeconds(1), null, "OPEN", contributor1));
@@ -234,8 +242,8 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
         accountingHelper.grant(program.id(), projectId, 1000, CurrencyHelper.USD);
         accountingHelper.grant(program.id(), projectId, 1000, CurrencyHelper.STRK);
 
-        rewardHelper.create(projectId, projectLead, contributor2.githubUserId(), 120, CurrencyHelper.STRK);
-        rewardHelper.create(projectId, projectLead, contributor2.githubUserId(), 100, CurrencyHelper.USD);
+        reward1 = rewardHelper.create(projectId, projectLead, contributor2.githubUserId(), 120, CurrencyHelper.STRK);
+        reward2 = rewardHelper.create(projectId, projectLead, contributor2.githubUserId(), 100, CurrencyHelper.USD);
 
         githubHelper.addRepoLanguage(repo1.getId(), "Java", 100L);
         githubHelper.addRepoLanguage(repo2.getId(), "JavaScript", 10L);
@@ -282,6 +290,7 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
         assertThat(response.getName()).isEqualTo(project.getName());
         assertThat(response.getLogoUrl()).isEqualTo(project.getLogoUrl());
         assertThat(response.getShortDescription()).isEqualTo(project.getShortDescription());
+        assertThat(response.getLongDescription()).isEqualTo(project.getLongDescription());
         assertThat(response.getContributorCount()).isEqualTo(3);
         assertThat(response.getStarCount()).isEqualTo(repo1.getStarsCount() + repo2.getStarsCount());
         assertThat(response.getForkCount()).isEqualTo(repo1.getForksCount() + repo2.getForksCount());
@@ -491,6 +500,7 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
             .usingRecursiveFieldByFieldElementComparator(RecursiveComparisonConfiguration.builder()
                 .withComparatorForType(BIG_DECIMAL_COMPARATOR, BigDecimal.class)
                 .withIgnoreAllExpectedNullFields(true)
+                .withIgnoreCollectionOrder(true)
                 .build())
             .containsExactlyInAnyOrder(
                 new ContributorPageItemResponseV2()
@@ -499,8 +509,9 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
                     .avatarUrl(contributor1.user().getGithubAvatarUrl())
                     .isRegistered(true)
                     .id(contributor1.userId().value())
-                    .mergedPullRequestCount(2)
-                    .rewardCount(0)
+                    .globalRankPercentile(BigDecimal.valueOf(1.0))
+                    .mergedPullRequests(List.of(contribution1.value(), contribution2.value()))
+                    .rewards(List.of())
                     .totalEarnedUsdAmount(BigDecimal.valueOf(0)),
 
                 new ContributorPageItemResponseV2()
@@ -509,8 +520,9 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
                     .avatarUrl(contributor2.user().getGithubAvatarUrl())
                     .isRegistered(true)
                     .id(contributor2.userId().value())
-                    .mergedPullRequestCount(0)
-                    .rewardCount(2)
+                    .globalRankPercentile(BigDecimal.valueOf(1.0))
+                    .mergedPullRequests(List.of())
+                    .rewards(List.of(reward1.value(), reward2.value()))
                     .totalEarnedUsdAmount(BigDecimal.valueOf(166)),
 
                 new ContributorPageItemResponseV2()
@@ -519,8 +531,9 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
                     .avatarUrl(contributor3.user().getGithubAvatarUrl())
                     .isRegistered(true)
                     .id(contributor3.userId().value())
-                    .mergedPullRequestCount(1)
-                    .rewardCount(0)
+                    .globalRankPercentile(BigDecimal.valueOf(1.0))
+                    .mergedPullRequests(List.of(contribution3.value()))
+                    .rewards(List.of())
                     .totalEarnedUsdAmount(BigDecimal.valueOf(0))
             );
     }

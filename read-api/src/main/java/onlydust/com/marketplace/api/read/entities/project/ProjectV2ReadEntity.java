@@ -29,6 +29,7 @@ public class ProjectV2ReadEntity {
     String slug;
     String name;
     String shortDescription;
+    String longDescription;
     String logoUrl;
     Integer contributorCount;
     Integer forkCount;
@@ -69,6 +70,7 @@ public class ProjectV2ReadEntity {
                 .name(name)
                 .slug(slug)
                 .shortDescription(shortDescription)
+                .longDescription(longDescription)
                 .id(id)
                 .logoUrl(logoUrl)
                 .categories(categories())

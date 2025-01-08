@@ -7722,14 +7722,14 @@ components:
             - rewardCount
             - totalEarnedUsdAmount
           properties:
-            mergedPullRequestCount:
-              type: integer
-              description: Total number of merged pull requests the contributor made on this project.
-              example: 22
-            rewardCount:
-              type: integer
-              description: Total number of rewards the contributor got on this project.
-              example: 10
+            mergedPullRequests:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContributionUuid'
+            rewards:
+              type: array
+              items:
+                $ref: '#/components/schemas/RewardId'
             totalEarnedUsdAmount:
               type: number
               description: Total USD-equivalent amount of all rewards granted on this project for the contributor.
@@ -9171,7 +9171,7 @@ components:
         - from
         - to
         - amount
-        - contributionCount
+        - contributions
       properties:
         id:
           $ref: '#/components/schemas/RewardId'
@@ -9185,9 +9185,10 @@ components:
           $ref: '#/components/schemas/GithubUserResponse'
         amount:
           $ref: '#/components/schemas/Money'
-        contributionCount:
-          type: integer
-          example: 11
+        contributions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributionUuid'
 
     MyRewardPageItemResponse:
       type: object
@@ -13960,12 +13961,15 @@ components:
         - $ref: '#/components/schemas/ProjectShortResponseV2'
         - type: object
           required:
+            - longDescription
             - leads
             - moreInfos
             - mergedPrCount
             - currentWeekAvailableIssueCount
             - currentWeekMergedPrCount
           properties:
+            longDescription:
+              type: string
             leads:
               type: array
               items:

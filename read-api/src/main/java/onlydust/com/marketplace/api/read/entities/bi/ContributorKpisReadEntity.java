@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.read.entities.bi;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
 import static onlydust.com.marketplace.api.contract.model.ContactInformation.VisibilityEnum.PUBLIC;
-import static onlydust.com.marketplace.api.read.entities.user.PublicUserProfileResponseV2Entity.prettyRankPercentile;
+import static onlydust.com.marketplace.api.read.utils.RankingUtils.prettyRankPercentile;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
 import java.io.IOException;

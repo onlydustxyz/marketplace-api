@@ -1,16 +1,6 @@
 package onlydust.com.marketplace.api.read.entities.user;
 
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.Accessors;
-import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.read.entities.github.GithubAccountReadEntity;
-import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
-import org.hibernate.type.SqlTypes;
+import static java.util.Objects.isNull;
 
 import java.math.BigDecimal;
 import java.net.URI;
@@ -21,7 +11,19 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static java.util.Objects.isNull;
+import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.type.SqlTypes;
+
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
+import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.read.entities.github.GithubAccountReadEntity;
+import onlydust.com.marketplace.api.read.utils.RankingUtils;
 
 @Entity
 @Getter
@@ -114,12 +116,7 @@ public class PublicUserProfileResponseV2Entity {
     }
 
     public static BigDecimal prettyRankPercentile(BigDecimal rankPercentile) {
-        final var percent = rankPercentile.multiply(BigDecimal.valueOf(100)).doubleValue();
-        return Stream.of(0.1D, 1D, 5D, 10D)
-                .filter(i -> percent <= i)
-                .map(BigDecimal::valueOf)
-                .min(BigDecimal::compareTo)
-                .orElse(BigDecimal.valueOf(100));
+        return RankingUtils.prettyRankPercentile(rankPercentile);
     }
 
     private static List<ContactInformation> contactsOf(GithubAccountReadEntity account) {
