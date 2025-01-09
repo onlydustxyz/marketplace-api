@@ -27,6 +27,12 @@ public interface ProjectContributorV2ReadRepository extends JpaRepository<Projec
                 and (:search is null or c.contributor_login ilike '%' || :search || '%')
                 group by c.contributor_id, rd.reward_ids
                 order by cast(c.contributor ->> 'globalRank' as int)
+            """, countQuery = """
+                select count(distinct cc.contributor_id)
+                from bi.p_per_contributor_contribution_data cc
+                    join bi.p_contributor_global_data c on cc.contributor_id = c.contributor_id
+                where (cc.project_id = :projectId or cc.project_slug = :projectSlug)
+                and (:search is null or c.contributor_login ilike '%' || :search || '%')
             """, nativeQuery = true)
     Page<ProjectContributorV2ReadEntity> findAll(UUID projectId,
                                                  String projectSlug,

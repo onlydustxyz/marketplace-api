@@ -470,6 +470,28 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    public void should_get_paginated_project_contributors_by_id() {
+        {
+            final var page = get_project_contributors(project.getId().toString(), Map.of("pageIndex", "0", "pageSize", "2"));
+            assertThat(page.getContributors()).hasSize(2);
+            assertThat(page.getHasMore()).isTrue();
+            assertThat(page.getNextPageIndex()).isEqualTo(1);
+            assertThat(page.getTotalPageNumber()).isEqualTo(2);
+            assertThat(page.getTotalItemNumber()).isEqualTo(3);
+        }
+
+        {
+            final var page = get_project_contributors(project.getId().toString(), Map.of("pageIndex", "1", "pageSize", "2"));
+            assertThat(page.getContributors()).hasSize(1);
+            assertThat(page.getHasMore()).isFalse();
+            assertThat(page.getNextPageIndex()).isEqualTo(1);
+            assertThat(page.getTotalPageNumber()).isEqualTo(2);
+            assertThat(page.getTotalItemNumber()).isEqualTo(3);
+        }
+    }
+
+
+    @Test
     public void should_get_project_contributors_by_slug() {
         should_get_project_contributors(project.getSlug());
     }
@@ -491,7 +513,7 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
 
     private void should_get_project_contributors(String idOrSlug) {
         // When
-        final var contributors = get_project_contributors(idOrSlug, null)
+        final var contributors = get_project_contributors(idOrSlug, Map.of())
             .getContributors();
 
         assertThat(contributors)
@@ -544,6 +566,11 @@ public class ReadProjectsV2ApiIT extends AbstractMarketplaceApiIT {
         if (login != null) 
             params.put("login", login);
 
+        // When
+        return get_project_contributors(idOrSlug, params);
+    }
+
+    private ContributorsPageResponseV2 get_project_contributors(String idOrSlug, Map<String, String> params) {
         // When
         return client.get()
                 .uri(getApiURI(PROJECTS_V2_GET_CONTRIBUTORS_BY_ID_OR_SLUG.formatted(idOrSlug), params))
