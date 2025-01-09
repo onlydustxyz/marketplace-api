@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiContributorGlobalDataRepository;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.model.ProjectId;
@@ -30,6 +31,8 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
     HackathonStoragePort hackathonStoragePort;
     @Autowired
     SlackApiAdapter slackApiAdapter;
+    @Autowired
+    BiContributorGlobalDataRepository biContributorGlobalDataRepository;
 
     UserAuthHelper.AuthenticatedUser olivier;
 
@@ -43,6 +46,9 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
     static ProjectId projectId1 = ProjectId.of("8156fc5f-cec5-4f70-a0de-c368772edcd4");
     static ProjectId projectId2 = ProjectId.of("7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54");
     static ProjectId projectId3 = ProjectId.of("c6940f66-d64e-4b29-9a7f-07abf5c3e0ed");
+
+    static UserAuthHelper.AuthenticatedUser contributor1;
+    static UserAuthHelper.AuthenticatedUser contributor2;
 
     @BeforeEach
     void setUp() {
@@ -105,6 +111,11 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
         hackathon3.links().add(NamedLink.builder().url("https://www.foo.org").value("Foo").build());
         hackathon3.projectIds().add(projectId1.value());
 
+        contributor1 = userAuthHelper.create();
+        contributor2 = userAuthHelper.create();
+
+        final var contributors = List.of(contributor1, contributor2);
+
         final var repo = githubHelper.createRepo(projectId2);
         final var labelId = githubHelper.createLabel("label1");
         // 3 available issues
@@ -116,7 +127,7 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
         IntStream.range(0, 2).forEach(i -> {
             final var issue = githubHelper.createIssue(repo, ZonedDateTime.now().minusDays(1), null, "OPEN", olivier);
             githubHelper.addLabelToIssue(issue.id(), labelId, ZonedDateTime.now());
-            githubHelper.assignIssueToContributor(issue.id(), olivier.githubUserId().value());
+            githubHelper.assignIssueToContributor(issue.id(), contributors.get(i).githubUserId().value());
         });
 
         hackathonStoragePort.save(hackathon1);
@@ -125,8 +136,13 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
         hackathonId1 = hackathon1.id();
         hackathonId2 = hackathon2.id();
         hackathonId3 = hackathon3.id();
-    }
 
+        databaseHelper.executeInTransaction(() -> {
+            userRepository.refreshUsersRanksAndStats();
+            biContributorGlobalDataRepository.refresh(contributor1.user().getGithubUserId());
+            biContributorGlobalDataRepository.refresh(contributor2.user().getGithubUserId());
+        });
+    }
 
     @Test
     @Order(1)
@@ -571,5 +587,55 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                 .extracting(HackathonsEventItemResponse::getName)
                 .containsExactlyInAnyOrder("Event 1", "ODHack begins", "Event 2");
         }
+    }
+
+    @Test
+    @Order(30)
+    void should_get_hackathon_contributors() {
+        // When
+        final var contributors = client.get()
+                .uri(getApiURI(HACKATHONS_BY_SLUG_CONTRIBUTORS.formatted(hackathon1.slug())))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(ContributorsPageResponseV2.class)
+                .returnResult().getResponseBody().getContributors();
+
+        assertThat(contributors)
+            .hasSize(2)
+            .isSortedAccordingTo(Comparator.comparing(ContributorPageItemResponseV2::getGlobalRank))
+            .usingRecursiveFieldByFieldElementComparator(RecursiveComparisonConfiguration.builder()
+                .withIgnoreAllExpectedNullFields(true)
+                .build())
+            .containsExactlyInAnyOrder(
+                new ContributorPageItemResponseV2()
+                    .login(contributor1.user().getGithubLogin()),
+                new ContributorPageItemResponseV2()
+                    .login(contributor2.user().getGithubLogin())
+            );
+    }
+
+
+    @Test
+    @Order(30)
+    void should_search_hackathon_contributors_by_login() {
+        // Given
+        final var search = contributor1.user().getGithubLogin().substring(0, 3).toUpperCase();
+
+        // When
+        final var contributors = client.get()
+                .uri(getApiURI(HACKATHONS_BY_SLUG_CONTRIBUTORS.formatted(hackathon1.slug()), Map.of("search", search)))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(ContributorsPageResponseV2.class)
+                .returnResult().getResponseBody().getContributors();
+
+        assertThat(contributors)
+            .isNotEmpty()
+            .extracting(ContributorPageItemResponseV2::getLogin)
+            .containsOnly(contributor1.user().getGithubLogin());
     }
 }

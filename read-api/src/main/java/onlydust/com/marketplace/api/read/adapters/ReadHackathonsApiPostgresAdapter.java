@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.read.adapters;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.read.cache.Cache.S;
 import static onlydust.com.marketplace.api.read.cache.Cache.XS;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static org.springframework.http.ResponseEntity.ok;
@@ -27,6 +28,7 @@ import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonEventReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonItemReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonProjectIssuesReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectContributorV2ReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectPageV2ItemWithOdHackQueryEntity;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
@@ -47,6 +49,7 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
     private final HackathonV2ReadRepository hackathonV2ReadRepository;
     private final ProjectsPageV2WithOdHackStatsRepository projectsPageV2WithOdHackStatsRepository;
     private final HackathonEventReadRepository hackathonEventReadRepository;
+    private final ProjectContributorV2ReadRepository projectContributorV2ReadRepository;
 
     @Override
     public ResponseEntity<HackathonsDetailsResponse> getHackathonBySlug(String hackathonSlug) {
@@ -147,5 +150,27 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
                         .projects(hackathonProjectIssues.stream()
                                 .map(HackathonProjectIssuesReadEntity::toDto)
                                 .toList()));
+    }
+
+    @Override
+    public ResponseEntity<ContributorsPageResponseV2> getHackathonContributors(String hackathonSlug, Integer pageIndex, Integer pageSize, String search) {
+        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
+        final var sanitizedPageSize = sanitizePageSize(pageSize);
+
+        final var contributors = projectContributorV2ReadRepository.findHackathonContributors(
+                hackathonSlug,
+                search,
+                PageRequest.of(sanitizedPageIndex, sanitizedPageSize)
+        );
+
+        return ok()
+                .body(new ContributorsPageResponseV2()
+                        .contributors(contributors.getContent().stream()
+                                .map(ProjectContributorV2ReadEntity::toResponse)
+                                .toList())
+                        .hasMore(contributors.hasNext())
+                        .totalPageNumber(contributors.getTotalPages())
+                        .totalItemNumber((int) contributors.getTotalElements())
+                        .nextPageIndex(nextPageIndex(sanitizedPageIndex, contributors.getTotalPages())));
     }
 }
