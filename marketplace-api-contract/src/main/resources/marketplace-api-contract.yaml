@@ -11920,29 +11920,26 @@ components:
       type: object
       required:
         - id
-        - index
         - slug
         - title
         - description
         - location
-        - totalBudget
-        - communityLinks
-        - links
-        - projects
-        - me
+        - startDate
+        - endDate
+        - projectCount
         - subscriberCount
         - issueCount
-        - openIssueCount
-        - events
+        - availableIssueCount
+        - communityLinks
+        - links
       properties:
         id:
           $ref: '#/components/schemas/HackathonId'
-        index:
-          type: integer
-          description: unique auto-incremented index of the hackathon
         slug:
           $ref: '#/components/schemas/HackathonSlug'
         title:
+          type: string
+        description:
           type: string
         location:
           type: string
@@ -11960,8 +11957,6 @@ components:
           type: integer
         availableIssueCount:
           type: integer
-        description:
-          type: string
         communityLinks:
           type: array
           items:
