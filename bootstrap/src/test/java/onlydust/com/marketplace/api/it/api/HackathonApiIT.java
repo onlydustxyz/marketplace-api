@@ -5,13 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -484,5 +482,38 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
             .hasSize(1)
             .extracting(ProjectShortResponseV2::getId)
             .containsOnly(projectId2.value());
+    }
+
+    @Test
+    @Order(30)
+    void should_get_hackathon_events() {
+        // When
+        final var events = client.get()
+                .uri(getApiURI(HACKATHONS_BY_SLUG_EVENTS.formatted(hackathon1.slug())))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(HackathonEventsResponse.class)
+                .returnResult().getResponseBody().getEvents();
+
+        assertThat(events)
+            .hasSize(2)
+            .isSortedAccordingTo(Comparator.comparing(HackathonsEventItemResponse::getStartDate).reversed())
+            .usingRecursiveFieldByFieldElementComparator(RecursiveComparisonConfiguration.builder()
+                .withIgnoreAllExpectedNullFields(true)
+                .build())
+            .containsExactlyInAnyOrder(
+                new HackathonsEventItemResponse()
+                    .name("Event 1")
+                    .subtitle("Event 1 is awesome")
+                    .iconSlug("icon1")
+                    .links(List.of(new SimpleLink().url("https://www.foo.bar").value("Foo"))),
+                new HackathonsEventItemResponse()
+                    .name("Event 2")
+                    .subtitle("Event 2 is awesome")
+                    .iconSlug("icon2")
+                    .links(List.of(new SimpleLink().url("https://www.foo2.bar").value("Foo2")))
+            );
     }
 }

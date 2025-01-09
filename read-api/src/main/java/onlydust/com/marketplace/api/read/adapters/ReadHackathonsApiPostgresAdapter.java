@@ -24,10 +24,12 @@ import onlydust.com.marketplace.api.contract.ReadHackathonsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.cache.Cache;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
+import onlydust.com.marketplace.api.read.entities.hackathon.HackathonEventReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonItemReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonProjectIssuesReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectPageV2ItemWithOdHackQueryEntity;
 import onlydust.com.marketplace.api.read.repositories.*;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 @RestController
@@ -44,6 +46,7 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
     private final HackathonItemReadRepository hackathonItemReadRepository;
     private final HackathonV2ReadRepository hackathonV2ReadRepository;
     private final ProjectsPageV2WithOdHackStatsRepository projectsPageV2WithOdHackStatsRepository;
+    private final HackathonEventReadRepository hackathonEventReadRepository;
 
     @Override
     public ResponseEntity<HackathonsDetailsResponse> getHackathonBySlug(String hackathonSlug) {
@@ -87,6 +90,18 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
                         .totalPageNumber(page.getTotalPages())
                         .totalItemNumber((int) page.getTotalElements())
                         .hasMore(page.hasNext()));
+    }
+
+    @Override
+    public ResponseEntity<HackathonEventsResponse> getHackathonEvents(String hackathonSlug, String fromDate, String toDate) {
+        final var events = hackathonEventReadRepository.findHackathonEvents(
+            hackathonSlug,
+            DateMapper.parseZonedNullable(fromDate),
+            DateMapper.parseZonedNullable(toDate)
+        );
+
+        return ok()
+                .body(new HackathonEventsResponse().events(events.stream().map(HackathonEventReadEntity::toDto).toList()));
     }
 
     @Override
