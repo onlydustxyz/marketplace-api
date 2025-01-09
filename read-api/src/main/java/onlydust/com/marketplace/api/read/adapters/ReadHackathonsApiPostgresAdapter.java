@@ -26,7 +26,7 @@ import onlydust.com.marketplace.api.read.cache.Cache;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonItemReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonProjectIssuesReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectPageV2ItemQueryEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectPageV2ItemWithOdHackQueryEntity;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
@@ -43,7 +43,7 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
     private final LanguageReadRepository languageReadRepository;
     private final HackathonItemReadRepository hackathonItemReadRepository;
     private final HackathonV2ReadRepository hackathonV2ReadRepository;
-    private final ProjectsPageV2Repository projectsPageV2Repository;
+    private final ProjectsPageV2WithOdHackStatsRepository projectsPageV2WithOdHackStatsRepository;
 
     @Override
     public ResponseEntity<HackathonsDetailsResponse> getHackathonBySlug(String hackathonSlug) {
@@ -74,7 +74,7 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
     ) {       
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final var sanitizedPageSize = sanitizePageSize(pageSize);
-        final var page = projectsPageV2Repository.findHackathonProjects(hackathonSlug, 
+        final var page = projectsPageV2WithOdHackStatsRepository.findHackathonProjects(hackathonSlug, 
             isNull(languageIds) ? null : languageIds.stream().distinct().toArray(UUID[]::new),
             isNull(ecosystemIds) ? null : ecosystemIds.stream().distinct().toArray(UUID[]::new),
             hasAvailableIssues,
@@ -83,7 +83,7 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
 
         return ok()
                 .body(new ProjectPageResponseV2()
-                        .projects(page.getContent().stream().map(ProjectPageV2ItemQueryEntity::toShortResponse).toList())
+                        .projects(page.getContent().stream().map(ProjectPageV2ItemWithOdHackQueryEntity::toShortResponse).toList())
                         .totalPageNumber(page.getTotalPages())
                         .totalItemNumber((int) page.getTotalElements())
                         .hasMore(page.hasNext()));
