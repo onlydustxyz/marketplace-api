@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -464,5 +465,24 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
             .isEqualTo(new ProjectShortResponseV2OdHackStats()
                     .issueCount(5)
                     .availableIssueCount(3));
+    }
+
+    @Test
+    @Order(30)
+    void should_get_hackathon_projects_with_available_issues() {
+        // When
+        final var projects = client.get()
+                .uri(getApiURI(HACKATHONS_BY_SLUG_PROJECTS.formatted(hackathon1.slug()), Map.of("hasAvailableIssues", "true")))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(ProjectPageResponseV2.class)
+                .returnResult().getResponseBody().getProjects();
+
+        assertThat(projects)
+            .hasSize(1)
+            .extracting(ProjectShortResponseV2::getId)
+            .containsOnly(projectId2.value());
     }
 }
