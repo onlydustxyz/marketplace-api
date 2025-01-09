@@ -1,21 +1,28 @@
 package onlydust.com.marketplace.api.it.api;
 
-import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.slack.SlackApiAdapter;
-import onlydust.com.marketplace.api.suites.tags.TagProject;
-import onlydust.com.marketplace.project.domain.model.Hackathon;
-import onlydust.com.marketplace.project.domain.model.NamedLink;
-import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.IntStream;
 
-import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
-import static org.mockito.Mockito.verify;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import onlydust.com.marketplace.api.contract.model.HackathonResponseV2;
+import onlydust.com.marketplace.api.contract.model.SimpleLink;
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.slack.SlackApiAdapter;
+import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.project.domain.model.Hackathon;
+import onlydust.com.marketplace.project.domain.model.NamedLink;
+import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 
 @TagProject
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -27,6 +34,9 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
 
     UserAuthHelper.AuthenticatedUser olivier;
 
+    private static final AtomicBoolean setupDone = new AtomicBoolean();
+
+    static Hackathon hackathon1;
     static Hackathon.Id hackathonId1;
     static Hackathon.Id hackathonId2;
     static Hackathon.Id hackathonId3;
@@ -34,11 +44,11 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
     @BeforeEach
     void setUp() {
         olivier = userAuthHelper.authenticateOlivier();
-    }
 
-    void createHackathons() {
+        if (setupDone.compareAndExchange(false, true)) return;
+
         final var startDate = ZonedDateTime.of(2024, 4, 19, 0, 0, 0, 0, ZonedDateTime.now().getZone());
-        final var hackathon1 = Hackathon.builder()
+        hackathon1 = Hackathon.builder()
                 .id(Hackathon.Id.random())
                 .title("Hackathon 1")
                 .startDate(startDate)
@@ -94,6 +104,20 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
         hackathon3.links().add(NamedLink.builder().url("https://www.foo.org").value("Foo").build());
         hackathon3.projectIds().add(UUID.fromString("8156fc5f-cec5-4f70-a0de-c368772edcd4"));
 
+        final var repo = githubHelper.createRepo(ProjectId.of(hackathon1.projectIds().stream().findFirst().orElseThrow()));
+        final var labelId = githubHelper.createLabel("label1");
+        // 3 available issues
+        IntStream.range(0, 3).forEach(i -> {
+            final var issue = githubHelper.createIssue(repo, ZonedDateTime.now().minusDays(1), null, "OPEN", olivier);
+            githubHelper.addLabelToIssue(issue.id(), labelId, ZonedDateTime.now());
+        });
+        // 2 non available issues
+        IntStream.range(0, 2).forEach(i -> {
+            final var issue = githubHelper.createIssue(repo, ZonedDateTime.now().minusDays(1), null, "OPEN", olivier);
+            githubHelper.addLabelToIssue(issue.id(), labelId, ZonedDateTime.now());
+            githubHelper.assignIssueToContributor(issue.id(), olivier.githubUserId().value());
+        });
+
         hackathonStoragePort.save(hackathon1);
         hackathonStoragePort.save(hackathon2);
         hackathonStoragePort.save(hackathon3);
@@ -106,8 +130,6 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
     @Test
     @Order(1)
     void should_get_hackathon_by_slug() {
-        createHackathons();
-
         // When
         client.get()
                 .uri(getApiURI(HACKATHONS_BY_SLUG.formatted("hackathon-1")))
@@ -177,8 +199,8 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "subscriberCount": 0,
-                          "issueCount": 0,
-                          "openIssueCount": 0,
+                          "issueCount": 5,
+                          "openIssueCount": 3,
                           "events": [
                             {
                               "name": "Event 1",
@@ -354,8 +376,8 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "subscriberCount": 1,
-                              "issueCount": 0,
-                              "openIssueCount": 0
+                              "issueCount": 5,
+                              "openIssueCount": 3
                             },
                             {
                               "slug": "hackathon-3",
@@ -380,5 +402,41 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                           ]
                         }
                         """);
+    }
+
+    @Test
+    @Order(30)
+    void should_get_hackathon_by_slug_v2() {
+        // When
+        final var response = client.get()
+                .uri(getApiURI(HACKATHONS_V2_BY_SLUG.formatted(hackathon1.slug())))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(HackathonResponseV2.class)
+                .returnResult().getResponseBody();
+
+        assertThat(response.getId()).isEqualTo(hackathonId1.value());
+        assertThat(response.getSlug()).isEqualTo(hackathon1.slug());
+        assertThat(response.getTitle()).isEqualTo(hackathon1.title());
+        assertThat(response.getStartDate()).isEqualTo(hackathon1.startDate());
+        assertThat(response.getEndDate()).isEqualTo(hackathon1.endDate());
+        assertThat(response.getDescription()).isEqualTo(hackathon1.description());
+        assertThat(response.getLocation()).isEqualTo(hackathon1.location());
+        assertThat(response.getProjectCount()).isEqualTo(hackathon1.projectIds().size());
+        assertThat(response.getSubscriberCount()).isEqualTo(1);
+        assertThat(response.getIssueCount()).isEqualTo(5);
+        assertThat(response.getAvailableIssueCount()).isEqualTo(3);
+        assertThat(response.getCommunityLinks())
+            .extracting(SimpleLink::getUrl)
+            .containsExactlyInAnyOrderElementsOf(hackathon1.communityLinks().stream()
+                    .map(NamedLink::getUrl)
+                    .toList());
+        assertThat(response.getLinks())
+            .extracting(SimpleLink::getUrl)
+            .containsExactlyInAnyOrderElementsOf(hackathon1.links().stream()
+                    .map(NamedLink::getUrl)
+                    .toList());
     }
 }

@@ -1,5 +1,20 @@
 package onlydust.com.marketplace.api.read.adapters;
 
+import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.read.cache.Cache.S;
+import static onlydust.com.marketplace.api.read.cache.Cache.XS;
+import static org.springframework.http.ResponseEntity.ok;
+
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
@@ -9,25 +24,8 @@ import onlydust.com.marketplace.api.read.cache.Cache;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonItemReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonProjectIssuesReadEntity;
-import onlydust.com.marketplace.api.read.repositories.HackathonItemReadRepository;
-import onlydust.com.marketplace.api.read.repositories.HackathonProjectIssuesReadRepository;
-import onlydust.com.marketplace.api.read.repositories.HackathonReadRepository;
-import onlydust.com.marketplace.api.read.repositories.LanguageReadRepository;
+import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import org.springframework.context.annotation.Profile;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.UUID;
-
-import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.read.cache.Cache.S;
-import static onlydust.com.marketplace.api.read.cache.Cache.XS;
-import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @Tags(@Tag(name = "Hackathons"))
@@ -41,6 +39,7 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
     private final HackathonProjectIssuesReadRepository hackathonProjectIssuesReadRepository;
     private final LanguageReadRepository languageReadRepository;
     private final HackathonItemReadRepository hackathonItemReadRepository;
+    private final HackathonV2ReadRepository hackathonV2ReadRepository;
 
     @Override
     public ResponseEntity<HackathonsDetailsResponse> getHackathonBySlug(String hackathonSlug) {
@@ -48,6 +47,14 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
                 .orElseThrow(() -> OnlyDustException.notFound("Hackathon not found for slug %s".formatted(hackathonSlug)));
         return ok()
                 .cacheControl(cache.forEverybody(S))
+                .body(hackathon.toResponse());
+    }
+
+    @Override
+    public ResponseEntity<HackathonResponseV2> getHackathonBySlugV2(String hackathonSlug) {
+        final var hackathon = hackathonV2ReadRepository.findBySlug(hackathonSlug)
+                .orElseThrow(() -> OnlyDustException.notFound("Hackathon not found for slug %s".formatted(hackathonSlug)));
+        return ok()
                 .body(hackathon.toResponse());
     }
 

@@ -1,22 +1,16 @@
 package onlydust.com.marketplace.api.configuration;
 
-import com.auth0.jwt.interfaces.JWTVerifier;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.*;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationFilter;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.Auth0OnlyDustAppAuthenticationService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtVerifier;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Properties;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0UserInfoService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.backoffice.Auth0OnlyDustBackofficeAuthenticationService;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationFilter;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
-import onlydust.com.marketplace.project.domain.port.input.GithubUserPermissionsFacadePort;
-import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
-import onlydust.com.marketplace.user.domain.port.input.BackofficeUserFacadePort;
+import static onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.INTERNAL_SERVICE;
+import static onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.UNSAFE_INTERNAL_SERVICE;
+import static onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.USER;
+import static onlydust.com.marketplace.user.domain.model.BackofficeUser.Role.BO_FINANCIAL_ADMIN;
+import static onlydust.com.marketplace.user.domain.model.BackofficeUser.Role.BO_MARKETING_ADMIN;
+import static onlydust.com.marketplace.user.domain.model.BackofficeUser.Role.BO_READER;
+import static onlydust.com.marketplace.user.domain.model.BackofficeUser.Role.BO_TECH_ADMIN;
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
+import java.net.http.HttpClient;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,11 +26,24 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
-import java.net.http.HttpClient;
+import com.auth0.jwt.interfaces.JWTVerifier;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.*;
-import static onlydust.com.marketplace.user.domain.model.BackofficeUser.Role.*;
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+import lombok.Data;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.*;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationFilter;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.Auth0OnlyDustAppAuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtVerifier;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0Properties;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0UserInfoService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.backoffice.Auth0OnlyDustBackofficeAuthenticationService;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationFilter;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
+import onlydust.com.marketplace.project.domain.port.input.GithubUserPermissionsFacadePort;
+import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
+import onlydust.com.marketplace.user.domain.port.input.BackofficeUserFacadePort;
 
 @Configuration
 @EnableWebSecurity
@@ -137,6 +144,7 @@ public class WebSecurityConfiguration {
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/github/**")).hasAuthority(USER.name())
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/technologies")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/hackathons/**")).permitAll()
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/api/v2/hackathons/**")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/ecosystems/*/contributors")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/ecosystems/*/projects")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/ecosystems/slug/**")).permitAll()
