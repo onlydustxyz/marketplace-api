@@ -498,12 +498,22 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                 .returnResult().getResponseBody().getEvents();
 
         assertThat(events)
-            .hasSize(2)
+            .hasSize(4)
             .isSortedAccordingTo(Comparator.comparing(HackathonsEventItemResponse::getStartDate).reversed())
             .usingRecursiveFieldByFieldElementComparator(RecursiveComparisonConfiguration.builder()
                 .withIgnoreAllExpectedNullFields(true)
                 .build())
             .containsExactlyInAnyOrder(
+                new HackathonsEventItemResponse()
+                    .name("ODHack begins")
+                    .subtitle("Get ready to start contributing, connecting & receiving rewards!")
+                    .iconSlug("ri-calendar-line")
+                    .links(List.of()),
+                new HackathonsEventItemResponse()
+                    .name("ODHack finishes")
+                    .subtitle("All tasks should have been completed, now maintainers will review final work.")
+                    .iconSlug("ri-calendar-line")
+                    .links(List.of()),
                 new HackathonsEventItemResponse()
                     .name("Event 1")
                     .subtitle("Event 1 is awesome")
