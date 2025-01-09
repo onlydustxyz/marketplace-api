@@ -5,13 +5,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -56,7 +55,7 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                 .id(Hackathon.Id.random())
                 .title("Hackathon 1")
                 .startDate(startDate)
-                .endDate(startDate.plusDays(1))
+                .endDate(startDate.plusDays(7))
                 .description("Description 1")
                 .status(Hackathon.Status.PUBLISHED)
                 .build();
@@ -69,8 +68,8 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                 .name("Event 1")
                 .subtitle("Event 1 is awesome")
                 .iconSlug("icon1")
-                .startDate(startDate.plusHours(1))
-                .endDate(startDate.plusHours(2))
+                .startDate(startDate.plusDays(1))
+                .endDate(startDate.plusDays(2))
                 .links(Set.of(NamedLink.builder().url("https://www.foo.bar").value("Foo").build()))
                 .build());
         hackathon1.events().add(Hackathon.Event.builder()
@@ -78,8 +77,8 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                 .name("Event 2")
                 .subtitle("Event 2 is awesome")
                 .iconSlug("icon2")
-                .startDate(startDate.plusHours(2))
-                .endDate(startDate.plusHours(3))
+                .startDate(startDate.plusDays(2))
+                .endDate(startDate.plusDays(3))
                 .links(Set.of(NamedLink.builder().url("https://www.foo2.bar").value("Foo2").build()))
                 .build());
 
@@ -152,7 +151,7 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                           ],
                           "location": null,
                           "startDate": "2024-04-19T00:00:00Z",
-                          "endDate": "2024-04-20T00:00:00Z",
+                          "endDate": "2024-04-26T00:00:00Z",
                           "projects": [
                             {
                               "id": "c6940f66-d64e-4b29-9a7f-07abf5c3e0ed",
@@ -208,8 +207,8 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                               "name": "Event 1",
                               "subtitle": "Event 1 is awesome",
                               "iconSlug": "icon1",
-                              "startDate": "2024-04-19T01:00:00Z",
-                              "endDate": "2024-04-19T02:00:00Z",
+                              "startDate": "2024-04-20T00:00:00Z",
+                              "endDate": "2024-04-21T00:00:00Z",
                               "links": [
                                 {
                                   "url": "https://www.foo.bar",
@@ -221,8 +220,8 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                               "name": "Event 2",
                               "subtitle": "Event 2 is awesome",
                               "iconSlug": "icon2",
-                              "startDate": "2024-04-19T02:00:00Z",
-                              "endDate": "2024-04-19T03:00:00Z",
+                              "startDate": "2024-04-21T00:00:00Z",
+                              "endDate": "2024-04-22T00:00:00Z",
                               "links": [
                                 {
                                   "url": "https://www.foo2.bar",
@@ -356,7 +355,7 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                               ],
                               "location": null,
                               "startDate": "2024-04-19T00:00:00Z",
-                              "endDate": "2024-04-20T00:00:00Z",
+                              "endDate": "2024-04-26T00:00:00Z",
                               "projects": [
                                 {
                                   "id": "c6940f66-d64e-4b29-9a7f-07abf5c3e0ed",
@@ -484,5 +483,93 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
             .hasSize(1)
             .extracting(ProjectShortResponseV2::getId)
             .containsOnly(projectId2.value());
+    }
+
+    @Test
+    @Order(30)
+    void should_get_hackathon_events() {
+        // When
+        final var events = client.get()
+                .uri(getApiURI(HACKATHONS_BY_SLUG_EVENTS.formatted(hackathon1.slug())))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(HackathonEventsResponse.class)
+                .returnResult().getResponseBody().getEvents();
+
+        assertThat(events)
+            .hasSize(4)
+            .isSortedAccordingTo(Comparator.comparing(HackathonsEventItemResponse::getStartDate).reversed())
+            .usingRecursiveFieldByFieldElementComparator(RecursiveComparisonConfiguration.builder()
+                .withIgnoreAllExpectedNullFields(true)
+                .build())
+            .containsExactlyInAnyOrder(
+                new HackathonsEventItemResponse()
+                    .name("ODHack begins")
+                    .subtitle("Get ready to start contributing, connecting & receiving rewards!")
+                    .iconSlug("ri-calendar-line")
+                    .links(List.of()),
+                new HackathonsEventItemResponse()
+                    .name("ODHack finishes")
+                    .subtitle("All tasks should have been completed, now maintainers will review final work.")
+                    .iconSlug("ri-calendar-line")
+                    .links(List.of()),
+                new HackathonsEventItemResponse()
+                    .name("Event 1")
+                    .subtitle("Event 1 is awesome")
+                    .iconSlug("icon1")
+                    .links(List.of(new SimpleLink().url("https://www.foo.bar").value("Foo"))),
+                new HackathonsEventItemResponse()
+                    .name("Event 2")
+                    .subtitle("Event 2 is awesome")
+                    .iconSlug("icon2")
+                    .links(List.of(new SimpleLink().url("https://www.foo2.bar").value("Foo2")))
+            );
+    }
+
+
+    @Test
+    @Order(30)
+    void should_filter_hackathon_events_by_date() {
+        // Given
+        final var midHackathon = hackathon1.startDate().plusDays(3).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        {
+            // When
+            final var events = client.get()
+                .uri(getApiURI(HACKATHONS_BY_SLUG_EVENTS.formatted(hackathon1.slug()), Map.of("fromDate", midHackathon)))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(HackathonEventsResponse.class)
+                .returnResult().getResponseBody().getEvents();
+
+            assertThat(events)
+                .hasSize(2)
+                .isSortedAccordingTo(Comparator.comparing(HackathonsEventItemResponse::getStartDate).reversed())
+                .extracting(HackathonsEventItemResponse::getName)
+                .containsExactlyInAnyOrder("Event 2", "ODHack finishes");
+        }
+
+
+        {
+            // When
+            final var events = client.get()
+                .uri(getApiURI(HACKATHONS_BY_SLUG_EVENTS.formatted(hackathon1.slug()), Map.of("toDate", midHackathon)))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(HackathonEventsResponse.class)
+                .returnResult().getResponseBody().getEvents();
+
+            assertThat(events)
+                .hasSize(3)
+                .isSortedAccordingTo(Comparator.comparing(HackathonsEventItemResponse::getStartDate).reversed())
+                .extracting(HackathonsEventItemResponse::getName)
+                .containsExactlyInAnyOrder("Event 1", "ODHack begins", "Event 2");
+        }
     }
 }

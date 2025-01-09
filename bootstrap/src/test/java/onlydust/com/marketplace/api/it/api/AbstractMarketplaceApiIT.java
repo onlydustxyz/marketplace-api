@@ -192,6 +192,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String HACKATHONS_BY_SLUG = "/api/v1/hackathons/slug/%s";
     protected static final String HACKATHONS_V2_BY_SLUG = "/api/v2/hackathons/slug/%s";
     protected static final String HACKATHONS_BY_SLUG_PROJECTS = "/api/v1/hackathons/slug/%s/projects";
+    protected static final String HACKATHONS_BY_SLUG_EVENTS = "/api/v1/hackathons/slug/%s/events";
     protected static final String HACKATHON_BY_ID_PROJECT_ISSUES = "/api/v1/hackathons/%s/project-issues";
     protected static final String USER_LANGUAGES = "/api/v1/users/%d/languages";
     protected static final String USER_ECOSYSTEMS = "/api/v1/users/%d/ecosystems";
