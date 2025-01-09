@@ -16,10 +16,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.api.contract.model.EcosystemLinkResponse;
-import onlydust.com.marketplace.api.contract.model.ProjectCategoryResponse;
-import onlydust.com.marketplace.api.contract.model.ProjectShortResponseV2;
-import onlydust.com.marketplace.api.contract.model.ProjectTag;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.model.LanguageWithLineCount;
 
 @NoArgsConstructor(force = true)
@@ -46,6 +43,8 @@ public class ProjectPageV2ItemQueryEntity {
     List<ProjectTag> tags;
     @JdbcTypeCode(SqlTypes.ARRAY)
     @NonNull List<EcosystemLinkResponse> ecosystems;
+    Integer odHackIssueCount;
+    Integer odHackAvailableIssueCount;
 
     private List<ProjectCategoryResponse> categories() {
         return categories == null ? List.of() : categories.stream().sorted(comparing(ProjectCategoryResponse::getName)).toList();
@@ -64,6 +63,13 @@ public class ProjectPageV2ItemQueryEntity {
                 .goodFirstIssueCount(goodFirstIssueCount)
                 .forkCount(forkCount)
                 .contributorCount(contributorCount)
-                .ecosystems(ecosystems);
+                .ecosystems(ecosystems)
+                .odHackStats(odHackStats());
+    }
+
+    private ProjectShortResponseV2OdHackStats odHackStats() {
+        return odHackIssueCount == null || odHackAvailableIssueCount == null ? null : new ProjectShortResponseV2OdHackStats()
+                .issueCount(odHackIssueCount)
+                .availableIssueCount(odHackAvailableIssueCount);
     }
 }
