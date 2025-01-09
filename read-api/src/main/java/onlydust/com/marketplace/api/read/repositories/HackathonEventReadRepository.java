@@ -53,8 +53,8 @@ public interface HackathonEventReadRepository extends Repository<HackathonEventR
                             from custom_events)
         select *
         from all_events e
-        where (cast(:fromDate as timestamptz) is null or e.start_at >= cast(:fromDate as timestamptz))
-        and (cast(:toDate as timestamptz) is null or e.end_at < cast(:toDate as timestamptz))
+        where (cast(:fromDate as timestamptz) is null or e.end_at >= cast(:fromDate as timestamptz))
+        and (cast(:toDate as timestamptz) is null or e.start_at <= cast(:toDate as timestamptz))
         order by e.start_at desc
         """, nativeQuery = true)
     List<HackathonEventReadEntity> findHackathonEvents(String hackathonSlug, ZonedDateTime fromDate, ZonedDateTime toDate);
