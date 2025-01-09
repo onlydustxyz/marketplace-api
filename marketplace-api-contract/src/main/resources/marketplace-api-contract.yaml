@@ -9392,7 +9392,11 @@ components:
             githubAppInstallationPermissionsUpdateUrl:
               type: string
               format: uri
-
+            project:
+              $ref: '#/components/schemas/ProjectLinkResponse'
+            hackathon:
+              $ref: '#/components/schemas/HackathonLinkResponse'
+              
     GithubIssuePageItemResponse:
       allOf:
         - $ref: '#/components/schemas/GithubIssueLinkResponse'
@@ -11916,22 +11920,12 @@ components:
               items:
                 $ref: '#/components/schemas/HackathonsEventItemResponse'
 
-    HackathonResponseV2:
+    HackathonLinkResponse:
       type: object
       required:
         - id
         - slug
         - title
-        - description
-        - location
-        - startDate
-        - endDate
-        - projectCount
-        - subscriberCount
-        - issueCount
-        - availableIssueCount
-        - communityLinks
-        - links
       properties:
         id:
           $ref: '#/components/schemas/HackathonId'
@@ -11939,32 +11933,49 @@ components:
           $ref: '#/components/schemas/HackathonSlug'
         title:
           type: string
-        description:
-          type: string
-        location:
-          type: string
-        startDate:
-          type: string
-          format: date-time
-        endDate:
-          type: string
-          format: date-time
-        projectCount:
-          type: integer
-        subscriberCount:
-          type: integer
-        issueCount:
-          type: integer
-        availableIssueCount:
-          type: integer
-        communityLinks:
-          type: array
-          items:
-            $ref: '#/components/schemas/SimpleLink'
-        links:
-          type: array
-          items:
-            $ref: '#/components/schemas/SimpleLink'
+
+    HackathonResponseV2:
+      allOf:
+        - $ref: '#/components/schemas/HackathonLinkResponse'
+        - type: object
+          required:
+            - description
+            - location
+            - startDate
+            - endDate
+            - projectCount
+            - subscriberCount
+            - issueCount
+            - availableIssueCount
+            - communityLinks
+            - links
+          properties:
+            description:
+              type: string
+            location:
+              type: string
+            startDate:
+              type: string
+              format: date-time
+            endDate:
+              type: string
+              format: date-time
+            projectCount:
+              type: integer
+            subscriberCount:
+              type: integer
+            issueCount:
+              type: integer
+            availableIssueCount:
+              type: integer
+            communityLinks:
+              type: array
+              items:
+                $ref: '#/components/schemas/SimpleLink'
+            links:
+              type: array
+              items:
+                $ref: '#/components/schemas/SimpleLink'
 
     HackathonEventsResponse:
       type: object

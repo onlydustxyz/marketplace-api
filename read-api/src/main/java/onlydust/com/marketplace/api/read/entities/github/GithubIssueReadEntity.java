@@ -1,5 +1,13 @@
 package onlydust.com.marketplace.api.read.entities.github;
 
+import java.net.URI;
+import java.time.ZonedDateTime;
+import java.util.*;
+
+import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -12,18 +20,9 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposit
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
-
-import java.net.URI;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
@@ -147,7 +146,14 @@ public class GithubIssueReadEntity {
                 .labels(labels.stream().map(GithubLabelReadEntity::toDto).toList())
                 .applicants(applications.stream().map(ApplicationReadEntity::applicant).map(AllUserReadEntity::toGithubUserResponse).toList())
                 .assignees(assignees.stream().map(AllUserReadEntity::toGithubUserResponse).toList())
-                .languages(repo.languages().stream().distinct().map(LanguageReadEntity::toDto).toList());
+                .languages(repo.languages().stream().distinct().map(LanguageReadEntity::toDto).toList())
+                .project(repo.projects().stream().findFirst().map(ProjectLinkReadEntity::toLinkResponse).orElse(null))
+                .hackathon(hackathons.stream()
+                        .filter(HackathonReadEntity::isPublished)
+                        .sorted(Comparator.comparing(HackathonReadEntity::startDate).reversed())
+                        .findFirst()
+                        .map(HackathonReadEntity::toLinkResponse)
+                        .orElse(null));
 
         if (asProjectLead) {
             final var installationStatus = map(repo.owner().installation().map(GithubAppInstallationViewEntity::getStatus).orElse(null));

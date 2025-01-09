@@ -1,15 +1,26 @@
 package onlydust.com.marketplace.api.it.api;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
+import java.time.ZonedDateTime;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.project.domain.model.Hackathon;
 
 public class IssuesApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_return_issue_by_id() {
         final var olivier = userAuthHelper.authenticateOlivier();
+
+        final var hackathonId = hackathonHelper.createHackathon(Hackathon.Status.PUBLISHED, List.of("od-label"),
+                List.of(ProjectId.of("7d04163c-4187-4313-8066-61504d34fc56")));
+
+        githubHelper.addLabelToIssue(1952203217L, "od-label", ZonedDateTime.now());
 
         // When
         client.get()
@@ -20,6 +31,9 @@ public class IssuesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.hackathon.id").isEqualTo(hackathonId.toString())
+                .jsonPath("$.hackathon.title").isNotEmpty()
+                .jsonPath("$.hackathon.slug").isNotEmpty()
                 .json("""
                         {
                           "id": 1952203217,
@@ -45,12 +59,20 @@ public class IssuesApiIT extends AbstractMarketplaceApiIT {
                           "closedAt": "2023-10-19T12:59:46Z",
                           "body": "aaaa",
                           "commentCount": 0,
-                          "labels": [],
+                          "labels": [{
+                            "name": "od-label"
+                          }],
                           "applicants": [],
                           "assignees": [],
                           "languages": [],
                           "githubAppInstallationStatus": null,
-                          "githubAppInstallationPermissionsUpdateUrl": null
+                          "githubAppInstallationPermissionsUpdateUrl": null,
+                          "project": {
+                            "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                            "slug": "bretzel",
+                            "name": "Bretzel",
+                            "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                          }
                         }
                         """);
     }
