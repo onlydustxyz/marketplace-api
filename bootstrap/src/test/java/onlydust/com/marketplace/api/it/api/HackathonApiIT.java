@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -14,8 +15,7 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import onlydust.com.marketplace.api.contract.model.HackathonResponseV2;
-import onlydust.com.marketplace.api.contract.model.SimpleLink;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
@@ -41,6 +41,10 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
     static Hackathon.Id hackathonId2;
     static Hackathon.Id hackathonId3;
 
+    static ProjectId projectId1 = ProjectId.of("8156fc5f-cec5-4f70-a0de-c368772edcd4");
+    static ProjectId projectId2 = ProjectId.of("7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54");
+    static ProjectId projectId3 = ProjectId.of("c6940f66-d64e-4b29-9a7f-07abf5c3e0ed");
+
     @BeforeEach
     void setUp() {
         olivier = userAuthHelper.authenticateOlivier();
@@ -59,9 +63,7 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
         hackathon1.githubLabels().addAll(List.of("label1", "label2"));
         hackathon1.communityLinks().add(NamedLink.builder().url("https://www.foo.bar").value("Foo").build());
         hackathon1.links().add(NamedLink.builder().url("https://www.google.com").value("Google").build());
-        hackathon1.projectIds().addAll(List.of(UUID.fromString("8156fc5f-cec5-4f70-a0de-c368772edcd4"),
-                UUID.fromString("7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54"),
-                UUID.fromString("c6940f66-d64e-4b29-9a7f-07abf5c3e0ed")));
+        hackathon1.projectIds().addAll(List.of(projectId1.value(), projectId2.value(), projectId3.value()));
         hackathon1.events().add(Hackathon.Event.builder()
                 .id(UUID.randomUUID())
                 .name("Event 1")
@@ -102,9 +104,9 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
         hackathon1.githubLabels().add("label1");
         hackathon1.communityLinks().add(NamedLink.builder().url("https://www.foo.bar").value("Bar").build());
         hackathon3.links().add(NamedLink.builder().url("https://www.foo.org").value("Foo").build());
-        hackathon3.projectIds().add(UUID.fromString("8156fc5f-cec5-4f70-a0de-c368772edcd4"));
+        hackathon3.projectIds().add(projectId1.value());
 
-        final var repo = githubHelper.createRepo(ProjectId.of(hackathon1.projectIds().stream().findFirst().orElseThrow()));
+        final var repo = githubHelper.createRepo(projectId2);
         final var labelId = githubHelper.createLabel("label1");
         // 3 available issues
         IntStream.range(0, 3).forEach(i -> {
@@ -438,5 +440,49 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
             .containsExactlyInAnyOrderElementsOf(hackathon1.links().stream()
                     .map(NamedLink::getUrl)
                     .toList());
+    }
+
+    @Test
+    @Order(30)
+    void should_get_hackathon_projects() {
+        // When
+        final var projects = client.get()
+                .uri(getApiURI(HACKATHONS_BY_SLUG_PROJECTS.formatted(hackathon1.slug())))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(ProjectPageResponseV2.class)
+                .returnResult().getResponseBody().getProjects();
+
+        assertThat(projects)
+            .hasSize(hackathon1.projectIds().size())
+            .extracting(ProjectShortResponseV2::getId)
+            .containsExactlyInAnyOrderElementsOf(hackathon1.projectIds());
+
+        assertThat(projects.stream().filter(p -> p.getId().equals(projectId2.value())).findFirst().orElseThrow().getOdHackStats())
+            .usingRecursiveComparison()
+            .isEqualTo(new ProjectShortResponseV2OdHackStats()
+                    .issueCount(5)
+                    .availableIssueCount(3));
+    }
+
+    @Test
+    @Order(30)
+    void should_get_hackathon_projects_with_available_issues() {
+        // When
+        final var projects = client.get()
+                .uri(getApiURI(HACKATHONS_BY_SLUG_PROJECTS.formatted(hackathon1.slug()), Map.of("hasAvailableIssues", "true")))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(ProjectPageResponseV2.class)
+                .returnResult().getResponseBody().getProjects();
+
+        assertThat(projects)
+            .hasSize(1)
+            .extracting(ProjectShortResponseV2::getId)
+            .containsOnly(projectId2.value());
     }
 }
