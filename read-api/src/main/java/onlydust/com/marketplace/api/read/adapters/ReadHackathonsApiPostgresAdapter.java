@@ -3,6 +3,8 @@ package onlydust.com.marketplace.api.read.adapters;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.read.cache.Cache.S;
 import static onlydust.com.marketplace.api.read.cache.Cache.XS;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static org.springframework.http.ResponseEntity.ok;
 
 import java.util.List;
@@ -24,6 +26,7 @@ import onlydust.com.marketplace.api.read.cache.Cache;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonItemReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonProjectIssuesReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectPageV2ItemQueryEntity;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
@@ -40,6 +43,7 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
     private final LanguageReadRepository languageReadRepository;
     private final HackathonItemReadRepository hackathonItemReadRepository;
     private final HackathonV2ReadRepository hackathonV2ReadRepository;
+    private final ProjectsPageV2Repository projectsPageV2Repository;
 
     @Override
     public ResponseEntity<HackathonsDetailsResponse> getHackathonBySlug(String hackathonSlug) {
@@ -56,6 +60,33 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
                 .orElseThrow(() -> OnlyDustException.notFound("Hackathon not found for slug %s".formatted(hackathonSlug)));
         return ok()
                 .body(hackathon.toResponse());
+    }
+
+    @Override
+    public ResponseEntity<ProjectPageResponseV2> getHackathonProjects(
+        String hackathonSlug,
+        Integer pageIndex,
+        Integer pageSize,
+        String search,
+        List<UUID> languageIds,
+        List<UUID> ecosystemIds,
+        Boolean hasAvailableIssues
+    ) {       
+        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
+        final var sanitizedPageSize = sanitizePageSize(pageSize);
+        final var page = projectsPageV2Repository.findHackathonProjects(hackathonSlug, 
+            isNull(languageIds) ? null : languageIds.stream().distinct().toArray(UUID[]::new),
+            isNull(ecosystemIds) ? null : ecosystemIds.stream().distinct().toArray(UUID[]::new),
+            hasAvailableIssues,
+            search,
+            PageRequest.of(sanitizedPageIndex, sanitizedPageSize));
+
+        return ok()
+                .body(new ProjectPageResponseV2()
+                        .projects(page.getContent().stream().map(ProjectPageV2ItemQueryEntity::toShortResponse).toList())
+                        .totalPageNumber(page.getTotalPages())
+                        .totalItemNumber((int) page.getTotalElements())
+                        .hasMore(page.hasNext()));
     }
 
     @Override

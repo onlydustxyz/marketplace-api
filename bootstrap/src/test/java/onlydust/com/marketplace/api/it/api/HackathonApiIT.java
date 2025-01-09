@@ -15,6 +15,8 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import onlydust.com.marketplace.api.contract.model.HackathonResponseV2;
+import onlydust.com.marketplace.api.contract.model.ProjectPageResponseV2;
+import onlydust.com.marketplace.api.contract.model.ProjectShortResponseV2;
 import onlydust.com.marketplace.api.contract.model.SimpleLink;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
@@ -438,5 +440,25 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
             .containsExactlyInAnyOrderElementsOf(hackathon1.links().stream()
                     .map(NamedLink::getUrl)
                     .toList());
+    }
+
+
+    @Test
+    @Order(30)
+    void should_get_hackathon_projects() {
+        // When
+        final var projects = client.get()
+                .uri(getApiURI(HACKATHONS_BY_SLUG_PROJECTS.formatted(hackathon1.slug())))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(ProjectPageResponseV2.class)
+                .returnResult().getResponseBody().getProjects();
+
+        assertThat(projects)
+            .hasSize(hackathon1.projectIds().size())
+            .extracting(ProjectShortResponseV2::getId)
+            .containsExactlyInAnyOrderElementsOf(hackathon1.projectIds());
     }
 }
