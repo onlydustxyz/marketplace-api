@@ -1,5 +1,18 @@
 package onlydust.com.marketplace.api.read.entities.hackathon;
 
+import static java.util.Objects.isNull;
+
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.*;
+
+import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import org.hibernate.type.SqlTypes;
+
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -10,25 +23,10 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.HackathonStatus;
 import onlydust.com.backoffice.api.contract.model.HackathonsEvent;
-import onlydust.com.marketplace.api.contract.model.HackathonsDetailsResponse;
-import onlydust.com.marketplace.api.contract.model.HackathonsEventItemResponse;
-import onlydust.com.marketplace.api.contract.model.ProjectShortResponse;
-import onlydust.com.marketplace.api.contract.model.SimpleLink;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
-import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
-import org.hibernate.type.SqlTypes;
-
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.*;
-
-import static java.util.Objects.isNull;
 
 @Entity
 @NoArgsConstructor(force = true)
@@ -129,6 +127,16 @@ public class HackathonReadEntity {
                         .toList());
     }
 
+    public HackathonLinkResponse toLinkResponse() {
+        return new HackathonLinkResponse()
+                .id(this.id)
+                .slug(this.slug)
+                .title(this.title);
+    }
+
+    public boolean isPublished() {
+        return this.status == Hackathon.Status.PUBLISHED;
+    }
 
     public onlydust.com.backoffice.api.contract.model.HackathonsDetailsResponse toBoResponse() {
         return new onlydust.com.backoffice.api.contract.model.HackathonsDetailsResponse()

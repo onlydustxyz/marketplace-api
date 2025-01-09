@@ -15,6 +15,7 @@ import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
+import onlydust.com.marketplace.project.domain.model.NamedLink;
 
 @Service
 public class HackathonHelper {
@@ -42,7 +43,7 @@ public class HackathonHelper {
         parameters.put("endDate", endDate);
         parameters.put("index", faker.random().nextInt(0, 1000000));
         parameters.put("githubLabels", "{" + String.join("\",", labels) + "}");
-        parameters.put("links", new ObjectMapper().writeValueAsString(List.of(faker.internet().url())));
+        parameters.put("links", new ObjectMapper().writeValueAsString(List.of(new NamedLink(faker.internet().url(), "link"))));
 
         databaseHelper.executeQuery(
                 """
