@@ -3064,6 +3064,59 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/UserId'
+        overview:
+          type: string
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/SimpleLink'
+        documentations:
+          type: array
+          items:
+            $ref: '#/components/schemas/BoEcosystemDocumentation'
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/BoEcosystemEvent'
+
+    BoEcosystemDocumentation:
+      type: object
+      required:
+        - name
+        - url
+        - description
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        description:
+          type: string
+
+    BoEcosystemEvent:
+      type: object
+      required:
+        - name
+        - description
+        - location
+        - startDate
+        - endDate
+        - link
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        location:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        link:
+          $ref: '#/components/schemas/SimpleLink'
 
     EcosystemLinkResponse:
       type: object
@@ -3126,9 +3179,27 @@ components:
         - type: object
           required:
             - description
+            - overview
+            - links
+            - documentations
+            - events
           properties:
             description:
               type: string
+            overview:
+              type: string
+            links:
+              type: array
+              items:
+                $ref: '#/components/schemas/SimpleLink'
+            documentations:
+              type: array
+              items:
+                $ref: '#/components/schemas/BoEcosystemDocumentation'
+            events:
+              type: array
+              items:
+                $ref: '#/components/schemas/BoEcosystemEvent'
 
     UpdateInvoiceStatusRequest:
       type: object
