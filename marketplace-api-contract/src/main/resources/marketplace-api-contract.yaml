@@ -5098,10 +5098,12 @@ paths:
         - $ref: '#/components/parameters/pageSizeParam'
         - $ref: '#/components/parameters/searchParam'
         - in: query
-          name: type
+          name: types
           required: false
           schema:
-            $ref: '#/components/schemas/ContributorType'
+            type: array
+            items:
+              $ref: '#/components/schemas/MemberType'
 
       responses:
         "200":
@@ -12793,8 +12795,8 @@ components:
         - CONTRIBUTOR
         - MAINTAINER
 
-    ContributorType:
-      description: Type of contributor.
+    MemberType:
+      description: Type of member.
       type: string
       enum:
         - CONTRIBUTOR
