@@ -569,7 +569,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
     @Override
     public ResponseEntity<ProjectPageResponseV2> getProjectsV2(Integer pageIndex, Integer pageSize, List<ProjectTag> tags, List<UUID> ecosystemIds,
-                                                               List<UUID> languageIds, List<UUID> categoryIds) {
+                                                               List<UUID> languageIds, List<UUID> categoryIds, String search) {
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
         final var projects = projectsPageV2Repository.findAll(

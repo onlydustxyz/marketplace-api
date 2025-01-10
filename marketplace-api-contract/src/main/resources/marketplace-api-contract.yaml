@@ -2300,6 +2300,7 @@ paths:
         - $ref: '#/components/parameters/projectCategoryIdsParam'
         - $ref: '#/components/parameters/pageIndexParam'
         - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'List of projects'
