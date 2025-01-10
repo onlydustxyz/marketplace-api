@@ -4862,6 +4862,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
   /api/v1/ecosystems/{ecosystemSlug}/contributors:
     get:
       security:
@@ -4963,6 +4964,151 @@ paths:
                 $ref: '#/components/schemas/EcosystemDetailsResponse'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
+  /api/v2/ecosystems/{slug}:
+    get:
+      security:
+        - { }
+      tags:
+        - ReadEcosystems
+      summary: Get ecosystem details by slug
+      operationId: getEcosystemV2
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            $ref: '#/components/schemas/EcosystemSlug'
+      responses:
+        "200":
+          description: 'Ecosystem details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcosystemResponseV2'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/ecosystems/{slug}/events:
+    get:
+      security:
+        - { }
+      tags:
+        - ReadEcosystems
+      summary: Get ecosystem events
+      operationId: getEcosystemEvents
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            $ref: '#/components/schemas/EcosystemSlug'
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
+      responses:
+        "200":
+          description: 'Ecosystem events'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcosystemEventsListResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/ecosystems/{slug}/documentations:
+    get:
+      security:
+        - { }
+      tags:
+        - ReadEcosystems
+      summary: Get ecosystem documentations
+      operationId: getEcosystemDocumentations
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            $ref: '#/components/schemas/EcosystemSlug'
+      responses:
+        "200":
+          description: 'Ecosystem documentations'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcosystemDocumentationListResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v2/ecosystems/{slug}/projects:
+    get:
+      security:
+        - { }
+      tags:
+        - ReadEcosystems
+      summary: Get ecosystem projects
+      operationId: getEcosystemProjectsV2
+      description: |
+        Get ecosystem projects
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            $ref: '#/components/schemas/EcosystemSlug'
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/searchParam'
+        - $ref: '#/components/parameters/languageIdsParam'
+        - $ref: '#/components/parameters/projectCategoryIdsParam'
+        - in: query
+          name: hasAvailableIssues
+          description: Filter by projects with available issues
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: 'Ecosystem projects'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectPageResponseV2'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v2/ecosystems/{slug}/contributors:
+    get:
+      security:
+        - { }
+      tags:
+        - ReadEcosystems
+      summary: Get ecosystem contributors
+      operationId: getEcosystemContributorsV2
+      description: |
+        Get ecosystem contributors
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            $ref: '#/components/schemas/EcosystemSlug'
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/searchParam'
+        - in: query
+          name: type
+          required: false
+          schema:
+            $ref: '#/components/schemas/ContributorType'
+
+      responses:
+        "200":
+          description: 'Ecosystem contributors'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContributorsPageResponseV2'
 
   /api/v1/ecosystems/slug/{slug}/languages:
     get:
@@ -7726,6 +7872,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ContributionUuid'
+            assignedIssues:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContributionUuid'
             rewards:
               type: array
               items:
@@ -8394,7 +8544,6 @@ components:
         - slug
         - name
         - description
-        - topProjects
         - banners
       properties:
         id:
@@ -8469,6 +8618,87 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/EcosystemArticle'
+
+    EcosystemEventsListResponse:
+      type: object
+      required:
+        - events
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemEventResponse'
+
+    EcosystemResponseV2:
+      allOf:
+        - $ref: '#/components/schemas/EcosystemShortResponse'
+        - type: object
+          required:
+            - overview
+            - languages
+            - links
+            - starCount
+            - forkCount
+            - projectCount
+            - contributorCount
+            - availableIssueCount
+            - mergedPrCount
+          properties:
+            overview:
+              type: string
+              description: Overview of the ecosystem
+            languages:
+              type: array
+              items:
+                $ref: '#/components/schemas/LanguageWithPercentageResponse'
+            links:
+              type: array
+              items:
+                $ref: '#/components/schemas/SimpleLink'
+            starCount:
+              type: integer
+              description: Number of stars of repositories in the ecosystem
+            forkCount:
+              type: integer
+              description: Number of forks of repositories in the ecosystem
+            contributorCount:
+              type: integer
+              description: Number of contributors in the ecosystem
+            availableIssueCount:
+              type: integer
+              description: Number of available issues in the ecosystem
+            mergedPrCount:
+              type: integer
+              description: Number of merged pull requests in the ecosystem
+            projectCount:
+              type: integer
+              description: Number of active projects in the ecosystem
+
+    EcosystemEventResponse:
+      type: object
+      required:
+        - name
+        - description
+        - location
+        - startDate
+        - endDate
+        - link
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        location:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        link:
+          $ref: '#/components/schemas/SimpleLink'
+
 
     EcosystemArticle:
       type: object
@@ -10382,6 +10612,30 @@ components:
         url:
           type: string
         value:
+          type: string
+
+    EcosystemDocumentationListResponse:
+      type: object
+      required:
+        - documentations
+      properties:
+        documentations:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemDocumentationResponse'
+
+    EcosystemDocumentationResponse:
+      type: object
+      required:
+        - name
+        - description
+        - url
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        url:
           type: string
 
     GithubUserListResponse:
@@ -12533,6 +12787,13 @@ components:
 
     UserJoiningReason:
       description: Reason why the user has chosen to join OnlyDust.
+      type: string
+      enum:
+        - CONTRIBUTOR
+        - MAINTAINER
+
+    ContributorType:
+      description: Type of contributor.
       type: string
       enum:
         - CONTRIBUTOR
